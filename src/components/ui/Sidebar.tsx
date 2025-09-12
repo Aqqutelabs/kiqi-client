@@ -59,7 +59,7 @@ const navigation: (NavHeading | NavLinkItem | NavAction)[] = [
   { type: 'link', href: '/dashboard/contacts', label: 'Contacts', icon: Contact },
 
   { type: 'heading', label: 'Campaigns' },
-  { type: 'link', href: '/dashboard/email-campaigns', label: 'Email Campaigns', icon: Mail },
+  { type: 'link', href: '/email-campaigns/lists', label: 'Email Campaigns', icon: Mail },
   { type: 'link', href: '/dashboard/sms', label: 'SMS', icon: SmsIcon },
   { type: 'link', href: '/dashboard/social-media', label: 'Social Media', icon: Share2 },
   { type: 'link', href: '/dashboard/analytics', label: 'Analytics', icon: BarChart3 },

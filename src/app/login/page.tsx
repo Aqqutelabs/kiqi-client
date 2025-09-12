@@ -26,9 +26,12 @@ const LoginPage = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget as HTMLFormElement);
-    const credentials = Object.fromEntries(formData.entries());
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    const credentials = { email, password };
     dispatch(loginUser(credentials)).then((result) => {
         if (loginUser.fulfilled.match(result)) {
+          
             router.push('/dashboard');
         }
     });

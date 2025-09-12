@@ -1,4 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import apiClient from '@/lib/utils/apiClient';
+import BASE_URL from '@/lib/utils/baseUrl';
 
 // This is a mock API call function. Replace with your actual API logic.
 const apiLogin = async (credentials: any) => {
@@ -11,11 +13,35 @@ const apiLogin = async (credentials: any) => {
   }
 };
 
+interface RegisterPayload {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  organizationName: string;
+}
+
+interface RegisteredUser {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  organizationName: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface AuthState {
-  user: { name: string; email: string } | null;
+  user: { name: string; email: string } | RegisteredUser | null;
   token: string | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
+  registration: {
+    status: 'idle' | 'loading' | 'succeeded' | 'failed';
+    error: string | null;
+    data: RegisteredUser | null;
+    message: string | null;
+  };
 }
 
 const initialState: AuthState = {
@@ -23,17 +49,61 @@ const initialState: AuthState = {
   token: null,
   status: 'idle',
   error: null,
+  registration: {
+    status: 'idle',
+    error: null,
+    data: null,
+    message: null,
+  },
 };
 
-export const loginUser = createAsyncThunk('auth/loginUser', async (credentials: any, { rejectWithValue }) => {
+export const loginUser = createAsyncThunk('auth/loginUser', async (credentials: { email: string; password: string }, { rejectWithValue }) => {
     try {
-        const response = await apiLogin(credentials);
-        return response;
+        const response = await apiClient.post(`${BASE_URL}/auth/login`, credentials);
+        // No response.success in your backend, so just check for accessToken
+        if (!response.accessToken) {
+            return rejectWithValue(response.message || 'Login failed');
+        }
+        return {
+            user: { email: credentials.email }, // You can expand this if backend returns more user info
+            token: response.accessToken,
+            refreshToken: response.refreshToken,
+            message: response.message,
+        };
     } catch (error: any) {
-        return rejectWithValue(error.message);
+        let message = error.message || 'Login failed';
+        try {
+            const errObj = JSON.parse(message);
+            message = errObj.message || message;
+        } catch {}
+        return rejectWithValue(message);
     }
 });
 
+export const registerUser = createAsyncThunk(
+  'auth/registerUser',
+  async (payload: RegisterPayload, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.post(`${BASE_URL}/auth/register`, payload);
+      if (response.error) {
+        return rejectWithValue(response.message || 'Registration failed');
+      }
+      // Store token if present
+      return {
+        data: response.data,
+        message: response.message,
+        token: response.accessToken,
+      };
+    } catch (error: any) {
+      let message = error.message || 'Registration failed';
+      try {
+        const errObj = JSON.parse(message);
+        message = errObj.message || message;
+      } catch {}
+      return rejectWithValue(message);
+    }
+  }
+);
 
 const authSlice = createSlice({
   name: 'auth',
@@ -43,6 +113,12 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.status = 'idle';
+      state.registration = {
+        status: 'idle',
+        error: null,
+        data: null,
+        message: null,
+      };
     },
   },
   extraReducers: (builder) => {
@@ -53,12 +129,32 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.user = action.payload.user;
+        // Always set user as { name: '', email } since backend only returns email
+        state.user = { name: '', email: action.payload.user.email };
         state.token = action.payload.token;
+        // Optionally store refreshToken if needed: state.refreshToken = action.payload.refreshToken;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload as string;
+      })
+      .addCase(registerUser.pending, (state) => {
+        state.registration.status = 'loading';
+        state.registration.error = null;
+        state.registration.data = null;
+        state.registration.message = null;
+      })
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.registration.status = 'succeeded';
+        state.registration.data = action.payload.data;
+        state.registration.message = action.payload.message;
+        if (action.payload.token) {
+          state.token = action.payload.token;
+        }
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.registration.status = 'failed';
+        state.registration.error = action.payload as string;
       });
   },
 });

@@ -1,9 +1,28 @@
 'use client'; 
 import React from 'react';
 import { Search, ChevronDown } from 'lucide-react';
-
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { logout } from '@/redux/slices/authSlice';
+import { useRouter } from 'next/navigation';
 
 const Header = () => {
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+  const user = useAppSelector(state => state.auth.user);
+  const displayName = user
+    ? ('firstName' in user && user.firstName
+        ? `${user.firstName} ${user.lastName}`
+        : 'name' in user
+          ? user.name
+          : 'User')
+    : 'User';
+  const email = user ? user.email : '';
+
+  const handleLogout = () => {
+    dispatch(logout());
+    router.push('/');
+  };
+
   return (
     <header className="flex-shrink-0 bg-white h-16 border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 lg:px-8">
       {/* Search Bar Section */}
@@ -27,20 +46,21 @@ const Header = () => {
         <div className="flex-shrink-0">
           <img
             className="h-9 w-9 rounded-full object-cover"
-            src="https://i.pravatar.cc/150?u=obinnafestus" // Placeholder user avatar
+            src={`https://i.pravatar.cc/150?u=${email || displayName}`}
             alt="User avatar"
           />
         </div>
         <div className="hidden sm:block">
-          <div className="text-sm font-semibold text-gray-800">Obinna Festus</div>
+          <div className="text-sm font-semibold text-gray-800">{displayName}</div>
           <div className="text-xs text-gray-500">Owner</div>
         </div>
         <button
           type="button"
           className="p-1 rounded-full text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3366FF]"
           aria-haspopup="true"
+          onClick={handleLogout}
         >
-          <ChevronDown size={20} />
+          Logout
         </button>
       </div>
     </header>

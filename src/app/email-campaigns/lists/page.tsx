@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 
-import { Plus, Wand2, Filter, Search } from 'lucide-react';
+import { Plus, Wand2, Filter, Search, Mail, FileText, Users, Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -10,25 +10,55 @@ import DashboardLayout from '@/components/ui/layout/DashboardLayout';
 import { Modal } from '@/components/ui/Modal';
 import { Pagination } from '@/components/ui/Pagination';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-
-const campaignsData = [
-    // Create more mock data to fill the table (at least 12 rows)
-    { name: 'My emails', status: 'active', audience: 450, deliveries: 450, opens: 300, clicks: 40, date: '10-04-2025' },
-    { name: 'Q4 Promo', status: 'active', audience: 1250, deliveries: 1245, opens: 950, clicks: 120, date: '10-04-2025' },
-    { name: 'Newsletter Nov.', status: 'active', audience: 4500, deliveries: 4490, opens: 2100, clicks: 350, date: '10-03-2025' },
-    { name: 'BFCM Teaser', status: 'scheduled', audience: 8000, deliveries: 0, opens: 0, clicks: 0, date: '10-15-2025' },
-    //... add more for a full list
-    { name: 'Onboarding Series', status: 'completed', audience: 600, deliveries: 600, opens: 450, clicks: 95, date: '09-28-2025' },
-];
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { createEmailListWithFiles, clearCreateEmailListStatus, fetchUserEmailLists } from '@/redux/slices/campaignSlice';
 
 const TABS = ['All', 'Active', 'Scheduled', 'Completed'];
 
 const EmailCampaignsListPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('All');
+    const [form, setForm] = useState({
+        email_listName: '',
+        emails: '',
+        emailFiles: '',
+    });
+    const dispatch = useAppDispatch();
+    const {
+        createEmailListStatus,
+        createEmailListError,
+        createEmailListData,
+        userCampaigns,
+        status,
+        error
+    } = useAppSelector(state => state.campaign);
+
+    React.useEffect(() => {
+        dispatch(fetchUserEmailLists());
+    }, [dispatch]);
 
     const handleCreateCampaignClick = () => {
         setIsModalOpen(true);
+        dispatch(clearCreateEmailListStatus());
+    };
+
+    const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setForm({ ...form, [e.target.name]: e.target.value });
+    };
+
+    const handleCreateList = async (e: React.FormEvent) => {
+        e.preventDefault();
+        dispatch(createEmailListWithFiles({
+            email_listName: form.email_listName,
+            emails: form.emails.split(',').map(e => e.trim()).filter(Boolean),
+            emailFiles: form.emailFiles.split(',').map(f => f.trim()).filter(Boolean),
+        }));
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setForm({ email_listName: '', emails: '', emailFiles: '' });
+        dispatch(clearCreateEmailListStatus());
     };
 
     return (
@@ -53,7 +83,6 @@ const EmailCampaignsListPage = () => {
                                     >{tab}</button>
                                 ))}
                             </div>
-                            
                             {/* Search and Actions */}
                             <div className="flex items-center gap-2">
                                 <div className="relative flex-grow">
@@ -64,57 +93,67 @@ const EmailCampaignsListPage = () => {
                             </div>
                         </div>
                     </div>
-                    
                     {/* Table */}
                     <div className="w-full overflow-x-auto">
                         <table className="min-w-full text-sm">
                              {/* Table Head */}
-                            <thead className="text-left text-gray-600"><tr>{['Name', 'Status', 'Audience', 'Deliveries', 'Opens', 'Clicks', 'Date', 'Date'].map(h=><th key={h} className="p-3 font-medium">{h}</th>)}</tr></thead>
+                            <thead className="text-left text-gray-600"><tr>{['Name', 'Status', 'Audience', 'Deliveries', 'Opens', 'Clicks', 'Date', 'Action'].map(h=><th key={h} className="p-3 font-medium">{h}</th>)}</tr></thead>
                             <tbody className="divide-y divide-gray-100">
-                                {campaignsData.map((campaign, i) => (
-                                    <tr key={i} className="text-gray-700">
-                                        <td className="p-3 font-medium">{campaign.name}</td>
-                                        <td className="p-3"><StatusBadge variant={campaign.status as any}>{campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1)}</StatusBadge></td>
-                                        <td className="p-3">{campaign.audience}</td>
-                                        <td className="p-3">{campaign.deliveries}</td>
-                                        <td className="p-3">{campaign.opens}</td>
-                                        <td className="p-3">{campaign.clicks}</td>
-                                        <td className="p-3">{campaign.date}</td>
-                                        <td className="p-3"><Button size="sm">Add Email</Button></td>
-                                    </tr>
-                                ))}
+                                {status === 'loading' ? (
+                                    <tr><td colSpan={8} className="p-4 text-center text-gray-500">Loading...</td></tr>
+                                ) : error ? (
+                                    <tr><td colSpan={8} className="p-4 text-center text-red-500">{error}</td></tr>
+                                ) : userCampaigns && userCampaigns.length > 0 ? (
+                                    userCampaigns.map((campaign: any, i: number) => (
+                                        <tr key={campaign._id || i} className="text-gray-700">
+                                            <td className="p-3 font-medium">{campaign.email_listName}</td>
+                                            <td className="p-3"><StatusBadge variant="active">Active</StatusBadge></td>
+                                            <td className="p-3">{campaign.emails?.length || 0}</td>
+                                            <td className="p-3">{campaign.emails?.length || 0}</td>
+                                            <td className="p-3">-</td>
+                                            <td className="p-3">-</td>
+                                            <td className="p-3">{campaign.createdAt ? new Date(campaign.createdAt).toLocaleDateString() : '-'}</td>
+                                            <td className="p-3"><Button size="sm">Add Email</Button></td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr><td colSpan={8} className="p-4 text-center text-gray-500">No campaigns found.</td></tr>
+                                )}
                             </tbody>
                         </table>
                     </div>
-                    
                     {/* Pagination */}
                     <div className="p-4 border-t border-gray-200">
-                        <Pagination currentPage={1} totalPages={10} onPageChange={(p) => console.log(p)}/>
+                        <Pagination currentPage={1} totalPages={1} onPageChange={(p) => console.log(p)}/>
                     </div>
                 </Card>
             </main>
         </DashboardLayout>
-        
         {/* The Modal for creating a campaign */}
-        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <Modal isOpen={isModalOpen} onClose={closeModal}>
             <div className="text-center">
-                <h3 className="text-xl font-semibold text-gray-800 mb-6">Create email campaign</h3>
-                <div className="space-y-4">
-                    <Link href="/dashboard/email-campaigns/create?ai=true" 
-                          className="w-full flex items-center justify-center p-4 rounded-lg bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 font-medium transition-colors"
-                          onClick={() => setIsModalOpen(false)} // Close modal on click
-                    >
-                        <Wand2 size={20} className="mr-3 text-purple-500" />
-                        Create with KiQi AI
-                    </Link>
-                     <Link href="/dashboard/email-campaigns/create"
-                           className="w-full flex items-center justify-center p-4 rounded-lg bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 font-medium transition-colors"
-                           onClick={() => setIsModalOpen(false)}
-                     >
-                        <Plus size={20} className="mr-3 text-blue-500" />
-                        Create Manually
-                    </Link>
-                </div>
+                <h3 className="text-xl font-semibold text-gray-800 mb-6 flex items-center justify-center gap-2">
+                  <Users className="text-blue-500" /> Create Email List
+                </h3>
+                <form className="space-y-4 text-left" onSubmit={handleCreateList}>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 flex items-center gap-1"><FileText size={16}/> List Name</label>
+                    <Input name="email_listName" value={form.email_listName} onChange={handleFormChange} placeholder="e.g. Tech Conference Attendees 2025" required icon={<FileText size={16} className="text-gray-400"/>}/>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 flex items-center gap-1"><Mail size={16}/> Emails (comma separated)</label>
+                    <Input name="emails" value={form.emails} onChange={handleFormChange} placeholder="john@example.com, jane@example.com" required icon={<Mail size={16} className="text-gray-400"/>}/>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 flex items-center gap-1"><FileText size={16}/> File URLs (comma separated)</label>
+                    <Input name="emailFiles" value={form.emailFiles} onChange={handleFormChange} placeholder="https://example.com/file.csv" icon={<FileText size={16} className="text-gray-400"/>}/>
+                  </div>
+                  {createEmailListError && <div className="text-red-500 flex items-center gap-1"><XCircle size={16}/>{createEmailListError}</div>}
+                  {createEmailListStatus === 'succeeded' && <div className="text-green-600 flex items-center gap-1"><CheckCircle2 size={16}/> Email list created!</div>}
+                  <Button type="submit" className="w-full" disabled={createEmailListStatus === 'loading'}>
+                    {createEmailListStatus === 'loading' ? <><Loader2 className="animate-spin mr-2 inline"/> Creating...</> : 'Create List'}
+                  </Button>
+                </form>
             </div>
         </Modal>
         </>

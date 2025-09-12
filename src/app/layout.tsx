@@ -33,12 +33,11 @@
 //   );
 // }
 
-
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { ReduxProvider } from '@/components/provider/ReduxProvider';
-// import { ReduxProvider } from '@/components/providers/ReduxProvider';
+import ToasterClient from './ToasterClient';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -55,7 +54,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ReduxProvider>{children}</ReduxProvider>
+        <ReduxProvider>
+          <ToasterClient />
+          {children}
+        </ReduxProvider>
       </body>
     </html>
   );

@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { ApiError, Campaign, EmailList, SenderEmail, EmailListDetails, CreateCampaignPayload } from '../../types';
 import apiClient from '@/lib/utils/apiClient';
+import BASE_URL from '@/lib/utils/baseUrl';
 
 interface CampaignsState {
   senders: SenderEmail[];
@@ -9,6 +10,13 @@ interface CampaignsState {
   currentListDetails: EmailListDetails | null; // For the list detail view
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
+
+  // Additional states for email list creation
+  createEmailListStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
+  createEmailListError: string | null;
+  createEmailListData: any | null;
+
+  userCampaigns: any[]; // New state for user-specific campaigns
 }
 
 // https://kiqi-8f9k.onrender.com/api/v1/senderEmail/
@@ -20,6 +28,13 @@ const initialState: CampaignsState = {
   currentListDetails: null,
   status: 'idle',
   error: null,
+
+  // Initial states for email list creation
+  createEmailListStatus: 'idle',
+  createEmailListError: null,
+  createEmailListData: null,
+
+  userCampaigns: [],
 };
 
 // --- SENDER ASYNC THUNKS ---
@@ -28,7 +43,7 @@ export const fetchSenders = createAsyncThunk<
   SenderEmail[], void, { rejectValue: ApiError }
 >('campaigns/fetchSenders', async (_, thunkAPI) => {
   try {
-    const response = await apiClient.get('/senderEmail/');
+    const response = await apiClient.get(`${BASE_URL}/senderEmail/`);
     console.log('Fetched senders:', response.data);
     return response.data;
   } catch (error: any) {
@@ -41,7 +56,7 @@ export const createSender = createAsyncThunk<
   SenderEmail, Pick<SenderEmail, 'email' | 'sender' | 'type'>, { rejectValue: ApiError }
 >('campaigns/createSender', async (senderData, thunkAPI) => {
   try {
-    const response = await apiClient.post('/senderEmail/', senderData);
+    const response = await apiClient.post(`${BASE_URL}/senderEmail/`, senderData);
     return response.data;
   } catch (error: any) {
     return thunkAPI.rejectWithValue(error.response.data);
@@ -55,7 +70,7 @@ export const fetchEmailLists = createAsyncThunk<
   EmailList[], void, { rejectValue: ApiError }
 >('campaigns/fetchEmailLists', async (_, thunkAPI) => {
   try {
-    const response = await apiClient.get('/email-lists');
+    const response = await apiClient.get(`${BASE_URL}/email-lists`);
     return response.data;
   } catch (error: any) {
     return thunkAPI.rejectWithValue(error.response.data);
@@ -63,10 +78,16 @@ export const fetchEmailLists = createAsyncThunk<
 });
 
 export const createEmailList = createAsyncThunk<
-  EmailList, { name: string, emails: string[] }, { rejectValue: ApiError }
+  EmailList, { name: string, emails: string[] }, { rejectValue: ApiError, state: { auth: { token: string | null } } }
 >('campaigns/createEmailList', async (listData, thunkAPI) => {
   try {
-    const response = await apiClient.post('/email-lists', listData);
+    const token = thunkAPI.getState().auth.token;
+    console.log('this is the token', token);
+    const response = await apiClient.post(
+      `${BASE_URL}/email-lists`,
+      listData,
+      token ? { headers: { Authorization: `Bearer ${token}` } } : {}
+    );
     return response.data;
   } catch (error: any) {
     return thunkAPI.rejectWithValue(error.response.data);
@@ -77,13 +98,39 @@ export const fetchEmailListDetails = createAsyncThunk<
   EmailListDetails, string, { rejectValue: ApiError }
 >('campaigns/fetchEmailListDetails', async (listId, thunkAPI) => {
     try {
-        const response = await apiClient.get(`/email-lists/${listId}`);
+        const response = await apiClient.get(`${BASE_URL}/email-lists/${listId}`);
         return response.data;
     } catch (error: any) {
         return thunkAPI.rejectWithValue(error.response.data)
     }
 });
 
+// --- EMAIL LIST CREATION FOR MODAL ---
+export const createEmailListWithFiles = createAsyncThunk<
+  any,
+  { email_listName: string; emails: string[]; emailFiles: string[] },
+  { rejectValue: string, state: { auth: { token: string | null } } }
+>('campaigns/createEmailListWithFiles', async (payload, thunkAPI) => {
+  try {
+    const token = thunkAPI.getState().auth.token;
+    const response = await apiClient.post(
+      `${BASE_URL}/email-lists`,
+      payload,
+      token ? { headers: { Authorization: `Bearer ${token}` } } : {}
+    );
+    if (response.error === true) {
+      return thunkAPI.rejectWithValue(response.message || 'Failed to create email list');
+    }
+    return response.data;
+  } catch (error: any) {
+    let message = error.message || 'Failed to create email list';
+    try {
+      const errObj = JSON.parse(message);
+      message = errObj.message || message;
+    } catch {}
+    return thunkAPI.rejectWithValue(message);
+  }
+});
 
 // --- CAMPAIGN ASYNC THUNKS ---
 
@@ -91,7 +138,7 @@ export const fetchDrafts = createAsyncThunk<
   Campaign[], void, { rejectValue: ApiError }
 >('campaigns/fetchDrafts', async (_, thunkAPI) => {
     try {
-        const response = await apiClient.get('/campaigns?status=draft');
+        const response = await apiClient.get(`${BASE_URL}/campaigns?status=draft`);
         return response.data;
     } catch (error: any) {
         return thunkAPI.rejectWithValue(error.response.data);
@@ -102,13 +149,46 @@ export const createCampaign = createAsyncThunk<
   Campaign, CreateCampaignPayload, { rejectValue: ApiError }
 >('campaigns/createCampaign', async (campaignData, thunkAPI) => {
     try {
-        const response = await apiClient.post('/campaigns', campaignData);
+        const response = await apiClient.post(`${BASE_URL}/campaigns`, campaignData);
         // This could be a draft or a scheduled campaign
         return response.data;
     } catch (error: any) {
         return thunkAPI.rejectWithValue(error.response.data);
     }
 });
+
+// --- FETCH USER EMAIL LISTS (CAMPAIGNS) ---
+export const fetchUserEmailLists = createAsyncThunk<
+  any[], // Adjust type if you have a specific type for this response
+  void,
+  { rejectValue: string, state: { auth: { token: string | null } } }
+>(
+  'campaigns/fetchUserEmailLists',
+  async (_, thunkAPI) => {
+    try {
+      const state = thunkAPI.getState();
+      console.log('ENTIRE APP STATE:', state);
+      const token = state.auth.token;
+      console.log('this is the token', token);
+      const response = await apiClient.get(
+        'http://localhost:8000/api/v1/email-lists/user/me',
+        token ? { headers: { Authorization: `Bearer ${token}` } } : {}
+      );
+      if (response.error) {
+        return thunkAPI.rejectWithValue(response.message || 'Failed to fetch campaigns');
+      }
+      console.log('response from fetch user email lists', response.data);
+      return response.data;
+    } catch (error: any) {
+      let message = error.message || 'Failed to fetch campaigns';
+      try {
+        const errObj = JSON.parse(message);
+        message = errObj.message || message;
+      } catch {}
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
 
 const campaignsSlice = createSlice({
   name: 'campaigns',
@@ -117,7 +197,12 @@ const campaignsSlice = createSlice({
     // Sync reducer to clear details when leaving a page
     clearCurrentListDetails: (state) => {
       state.currentListDetails = null;
-    }
+    },
+    clearCreateEmailListStatus: (state) => {
+      state.createEmailListStatus = 'idle';
+      state.createEmailListError = null;
+      state.createEmailListData = null;
+    },
   },
   extraReducers: (builder) => {
     // --- Success Handlers for each Thunk ---
@@ -152,6 +237,31 @@ const campaignsSlice = createSlice({
           state.drafts.push(action.payload);
         }
         // Handle other statuses if necessary
+      })
+      .addCase(createEmailListWithFiles.pending, (state) => {
+        state.createEmailListStatus = 'loading';
+        state.createEmailListError = null;
+        state.createEmailListData = null;
+      })
+      .addCase(createEmailListWithFiles.fulfilled, (state, action) => {
+        state.createEmailListStatus = 'succeeded';
+        state.createEmailListData = action.payload;
+      })
+      .addCase(createEmailListWithFiles.rejected, (state, action) => {
+        state.createEmailListStatus = 'failed';
+        state.createEmailListError = action.payload as string;
+      })
+      .addCase(fetchUserEmailLists.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.userCampaigns = action.payload;
+      })
+      .addCase(fetchUserEmailLists.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(fetchUserEmailLists.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload as string;
       });
     // --- Generic Handlers for status/error ---
     builder
@@ -172,5 +282,5 @@ const campaignsSlice = createSlice({
   },
 });
 
-export const { clearCurrentListDetails } = campaignsSlice.actions;
+export const { clearCurrentListDetails, clearCreateEmailListStatus } = campaignsSlice.actions;
 export default campaignsSlice.reducer;
