@@ -31,6 +31,7 @@ const EmailCampaignsListPage = () => {
       subject: '',
       body: '',
     });
+    const [tabCampaigns, setTabCampaigns] = useState<any[]>([]);
     const dispatch = useAppDispatch();
     const {
         createEmailListStatus,
@@ -44,6 +45,18 @@ const EmailCampaignsListPage = () => {
     React.useEffect(() => {
         dispatch(fetchUserEmailLists());
     }, [dispatch]);
+
+    React.useEffect(() => {
+        if (userCampaigns && userCampaigns.length > 0) {
+            let filtered = userCampaigns;
+            if (activeTab === 'Active') filtered = userCampaigns.filter((c: any) => c.status === 'active');
+            else if (activeTab === 'Scheduled') filtered = userCampaigns.filter((c: any) => c.status === 'scheduled');
+            else if (activeTab === 'Completed') filtered = userCampaigns.filter((c: any) => c.status === 'completed' || c.status === 'executed');
+            setTabCampaigns(filtered);
+        } else {
+            setTabCampaigns([]);
+        }
+    }, [userCampaigns, activeTab]);
 
     const handleCreateCampaignClick = () => {
         setIsModalOpen(true);
@@ -96,6 +109,11 @@ const EmailCampaignsListPage = () => {
       }
     };
 
+    const handleTabClick = (tab: string) => {
+        setActiveTab(tab);
+        toast.success(`${tab} campaigns loaded!`);
+    };
+
     return (
         <>
         <DashboardLayout>
@@ -113,8 +131,8 @@ const EmailCampaignsListPage = () => {
                                 {TABS.map(tab => (
                                     <button
                                         key={tab}
-                                        onClick={() => setActiveTab(tab)}
-                                        className={`px-4 py-1.5 text-sm font-medium rounded-md flex-1 sm:flex-initial transition-colors ${activeTab === tab ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                        onClick={() => handleTabClick(tab)}
+                                        className={`px-4 py-1.5 text-sm font-semibold rounded-md flex-1 sm:flex-initial transition-colors border ${activeTab === tab ? 'bg-white text-[#3366FF] border-[#3366FF] shadow' : 'text-gray-500 border-transparent hover:text-[#3366FF] hover:bg-gray-50'}`}
                                     >{tab}</button>
                                 ))}
                             </div>
@@ -138,21 +156,31 @@ const EmailCampaignsListPage = () => {
                                     <tr><td colSpan={8} className="p-4 text-center text-gray-500">Loading...</td></tr>
                                 ) : error ? (
                                     <tr><td colSpan={8} className="p-4 text-center text-red-500">{error}</td></tr>
-                                ) : userCampaigns && userCampaigns.length > 0 ? (
-                                    userCampaigns.map((campaign: any, i: number) => (
-                                      <tr key={campaign._id || i} className="text-gray-700">
-                                        <td className="p-3 font-medium flex items-center gap-2"><Mail className="text-blue-500" size={16}/>{campaign.email_listName}</td>
-                                        <td className="p-3"><StatusBadge variant="active">Active</StatusBadge></td>
-                                        <td className="p-3">{campaign.emails?.length || 0}</td>
-                                        <td className="p-3">{campaign.emails?.length || 0}</td>
-                                        <td className="p-3">-</td>
-                                        <td className="p-3">-</td>
-                                        <td className="p-3">{campaign.createdAt ? new Date(campaign.createdAt).toLocaleDateString() : '-'}</td>
-                                        <td className="p-3 flex gap-2">
-                                          <Button size="sm" variant="primary" onClick={() => handleOpenStartModal(campaign._id)}><Wand2 className="mr-1" size={16}/>Start Campaign</Button>
-                                        </td>
-                                      </tr>
-                                    ))
+                                ) : tabCampaigns && tabCampaigns.length > 0 ? (
+                                    tabCampaigns.map((campaign: any, i: number) => {
+                                        const executed = campaign.status === 'completed' || campaign.status === 'executed';
+                                        return (
+                                            <tr key={campaign._id || i} className={`text-gray-700 ${executed ? 'bg-green-50' : 'bg-yellow-50'}`}>
+                                                <td className="p-3 font-medium flex items-center gap-2"><Mail className="text-blue-500" size={16}/>{campaign.email_listName}</td>
+                                                <td className="p-3">
+                                                    <StatusBadge variant={executed ? 'completed' : 'active'}>
+                                                        {executed ? 'Executed' : 'Not Executed'}
+                                                    </StatusBadge>
+                                                </td>
+                                                <td className="p-3">{campaign.emails?.length || 0}</td>
+                                                <td className="p-3">{campaign.emails?.length || 0}</td>
+                                                <td className="p-3">-</td>
+                                                <td className="p-3">-</td>
+                                                <td className="p-3">{campaign.createdAt ? new Date(campaign.createdAt).toLocaleDateString() : '-'}</td>
+                                                <td className="p-3 flex gap-2">
+                                                    {!executed && (
+                                                        <Button size="sm" variant="primary" onClick={() => handleOpenStartModal(campaign._id)}><Wand2 className="mr-1" size={16}/>Start Campaign</Button>
+                                                    )}
+                                                    {executed && <span className="text-green-600 font-semibold flex items-center gap-1"><CheckCircle2 size={16}/>Executed</span>}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
                                 ) : (
                                     <tr><td colSpan={8} className="p-4 text-center text-gray-500">No campaigns found.</td></tr>
                                 )}

@@ -4,6 +4,9 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-hot-toast';
+import { FcGoogle } from 'react-icons/fc';
+import { SiMetabase } from 'react-icons/si';
 
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -13,15 +16,20 @@ import AuthLayout from '@/components/ui/layout/AuthLayout';
 import { loginUser } from '@/redux/slices/authSlice';
 import { AppDispatch, RootState } from '@/redux/store';
 
-// Assuming Google and Metamask have their own logo components or are SVGs
-const GoogleIcon = () => <svg /* ... */ height="20" width="20" />; 
-const MetamaskIcon = () => <img src="/metamask-fox.svg" alt="Metamask" className="h-5 w-5" />;
+const GoogleIcon = () => <FcGoogle size={20} />;
+const MetamaskIcon = () => <SiMetabase size={20} style={{ color: '#F6851B' }} />;
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const { status, error } = useSelector((state: RootState) => state.auth);
+
+  React.useEffect(() => {
+    if (status === 'succeeded') {
+      toast.success('Logged in successfully!');
+    }
+  }, [status]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,7 +89,7 @@ const LoginPage = () => {
         </form>
 
         <p className="mt-6 text-center text-sm text-gray-500">
-          Do not have an account? <Link href="/auth/signup" className="font-medium text-[#3366FF] hover:underline">Sign Up</Link>
+          Do not have an account? <Link href="/signup" className="font-medium text-[#3366FF] hover:underline">Sign Up</Link>
         </p>
       </Card>
     </AuthLayout>

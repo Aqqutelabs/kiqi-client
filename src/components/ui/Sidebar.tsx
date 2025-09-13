@@ -24,7 +24,10 @@ import {
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { Icon } from './IconComponent';
-// import { Icon } from '@/components/atoms/Icon'; // Import our new Icon component
+import { useAppDispatch } from '@/redux/hooks';
+import { logout } from '@/redux/slices/authSlice';
+import { useRouter } from 'next/navigation';
+import { persistor } from '@/redux/store';
 
 // --- DEFINE SPECIFIC TYPES FOR EACH NAVIGATION ITEM ---
 
@@ -77,6 +80,14 @@ const navigation: (NavHeading | NavLinkItem | NavAction)[] = [
 
 export const Sidebar: React.FC = () => {
   const pathname = usePathname();
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    dispatch(logout());
+    await persistor.purge();
+    router.push('/');
+  };
 
   return (
     <aside className="w-64 flex-shrink-0 bg-white border-r border-gray-200 hidden md:flex flex-col">
@@ -96,7 +107,9 @@ export const Sidebar: React.FC = () => {
             
             case 'logout':
               return (
-                 <button key={index} className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors mt-2">
+                 <button key={index} className="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors mt-2"
+                  onClick={handleLogout}
+                 >
                   <Icon icon={item.icon} />
                   <span className="text-sm font-medium">{item.label}</span>
                 </button>
