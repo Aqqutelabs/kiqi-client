@@ -17,6 +17,7 @@ interface CampaignsState {
   createEmailListData: any | null;
 
   userCampaigns: any[]; // New state for user-specific campaigns
+  lastStartedCampaign: Campaign | null; // New state to keep track of the last started campaign
 }
 
 // https://kiqi-8f9k.onrender.com/api/v1/senderEmail/
@@ -35,6 +36,7 @@ const initialState: CampaignsState = {
   createEmailListData: null,
 
   userCampaigns: [],
+  lastStartedCampaign: null,
 };
 
 // --- SENDER ASYNC THUNKS ---
@@ -190,6 +192,36 @@ export const fetchUserEmailLists = createAsyncThunk<
   }
 );
 
+// --- START EMAIL CAMPAIGN ---
+export const startEmailCampaign = createAsyncThunk<
+  any,
+  { campaignName: string; emailListId: string; subject: string; body: string },
+  { rejectValue: string, state: { auth: { token: string | null } } }
+>(
+  'campaigns/startEmailCampaign',
+  async (payload, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.token;
+      const response = await apiClient.post(
+        'http://localhost:8000/api/v1/campaigns/start',
+        payload,
+        token ? { headers: { Authorization: `Bearer ${token}` } } : {}
+      );
+      if (response.error) {
+        return thunkAPI.rejectWithValue(response.message || 'Failed to start campaign');
+      }
+      return response.data;
+    } catch (error: any) {
+      let message = error.message || 'Failed to start campaign';
+      try {
+        const errObj = JSON.parse(message);
+        message = errObj.message || message;
+      } catch {}
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 const campaignsSlice = createSlice({
   name: 'campaigns',
   initialState,
@@ -260,6 +292,18 @@ const campaignsSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchUserEmailLists.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload as string;
+      })
+      .addCase(startEmailCampaign.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(startEmailCampaign.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.lastStartedCampaign = action.payload;
+      })
+      .addCase(startEmailCampaign.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload as string;
       });

@@ -35,7 +35,15 @@ const campaignsData = [
 ];
 
 // --- CUSTOM TOOLTIP FOR THE CHART ---
-const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
+import type { Payload } from 'recharts/types/component/DefaultTooltipContent';
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Payload<number, string>[];
+  label?: string;
+}
+
+const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (

@@ -11,7 +11,8 @@ import { Modal } from '@/components/ui/Modal';
 import { Pagination } from '@/components/ui/Pagination';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { createEmailListWithFiles, clearCreateEmailListStatus, fetchUserEmailLists } from '@/redux/slices/campaignSlice';
+import { createEmailListWithFiles, clearCreateEmailListStatus, fetchUserEmailLists, startEmailCampaign } from '@/redux/slices/campaignSlice';
+import { toast } from 'react-hot-toast';
 
 const TABS = ['All', 'Active', 'Scheduled', 'Completed'];
 
@@ -22,6 +23,13 @@ const EmailCampaignsListPage = () => {
         email_listName: '',
         emails: '',
         emailFiles: '',
+    });
+    const [isStartModalOpen, setIsStartModalOpen] = useState(false);
+    const [selectedListId, setSelectedListId] = useState<string | null>(null);
+    const [campaignForm, setCampaignForm] = useState({
+      campaignName: '',
+      subject: '',
+      body: '',
     });
     const dispatch = useAppDispatch();
     const {
@@ -59,6 +67,33 @@ const EmailCampaignsListPage = () => {
         setIsModalOpen(false);
         setForm({ email_listName: '', emails: '', emailFiles: '' });
         dispatch(clearCreateEmailListStatus());
+    };
+
+    const handleOpenStartModal = (listId: string) => {
+      setSelectedListId(listId);
+      setIsStartModalOpen(true);
+      setCampaignForm({ campaignName: '', subject: '', body: '' });
+    };
+
+    const handleStartCampaignChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setCampaignForm({ ...campaignForm, [e.target.name]: e.target.value });
+    };
+
+    const handleStartCampaign = async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!selectedListId) return;
+      const result = await dispatch(startEmailCampaign({
+        campaignName: campaignForm.campaignName,
+        emailListId: selectedListId,
+        subject: campaignForm.subject,
+        body: campaignForm.body,
+      }));
+      if (startEmailCampaign.fulfilled.match(result)) {
+        toast.success('Campaign started and emails sent!');
+        setIsStartModalOpen(false);
+      } else {
+        toast.error(result.payload || 'Failed to start campaign');
+      }
     };
 
     return (
@@ -105,16 +140,18 @@ const EmailCampaignsListPage = () => {
                                     <tr><td colSpan={8} className="p-4 text-center text-red-500">{error}</td></tr>
                                 ) : userCampaigns && userCampaigns.length > 0 ? (
                                     userCampaigns.map((campaign: any, i: number) => (
-                                        <tr key={campaign._id || i} className="text-gray-700">
-                                            <td className="p-3 font-medium">{campaign.email_listName}</td>
-                                            <td className="p-3"><StatusBadge variant="active">Active</StatusBadge></td>
-                                            <td className="p-3">{campaign.emails?.length || 0}</td>
-                                            <td className="p-3">{campaign.emails?.length || 0}</td>
-                                            <td className="p-3">-</td>
-                                            <td className="p-3">-</td>
-                                            <td className="p-3">{campaign.createdAt ? new Date(campaign.createdAt).toLocaleDateString() : '-'}</td>
-                                            <td className="p-3"><Button size="sm">Add Email</Button></td>
-                                        </tr>
+                                      <tr key={campaign._id || i} className="text-gray-700">
+                                        <td className="p-3 font-medium flex items-center gap-2"><Mail className="text-blue-500" size={16}/>{campaign.email_listName}</td>
+                                        <td className="p-3"><StatusBadge variant="active">Active</StatusBadge></td>
+                                        <td className="p-3">{campaign.emails?.length || 0}</td>
+                                        <td className="p-3">{campaign.emails?.length || 0}</td>
+                                        <td className="p-3">-</td>
+                                        <td className="p-3">-</td>
+                                        <td className="p-3">{campaign.createdAt ? new Date(campaign.createdAt).toLocaleDateString() : '-'}</td>
+                                        <td className="p-3 flex gap-2">
+                                          <Button size="sm" variant="primary" onClick={() => handleOpenStartModal(campaign._id)}><Wand2 className="mr-1" size={16}/>Start Campaign</Button>
+                                        </td>
+                                      </tr>
                                     ))
                                 ) : (
                                     <tr><td colSpan={8} className="p-4 text-center text-gray-500">No campaigns found.</td></tr>
@@ -155,6 +192,31 @@ const EmailCampaignsListPage = () => {
                   </Button>
                 </form>
             </div>
+        </Modal>
+        {/* Start Campaign Modal */}
+        <Modal isOpen={isStartModalOpen} onClose={() => setIsStartModalOpen(false)}>
+          <div className="text-center">
+            <h3 className="text-xl font-semibold text-gray-800 mb-6 flex items-center justify-center gap-2">
+              <Wand2 className="text-blue-500" /> Start Email Campaign
+            </h3>
+            <form className="space-y-4 text-left" onSubmit={handleStartCampaign}>
+              <div>
+                <label className="block text-sm font-medium mb-1 flex items-center gap-1"><FileText size={16}/> Campaign Name</label>
+                <Input name="campaignName" value={campaignForm.campaignName} onChange={handleStartCampaignChange} placeholder="e.g. September Newsletter" required icon={<FileText size={16} className="text-gray-400"/>}/>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1 flex items-center gap-1"><Mail size={16}/> Subject</label>
+                <Input name="subject" value={campaignForm.subject} onChange={handleStartCampaignChange} placeholder="e.g. Welcome to Our September Newsletter!" required icon={<Mail size={16} className="text-gray-400"/>}/>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1 flex items-center gap-1"><FileText size={16}/> Email Body (HTML)</label>
+                <textarea name="body" value={campaignForm.body} onChange={handleStartCampaignChange} placeholder="<h1>Hello!</h1><p>Thank you for subscribing...</p>" required className="w-full rounded-md border-0 bg-gray-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3366FF] min-h-[100px]"/>
+              </div>
+              <Button type="submit" className="w-full" disabled={status === 'loading'}>
+                {status === 'loading' ? <><Loader2 className="animate-spin mr-2 inline"/> Starting...</> : 'Start Campaign'}
+              </Button>
+            </form>
+          </div>
         </Modal>
         </>
     );
