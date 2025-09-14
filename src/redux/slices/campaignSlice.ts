@@ -72,7 +72,8 @@ export const fetchEmailLists = createAsyncThunk<
   EmailList[], void, { rejectValue: ApiError }
 >('campaigns/fetchEmailLists', async (_, thunkAPI) => {
   try {
-    const response = await apiClient.get(`${BASE_URL}/email-lists`);
+    const response = await apiClient.get(`${BASE_URL}/api/v1/email-lists`);
+    console.log('the response', response.data);
     return response.data;
   } catch (error: any) {
     return thunkAPI.rejectWithValue(error.response.data);
@@ -100,7 +101,7 @@ export const fetchEmailListDetails = createAsyncThunk<
   EmailListDetails, string, { rejectValue: ApiError }
 >('campaigns/fetchEmailListDetails', async (listId, thunkAPI) => {
     try {
-        const response = await apiClient.get(`${BASE_URL}/email-lists/${listId}`);
+        const response = await apiClient.get(`${BASE_URL}/api/v1/email-lists/${listId}`);
         return response.data;
     } catch (error: any) {
         return thunkAPI.rejectWithValue(error.response.data)
@@ -116,7 +117,7 @@ export const createEmailListWithFiles = createAsyncThunk<
   try {
     const token = thunkAPI.getState().auth.token;
     const response = await apiClient.post(
-      `${BASE_URL}/email-lists`,
+      `${BASE_URL}/api/v1/email-lists`,
       payload,
       token ? { headers: { Authorization: `Bearer ${token}` } } : {}
     );
@@ -140,7 +141,7 @@ export const fetchDrafts = createAsyncThunk<
   Campaign[], void, { rejectValue: ApiError }
 >('campaigns/fetchDrafts', async (_, thunkAPI) => {
     try {
-        const response = await apiClient.get(`${BASE_URL}/campaigns?status=draft`);
+        const response = await apiClient.get(`${BASE_URL}/api/v1/campaigns?status=draft`);
         return response.data;
     } catch (error: any) {
         return thunkAPI.rejectWithValue(error.response.data);
@@ -173,7 +174,7 @@ export const fetchUserEmailLists = createAsyncThunk<
       const token = state.auth.token;
       console.log('this is the token', token);
       const response = await apiClient.get(
-        'http://localhost:8000/api/v1/email-lists/user/me',
+        `${BASE_URL}/api/v1/email-lists/user/me`,
         token ? { headers: { Authorization: `Bearer ${token}` } } : {}
       );
       if (response.error) {
@@ -203,7 +204,7 @@ export const startEmailCampaign = createAsyncThunk<
     try {
       const token = thunkAPI.getState().auth.token;
       const response = await apiClient.post(
-        'http://localhost:8000/api/v1/campaigns/start',
+        `${BASE_URL}/campaigns/start`,
         payload,
         token ? { headers: { Authorization: `Bearer ${token}` } } : {}
       );

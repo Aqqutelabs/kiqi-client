@@ -3,20 +3,23 @@ import authReducer from './slices/authSlice';
 import campaignReducer from './slices/campaignSlice';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
+import { combineReducers } from 'redux';
+
+const rootReducer = combineReducers({
+  auth: authReducer,
+  campaign: campaignReducer,
+});
 
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['auth'],
+  whitelist: ['auth'], // Only persist auth slice
 };
 
-const persistedReducer = persistReducer(persistConfig, authReducer);
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
-  reducer: {
-    auth: persistedReducer,
-    campaign: campaignReducer,
-  },
+  reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,

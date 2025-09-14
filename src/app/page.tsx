@@ -80,7 +80,7 @@ const LoginPage = () => {
         </form>
 
         <p className="mt-6 text-center text-sm text-gray-500">
-          Do not have an account? <Link href="/auth/signup" className="font-medium text-[#3366FF] hover:underline">Sign Up</Link>
+          Do not have an account? <Link href="/signup" className="font-medium text-[#3366FF] hover:underline">Sign Up</Link>
         </p>
       </Card>
     </AuthLayout>

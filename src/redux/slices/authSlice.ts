@@ -59,7 +59,7 @@ const initialState: AuthState = {
 
 export const loginUser = createAsyncThunk('auth/loginUser', async (credentials: { email: string; password: string }, { rejectWithValue }) => {
     try {
-        const response = await apiClient.post(`${BASE_URL}/auth/login`, credentials);
+        const response = await apiClient.post(`${BASE_URL}/api/v1/auth/login`, credentials);
         // No response.success in your backend, so just check for accessToken
         if (!response.accessToken) {
             return rejectWithValue(response.message || 'Login failed');
@@ -84,7 +84,7 @@ export const registerUser = createAsyncThunk(
   'auth/registerUser',
   async (payload: RegisterPayload, { rejectWithValue }) => {
     try {
-      const response = await apiClient.post(`${BASE_URL}/auth/register`, payload);
+      const response = await apiClient.post(`${BASE_URL}/api/v1/auth/register`, payload);
       if (response.error) {
         return rejectWithValue(response.message || 'Registration failed');
       }
