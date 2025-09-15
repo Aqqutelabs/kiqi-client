@@ -51,30 +51,34 @@ type NavAction = {
 
 // The main navigation array now uses a union of our specific types
 const navigation: (NavHeading | NavLinkItem | NavAction)[] = [
-  { type: 'heading', label: 'Dashboard' },
   { type: 'link', href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
-
-  { type: 'heading', label: 'Chatbot' },
-  { type: 'link', href: '/dashboard/live-chats', label: 'Live Chats', icon: MessageSquare },
-  { type: 'link', href: '/dashboard/customization', label: 'Customization', icon: Palette },
-  { type: 'link', href: '/dashboard/knowledge-base', label: 'Knowledge Base', icon: BookText },
-  { type: 'link', href: '/dashboard/integrations', label: 'Integrations', icon: Puzzle },
-  { type: 'link', href: '/dashboard/contacts', label: 'Contacts', icon: Contact },
 
   { type: 'heading', label: 'Campaigns' },
   { type: 'link', href: '/email-campaigns/lists', label: 'Email Campaigns', icon: Mail },
-  { type: 'link', href: '/dashboard/sms', label: 'SMS', icon: SmsIcon },
-  { type: 'link', href: '/dashboard/social-media', label: 'Social Media', icon: Share2 },
-  { type: 'link', href: '/dashboard/analytics', label: 'Analytics', icon: BarChart3 },
+  { type: 'link', href: '/email-campaigns/composer', label: 'Create Email Campaign', icon: Mail },
+  { type: 'link', href: '/email-campaigns/email-lists', label: 'Email Lists', icon: Mail },
+  // { type: 'link', href: '/email-campaigns/lists', label: 'Email Campaigns', icon: Mail },
+  // { type: 'link', href: '/dashboard/sms', label: 'SMS', icon: SmsIcon },
+  // { type: 'link', href: '/dashboard/social-media', label: 'Social Media', icon: Share2 },
+  // { type: 'link', href: '/dashboard/analytics', label: 'Analytics', icon: BarChart3 },
 
+
+  { type: 'heading', label: 'Chatbot' },
+  { type: 'link', href: 'coming-soon', label: 'Live Chats', icon: MessageSquare },
+  { type: 'link', href: 'coming-soon', label: 'Customization', icon: Palette },
+  { type: 'link', href: 'coming-soon', label: 'Knowledge Base', icon: BookText },
+  { type: 'link', href: 'coming-soon', label: 'Integrations', icon: Puzzle },
+  { type: 'link', href: 'coming-soon', label: 'Contacts', icon: Contact },
+
+  
   { type: 'heading', label: 'Finance' },
-  { type: 'link', href: '/dashboard/wallet', label: 'Wallet', icon: Wallet },
-  { type: 'link', href: '/dashboard/subscription', label: 'Subscription', icon: Repeat },
+  { type: 'link', href: 'coming-soon', label: 'Wallet', icon: Wallet },
+  { type: 'link', href: 'coming-soon', label: 'Subscription', icon: Repeat },
 
   { type: 'heading', label: 'System' },
-  { type: 'link', href: '/dashboard/users', label: 'Users and Roles', icon: Users },
-  { type: 'link', href: '/dashboard/profile', label: 'Profile', icon: UserCircle },
-  { type: 'link', href: '/dashboard/settings', label: 'Settings', icon: Settings },
+  { type: 'link', href: 'coming-soon', label: 'Users and Roles', icon: Users },
+  { type: 'link', href: 'coming-soon', label: 'Profile', icon: UserCircle },
+  { type: 'link', href: 'coming-soon', label: 'Settings', icon: Settings },
   { type: 'logout', label: 'Log out', icon: LogOut },
 ];
 

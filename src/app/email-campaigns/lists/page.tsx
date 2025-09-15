@@ -1,8 +1,9 @@
 'use client';
 import React, { useState } from 'react';
 
-import { Plus, Wand2, Filter, Search, Mail, FileText, Users, Loader2, CheckCircle2, XCircle } from 'lucide-react';
+import { Plus, Wand2, Filter, Search, Mail, FileText, Users, Loader2, CheckCircle2, XCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
@@ -11,12 +12,12 @@ import { Modal } from '@/components/ui/Modal';
 import { Pagination } from '@/components/ui/Pagination';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { createEmailListWithFiles, clearCreateEmailListStatus, fetchUserEmailLists, startEmailCampaign } from '@/redux/slices/campaignSlice';
+import { createEmailListWithFiles, clearCreateEmailListStatus, fetchUserEmailLists, startEmailCampaign, fetchAllCampaigns } from '@/redux/slices/campaignSlice';
 import { toast } from 'react-hot-toast';
 
 const TABS = ['All', 'Active', 'Scheduled', 'Completed'];
-
 const EmailCampaignsListPage = () => {
+    const router = useRouter();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('All');
     const [form, setForm] = useState({
@@ -32,6 +33,10 @@ const EmailCampaignsListPage = () => {
       body: '',
     });
     const [tabCampaigns, setTabCampaigns] = useState<any[]>([]);
+    const [expandedCampaignId, setExpandedCampaignId] = useState<string | null>(null);
+    const [campaignDetails, setCampaignDetails] = useState<any | null>(null);
+    const [detailsLoading, setDetailsLoading] = useState(false);
+    const [detailsError, setDetailsError] = useState<string | null>(null);
     const dispatch = useAppDispatch();
     const {
         createEmailListStatus,
@@ -43,15 +48,16 @@ const EmailCampaignsListPage = () => {
     } = useAppSelector(state => state.campaign);
 
     React.useEffect(() => {
-        dispatch(fetchUserEmailLists());
+        dispatch(fetchAllCampaigns());
     }, [dispatch]);
 
     React.useEffect(() => {
         if (userCampaigns && userCampaigns.length > 0) {
             let filtered = userCampaigns;
-            if (activeTab === 'Active') filtered = userCampaigns.filter((c: any) => c.status === 'active');
-            else if (activeTab === 'Scheduled') filtered = userCampaigns.filter((c: any) => c.status === 'scheduled');
-            else if (activeTab === 'Completed') filtered = userCampaigns.filter((c: any) => c.status === 'completed' || c.status === 'executed');
+            if (activeTab === 'Active') filtered = userCampaigns.filter((c: any) => c.status === 'Active');
+            else if (activeTab === 'Scheduled') filtered = userCampaigns.filter((c: any) => c.status === 'Scheduled');
+            else if (activeTab === 'Completed') filtered = userCampaigns.filter((c: any) => c.status === 'Completed');
+            else filtered = userCampaigns; // Show all for 'All' tab
             setTabCampaigns(filtered);
         } else {
             setTabCampaigns([]);
@@ -59,8 +65,9 @@ const EmailCampaignsListPage = () => {
     }, [userCampaigns, activeTab]);
 
     const handleCreateCampaignClick = () => {
-        setIsModalOpen(true);
-        dispatch(clearCreateEmailListStatus());
+        // setIsModalOpen(true);
+        // dispatch(clearCreateEmailListStatus());
+        router.push('/email-campaigns/composer');
     };
 
     const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,9 +76,16 @@ const EmailCampaignsListPage = () => {
 
     const handleCreateList = async (e: React.FormEvent) => {
         e.preventDefault();
+        // Parse emails as array of objects: [{ email, fullName? }]
+        // Accepts: "email1, email2" or "email1:Full Name, email2:Full Name2"
+        const emailsArr = form.emails.split(',').map(e => {
+            const [email, ...rest] = e.trim().split(':');
+            const fullName = rest.join(':').trim();
+            return fullName ? { email: email.trim(), fullName } : { email: email.trim() };
+        }).filter(e => e.email);
         dispatch(createEmailListWithFiles({
             email_listName: form.email_listName,
-            emails: form.emails.split(',').map(e => e.trim()).filter(Boolean),
+            emails: emailsArr,
             emailFiles: form.emailFiles.split(',').map(f => f.trim()).filter(Boolean),
         }));
     };
@@ -112,6 +126,38 @@ const EmailCampaignsListPage = () => {
     const handleTabClick = (tab: string) => {
         setActiveTab(tab);
         toast.success(`${tab} campaigns loaded!`);
+    };
+
+    const handleCampaignRowClick = async (campaignId: string) => {
+        if (expandedCampaignId === campaignId) {
+            setExpandedCampaignId(null);
+            setCampaignDetails(null);
+            setDetailsError(null);
+            return;
+        }
+        setExpandedCampaignId(campaignId);
+        setDetailsLoading(true);
+        setDetailsError(null);
+        try {
+            console.log('the campaign id', campaignId);
+            const token = (typeof window !== 'undefined') ? JSON.parse(localStorage.getItem('persist:root') || '{}').auth ? JSON.parse(JSON.parse(localStorage.getItem('persist:root') || '{}').auth).token : null : null;
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://kiqi.onrender.com'}/api/v1/email-lists/${campaignId}`,
+                token ? { headers: { Authorization: `Bearer ${token}` } } : undefined
+            );
+            const data = await res.json();
+            if (data.error) {
+                console.log('data', data.error);
+                setDetailsError('Failed to fetch campaign details');
+                setCampaignDetails(null);
+            } else {
+                setCampaignDetails(data.data);
+            }
+        } catch (err) {
+            setDetailsError('Failed to fetch campaign details');
+            setCampaignDetails(null);
+        } finally {
+            setDetailsLoading(false);
+        }
     };
 
     return (
@@ -158,27 +204,51 @@ const EmailCampaignsListPage = () => {
                                     <tr><td colSpan={8} className="p-4 text-center text-red-500">{error}</td></tr>
                                 ) : tabCampaigns && tabCampaigns.length > 0 ? (
                                     tabCampaigns.map((campaign: any, i: number) => {
-                                        const executed = campaign.status === 'completed' || campaign.status === 'executed';
+                                        const isExpanded = expandedCampaignId === campaign._id;
                                         return (
-                                            <tr key={campaign._id || i} className={`text-gray-700 ${executed ? 'bg-green-50' : 'bg-yellow-50'}`}>
-                                                <td className="p-3 font-medium flex items-center gap-2"><Mail className="text-blue-500" size={16}/>{campaign.email_listName}</td>
-                                                <td className="p-3">
-                                                    <StatusBadge variant={executed ? 'completed' : 'active'}>
-                                                        {executed ? 'Executed' : 'Not Executed'}
-                                                    </StatusBadge>
+                                            <React.Fragment key={campaign._id || i}>
+                                            <tr className="text-gray-700 bg-white cursor-pointer hover:bg-blue-50 transition-all" onClick={() => handleCampaignRowClick(campaign._id)}>
+                                                <td className="p-3 font-medium flex items-center gap-2">
+                                                    <Mail className="text-blue-500" size={16}/>{campaign.campaignName}
+                                                    <span className="ml-2">{isExpanded ? <ChevronUp size={16}/> : <ChevronDown size={16}/>}</span>
                                                 </td>
-                                                <td className="p-3">{campaign.emails?.length || 0}</td>
-                                                <td className="p-3">{campaign.emails?.length || 0}</td>
+                                                <td className="p-3">{campaign.status}</td>
                                                 <td className="p-3">-</td>
                                                 <td className="p-3">-</td>
+                                                <td className="p-3">-</td>
+                                                <td className="p-3">{campaign.deliveryStatus}</td>
                                                 <td className="p-3">{campaign.createdAt ? new Date(campaign.createdAt).toLocaleDateString() : '-'}</td>
-                                                <td className="p-3 flex gap-2">
-                                                    {!executed && (
-                                                        <Button size="sm" variant="primary" onClick={() => handleOpenStartModal(campaign._id)}><Wand2 className="mr-1" size={16}/>Start Campaign</Button>
-                                                    )}
-                                                    {executed && <span className="text-green-600 font-semibold flex items-center gap-1"><CheckCircle2 size={16}/>Executed</span>}
-                                                </td>
+                                                <td className="p-3 flex gap-2">-</td>
                                             </tr>
+                                            {isExpanded && (
+                                                <tr>
+                                                    <td colSpan={8} className="bg-white border-t-0 p-0">
+                                                        <div className="transition-all duration-300 overflow-hidden rounded-b-xl border border-t-0 border-blue-200 shadow-lg p-6">
+                                                            {detailsLoading ? (
+                                                                <div className="flex items-center justify-center py-8"><Loader2 className="animate-spin mr-2"/> Loading details...</div>
+                                                            ) : detailsError ? (
+                                                                <div className="text-red-500 flex items-center gap-2"><XCircle size={18}/>{detailsError}</div>
+                                                            ) : campaignDetails ? (
+                                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                                    <div>
+                                                                        <h4 className="text-lg font-semibold mb-2 flex items-center gap-2"><Users className="text-blue-500"/> List Details</h4>
+                                                                        <div className="mb-2"><span className="font-medium">Name:</span> {campaignDetails.email_listName}</div>
+                                                                        <div className="mb-2"><span className="font-medium">Created:</span> {new Date(campaignDetails.createdAt).toLocaleString()}</div>
+                                                                        <div className="mb-2"><span className="font-medium">Files:</span> {campaignDetails.emailFiles && campaignDetails.emailFiles.length > 0 ? campaignDetails.emailFiles.map((f:string, idx:number) => <a key={idx} href={f} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline mr-2">File {idx+1}</a>) : 'None'}</div>
+                                                                    </div>
+                                                                    <div>
+                                                                        <h4 className="text-lg font-semibold mb-2 flex items-center gap-2"><Mail className="text-blue-500"/> Emails</h4>
+                                                                        <div className="max-h-40 overflow-y-auto bg-gray-50 rounded p-2 border border-gray-100">
+                                                                            {campaignDetails.emails && campaignDetails.emails.length > 0 ? campaignDetails.emails.map((email:string, idx:number) => <div key={idx} className="text-gray-700 text-sm py-1 border-b border-gray-100 last:border-b-0">{email}</div>) : 'No emails found.'}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            ) : null}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )}
+                                            </React.Fragment>
                                         );
                                     })
                                 ) : (

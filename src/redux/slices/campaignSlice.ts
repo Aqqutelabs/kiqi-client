@@ -69,10 +69,14 @@ export const createSender = createAsyncThunk<
 // --- EMAIL LIST ASYNC THUNKS ---
 
 export const fetchEmailLists = createAsyncThunk<
-  EmailList[], void, { rejectValue: ApiError }
+  EmailList[], void, { rejectValue: ApiError, state: { auth: { token: string | null } } }
 >('campaigns/fetchEmailLists', async (_, thunkAPI) => {
   try {
-    const response = await apiClient.get(`${BASE_URL}/api/v1/email-lists`);
+    const token = thunkAPI.getState().auth.token;
+    const response = await apiClient.get(
+      `${BASE_URL}/api/v1/email-lists/user/me`,
+      token ? { headers: { Authorization: `Bearer ${token}` } } : {}
+    );
     console.log('the response', response.data);
     return response.data;
   } catch (error: any) {
@@ -111,14 +115,18 @@ export const fetchEmailListDetails = createAsyncThunk<
 // --- EMAIL LIST CREATION FOR MODAL ---
 export const createEmailListWithFiles = createAsyncThunk<
   any,
-  { email_listName: string; emails: string[]; emailFiles: string[] },
+  { email_listName: string; emails: { email: string; fullName?: string }[]; emailFiles: string[] },
   { rejectValue: string, state: { auth: { token: string | null } } }
 >('campaigns/createEmailListWithFiles', async (payload, thunkAPI) => {
   try {
     const token = thunkAPI.getState().auth.token;
+    // Ensure emails are objects with at least { email }
+    const emails = payload.emails.map(e =>
+      typeof e === 'string' ? { email: e } : e
+    );
     const response = await apiClient.post(
       `${BASE_URL}/api/v1/email-lists`,
-      payload,
+      { ...payload, emails },
       token ? { headers: { Authorization: `Bearer ${token}` } } : {}
     );
     if (response.error === true) {
@@ -149,11 +157,24 @@ export const fetchDrafts = createAsyncThunk<
 });
 
 export const createCampaign = createAsyncThunk<
-  Campaign, CreateCampaignPayload, { rejectValue: ApiError }
+  Campaign, CreateCampaignPayload, { rejectValue: ApiError, state: { auth: { token: string | null } } }
 >('campaigns/createCampaign', async (campaignData, thunkAPI) => {
     try {
-        const response = await apiClient.post(`${BASE_URL}/campaigns`, campaignData);
-        // This could be a draft or a scheduled campaign
+        const token = thunkAPI.getState().auth.token;
+        // Map fields to match backend requirements
+        const mappedData = {
+            ...campaignData,
+            campaignName: (campaignData as any).campaignName || (campaignData as any).name,
+            subjectLine: (campaignData as any).subjectLine || (campaignData as any).subject,
+        };
+        delete (mappedData as any).name;
+        delete (mappedData as any).subject;
+        const response = await apiClient.post(
+            `${BASE_URL}/api/v1/campaigns`,
+            mappedData,
+            token ? { headers: { Authorization: `Bearer ${token}` } } : {}
+        );
+        console.log('create campaign response', response);
         return response.data;
     } catch (error: any) {
         return thunkAPI.rejectWithValue(error.response.data);
@@ -204,7 +225,7 @@ export const startEmailCampaign = createAsyncThunk<
     try {
       const token = thunkAPI.getState().auth.token;
       const response = await apiClient.post(
-        `${BASE_URL}/campaigns/start`,
+        `${BASE_URL}/api/v1/campaigns/start`,
         payload,
         token ? { headers: { Authorization: `Bearer ${token}` } } : {}
       );
@@ -214,6 +235,42 @@ export const startEmailCampaign = createAsyncThunk<
       return response.data;
     } catch (error: any) {
       let message = error.message || 'Failed to start campaign';
+      try {
+        const errObj = JSON.parse(message);
+        message = errObj.message || message;
+      } catch {}
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+// New reducer to fetch all campaigns from /api/v1/campaigns
+export const fetchAllCampaigns = createAsyncThunk<
+  any[],
+  void,
+  { rejectValue: string, state: { auth: { token: string | null } } }
+>(
+  'campaigns/fetchAllCampaigns',
+  async (_, thunkAPI) => {
+    try {
+      const state = thunkAPI.getState();
+      const token = state.auth.token;
+      const response = await apiClient.get(
+        `${BASE_URL}/api/v1/campaigns`,
+        token ? { headers: { Authorization: `Bearer ${token}` } } : {}
+      );
+
+      if (response.error) {
+        return thunkAPI.rejectWithValue(response.message || 'Failed to fetch campaigns');
+      }
+
+      console.log('response from fetch all campaigns', response.data);
+
+      // FIX THIS LINE
+      return response.data || [];
+    } catch (error: any) {
+      console.log('the error', error);
+      let message = error.message || 'Failed to fetch campaigns';
       try {
         const errObj = JSON.parse(message);
         message = errObj.message || message;
@@ -305,6 +362,18 @@ const campaignsSlice = createSlice({
         state.lastStartedCampaign = action.payload;
       })
       .addCase(startEmailCampaign.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload as string;
+      })
+      .addCase(fetchAllCampaigns.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.userCampaigns = action.payload;
+      })
+      .addCase(fetchAllCampaigns.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(fetchAllCampaigns.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload as string;
       });
