@@ -1,90 +1,109 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useDispatch, useSelector } from 'react-redux';
+import Image from "next/image";
+import { GoArrowUp } from "react-icons/go";
+import { FaCircleCheck } from "react-icons/fa6";
 
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { FormField } from '@/components/ui/FormField';
-import AuthLayout from '@/components/ui/layout/AuthLayout';
-import { loginUser } from '@/redux/slices/authSlice';
-import { AppDispatch, RootState } from '@/redux/store';
-
-// Assuming Google and Metamask have their own logo components or are SVGs
-const GoogleIcon = () => <svg /* ... */ height="20" width="20" />; 
-const MetamaskIcon = () => <img src="/metamask-fox.svg" alt="Metamask" className="h-5 w-5" />;
-
-const LoginPage = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const dispatch = useDispatch<AppDispatch>();
-  const router = useRouter();
-  const { status, error } = useSelector((state: RootState) => state.auth);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget as HTMLFormElement);
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-    const credentials = { email, password };
-    dispatch(loginUser(credentials)).then((result) => {
-        if (loginUser.fulfilled.match(result)) {
-            router.push('/dashboard');
-        }
-    });
-  };
-
-  return (
-    <AuthLayout>
-      <Card>
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">Login to KiQi</h2>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Button variant="primary" className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"><GoogleIcon /> <span className="ml-2">Google</span></Button>
-            <Button variant="secondary"><MetamaskIcon /> <span className="ml-2">MetaMask</span></Button>
-        </div>
-        
-        <div className="my-6 flex items-center">
-            <div className="flex-grow border-t border-gray-200"></div>
-            <span className="flex-shrink mx-4 text-xs text-gray-400">OR</span>
-            <div className="flex-grow border-t border-gray-200"></div>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-            <FormField label="Email Address" id="email" name="email" type="email" placeholder="Enter Email Address" icon={<Mail className="text-gray-400" size={18}/>} required/>
-            
-            <div className="relative">
-                <FormField label="Password" id="password" name="password" type={showPassword ? 'text' : 'password'} placeholder="Enter Password" icon={<Lock className="text-gray-400" size={18}/>} required/>
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-10 text-gray-400">
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-            </div>
-
-            <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center">
-                    <input type="checkbox" className="h-4 w-4 rounded border-gray-300 text-[#3366FF] focus:ring-[#3366FF]" />
-                    <span className="ml-2 text-gray-600">Remember Me</span>
-                </label>
-                <Link href="/auth/reset-password" className="font-medium text-[#3366FF] hover:underline">Forgot Password?</Link>
-            </div>
-          
-            {error && <p className="text-sm text-red-500">{error}</p>}
-            
-            <Button type="submit" className="w-full" disabled={status === 'loading'}>
-                {status === 'loading' ? 'Logging in...' : 'Log In'}
-            </Button>
-        </form>
-
-        <p className="mt-6 text-center text-sm text-gray-500">
-          Do not have an account? <Link href="/signup" className="font-medium text-[#3366FF] hover:underline">Sign Up</Link>
-        </p>
-      </Card>
-    </AuthLayout>
-  );
+type ButtonProps = {
+  variant: "primary" | "secondary" | "plain";
+  icon?: React.ReactNode;
+  content: string;
 };
 
-export default LoginPage;
+function Button({ variant, icon, content }: ButtonProps) {
+  const classes = `${
+    variant === "primary"
+      ? "bg-[#0C31A1] text-white"
+      : variant === "secondary"
+      ? "bg-transparent border border-white text-white"
+      : "bg-white text-[#111111]"
+  } h-[58px] w-full rounded-[10px] flex justify-center items-center relative text-sm`;
+  return (
+    <button className={classes}>
+      {content}
+      {icon && (
+        <div className="bg-[#020617] size-[30px] rounded-full border border-white flex justify-center items-center text-white absolute -right-3.5 rotate-45">
+          {icon}
+        </div>
+      )}
+    </button>
+  );
+}
+
+export default function Home() {
+  const navLinks = ["Product", "Pricing", "Blog", "Download"];
+  return (
+    <section className="px-4 md:px-10 py-5 space-y-6">
+      {/* navigation */}
+      <nav className="flex justify-between items-center">
+        {/* logo */}
+        <Image src={"/kiqi-logo.svg"} alt="KiQi 2025" height={66} width={140} />
+
+        {/* links */}
+        <ul className="hidden md:flex items-center gap-4">
+          {navLinks.map((link, index) => (
+            <li
+              key={index}
+              className="text-base text-[#111111] font-normal hover:text-[#0C31A1] cursor-pointer"
+            >
+              {link}
+            </li>
+          ))}
+        </ul>
+
+        {/* cta */}
+        <div className="bg-[#111111] h-[58px] w-[260px] rounded-[10px] py-5 gap-10 hidden md:flex items-center justify-center">
+          <p className="text-sm text-white cursor-pointer">Sign In</p>
+          <p className="text-sm text-white cursor-pointer">Get Started</p>
+        </div>
+      </nav>
+
+      {/* hero */}
+      <div className="flex flex-col md:flex-row items-start md:h-[600px] gap-5">
+        <div className="w-full md:w-3/4 bg-[#0C31A1] text-white rounded-[30px] h-full relative p-7 md:p-14">
+          <Image
+            src={"/kiqi-hero.svg"}
+            alt="Hero Image"
+            width={410}
+            height={530}
+            className="absolute -right-11 bottom-0 z-10 hidden md:block"
+          />
+
+          <h1 className="font-bold text-[28px] md:text-[52px]">
+            KiQi, <br className="hidden md:block" /> Your Easy To Use{" "}
+            <br className="hidden md:block" /> AI Sales Assistant
+          </h1>
+          <p className="text-base md:text-xl font-light my-12">
+            Swamped with business tasks and can't keep up{" "}
+            <br className="hidden md:block" />
+            with customer inquiries? Let KiQi handle it for you!
+          </p>
+
+          <div className="flex flex-col md:flex-row gap-4 md:gap-8 items-center w-full md:w-[360px]">
+            <Button content="Start For Free" variant="plain" icon={<GoArrowUp />}/>
+            <Button content="Watch Demo" variant="secondary" />
+          </div>
+          
+          <div className="flex flex-col md:flex-row gap-6 items-start md:items-center my-8">
+            <div className="flex gap-2 items-center">
+              <FaCircleCheck color="#4CAF50" size={20}/>
+              <p className="text-sm">No technical experience required</p>
+            </div>
+            <div className="flex gap-2 items-center">
+              <FaCircleCheck color="#4CAF50" size={20}/>
+              <p className="text-sm">No credit card required</p>
+            </div>
+          </div>
+        </div>
+        <div className="w-full md:w-1/4 relative rounded-[30px] h-full">
+          <Image
+            src={"/hero-group.svg"}
+            alt="Hero Image"
+            fill
+            className="object-cover rounded-[30px]"
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
