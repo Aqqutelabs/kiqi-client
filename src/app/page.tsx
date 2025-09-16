@@ -3,6 +3,10 @@
 import Image from "next/image";
 import { GoArrowUp } from "react-icons/go";
 import { FaCircleCheck } from "react-icons/fa6";
+import LandingCarousel from "@/components/landing/carousel";
+import KiQiFeatures from "@/components/landing/kiqi-features";
+import FAQ from "@/components/landing/faq";
+import LandingFooter from "@/components/landing/footer";
 
 type ButtonProps = {
   variant: "primary" | "secondary" | "plain";
@@ -33,6 +37,7 @@ function Button({ variant, icon, content }: ButtonProps) {
 export default function Home() {
   const navLinks = ["Product", "Pricing", "Blog", "Download"];
   return (
+    <>
     <section className="px-4 md:px-10 py-5 space-y-6">
       {/* navigation */}
       <nav className="flex justify-between items-center">
@@ -80,17 +85,21 @@ export default function Home() {
           </p>
 
           <div className="flex flex-col md:flex-row gap-4 md:gap-8 items-center w-full md:w-[360px]">
-            <Button content="Start For Free" variant="plain" icon={<GoArrowUp />}/>
+            <Button
+              content="Start For Free"
+              variant="plain"
+              icon={<GoArrowUp />}
+            />
             <Button content="Watch Demo" variant="secondary" />
           </div>
-          
+
           <div className="flex flex-col md:flex-row gap-6 items-start md:items-center my-8">
             <div className="flex gap-2 items-center">
-              <FaCircleCheck color="#4CAF50" size={20}/>
+              <FaCircleCheck color="#4CAF50" size={20} />
               <p className="text-sm">No technical experience required</p>
             </div>
             <div className="flex gap-2 items-center">
-              <FaCircleCheck color="#4CAF50" size={20}/>
+              <FaCircleCheck color="#4CAF50" size={20} />
               <p className="text-sm">No credit card required</p>
             </div>
           </div>
@@ -104,6 +113,54 @@ export default function Home() {
           />
         </div>
       </div>
+
+      <LandingCarousel />
+
+      {/* easy integration */}
+      <div className="flex flex-col justify-center items-center gap-6 my-20">
+        <div className="bg-[#0C31A133] h-[34px] w-[220px] rounded-full flex justify-center items-center">
+          <p className="text-[#0C31A1] text-xs md:text-sm">Easy Integration</p>
+        </div>
+          <h2 className="text-[#111111] text-[32px] md:text-[52px] text-center font-bold md:w-[677px]">
+            One Click Is All It Takes To Connect KiQi With Your Top Sales
+            Platforms
+          </h2>
+          <p className="text-[#797878] text-lg md:text-[27px] text-center font-normal">All your messages in one place - Automate your Lead Conversion.</p>
+          <div className="border border-[#E7EBFF] shadow-sm rounded-[30px] h-[155px] w-[95%] md:w-[420px] flex items-center justify-between p-5">
+            <div className="border border-[#E7EBFF] size-20 md:size-[115px] rounded-[10px] py-2.5 px-5 space-y-2.5">
+              <Image
+              src={"/instagram.svg"}
+              alt="Instagram"
+              height={70}
+              width={70}
+              />
+              <p className="text-[8px] md:text-xs text-center text-[#111111]">Instagram</p>
+            </div>
+            <div className="border border-[#E7EBFF] size-20 md:size-[115px] rounded-[10px] py-2.5 px-5 space-y-2.5">
+              <Image
+              src={"/facebook.svg"}
+              alt="Facebook"
+              height={70}
+              width={70}
+              />
+              <p className="text-[8px] md:text-xs text-center text-[#111111]">Facebook</p>
+            </div>
+            <div className="border border-[#E7EBFF] size-20 md:size-[115px] rounded-[10px] py-2.5 px-5 space-y-2.5">
+              <Image
+              src={"/whatsapp.svg"}
+              alt="WhatsApp"
+              height={70}
+              width={70}
+              />
+              <p className="text-[8px] md:text-xs text-center text-[#111111]">Whatsapp</p>
+            </div>
+          </div>
+      </div>
+
+      <KiQiFeatures/>
+      <FAQ/>
     </section>
+    <LandingFooter/>
+    </>
   );
 }
