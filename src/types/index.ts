@@ -40,10 +40,11 @@ export interface Campaign {
 }
 
 export interface CreateCampaignPayload {
-  name: string;
-  subject: string;
+  campaignName: string;
+  subjectLine: string;
+  status: string;
+  emailListIds: string[];
+  senderEmail: string;
+  time?: string;
   content: string;
-  senderId: string;
-  listId: string;
-  scheduledAt?: string;
 }

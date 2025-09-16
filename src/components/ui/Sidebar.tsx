@@ -64,21 +64,21 @@ const navigation: (NavHeading | NavLinkItem | NavAction)[] = [
 
 
   { type: 'heading', label: 'Chatbot' },
-  { type: 'link', href: 'coming-soon', label: 'Live Chats', icon: MessageSquare },
-  { type: 'link', href: 'coming-soon', label: 'Customization', icon: Palette },
-  { type: 'link', href: 'coming-soon', label: 'Knowledge Base', icon: BookText },
-  { type: 'link', href: 'coming-soon', label: 'Integrations', icon: Puzzle },
-  { type: 'link', href: 'coming-soon', label: 'Contacts', icon: Contact },
+  { type: 'link', href: '/coming-soon', label: 'Live Chats', icon: MessageSquare },
+  { type: 'link', href: '/coming-soon', label: 'Customization', icon: Palette },
+  { type: 'link', href: '/coming-soon', label: 'Knowledge Base', icon: BookText },
+  { type: 'link', href: '/coming-soon', label: 'Integrations', icon: Puzzle },
+  { type: 'link', href: '/coming-soon', label: 'Contacts', icon: Contact },
 
   
   { type: 'heading', label: 'Finance' },
-  { type: 'link', href: 'coming-soon', label: 'Wallet', icon: Wallet },
-  { type: 'link', href: 'coming-soon', label: 'Subscription', icon: Repeat },
+  { type: 'link', href: '/coming-soon', label: 'Wallet', icon: Wallet },
+  { type: 'link', href: '/coming-soon', label: 'Subscription', icon: Repeat },
 
   { type: 'heading', label: 'System' },
-  { type: 'link', href: 'coming-soon', label: 'Users and Roles', icon: Users },
-  { type: 'link', href: 'coming-soon', label: 'Profile', icon: UserCircle },
-  { type: 'link', href: 'coming-soon', label: 'Settings', icon: Settings },
+  { type: 'link', href: '/coming-soon', label: 'Users and Roles', icon: Users },
+  { type: 'link', href: '/coming-soon', label: 'Profile', icon: UserCircle },
+  { type: 'link', href: '/coming-soon', label: 'Settings', icon: Settings },
   { type: 'logout', label: 'Log out', icon: LogOut },
 ];
 

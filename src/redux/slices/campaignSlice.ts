@@ -169,6 +169,7 @@ export const createCampaign = createAsyncThunk<
         };
         delete (mappedData as any).name;
         delete (mappedData as any).subject;
+        console.log('the mapped data', mappedData);
         const response = await apiClient.post(
             `${BASE_URL}/api/v1/campaigns`,
             mappedData,

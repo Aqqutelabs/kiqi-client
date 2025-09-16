@@ -78,32 +78,38 @@ const CampaignComposerPage = () => {
         setIsSubmitting(true);
         try {
             const payload = {
-                name: form.campaignName,
-                subject: form.subjectLine,
-                content: editorContent,
-                senderId: form.senderEmail,
-                listId: form.emailListId,
-                scheduledAt: form.status === 'Scheduled' ? new Date().toISOString() : undefined,
+                campaignName: form.campaignName,
+                subjectLine: form.subjectLine,
+                status: form.status,
+                emailListIds: [form.emailListId],
+                senderEmail: form.senderEmail,
+                time: form.status === 'Scheduled' ? new Date().toISOString() : undefined,
+                content: editorContent, // include if your API expects it
             };
             const result = await dispatch(createCampaign(payload));
+            // Type guard helpers
+            const hasErrorField = (obj: any): obj is { error: boolean; message: string; data?: any } =>
+                obj && typeof obj === 'object' && 'error' in obj && 'message' in obj;
+
             if (createCampaign.fulfilled.match(result)) {
                 // Start the campaign after creation
-                const campaign = result.payload;
+                const campaign = (result.payload && ((result.payload as any).data || result.payload)) || {};
                 const startPayload = {
                     campaignName: campaign.campaignName || campaign.name || form.campaignName,
                     emailListId: form.emailListId,
                     subject: form.subjectLine,
                     body: editorContent,
+                    senderEmail: form.senderEmail,
                 };
                 const startResult = await dispatch(startEmailCampaign(startPayload));
                 if (startEmailCampaign.fulfilled.match(startResult)) {
                     toast.success('Campaign created and started!');
-                    router.push('/dashboard/email-campaigns');
+                    router.push('/email-campaigns/lists');
                 } else {
                     toast.error(startResult.payload || 'Campaign created, but failed to start.');
                 }
             } else {
-                toast.error(result.payload?.message || 'Failed to create campaign');
+                toast.error('Failed to create campaign');
             }
         } catch (err) {
             toast.error('An unexpected error occurred.');
