@@ -40,18 +40,42 @@ const DashboardOverviewPage = () => {
         <Header />
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
           {/* Stat Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <StatCard title="Website Vistis" value="18.6K" change="+1.2%" changeType="increase" />
-            <StatCard title="Live Chats" value="70" change="+1.3%" changeType="increase" />
-            <StatCard title="Active Clients" value="2200" change="+1.3%" changeType="increase" />
-          </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="relative">
+              <StatCard title="Website Vistis" value="18.6K" change="+1.2%" changeType="increase" />
+              <span className="absolute top-2 right-2 bg-yellow-400 text-xs font-bold px-2 py-0.5 rounded">Coming Soon</span>
+            </div>
+            <div className="relative">
+              <StatCard title="Live Chats" value="70" change="+1.3%" changeType="increase" />
+              <span className="absolute top-2 right-2 bg-yellow-400 text-xs font-bold px-2 py-0.5 rounded">Coming Soon</span>
+            </div>
+            <div className="relative">
+              <StatCard title="Active Clients" value="2200" change="+1.3%" changeType="increase" />
+              <span className="absolute top-2 right-2 bg-yellow-400 text-xs font-bold px-2 py-0.5 rounded">Coming Soon</span>
+            </div>
+            </div>
 
           {/* Action Buttons */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Button variant="tertiary" className="h-14 justify-start p-4 text-left !font-semibold !text-gray-700"><Wallet className="mr-3 text-[#3366FF]" /> Connect a wallet</Button>
-              <Button variant="tertiary" className="h-14 justify-start p-4 text-left !font-semibold !text-gray-700"><MessageCircle className="mr-3 text-[#3366FF]" /> Connect your social accounts</Button>
-              <Button variant="tertiary" className="h-14 justify-start p-4 text-left !font-semibold !text-gray-700"><Send className="mr-3 text-[#3366FF]" /> Send bulk SMS</Button>
-          </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="relative">
+              <Button variant="tertiary" className="h-14 justify-start p-4 text-left !font-semibold !text-gray-700" disabled>
+                <Wallet className="mr-3 text-[#3366FF]" /> Connect a wallet
+              </Button>
+              <span className="absolute top-2 right-2 bg-yellow-400 text-xs font-bold px-2 py-0.5 rounded">Coming Soon</span>
+              </div>
+              <div className="relative">
+              <Button variant="tertiary" className="h-14 justify-start p-4 text-left !font-semibold !text-gray-700" disabled>
+                <MessageCircle className="mr-3 text-[#3366FF]" /> Connect your social accounts
+              </Button>
+              <span className="absolute top-2 right-2 bg-yellow-400 text-xs font-bold px-2 py-0.5 rounded">Coming Soon</span>
+              </div>
+              <div className="relative">
+              <Button variant="tertiary" className="h-14 justify-start p-4 text-left !font-semibold !text-gray-700" disabled>
+                <Send className="mr-3 text-[#3366FF]" /> Send bulk SMS
+              </Button>
+              <span className="absolute top-2 right-2 bg-yellow-400 text-xs font-bold px-2 py-0.5 rounded">Coming Soon</span>
+              </div>
+            </div>
 
           {/* Main Grid for Widgets */}
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -66,7 +90,7 @@ const DashboardOverviewPage = () => {
               </ResponsiveContainer>
             </ChartCard>
 
-            <ChartCard title="Live Chat">
+            {/* <ChartCard title="Live Chat">
               <div className="space-y-4">
                 {liveChats.map((chat, i) => (
                   <div key={i} className="flex items-center justify-between">
@@ -81,7 +105,7 @@ const DashboardOverviewPage = () => {
                   </div>
                 ))}
               </div>
-            </ChartCard>
+            </ChartCard> */}
 
             <ChartCard title="Top Queries" className="xl:col-span-1">
               <div className="space-y-3">
