@@ -10,6 +10,7 @@ import LandingFooter from "@/components/landing/footer";
 import TestimonialCarousel from "@/components/landing/testimonial-carousel";
 import BlogCarousel from "@/components/landing/blog-carousel";
 import { useState } from "react";
+import Link from "next/link";
 
 type ButtonProps = {
   variant: "primary" | "secondary" | "plain";
@@ -156,8 +157,8 @@ export default function Home() {
 
           {/* cta */}
           <div className="bg-[#111111] h-[58px] w-[260px] rounded-[10px] py-5 gap-10 hidden md:flex items-center justify-center">
-            <p className="text-sm text-white cursor-pointer">Sign In</p>
-            <p className="text-sm text-white cursor-pointer">Get Started</p>
+            <Link href="/login" className="text-sm text-white cursor-pointer">Sign In</Link>
+            <Link href="/signup" className="text-sm text-white cursor-pointer">Get Started</Link>
           </div>
         </nav>
 

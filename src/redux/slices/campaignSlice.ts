@@ -115,20 +115,29 @@ export const fetchEmailListDetails = createAsyncThunk<
 // --- EMAIL LIST CREATION FOR MODAL ---
 export const createEmailListWithFiles = createAsyncThunk<
   any,
-  { email_listName: string; emails: { email: string; fullName?: string }[]; emailFiles: string[] },
+  FormData | { email_listName: string; emails: { email: string; fullName?: string }[]; emailFiles: string[] },
   { rejectValue: string, state: { auth: { token: string | null } } }
 >('campaigns/createEmailListWithFiles', async (payload, thunkAPI) => {
   try {
     const token = thunkAPI.getState().auth.token;
-    // Ensure emails are objects with at least { email }
-    const emails = payload.emails.map(e =>
-      typeof e === 'string' ? { email: e } : e
-    );
-    const response = await apiClient.post(
-      `${BASE_URL}/api/v1/email-lists`,
-      { ...payload, emails },
-      token ? { headers: { Authorization: `Bearer ${token}` } } : {}
-    );
+    let response;
+    if (payload instanceof FormData) {
+      response = await apiClient.post(
+        `${BASE_URL}/api/v1/email-lists`,
+        payload,
+        token ? { headers: { Authorization: `Bearer ${token}` } } : {}
+      );
+    } else {
+      // Ensure emails are objects with at least { email }
+      const emails = payload.emails.map(e =>
+        typeof e === 'string' ? { email: e } : e
+      );
+      response = await apiClient.post(
+        `${BASE_URL}/api/v1/email-lists`,
+        { ...payload, emails },
+        token ? { headers: { Authorization: `Bearer ${token}` } } : {}
+      );
+    }
     if (response.error === true) {
       return thunkAPI.rejectWithValue(response.message || 'Failed to create email list');
     }

@@ -8,15 +8,19 @@ const apiClient = {
     return response.json();
   },
   post: async (url: string, data: any, options: RequestInit = {}) => {
-    const response = await fetch(url, {
-      ...options,
-      method: 'POST',
-      headers: {
+    let fetchOptions: RequestInit = { ...options, method: 'POST' };
+    if (data instanceof FormData) {
+      fetchOptions.body = data;
+      // Don't set Content-Type, browser will set it for FormData
+      fetchOptions.headers = { ...(options.headers || {}) };
+    } else {
+      fetchOptions.body = JSON.stringify(data);
+      fetchOptions.headers = {
         'Content-Type': 'application/json',
         ...(options.headers || {}),
-      },
-      body: JSON.stringify(data),
-    });
+      };
+    }
+    const response = await fetch(url, fetchOptions);
     if (!response.ok) throw new Error(await response.text());
     return response.json();
   },

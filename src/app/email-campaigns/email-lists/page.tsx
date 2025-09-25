@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import Link from 'next/link';
 import { Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -24,10 +24,21 @@ const ManageEmailListPage = () => {
         emailFiles: '',
     });
     const [isSubmitting, setIsSubmitting] = React.useState(false);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const [uploading, setUploading] = useState(false);
+    const [uploadError, setUploadError] = useState<string | null>(null);
+    const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
 
     useEffect(() => {
         dispatch(fetchUserEmailLists());
     }, [dispatch]);
+
+    // Refetch email lists after successful creation
+    useEffect(() => {
+        if (createEmailListStatus === 'succeeded') {
+            dispatch(fetchUserEmailLists());
+        }
+    }, [createEmailListStatus, dispatch]);
 
     const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -67,6 +78,50 @@ const ManageEmailListPage = () => {
         }
     };
 
+    // CSV upload handler (just send file, let backend process)
+    const handleCsvUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setUploading(true);
+        setUploadError(null);
+        setUploadSuccess(null);
+        try {
+            const formData = new FormData();
+            formData.append('csv', file);
+            formData.append('email_listName', form.email_listName || 'Untitled List');
+            const result = await dispatch(createEmailListWithFiles(formData));
+            if (createEmailListWithFiles.fulfilled.match(result)) {
+                setUploadSuccess('CSV uploaded and email list created!');
+                setForm({ email_listName: '', emails: '', emailFiles: '' });
+                dispatch(fetchUserEmailLists());
+            } else {
+                setUploadError(result.payload || createEmailListError || 'Failed to create email list');
+            }
+        } catch (err) {
+            setUploadError('Failed to upload CSV');
+        } finally {
+            setUploading(false);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+    };
+
+    // Sort userCampaigns by createdAt descending
+    const sortedCampaigns = Array.isArray(userCampaigns)
+        ? [...userCampaigns].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        : [];
+
+    // Add delete handler
+    const handleDelete = async (id: string) => {
+        if (!window.confirm('Are you sure you want to delete this email list?')) return;
+        try {
+            await dispatch({ type: 'campaign/deleteEmailList', payload: id });
+            dispatch(fetchUserEmailLists());
+            toast.success('Email list deleted successfully!');
+        } catch (err) {
+            toast.error('Failed to delete email list.');
+        }
+    };
+
     return (
         <DashboardLayout>
             <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
@@ -84,8 +139,14 @@ const ManageEmailListPage = () => {
                             <Textarea name="emails" rows={3} value={form.emails} onChange={handleFormChange} placeholder="Enter email addresses here. Each line: 'email fullName', e.g. john@example.com John Doe, jane@example.com Jane Doe."/>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium mb-1">Upload Email Address Files (Option 2)</label>
-                            <Input name="emailFiles" value={form.emailFiles} onChange={handleFormChange} placeholder="Paste file URLs, comma separated" />
+                            <label className="block text-sm font-medium mb-1">Upload Email Address CSV (Option 2)</label>
+                            <input
+                                type="file"
+                                accept=".csv"
+                                ref={fileInputRef}
+                                onChange={handleCsvUpload}
+                                className="block w-full text-sm text-gray-700 border border-gray-300 rounded px-3 py-2 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                            />
                         </div>
                         {createEmailListStatus === 'loading' || isSubmitting ? (
                             <div className="text-blue-600">Creating list...</div>
@@ -96,6 +157,9 @@ const ManageEmailListPage = () => {
                         {createEmailListStatus === 'succeeded' && (
                             <div className="text-green-600">Email list created!</div>
                         )}
+                        {uploading && <div className="text-blue-600">Uploading CSV...</div>}
+                        {uploadError && <div className="text-red-500">{uploadError}</div>}
+                        {uploadSuccess && <div className="text-green-600">{uploadSuccess}</div>}
                         <Button type="submit" disabled={isSubmitting || createEmailListStatus === 'loading'}>Create Email List</Button>
                     </form>
                 </Card>
@@ -114,7 +178,7 @@ const ManageEmailListPage = () => {
                                 ) : error ? (
                                     <tr><td colSpan={4} className="p-4 text-center text-red-500">{error}</td></tr>
                                 ) : userCampaigns && userCampaigns.length > 0 ? (
-                                    userCampaigns.map((list: any) => (
+                                    sortedCampaigns.map((list: any) => (
                                         <tr key={list._id}>
                                             <td className="p-3 font-medium text-gray-800">{list.email_listName}</td>
                                             <td className="p-3 text-gray-500">{list.createdAt ? new Date(list.createdAt).toLocaleDateString() : '-'}</td>
@@ -122,7 +186,8 @@ const ManageEmailListPage = () => {
                                             <td className="p-3">
                                                 <div className="flex items-center gap-2">
                                                     <Link href={`/email-campaigns/email-lists/${list._id}`}><Button size="sm" className="!bg-cyan-500 hover:!bg-cyan-600 text-white">View List</Button></Link>
-                                                    <Button variant="destructive" size="sm" className="!p-2"><Trash2 size={16} /></Button>
+                                                    <Link href={`/email-campaigns/email-lists/${list._id}/edit`}><Button size="sm" variant="secondary">Edit</Button></Link>
+                                                    <Button variant="destructive" size="sm" className="!p-2" onClick={() => handleDelete(list._id)}><Trash2 size={16} /></Button>
                                                 </div>
                                             </td>
                                         </tr>
