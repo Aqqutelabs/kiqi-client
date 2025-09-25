@@ -75,6 +75,16 @@ const DashboardOverviewPage = () => {
               </Button>
               <span className="absolute top-2 right-2 bg-yellow-400 text-xs font-bold px-2 py-0.5 rounded">Coming Soon</span>
               </div>
+              {/* Users Button */}
+              <div className="relative">
+                <Button
+                  variant="primary"
+                  className="h-14 w-full justify-center p-4 text-center font-semibold text-white bg-[#3366FF] hover:bg-[#254EDB]"
+                  onClick={() => window.location.href = '/dashboard/users'}
+                >
+                  Manage Users
+                </Button>
+              </div>
             </div>
 
           {/* Main Grid for Widgets */}
@@ -140,3 +150,4 @@ const DashboardOverviewPage = () => {
 };
 
 export default DashboardOverviewPage;
+
