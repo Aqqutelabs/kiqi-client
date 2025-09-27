@@ -60,12 +60,11 @@ const initialState: AuthState = {
 export const loginUser = createAsyncThunk('auth/loginUser', async (credentials: { email: string; password: string }, { rejectWithValue }) => {
     try {
         const response = await apiClient.post(`${BASE_URL}/api/v1/auth/login`, credentials);
-        // No response.success in your backend, so just check for accessToken
-        if (!response.accessToken) {
+        if (!response.accessToken || !response.user) {
             return rejectWithValue(response.message || 'Login failed');
         }
         return {
-            user: { email: credentials.email }, // You can expand this if backend returns more user info
+            user: response.user, // Use full user object from backend
             token: response.accessToken,
             refreshToken: response.refreshToken,
             message: response.message,
@@ -129,8 +128,7 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        // Always set user as { name: '', email } since backend only returns email
-        state.user = { name: '', email: action.payload.user.email };
+        state.user = action.payload.user; // Store full user object
         state.token = action.payload.token;
         // Optionally store refreshToken if needed: state.refreshToken = action.payload.refreshToken;
       })

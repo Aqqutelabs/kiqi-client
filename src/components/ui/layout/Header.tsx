@@ -4,19 +4,21 @@ import { Search, ChevronDown } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { logout } from '@/redux/slices/authSlice';
 import { useRouter } from 'next/navigation';
+import { User } from 'lucide-react';
 
 const Header = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const user = useAppSelector(state => state.auth.user);
+  console.log('i am the user', user);
   const displayName = user
-    ? ('firstName' in user && user.firstName
+    ? ('firstName' in user && 'lastName' in user && user.firstName && user.lastName
         ? `${user.firstName} ${user.lastName}`
-        : 'name' in user
+        : 'name' in user && user.name
           ? user.name
           : 'User')
     : 'User';
-  const email = user ? user.email : '';
+  const email = user && 'email' in user ? user.email : '';
 
   const handleLogout = () => {
     dispatch(logout());
@@ -44,15 +46,14 @@ const Header = () => {
       {/* User Menu Section */}
       <div className="ml-4 flex items-center space-x-3">
         <div className="flex-shrink-0">
-          <img
-            className="h-9 w-9 rounded-full object-cover"
-            src={`https://i.pravatar.cc/150?u=${email || displayName}`}
-            alt="User avatar"
-          />
+          <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gray-200">
+            <ChevronDown className="hidden" /> {/* Hidden, just to keep import if needed */}
+            <User className="h-6 w-6 text-gray-500" aria-label="User avatar" />
+          </span>
         </div>
         <div className="hidden sm:block">
           <div className="text-sm font-semibold text-gray-800">{displayName}</div>
-          <div className="text-xs text-gray-500">Owner</div>
+          <div className="text-xs text-gray-500">{email}</div>
         </div>
         <button
           type="button"

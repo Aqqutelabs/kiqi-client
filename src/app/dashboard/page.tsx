@@ -1,5 +1,5 @@
 'use client'; // This page uses client-side hooks and libraries like Recharts
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Wallet, MessageCircle, Send } from 'lucide-react';
 import { Bar, BarChart, Line, LineChart, RadialBar, RadialBarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Button } from '@/components/ui/Button';
@@ -7,6 +7,8 @@ import DashboardLayout from '@/components/ui/layout/DashboardLayout';
 import { StatCard } from '@/components/ui/StatCard';
 import { ChartCard } from '@/components/ui/ChartCard';
 import Header from '@/components/ui/layout/Header';
+import { useAppSelector } from '@/redux/hooks';
+import { useRouter } from 'next/navigation';
 
 // --- MOCK DATA ---
 const lineChartData = [
@@ -34,6 +36,16 @@ const topQueries = [
 const satisfactionData = [{ name: 'satisfaction', value: 75.55, fill: '#3366FF' }];
 
 const DashboardOverviewPage = () => {
+  const user = useAppSelector(state => state.auth.user);
+  const token = useAppSelector(state => state.auth.token);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!user || !token) {
+      router.replace('/login');
+    }
+  }, [user, token, router]);
+
   return (
     <DashboardLayout>
       <div className="flex-1 flex flex-col">
@@ -76,7 +88,7 @@ const DashboardOverviewPage = () => {
               <span className="absolute top-2 right-2 bg-yellow-400 text-xs font-bold px-2 py-0.5 rounded">Coming Soon</span>
               </div>
               {/* Users Button */}
-              <div className="relative">
+              {/* <div className="relative">
                 <Button
                   variant="primary"
                   className="h-14 w-full justify-center p-4 text-center font-semibold text-white bg-[#3366FF] hover:bg-[#254EDB]"
@@ -84,7 +96,7 @@ const DashboardOverviewPage = () => {
                 >
                   Manage Users
                 </Button>
-              </div>
+              </div> */}
             </div>
 
           {/* Main Grid for Widgets */}

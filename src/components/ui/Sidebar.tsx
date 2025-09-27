@@ -21,6 +21,10 @@ import {
   Settings,
   LogOut,
   LucideIcon, // Import the base icon type
+  ChevronDown,
+  ChevronUp,
+  Pencil,
+  List as ListIcon,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { Icon } from './IconComponent';
@@ -52,17 +56,7 @@ type NavAction = {
 // The main navigation array now uses a union of our specific types
 const navigation: (NavHeading | NavLinkItem | NavAction)[] = [
   { type: 'link', href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
-
   { type: 'heading', label: 'Campaigns' },
-  { type: 'link', href: '/email-campaigns/lists', label: 'Email Campaigns', icon: Mail },
-  { type: 'link', href: '/email-campaigns/composer', label: 'Create Email Campaign', icon: Mail },
-  { type: 'link', href: '/email-campaigns/email-lists', label: 'Email Lists', icon: Mail },
-  // { type: 'link', href: '/email-campaigns/lists', label: 'Email Campaigns', icon: Mail },
-  // { type: 'link', href: '/dashboard/sms', label: 'SMS', icon: SmsIcon },
-  // { type: 'link', href: '/dashboard/social-media', label: 'Social Media', icon: Share2 },
-  // { type: 'link', href: '/dashboard/analytics', label: 'Analytics', icon: BarChart3 },
-
-
   { type: 'heading', label: 'Chatbot' },
   { type: 'link', href: '/coming-soon', label: 'Live Chats', icon: MessageSquare },
   { type: 'link', href: '/coming-soon', label: 'Customization', icon: Palette },
@@ -87,11 +81,21 @@ export const Sidebar: React.FC = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
+  // Dropdown state for Campaigns
+  const [campaignsOpen, setCampaignsOpen] = React.useState(false);
+
   const handleLogout = async () => {
     dispatch(logout());
     await persistor.purge();
     router.push('/');
   };
+
+  // Campaigns dropdown links
+  const campaignLinks = [
+    { href: '/email-campaigns/lists', label: 'Email Campaigns', icon: Mail },
+    { href: '/email-campaigns/composer', label: 'Create Email Campaign', icon: Pencil },
+    { href: '/email-campaigns/email-lists', label: 'Email Lists', icon: ListIcon },
+  ];
 
   return (
     <aside className="w-64 flex-shrink-0 bg-white border-r border-gray-200 hidden md:flex flex-col">
@@ -103,6 +107,53 @@ export const Sidebar: React.FC = () => {
           // Use a switch statement for clean type narrowing
           switch (item.type) {
             case 'heading':
+              if (item.label === 'Campaigns') {
+                return (
+                  <div key={index} className="mb-1">
+                    <button
+                      className="w-full flex items-center justify-between px-3 pt-4 pb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider focus:outline-none"
+                      onClick={() => setCampaignsOpen((open) => !open)}
+                      aria-expanded={campaignsOpen}
+                    >
+                      <span>{item.label}</span>
+                      {campaignsOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                    </button>
+                    <div
+                      className={
+                        'overflow-hidden transition-all duration-300' +
+                        (campaignsOpen ? ' max-h-40 opacity-100' : ' max-h-0 opacity-0')
+                      }
+                    >
+                      <ul className="pl-2">
+                        {campaignLinks.map((link, i) => {
+                          const isActive = pathname.startsWith(link.href);
+                          return (
+                            <li key={link.href}>
+                              <Link
+                                href={link.href}
+                                className={clsx(
+                                  'flex items-center space-x-3 px-3 py-2 rounded-lg transition-all text-sm font-medium',
+                                  {
+                                    'bg-[#E0E7FF] text-[#3366FF] font-semibold': isActive,
+                                    'text-gray-600 hover:bg-gray-100 hover:text-gray-900': !isActive,
+                                  }
+                                )}
+                              >
+                                <Icon
+                                  icon={link.icon}
+                                  className={clsx({ 'text-[#3366FF]': isActive })}
+                                  strokeWidth={isActive ? 2 : 1.5}
+                                />
+                                <span>{link.label}</span>
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  </div>
+                );
+              }
               return (
                 <h3 key={index} className="px-3 pt-4 pb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   {item.label}

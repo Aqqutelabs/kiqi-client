@@ -15,11 +15,9 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { createEmailListWithFiles, clearCreateEmailListStatus, fetchUserEmailLists, startEmailCampaign, fetchAllCampaigns } from '@/redux/slices/campaignSlice';
 import { toast } from 'react-hot-toast';
 
-const TABS = ['All', 'Active', 'Scheduled', 'Completed'];
 const EmailCampaignsListPage = () => {
     const router = useRouter();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState('All');
     const [form, setForm] = useState({
         email_listName: '',
         emails: '',
@@ -53,16 +51,13 @@ const EmailCampaignsListPage = () => {
 
     React.useEffect(() => {
         if (userCampaigns && userCampaigns.length > 0) {
-            let filtered = userCampaigns;
-            if (activeTab === 'Active') filtered = userCampaigns.filter((c: any) => c.status === 'Active');
-            else if (activeTab === 'Scheduled') filtered = userCampaigns.filter((c: any) => c.status === 'Scheduled');
-            else if (activeTab === 'Completed') filtered = userCampaigns.filter((c: any) => c.status === 'Completed');
-            else filtered = userCampaigns; // Show all for 'All' tab
-            setTabCampaigns(filtered);
+            // Sort campaigns by createdAt descending
+            const sorted = [...userCampaigns].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            setTabCampaigns(sorted);
         } else {
             setTabCampaigns([]);
         }
-    }, [userCampaigns, activeTab]);
+    }, [userCampaigns]);
 
     const handleCreateCampaignClick = () => {
         // setIsModalOpen(true);
@@ -123,9 +118,26 @@ const EmailCampaignsListPage = () => {
       }
     };
 
-    const handleTabClick = (tab: string) => {
-        setActiveTab(tab);
-        toast.success(`${tab} campaigns loaded!`);
+    // Delete campaign handler
+    const handleDeleteCampaign = async (campaignId: string) => {
+        try {
+            const token = (typeof window !== 'undefined') ? JSON.parse(localStorage.getItem('persist:root') || '{}').auth ? JSON.parse(JSON.parse(localStorage.getItem('persist:root') || '{}').auth).token : null : null;
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/v1/campaigns/${campaignId}`,
+                {
+                    method: 'DELETE',
+                    headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+                }
+            );
+            if (res.ok) {
+                toast.success('Campaign deleted!');
+                dispatch(fetchAllCampaigns());
+            } else {
+                const data = await res.json();
+                toast.error(data.error || 'Failed to delete campaign');
+            }
+        } catch (err) {
+            toast.error('Failed to delete campaign');
+        }
     };
 
     const handleCampaignRowClick = async (campaignId: string) => {
@@ -172,18 +184,8 @@ const EmailCampaignsListPage = () => {
                     <div className="p-4 sm:p-6 border-b border-gray-200">
                         {/* Toolbar */}
                         <div className="flex flex-col sm:flex-row justify-between gap-4">
-                            {/* Tabs */}
-                            <div className="p-1 bg-gray-100 rounded-lg flex space-x-1 w-full sm:w-auto">
-                                {TABS.map(tab => (
-                                    <button
-                                        key={tab}
-                                        onClick={() => handleTabClick(tab)}
-                                        className={`px-4 py-1.5 text-sm font-semibold rounded-md flex-1 sm:flex-initial transition-colors border ${activeTab === tab ? 'bg-white text-[#3366FF] border-[#3366FF] shadow' : 'text-gray-500 border-transparent hover:text-[#3366FF] hover:bg-gray-50'}`}
-                                    >{tab}</button>
-                                ))}
-                            </div>
                             {/* Search and Actions */}
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 w-full justify-end">
                                 <div className="relative flex-grow">
                                     <Input icon={<Search size={16} className="text-gray-400" />} placeholder="Search anything that comes to mind"/>
                                 </div>
@@ -196,12 +198,12 @@ const EmailCampaignsListPage = () => {
                     <div className="w-full overflow-x-auto">
                         <table className="min-w-full text-sm">
                              {/* Table Head */}
-                            <thead className="text-left text-gray-600"><tr>{['Name', 'Status', 'Audience', 'Deliveries', 'Opens', 'Clicks', 'Date', 'Action'].map(h=><th key={h} className="p-3 font-medium">{h}</th>)}</tr></thead>
+                            <thead className="text-left text-gray-600"><tr>{['Name', 'Status', 'Date', 'Action'].map(h=><th key={h} className="p-3 font-medium">{h}</th>)}</tr></thead>
                             <tbody className="divide-y divide-gray-100">
                                 {status === 'loading' ? (
-                                    <tr><td colSpan={8} className="p-4 text-center text-gray-500">Loading...</td></tr>
+                                    <tr><td colSpan={5} className="p-4 text-center text-gray-500">Loading...</td></tr>
                                 ) : error ? (
-                                    <tr><td colSpan={8} className="p-4 text-center text-red-500">{error}</td></tr>
+                                    <tr><td colSpan={5} className="p-4 text-center text-red-500">{error}</td></tr>
                                 ) : tabCampaigns && tabCampaigns.length > 0 ? (
                                     tabCampaigns.map((campaign: any, i: number) => {
                                         const isExpanded = expandedCampaignId === campaign._id;
@@ -213,16 +215,14 @@ const EmailCampaignsListPage = () => {
                                                     <span className="ml-2">{isExpanded ? <ChevronUp size={16}/> : <ChevronDown size={16}/>}</span>
                                                 </td>
                                                 <td className="p-3">{campaign.status}</td>
-                                                <td className="p-3">-</td>
-                                                <td className="p-3">-</td>
-                                                <td className="p-3">-</td>
-                                                <td className="p-3">{campaign.deliveryStatus}</td>
                                                 <td className="p-3">{campaign.createdAt ? new Date(campaign.createdAt).toLocaleDateString() : '-'}</td>
-                                                <td className="p-3 flex gap-2">-</td>
+                                                <td className="p-3 flex gap-2" onClick={e => e.stopPropagation()}>
+                                                    <Button variant="destructive" size="sm" onClick={() => handleDeleteCampaign(campaign._id)}>Delete</Button>
+                                                </td>
                                             </tr>
                                             {isExpanded && (
                                                 <tr>
-                                                    <td colSpan={8} className="bg-white border-t-0 p-0">
+                                                    <td colSpan={5} className="bg-white border-t-0 p-0">
                                                         <div className="transition-all duration-300 overflow-hidden rounded-b-xl border border-t-0 border-blue-200 shadow-lg p-6">
                                                             {detailsLoading ? (
                                                                 <div className="flex items-center justify-center py-8"><Loader2 className="animate-spin mr-2"/> Loading details...</div>
@@ -252,7 +252,7 @@ const EmailCampaignsListPage = () => {
                                         );
                                     })
                                 ) : (
-                                    <tr><td colSpan={8} className="p-4 text-center text-gray-500">No campaigns found.</td></tr>
+                                    <tr><td colSpan={5} className="p-4 text-center text-gray-500">No campaigns found.</td></tr>
                                 )}
                             </tbody>
                         </table>
