@@ -1,7 +1,4 @@
-// src/lib/utils/baseUrl.ts
-
-
-
+// 9
 
 const BASE_URL = 'https://kiqi-server-pqqr.onrender.com';
 
