@@ -58,25 +58,29 @@ const initialState: AuthState = {
 };
 
 export const loginUser = createAsyncThunk('auth/loginUser', async (credentials: { email: string; password: string }, { rejectWithValue }) => {
-    try {
-        const response = await apiClient.post(`${BASE_URL}/api/v1/auth/login`, credentials);
-        if (!response.accessToken || !response.user) {
-            return rejectWithValue(response.message || 'Login failed');
-        }
-        return {
-            user: response.user, // Use full user object from backend
-            token: response.accessToken,
-            refreshToken: response.refreshToken,
-            message: response.message,
-        };
-    } catch (error: any) {
-        let message = error.message || 'Login failed';
-        try {
-            const errObj = JSON.parse(message);
-            message = errObj.message || message;
-        } catch {}
-        return rejectWithValue(message);
+  try {
+    const response = await apiClient.post(`${BASE_URL}/api/v1/auth/login`, credentials);
+    if (response.error) {
+
+      return rejectWithValue(response.message || 'Login failed');
     }
+    if (!response.accessToken || !response.user) {
+      return rejectWithValue(response.message || 'Login failed');
+    }
+    return {
+      user: response.user, // Use full user object from backend
+      token: response.accessToken,
+      refreshToken: response.refreshToken,
+      message: response.message,
+    };
+  } catch (error: any) {
+    let message = error.message || 'Login failed';
+    try {
+      const errObj = JSON.parse(message);
+      message = errObj.message || message;
+    } catch {}
+    return rejectWithValue(message);
+  }
 });
 
 export const registerUser = createAsyncThunk(
@@ -112,12 +116,20 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.status = 'idle';
+      state.error = null;
       state.registration = {
         status: 'idle',
         error: null,
         data: null,
         message: null,
       };
+    },
+    resetAuthState: (state) => {
+      state.status = 'idle';
+      state.error = null;
+      state.registration.status = 'idle';
+      state.registration.error = null;
+      state.registration.message = null;
     },
   },
   extraReducers: (builder) => {
@@ -157,6 +169,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, resetAuthState } = authSlice.actions;
 
 export default authSlice.reducer;

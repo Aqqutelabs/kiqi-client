@@ -23,6 +23,11 @@ const LoginPage = () => {
   const router = useRouter();
   const { status, error } = useSelector((state: RootState) => state.auth);
 
+  // Reset auth error/status on mount to avoid showing stale errors
+  React.useEffect(() => {
+    dispatch(require('@/redux/slices/authSlice').resetAuthState());
+  }, [dispatch]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget as HTMLFormElement);
