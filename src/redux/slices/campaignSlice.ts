@@ -227,7 +227,7 @@ export const fetchUserEmailLists = createAsyncThunk<
 // --- START EMAIL CAMPAIGN ---
 export const startEmailCampaign = createAsyncThunk<
   any,
-  { campaignName: string; emailListId: string; subject: string; body: string },
+  { campaignName: string; emailListId: string; subject: string; body: string; replyTo?: string },
   { rejectValue: string, state: { auth: { token: string | null } } }
 >(
   'campaigns/startEmailCampaign',

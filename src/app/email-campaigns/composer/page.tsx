@@ -99,7 +99,7 @@ const CampaignComposerPage = () => {
                     emailListId: form.emailListId,
                     subject: form.subjectLine,
                     body: editorContent,
-                    senderEmail: form.senderEmail,
+                    replyTo: form.senderEmail, // Use senderEmail as replyTo
                 };
                 const startResult = await dispatch(startEmailCampaign(startPayload));
                 if (startEmailCampaign.fulfilled.match(startResult)) {

@@ -155,11 +155,15 @@ const authSlice = createSlice({
         state.registration.message = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
+        // Clear previous user state
+        Object.assign(state, initialState);
+        
         state.registration.status = 'succeeded';
         state.registration.data = action.payload.data;
         state.registration.message = action.payload.message;
         if (action.payload.token) {
           state.token = action.payload.token;
+          state.user = action.payload.data; // Set the user on successful registration
         }
       })
       .addCase(registerUser.rejected, (state, action) => {
