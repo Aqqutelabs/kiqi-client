@@ -1,8 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+// import icons
 import {
   LayoutDashboard,
   MessageSquare,
@@ -25,6 +26,7 @@ import {
   ChevronUp,
   Pencil,
   List as ListIcon,
+  Play,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { Icon } from './IconComponent';
@@ -35,7 +37,6 @@ import { persistor } from '@/redux/store';
 import Image from 'next/image';
 
 // --- DEFINE SPECIFIC TYPES FOR EACH NAVIGATION ITEM ---
-
 type NavHeading = {
   type: 'heading';
   label: string;
@@ -56,11 +57,17 @@ type NavAction = {
 
 // The main navigation array now uses a union of our specific types
 const navigation: (NavHeading | NavLinkItem)[] = [
-  { type: 'link', href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
-  { type: 'heading', label: 'Campaigns' },
-  { type: 'heading', label: 'Chatbot' },
-  { type: 'heading', label: 'Finance' },
-  { type: 'heading', label: 'System' },
+  {
+    type: "link",
+    href: "/dashboard",
+    label: "Overview",
+    icon: LayoutDashboard,
+  },
+  { type: "heading", label: "Campaigns" },
+  { type: "heading", label: "SMS" },
+  { type: "heading", label: "Chatbot" },
+  { type: "heading", label: "Finance" },
+  { type: "heading", label: "System" },
 ];
 
 export const Sidebar: React.FC = () => {
@@ -70,6 +77,7 @@ export const Sidebar: React.FC = () => {
 
   // Dropdown state
   const [campaignsOpen, setCampaignsOpen] = React.useState(false);
+  const [SMSOpen, setSMSOpen] = React.useState(false);
   const [financeOpen, setFinanceOpen] = React.useState(false);
   const [systemsOpen, setSystemsOpen] = React.useState(false);
   const [chatbotOpen, setChatbotOpen] = React.useState(false);
@@ -85,6 +93,15 @@ export const Sidebar: React.FC = () => {
     { href: '/email-campaigns', label: 'Email Campaigns', icon: Mail },
     { href: '/email-campaigns/composer', label: 'Create Email Campaign', icon: Pencil },
     { href: '/email-campaigns/email-lists', label: 'Email Lists', icon: ListIcon },
+  ];
+
+  // SMS dropdown links
+  const SMSLinks = [
+    { href: "/sms/send-bulk-sms", label: "Send Bulk SMS", icon: Play },
+    { href: "/sms/create-sender-id", label: "Create a Sender ID", icon: Play },
+    { href: "/sms/manage-recipient-groups", label: "Manage Recipient Groups", icon: Play },
+    { href: "/sms/sms-drafts", label: "SMS Drafts", icon: Play },
+    { href: "/sms/sms-templates", label: "SMS Templates", icon: Play },
   ];
 
   // Finance dropdown links
@@ -173,6 +190,60 @@ export const Sidebar: React.FC = () => {
                   </div>
                 );
               }
+               if (item.label === "SMS") {
+                 return (
+                   <div key={index} className="mb-1">
+                     <button
+                       className="w-full flex items-center justify-between px-3 pt-4 pb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider focus:outline-none hover:text-gray-700"
+                       onClick={() => setSMSOpen((open) => !open)}
+                       aria-expanded={SMSOpen}>
+                       <span>{item.label}</span>
+                       {SMSOpen ? (
+                         <ChevronUp size={16} />
+                       ) : (
+                         <ChevronDown size={16} />
+                       )}
+                     </button>
+                     <div
+                       className={clsx(
+                         "overflow-hidden transition-all duration-300",
+                         SMSOpen
+                           ? "max-h-40 opacity-100"
+                           : "max-h-0 opacity-0"
+                       )}>
+                       <ul className="pl-2">
+                         {SMSLinks.map((linkObj) => {
+                           const isActive = pathname.startsWith(linkObj.href);
+                           return (
+                             <li key={linkObj.href}>
+                               <Link
+                                 href={linkObj.href}
+                                 className={clsx(
+                                   "flex items-center space-x-3 px-3 py-2 rounded-lg transition-all text-sm font-medium",
+                                   {
+                                     "bg-[#E0E7FF] text-[#3366FF] font-semibold":
+                                       isActive,
+                                     "text-gray-600 hover:bg-gray-100 hover:text-gray-900":
+                                       !isActive,
+                                   }
+                                 )}>
+                                 <Icon
+                                   icon={linkObj.icon}
+                                   className={clsx({
+                                     "text-[#3366FF]": isActive,
+                                   })}
+                                   strokeWidth={isActive ? 2 : 1.5}
+                                 />
+                                 <span>{linkObj.label}</span>
+                               </Link>
+                             </li>
+                           );
+                         })}
+                       </ul>
+                     </div>
+                   </div>
+                 );
+               }
               if (item.label === 'Finance') {
                 return (
                   <div key={index} className="mb-1">

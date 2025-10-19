@@ -10,7 +10,7 @@ export const Label: React.FC<React.LabelHTMLAttributes<HTMLLabelElement>> = ({ c
 );
 
 interface FormFieldProps extends InputProps {
-  label: string;
+  label?: string;
   id: string;
 }
 
