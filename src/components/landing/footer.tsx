@@ -34,7 +34,7 @@ export default function LandingFooter() {
 
           <div className="flex flex-col md:flex-row gap-5 md:items-center mt-5">
             {cta.map(c => (
-                <div className="p-2 border border-[#A6A6A6] rounded flex gap-3">
+                <div key={c.id} className="p-2 border border-[#A6A6A6] rounded flex gap-3">
                     <Image
                     src={c.image}
                     alt="Icon"

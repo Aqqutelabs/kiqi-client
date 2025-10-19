@@ -158,7 +158,7 @@ const CampaignComposerPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
             >
-                <PageHeader title="Create a campaign" backLink="/dashboard/email-campaigns" />
+                <PageHeader title="Create a campaign" backLink="/email-campaigns/lists" />
                 <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl mx-auto">
                     <Card className="p-6 animate-fade-in">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

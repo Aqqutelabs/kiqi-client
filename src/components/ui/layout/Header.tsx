@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { logout } from '@/redux/slices/authSlice';
 import { useRouter } from 'next/navigation';
 import { User } from 'lucide-react';
+import Image from 'next/image';
 
 const Header = () => {
   const dispatch = useAppDispatch();
@@ -55,14 +56,14 @@ const Header = () => {
           <div className="text-sm font-semibold text-gray-800">{displayName}</div>
           <div className="text-xs text-gray-500">{email}</div>
         </div>
-        <button
+        {/* <button
           type="button"
           className="p-1 rounded-full text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3366FF]"
           aria-haspopup="true"
           onClick={handleLogout}
         >
           Logout
-        </button>
+        </button> */}
       </div>
     </header>
   );
