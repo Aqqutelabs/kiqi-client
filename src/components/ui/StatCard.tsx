@@ -2,7 +2,7 @@ import React from 'react';
 import { ArrowUp } from 'lucide-react';
 import { Card } from './Card';
 
-interface StatCardProps {
+export interface StatCardProps {
   title: string;
   value: string;
   change: string;
