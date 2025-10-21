@@ -9,6 +9,7 @@ import Header from "@/components/ui/layout/Header";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import SearchInput from "@/components/ui/Search";
 import { StatCard, StatCardProps } from "@/components/ui/StatCard";
+import { redirect } from "next/navigation";
 
 // define types for pr list
 interface PRList {
@@ -114,7 +115,7 @@ export default function PRDashboard() {
               <div className="flex items-center gap-2">
                 <SearchInput name="search" value="" onChange={() => {}} />
                 <Filter value="" onChange={() => {}} />
-                <Button>Create New Press Release</Button>
+                <Button onClick={() => redirect("/pr/create")}>Create New Press Release</Button>
               </div>
             </div>
             <DataTable
