@@ -10,7 +10,7 @@ import { Trash2 } from "lucide-react";
 import SimpleFileInput from "@/components/ui/SimpleFileInput";
 import { redirect } from "next/navigation";
 
-// Define type for recipienr group list
+// Define type for recipient group list
 interface RecipientGroup {
   id: number;
   groupName: string;
