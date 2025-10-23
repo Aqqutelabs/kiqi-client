@@ -6,18 +6,19 @@ export interface StatCardProps {
   title: string;
   value: string;
   change: string;
-  changeType: 'increase' | 'decrease';
+  changeType: 'increase' | 'decrease' | 'intermediate';
 }
 
 const StatCard: React.FC<StatCardProps> = ({ title, value, change, changeType }) => {
   const isIncrease = changeType === 'increase';
+  const isIntermediate = changeType === 'intermediate';
   return (
     <Card className="p-4">
       <div className="flex flex-col">
         <p className="text-sm text-gray-500">{title}</p>
         <div className="flex items-end space-x-2 mt-1">
           <p className="text-2xl font-bold">{value}</p>
-          <div className={`flex items-center text-xs font-semibold ${isIncrease ? 'text-green-500' : 'text-red-500'}`}>
+          <div className={`flex items-center text-xs font-semibold ${isIncrease ? 'text-green-500' : isIntermediate ? 'text-gray-500' : 'text-red-500'}`}>
             <ArrowUp size={14} className={`${!isIncrease && 'rotate-180'}`} />
             <span>{change}</span>
           </div>

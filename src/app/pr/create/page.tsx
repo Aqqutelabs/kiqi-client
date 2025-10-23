@@ -2,12 +2,14 @@
 
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { FormField } from "@/components/ui/FormField";
 import DashboardLayout from "@/components/ui/layout/DashboardLayout";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import Heading from "@/components/ui/TextHeading";
 import { motion } from "framer-motion";
+import { redirect } from "next/navigation";
 import { useState } from "react";
 
 
@@ -29,7 +31,14 @@ const [activeTab, setActiveTab] = useState<number | null>(null);
         <PageHeader title="Create a Press Release" backLink="/pr/dashboard" />
         <Card>
             <Heading heading="Step 1" subtitle="Campaign Selection"/>
-           <Select>one</Select>
+            <FormField
+            name="campaign_selection"
+            value={""}
+            onChange={() => {}}
+            type="text"
+            id="campaign_selection"
+            placeholder="Campaign A"
+            />
         </Card>
         <Card>
              <Heading heading="Step 2" subtitle="Content Upload"/>
@@ -51,7 +60,7 @@ const [activeTab, setActiveTab] = useState<number | null>(null);
              <Textarea/>
         </Card>
        <div className="flex justify-end items-center">
-        <Button size={"lg"}>Next</Button>
+        <Button size={"lg"} onClick={() => redirect("/pr/create/publisher-platform")}>Next</Button>
        </div>
       </motion.main>
     </DashboardLayout>

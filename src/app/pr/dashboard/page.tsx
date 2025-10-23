@@ -9,6 +9,7 @@ import Header from "@/components/ui/layout/Header";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import SearchInput from "@/components/ui/Search";
 import { StatCard, StatCardProps } from "@/components/ui/StatCard";
+import Heading from "@/components/ui/TextHeading";
 import { redirect } from "next/navigation";
 
 // define types for pr list
@@ -27,27 +28,27 @@ export default function PRDashboard() {
   const dashboard_stats: StatCardProps[] = [
     {
       title: "Press Releases",
-      value: "20",
-      change: "18",
-      changeType: "increase",
+      value: "0",
+      change: "0",
+      changeType: "intermediate",
     },
     {
       title: "Press Release Views",
-      value: "24.5K",
-      change: "18",
-      changeType: "increase",
+      value: "0",
+      change: "0",
+      changeType: "intermediate",
     },
     {
       title: "Total Amount Spent",
-      value: "$200",
-      change: "18",
-      changeType: "increase",
+      value: "$0",
+      change: "0",
+      changeType: "intermediate",
     },
     {
       title: "Media Channels",
-      value: "7",
-      change: "",
-      changeType: "increase",
+      value: "0",
+      change: "0",
+      changeType: "intermediate",
     },
   ];
 
@@ -109,20 +110,28 @@ export default function PRDashboard() {
             ))}
           </div>
 
-          <Card>
-            <div className="flex justify-between items-center text-[#1B223C] font-medium mb-8">
-              <h3 className="text-lg md:text-xl">Press Release List</h3>
-              <div className="flex items-center gap-2">
-                <SearchInput name="search" value="" onChange={() => {}} />
-                <Filter value="" onChange={() => {}} />
-                <Button onClick={() => redirect("/pr/create")}>Create New Press Release</Button>
+          {data.length === 0 ? (
+            <section className="flex flex-col justify-center items-center h-[460px] gap-5">
+              <img src={"/rafiki.svg"} alt="No Press Releases" />
+              <Heading heading="No Press Releases Yet?" subtitle="You haven’t created any press releases. Start by launching your first PR campaign and get featured on top outlets in minutes." className="text-center w-[400px]"/>
+               <Button onClick={() => redirect("/pr/create")}>Create New Press Release</Button>
+            </section>
+          ) : (
+            <Card>
+              <div className="flex justify-between items-center text-[#1B223C] font-medium mb-8">
+                <h3 className="text-lg md:text-xl">Press Release List</h3>
+                <div className="flex items-center gap-2">
+                  <SearchInput name="search" value="" onChange={() => {}} />
+                  <Filter value="" onChange={() => {}} />
+                  <Button onClick={() => redirect("/pr/create")}>Create New Press Release</Button>
+                </div>
               </div>
-            </div>
-            <DataTable
-              columns={columns}
-              data={data}
-            />
-          </Card>
+              <DataTable
+                columns={columns}
+                data={data}
+              />
+            </Card>
+          )}
         </main>
       </div>
     </DashboardLayout>
