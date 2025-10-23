@@ -14,20 +14,16 @@ import {
   ChevronDown,
   TrendingUp,
   Package,
+  FileText,
+  ChartColumn,
+  Calendar,
+  ExternalLink,
 } from "lucide-react";
 import { Products } from "@/components/ui/ProductCard";
 import { Button } from "@/components/ui/Button";
+import { useProducts } from "@/context/ProductContext";
 
-export default function ProductSidebar({
-  isOpen,
-  onClose,
-  product,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  product: Products;
-}) {
-  const [activeTab, setActiveTab] = useState("overview");
+function Overview({ product }: { product: Products }) {
   const [openFaq, setOpenFaq] = useState<string | null>(null);
 
   const toggleFaq = (index: string) => {
@@ -41,12 +37,206 @@ export default function ProductSidebar({
     { question: "Is there a revision policy?", id: "4" },
   ];
 
+  return (
+    <div className="p-6">
+      {/* Key Features */}
+      <div className="mb-8">
+        <h2 className="font-bold text-gray-900 mb-4">Key Features</h2>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-gray-50 rounded-lg p-4">
+            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
+              <Award className="w-4 h-4 text-blue-600" />
+            </div>
+            <div className="text-xs text-gray-600 mb-1">Premium Quality</div>
+            <div className="font-semibold text-sm text-gray-900">
+              Verified Publisher
+            </div>
+          </div>
+
+          <div className="bg-gray-50 rounded-lg p-4">
+            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
+              <Target className="w-4 h-4 text-blue-600" />
+            </div>
+            <div className="text-xs text-gray-600 mb-1">High Engagement</div>
+            <div className="font-semibold text-sm text-gray-900">85% CTR</div>
+          </div>
+
+          <div className="bg-gray-50 rounded-lg p-4">
+            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
+              <Clock className="w-4 h-4 text-blue-600" />
+            </div>
+            <div className="text-xs text-gray-600 mb-1">Fast Delivery</div>
+            <div className="font-semibold text-sm text-gray-900">
+              24-48 Hours
+            </div>
+          </div>
+
+          <div className="bg-gray-50 rounded-lg p-4">
+            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
+              <Globe className="w-4 h-4 text-blue-600" />
+            </div>
+            <div className="text-xs text-gray-600 mb-1">Global Coverage</div>
+            <div className="font-semibold text-sm text-gray-900">
+              USA, Europe
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Additional Info */}
+      <div className="space-y-3 mb-8">
+        <div className="flex items-center justify-between py-3 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <TrendingUp size={15} color="#009966" />
+            <span className="text-sm text-gray-600">Industry Focus</span>
+          </div>
+          <span className="text-sm font-medium text-gray-900">
+            {product.industry}
+          </span>
+        </div>
+
+        <div className="flex items-center justify-between py-3 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <Globe size={15} color="#155DFC" />
+            <span className="text-sm text-gray-600">Coverage</span>
+          </div>
+          <span className="text-sm font-medium text-gray-900">
+            {product.region}
+          </span>
+        </div>
+
+        <div className="flex items-center justify-between py-3 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <Users size={15} color="#9810FA" />
+            <span className="text-sm text-gray-600">Audience Reach</span>
+          </div>
+          <span className="text-sm font-medium text-gray-900">
+            {product.reach}
+          </span>
+        </div>
+      </div>
+
+      {/* FAQ */}
+      <div>
+        <h2 className="font-bold text-gray-900 mb-4">
+          Frequently Asked Questions
+        </h2>
+        <div className="space-y-2">
+          {faqs.map((faq) => (
+            <button
+              key={faq.id}
+              onClick={() => toggleFaq(faq.id)}
+              className="w-full text-left p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-900">
+                  {faq.question}
+                </span>
+                <ChevronDown
+                  className={`w-4 h-4 text-gray-400 transition-transform ${
+                    openFaq === faq.id ? "rotate-180" : ""
+                  }`}
+                />
+              </div>
+              {openFaq === faq.id && (
+                <p className="mt-3 text-sm text-gray-600">
+                  This is the answer to the question. It provides detailed
+                  information about the topic.
+                </p>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Metrics({ product }: { product: Products }) {
+  const bars = [
+    { name: "Domain Authority", count: 92, color: "#155DFC" },
+    { name: "Trust Score", count: 88, color: "#009966" },
+    { name: "Average Traffic", count: 75, color: "#9810FA" },
+    { name: "Social Signals", count: 95, color: "#F54900" },
+  ];
+  return (
+    <div className="space-y-5 p-5">
+      <div className="space-y-4">
+        <h4 className="font-bold text-[#1B223C] text-base">
+          Performance Metrics
+        </h4>
+        {bars.map((bar, idx) => (
+          <div key={idx} className="">
+            <p className="flex justify-between items-center text-xs space-y-2">
+              <span className="text-[#1B223C]">{bar.name}</span>
+              <span className="font-bold text-[#233E97]">{bar.count}/100</span>
+            </p>
+            <div className="h-2 w-full rounded-full bg-[#F1F5F9]">
+              <span
+                style={{
+                  width: `${bar.count}%`,
+                  backgroundColor: `${bar.color}`,
+                  height: "80%",
+                }}></span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="space-y-4">
+        <h4 className="font-bold text-[#1B223C] text-base">Sample Results</h4>
+        <div className="flex items-center gap-4">
+          {/* publish time */}
+          <div className="p-5 rounded-xl shadow-sm flex-1 min-w-[150px] transition-shadow hover:shadow-md border border-[#A4F4CF]">
+            <div
+              className={`w-10 h-10 flex items-center justify-center rounded-lg mb-3`}>
+              <Calendar className="w-5 h-5" color="#009966" />
+            </div>
+            <p className="text-sm font-medium text-gray-500 mb-1">
+              Avg. Publish Time
+            </p>
+            <h3 className="text-xl font-bold">24-48 Hours</h3>
+          </div>
+
+          {/* backlinks */}
+          <div className="p-5 rounded-xl shadow-sm flex-1 min-w-[150px] transition-shadow hover:shadow-md border border-[#BEDBFF]">
+            <div
+              className={`w-10 h-10 flex items-center justify-center rounded-lg mb-3`}>
+              <ExternalLink className="w-5 h-5" color="#155DFC" />
+            </div>
+            <p className="text-sm font-medium text-gray-500 mb-1">
+              Avg. Backlinks
+            </p>
+            <h3 className="text-xl font-bold">15-30</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Reviews({ product }: { product: Products }) {
+  return <div></div>;
+}
+
+export default function ProductSidebar({
+  isOpen,
+  onClose,
+  product,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  product: Products;
+}) {
+  const [activeTab, setActiveTab] = useState(1);
+  const tabs = [
+    { name: "Overview", icon: FileText, id: 1 },
+    { name: "Metrics", icon: ChartColumn, id: 2 },
+    { name: "Reviews", icon: Star, id: 3 },
+  ];
+
   if (!product) return null;
 
-   const [isAdded, setIsAdded] = useState(false);
-   const handleAddToCart = () => {
-    setIsAdded(true);
-  };
+  const { isAdded, handleAddToCart } = useProducts();
 
   return (
     <>
@@ -100,12 +290,10 @@ export default function ProductSidebar({
 
         {/* Action Buttons */}
         <div className="p-4 border-b border-gray-100 flex gap-2">
-          <button
-            onClick={handleAddToCart}
-            className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors bg-blue-900 text-white hover:bg-blue-800 w-full`}>
-            <ShoppingCart className="w-4 h-4" />
+          <Button onClick={handleAddToCart}>
+            <ShoppingCart className="w-4 h-4 mr-2.5" />
             <span>{!isAdded ? "Add" : "Added"} to Cart</span>
-          </button>
+          </Button>
           <Button variant={"tertiary"}>
             <Bookmark className="w-4 h-4" />
           </Button>
@@ -115,169 +303,28 @@ export default function ProductSidebar({
         </div>
 
         {/* Tabs */}
-        <div className="border-b border-gray-200">
-          <div className="flex px-4">
-            <button
-              onClick={() => setActiveTab("overview")}
-              className={`flex items-center gap-2 px-4 py-3 font-medium text-sm transition-colors relative ${
-                activeTab === "overview"
-                  ? "text-blue-600"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}>
-              <Eye className="w-4 h-4" />
-              Overview
-              {activeTab === "overview" && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600" />
-              )}
-            </button>
-            <button
-              onClick={() => setActiveTab("metrics")}
-              className={`flex items-center gap-2 px-4 py-3 font-medium text-sm transition-colors relative ${
-                activeTab === "metrics"
-                  ? "text-blue-600"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}>
-              <Target className="w-4 h-4" />
-              Metrics
-              {activeTab === "metrics" && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600" />
-              )}
-            </button>
-            <button
-              onClick={() => setActiveTab("reviews")}
-              className={`flex items-center gap-2 px-4 py-3 font-medium text-sm transition-colors relative ${
-                activeTab === "reviews"
-                  ? "text-blue-600"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}>
-              <Star className="w-4 h-4" />
-              Reviews
-              {activeTab === "reviews" && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600" />
-              )}
-            </button>
+        <div className="border-b border-gray-200 py-4">
+          <div className="flex px-4 gap-2">
+            {tabs.map((tab) => (
+              <button
+                onClick={() => setActiveTab(tab.id)}
+                key={tab.id}
+                className={`flex items-center justify-center gap-2 rounded-[10px] h-[35px] w-[110px] cursor-pointer ${
+                  activeTab === tab.id
+                    ? "bg-[#233E97] text-white"
+                    : "bg-[#F1F5F9] text-[#45556C]"
+                }`}>
+                <tab.icon size={15} />
+                <span className="font-medium text-xs">{tab.name}</span>
+              </button>
+            ))}
           </div>
         </div>
 
         {/* Content */}
-        <div className="p-6">
-          {/* Key Features */}
-          <div className="mb-8">
-            <h2 className="font-bold text-gray-900 mb-4">Key Features</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gray-50 rounded-lg p-4">
-                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
-                  <Award className="w-4 h-4 text-blue-600" />
-                </div>
-                <div className="text-xs text-gray-600 mb-1">
-                  Premium Quality
-                </div>
-                <div className="font-semibold text-sm text-gray-900">
-                  Verified Publisher
-                </div>
-              </div>
-
-              <div className="bg-gray-50 rounded-lg p-4">
-                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
-                  <Target className="w-4 h-4 text-blue-600" />
-                </div>
-                <div className="text-xs text-gray-600 mb-1">
-                  High Engagement
-                </div>
-                <div className="font-semibold text-sm text-gray-900">
-                  85% CTR
-                </div>
-              </div>
-
-              <div className="bg-gray-50 rounded-lg p-4">
-                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
-                  <Clock className="w-4 h-4 text-blue-600" />
-                </div>
-                <div className="text-xs text-gray-600 mb-1">Fast Delivery</div>
-                <div className="font-semibold text-sm text-gray-900">
-                  24-48 Hours
-                </div>
-              </div>
-
-              <div className="bg-gray-50 rounded-lg p-4">
-                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
-                  <Globe className="w-4 h-4 text-blue-600" />
-                </div>
-                <div className="text-xs text-gray-600 mb-1">
-                  Global Coverage
-                </div>
-                <div className="font-semibold text-sm text-gray-900">
-                  USA, Europe
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Additional Info */}
-          <div className="space-y-3 mb-8">
-            <div className="flex items-center justify-between py-3 border-b border-gray-100">
-              <div className="flex items-center gap-3">
-                <TrendingUp size={15} color="#009966" />
-                <span className="text-sm text-gray-600">Industry Focus</span>
-              </div>
-              <span className="text-sm font-medium text-gray-900">
-                {product.industry}
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between py-3 border-b border-gray-100">
-              <div className="flex items-center gap-3">
-                <Globe size={15} color="#155DFC" />
-                <span className="text-sm text-gray-600">Coverage</span>
-              </div>
-              <span className="text-sm font-medium text-gray-900">
-                {product.region}
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between py-3 border-b border-gray-100">
-              <div className="flex items-center gap-3">
-                <Users size={15} color="#9810FA" />
-                <span className="text-sm text-gray-600">Audience Reach</span>
-              </div>
-              <span className="text-sm font-medium text-gray-900">
-                {product.reach}
-              </span>
-            </div>
-          </div>
-
-          {/* FAQ */}
-          <div>
-            <h2 className="font-bold text-gray-900 mb-4">
-              Frequently Asked Questions
-            </h2>
-            <div className="space-y-2">
-              {faqs.map((faq) => (
-                <button
-                  key={faq.id}
-                  onClick={() => toggleFaq(faq.id)}
-                  className="w-full text-left p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-900">
-                      {faq.question}
-                    </span>
-                    <ChevronDown
-                      className={`w-4 h-4 text-gray-400 transition-transform ${
-                        openFaq === faq.id ? "rotate-180" : ""
-                      }`}
-                    />
-                  </div>
-                  {openFaq === faq.id && (
-                    <p className="mt-3 text-sm text-gray-600">
-                      This is the answer to the question. It provides detailed
-                      information about the topic.
-                    </p>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+        {activeTab === 1 && <Overview product={product} />}
+        {activeTab === 2 && <Metrics product={product} />}
+        {activeTab === 3 && <Reviews product={product} />}
       </div>
     </>
   );

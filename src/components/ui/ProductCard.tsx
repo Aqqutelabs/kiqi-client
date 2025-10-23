@@ -8,6 +8,7 @@ import {
   Globe,
 } from "lucide-react";
 import ProductSidebar from "@/app/pr/create/publisher-platform/product-details";
+import { useProducts } from "@/context/ProductContext";
 
 
 export interface Products {
@@ -27,23 +28,12 @@ type ProductProps = {
 };
 
 export default function ProductCard({ product }: ProductProps) {
-    const [isAdded, setIsAdded] = useState(false);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const handleAddToCart = () => {
-    setIsAdded(true);
-  };
+  const { isAdded, handleAddToCart, setIsSidebarOpen, isSidebarOpen} = useProducts();
 
-
-  const sampleProduct = {
-    name: 'Forbes',
-    price: '₦100k',
-    rating: 4.8,
-    reviews: 127
-  };
   return (
     <>
-        <div className="w-full h-[540px] border border-[#E2E8F0] rounded-2xl">
+        <div onClick={() => setIsSidebarOpen(true)} className="w-full h-[540px] border border-[#E2E8F0] rounded-2xl">
         {/* header */}
         <div className="h-[140px] w-full rounded-t-2xl flex justify-center items-center bg-gradient-to-r from-[#F8FAFC] via-[#EFF6FF] to-[#EEF2FF] relative">
             {product.productName}
