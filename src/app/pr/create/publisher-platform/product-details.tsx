@@ -18,6 +18,7 @@ import {
   ChartColumn,
   Calendar,
   ExternalLink,
+  CheckCircle,
 } from "lucide-react";
 import { Products } from "@/components/ui/ProductCard";
 import { Button } from "@/components/ui/Button";
@@ -160,6 +161,7 @@ function Metrics({ product }: { product: Products }) {
   ];
   return (
     <div className="space-y-5 p-5">
+      {/* performance metrics  */}
       <div className="space-y-4">
         <h4 className="font-bold text-[#1B223C] text-base">
           Performance Metrics
@@ -176,17 +178,18 @@ function Metrics({ product }: { product: Products }) {
                   width: `${bar.count}%`,
                   backgroundColor: `${bar.color}`,
                   height: "80%",
-                }}></span>
+                }}
+                className="block rounded-full"></span>
             </div>
           </div>
         ))}
       </div>
-
+      {/* sample results */}
       <div className="space-y-4">
         <h4 className="font-bold text-[#1B223C] text-base">Sample Results</h4>
         <div className="flex items-center gap-4">
           {/* publish time */}
-          <div className="p-5 rounded-xl shadow-sm flex-1 min-w-[150px] transition-shadow hover:shadow-md border border-[#A4F4CF]">
+          <div className="p-5 rounded-xl shadow-sm flex-1 min-w-[150px] transition-shadow hover:shadow-md border border-[#A4F4CF] bg-gradient-to-r from-[#ECFDF5] to-[#F0FDF4]">
             <div
               className={`w-10 h-10 flex items-center justify-center rounded-lg mb-3`}>
               <Calendar className="w-5 h-5" color="#009966" />
@@ -198,7 +201,7 @@ function Metrics({ product }: { product: Products }) {
           </div>
 
           {/* backlinks */}
-          <div className="p-5 rounded-xl shadow-sm flex-1 min-w-[150px] transition-shadow hover:shadow-md border border-[#BEDBFF]">
+          <div className="p-5 rounded-xl shadow-sm flex-1 min-w-[150px] transition-shadow hover:shadow-md border border-[#BEDBFF] bg-gradient-to-r from-[#EFF6FF] to-[#EEF2FF]">
             <div
               className={`w-10 h-10 flex items-center justify-center rounded-lg mb-3`}>
               <ExternalLink className="w-5 h-5" color="#155DFC" />
@@ -214,8 +217,124 @@ function Metrics({ product }: { product: Products }) {
   );
 }
 
-function Reviews({ product }: { product: Products }) {
-  return <div></div>;
+interface RatingBreakdown {
+  stars: number;
+  percentage: number;
+  color: string;
+}
+interface Review {
+  verified?: boolean;
+  verifiedText?: string;
+  name: string;
+  rating: number;
+  timeAgo: string;
+  comment: string;
+}
+interface ReviewsComponentProps {
+  rating: number;
+  totalReviews: number;
+  ratingBreakdown: RatingBreakdown[];
+  reviews: Review[];
+}
+
+function Reviews({ rating, totalReviews, ratingBreakdown, reviews }: ReviewsComponentProps) {
+  return (
+    <div className="w-full max-w-2xl mx-auto p-5">
+      {/* Rating Summary */}
+      <div className="bg-amber-50 rounded-xl p-6 mb-6">
+        <div className="flex items-start gap-8">
+          {/* Overall Rating */}
+          <div className="flex flex-col items-center">
+            <div className="text-5xl font-bold text-gray-900 mb-2">
+              {rating}
+            </div>
+            <div className="flex gap-0.5 mb-1">
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  className={`w-4 h-4 ${
+                    i < Math.floor(rating)
+                      ? "fill-yellow-400 text-yellow-400"
+                      : "fill-gray-300 text-gray-300"
+                  }`}
+                />
+              ))}
+            </div>
+            <div className="text-xs text-gray-600">{totalReviews} reviews</div>
+          </div>
+
+          {/* Rating Bars */}
+          <div className="flex-1 space-y-2">
+            {ratingBreakdown.map((bar) => (
+              <div key={bar.stars} className="flex items-center gap-3">
+                <div className="text-sm text-gray-700 w-6 flex items-center gap-1">{bar.stars} <span className="block">★</span></div>
+                <div className="flex-1 h-2 rounded-full bg-gray-200 overflow-hidden">
+                  <div
+                    style={{
+                      width: `${bar.percentage}%`,
+                      backgroundColor: bar.color,
+                    }}
+                    className="h-full rounded-full transition-all duration-300"></div>
+                </div>
+                <div className="text-sm text-gray-600 w-10 text-right">
+                  {bar.percentage}%
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Reviews */}
+      <div>
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Recent Reviews</h3>
+        <div className="space-y-4">
+          {reviews.map((review, index) => (
+            <div
+              key={index}
+              className="bg-white rounded-lg p-5 border border-gray-100">
+              {/* Verified Badge (if applicable) */}
+              {review.verified && (
+                <div className="flex items-center gap-2 mb-3">
+                  <CheckCircle className="w-5 h-5 text-green-500 fill-green-500" />
+                  <span className="text-sm text-gray-700">
+                    {review.verifiedText}
+                  </span>
+                </div>
+              )}
+
+              {/* Reviewer Info */}
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <div className="font-semibold text-gray-900 mb-1">
+                    {review.name}
+                  </div>
+                  <div className="flex gap-0.5">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`w-4 h-4 ${
+                          i < review.rating
+                            ? "fill-yellow-400 text-yellow-400"
+                            : "fill-gray-300 text-gray-300"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div className="text-xs text-gray-500">{review.timeAgo}</div>
+              </div>
+
+              {/* Review Text */}
+              <p className="text-sm text-gray-700 leading-relaxed">
+                {review.comment}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function ProductSidebar({
@@ -233,11 +352,32 @@ export default function ProductSidebar({
     { name: "Metrics", icon: ChartColumn, id: 2 },
     { name: "Reviews", icon: Star, id: 3 },
   ];
-
   if (!product) return null;
-
   const { isAdded, handleAddToCart } = useProducts();
+  const ratingBreakdown: RatingBreakdown[] = [
+  { stars: 5, percentage: 95, color: '#FBBF24' },
+  { stars: 4, percentage: 12, color: '#FBBF24' },
+  { stars: 3, percentage: 3, color: '#FBBF24' },
+  { stars: 2, percentage: 3, color: '#D1D5DB' },
+  { stars: 1, percentage: 3, color: '#D1D5DB' },
+];
 
+const reviews: Review[] = [
+  {
+    verified: true,
+    verifiedText: 'Excellent platform! Great ROI and professional service.',
+    name: '',
+    rating: 0,
+    timeAgo: '',
+    comment: ''
+  },
+  {
+    name: 'Sarah M.',
+    rating: 5,
+    timeAgo: '1 week ago',
+    comment: 'Fast delivery and high-quality content distribution.'
+  }
+];
   return (
     <>
       {/* Overlay */}
@@ -324,7 +464,7 @@ export default function ProductSidebar({
         {/* Content */}
         {activeTab === 1 && <Overview product={product} />}
         {activeTab === 2 && <Metrics product={product} />}
-        {activeTab === 3 && <Reviews product={product} />}
+        {activeTab === 3 && <Reviews rating={4} ratingBreakdown={ratingBreakdown} reviews={reviews} totalReviews={5} />}
       </div>
     </>
   );
