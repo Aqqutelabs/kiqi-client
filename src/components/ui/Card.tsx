@@ -10,7 +10,7 @@ const Card: React.FC<CardProps> = ({ children, className, ...props }) => {
   return (
     <div
       className={twMerge(
-        clsx('bg-white rounded-xl shadow-md p-6 sm:p-8', className)
+        clsx('bg-white rounded-xl shadow-md p-6 sm:p-8 w-full', className)
       )}
       {...props}
     >
