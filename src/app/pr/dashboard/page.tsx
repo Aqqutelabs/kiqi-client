@@ -118,6 +118,7 @@ export default function PRDashboard() {
             </section>
           ) : (
             <Card>
+              {/* header */}
               <div className="flex justify-between items-center text-[#1B223C] font-medium mb-8">
                 <h3 className="text-lg md:text-xl">Press Release List</h3>
                 <div className="flex items-center gap-2">
@@ -129,6 +130,7 @@ export default function PRDashboard() {
               <DataTable
                 columns={columns}
                 data={data}
+                onView={(id) => `/pr/pr-details`}
               />
             </Card>
           )}

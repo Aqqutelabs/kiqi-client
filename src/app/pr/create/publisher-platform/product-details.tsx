@@ -464,7 +464,7 @@ const reviews: Review[] = [
         {/* Content */}
         {activeTab === 1 && <Overview product={product} />}
         {activeTab === 2 && <Metrics product={product} />}
-        {activeTab === 3 && <Reviews rating={4} ratingBreakdown={ratingBreakdown} reviews={reviews} totalReviews={5} />}
+        {activeTab === 3 && <Reviews rating={5} ratingBreakdown={ratingBreakdown} reviews={reviews} totalReviews={2} />}
       </div>
     </>
   );

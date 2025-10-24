@@ -1,7 +1,7 @@
 import React from 'react';
-// import { Button } from '@/components/atoms/Button';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, Eye } from 'lucide-react';
 import { Button } from './Button';
+import Link from 'next/link';
 
 export interface Column<T> {
   header: string;
@@ -13,6 +13,7 @@ interface DataTableProps<T> {
   data: T[];
   onEdit?: (item: T) => void;
   onDelete?: (item: T) => void;
+  onView?: (id: string | number) => string; // Returns the URL for the detail page
 }
 
 export function DataTable<T extends { id: string | number }>({
@@ -20,6 +21,7 @@ export function DataTable<T extends { id: string | number }>({
   data,
   onEdit,
   onDelete,
+  onView
 }: DataTableProps<T>) {
   return (
     <div className="w-full overflow-x-auto">
@@ -34,7 +36,7 @@ export function DataTable<T extends { id: string | number }>({
                 {col.header}
               </th>
             ))}
-            {(onEdit || onDelete) && (
+            {(onEdit || onDelete || onView) && (
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
               </th>
@@ -49,11 +51,27 @@ export function DataTable<T extends { id: string | number }>({
                   {String(row[col.accessor])}
                 </td>
               ))}
-              {(onEdit || onDelete) && (
+              {(onEdit || onDelete || onView) && (
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <div className="flex justify-end items-center space-x-2">
-                    {onEdit && <Button variant="tertiary" size="sm" onClick={() => onEdit(row)}>Edit</Button>}
-                    {onDelete && <Button variant="destructive" size="sm" onClick={() => onDelete(row)}>Delete</Button>}
+                  <div className="flex justify-end items-center gap-2">
+                    {onView && (
+                      <Link href={onView(row.id)}>
+                        <Button variant="tertiary" size="sm">
+                          <Eye className="w-4 h-4 mr-1" />
+                          View
+                        </Button>
+                      </Link>
+                    )}
+                    {onEdit && (
+                      <Button variant="tertiary" size="sm" onClick={() => onEdit(row)}>
+                        Edit
+                      </Button>
+                    )}
+                    {onDelete && (
+                      <Button variant="destructive" size="sm" onClick={() => onDelete(row)}>
+                        Delete
+                      </Button>
+                    )}
                   </div>
                 </td>
               )}

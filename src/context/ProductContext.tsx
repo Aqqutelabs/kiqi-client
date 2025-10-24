@@ -24,7 +24,6 @@ export const ProductsProvider = ({
   const handleAddToCart = () => {
     setIsAdded(true);
   };
-
   return (
     <ProductsContext.Provider
       value={{
