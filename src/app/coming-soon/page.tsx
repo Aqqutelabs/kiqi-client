@@ -23,7 +23,7 @@ const ComingSoonPage = () => {
         <p className="text-gray-600 text-center mb-6">We're working hard to bring you this feature. Stay tuned for updates and new tools to help you manage your business even better!</p>
         <Button onClick={() => router.back()} className="w-full">Go Back</Button>
       </motion.div>
-      {/* <div className="mt-8 text-gray-400 text-xs">&copy; {new Date().getFullYear()} Kiqi CRM. All rights reserved.</div> */}
+      {/* <div className="mt-8 text-gray-400 text-xs">&copy; {new Date().getFullYear()} KiKi CRM. All rights reserved.</div> */}
     </div>
   );
 };

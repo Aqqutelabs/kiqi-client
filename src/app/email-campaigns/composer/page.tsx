@@ -263,8 +263,8 @@ const CampaignComposerPage = () => {
                     {/* Action Buttons */}
                     <div className="flex flex-wrap gap-4 pt-4">
                         <Button type="submit" disabled={isSubmitting}>{isSubmitting ? 'Sending...' : 'Create Campaign'}</Button>
-                        <Button type="button" variant="secondary">Save as Draft</Button>
-                        <Button type="button" className="!bg-cyan-500 hover:!bg-cyan-600 !text-white">Schedule for Later</Button>
+                        <Button type="button" variant="secondary" onClick={() => toast.success("Draft saved successfully!")}>Save as Draft</Button>
+                        <Button type="button" className="!bg-cyan-500 hover:!bg-cyan-600 !text-white" onClick={() => toast.success("Campaign scheduled successfully!")}>Schedule for Later</Button>
                     </div>
                 </form>
             </motion.main>

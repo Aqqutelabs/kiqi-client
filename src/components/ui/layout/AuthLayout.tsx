@@ -1,9 +1,5 @@
 import React from "react";
-import {
-  CircleCheck,
-  Globe,
-  ChevronDown,
-} from "lucide-react";
+import { CircleCheck, Globe, ChevronDown } from "lucide-react";
 
 const AuthLayout = ({ children }: { children: React.ReactNode }) => {
   const features = [
@@ -32,10 +28,10 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
       <div className="w-full lg:w-[40%] bg-white p-8 lg:py-10 lg:px-14 hidden md:flex flex-col justify-between">
         <div>
           {/* Logo */}
-          <img src="/kiqi-logo.svg" alt="Logo" />
+          <img src="/kiki-logo.svg" alt="Logo" className="w-[100px]" />
           {/* Heading */}
           <h1 className="text-4xl lg:text-3xl font-medium text-[#1B223C] my-4 whitespace-nowrap">
-            Streamline your business with KiQi.
+            Streamline your business with KiKi.
           </h1>
           <p className="text-[#606062] flex items-center gap-2 mt-2 text-sm">
             <CircleCheck size={18} />
@@ -46,7 +42,7 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
           <div className="space-y-7 my-6 w-[500px]">
             {features.map((feat, index) => (
               <div key={index} className="space-y-3">
-                <img src={feat.icon} alt="Icon" className="size-7"/>
+                <img src={feat.icon} alt="Icon" className="size-7" />
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2">
                     {feat.title}

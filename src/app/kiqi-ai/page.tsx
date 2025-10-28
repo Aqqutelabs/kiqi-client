@@ -45,14 +45,14 @@ const KiQiAiPage = () => {
             <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-3">
                     <Wand2 className="text-purple-600" size={28}/>
-                    <h2 className="text-2xl font-semibold text-gray-800">KiQi Ai</h2>
+                    <h2 className="text-2xl font-semibold text-gray-800">KiKi Ai</h2>
                 </div>
                 <Button className="bg-purple-600 hover:bg-purple-700"><Zap size={16} className="mr-2"/>Upgrade</Button>
             </div>
             
             <div className="max-w-4xl mx-auto text-center">
                  <h1 className="text-3xl md:text-4xl font-bold text-gray-800">
-                    Supercharge your campaigns with <span className="text-purple-600">KiQi Ai</span>
+                    Supercharge your campaigns with <span className="text-purple-600">KiKi Ai</span>
                 </h1>
                 
                 {/* AI Prompt Input */}

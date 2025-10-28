@@ -12,27 +12,27 @@ export default function FAQ() {
   const faqData = [
     {
         id: 1,
-      question: "How does Kiqi work?",
+      question: "How does KiKi work?",
       answer:
-        "KiQi includes a payment feature that supports bank transfers and card payments worldwide. You will receive the money in your bank account immediately the payment is made (transaction fees apply, see subscription plans for more info).",
+        "KiKi includes a payment feature that supports bank transfers and card payments worldwide. You will receive the money in your bank account immediately the payment is made (transaction fees apply, see subscription plans for more info).",
     },
     {
         id: 2,
       question: "How will I know when a customer places an order?",
       answer:
-        "KiQi includes a payment feature that supports bank transfers and card payments worldwide. You will receive the money in your bank account immediately the payment is made (transaction fees apply, see subscription plans for more info).",
+        "KiKi includes a payment feature that supports bank transfers and card payments worldwide. You will receive the money in your bank account immediately the payment is made (transaction fees apply, see subscription plans for more info).",
     },
     {
         id: 3,
       question: "What if I have multiple businesses?",
       answer:
-        "KiQi includes a payment feature that supports bank transfers and card payments worldwide. You will receive the money in your bank account immediately the payment is made (transaction fees apply, see subscription plans for more info).",
+        "KiKi includes a payment feature that supports bank transfers and card payments worldwide. You will receive the money in your bank account immediately the payment is made (transaction fees apply, see subscription plans for more info).",
     },
     {
         id: 4,
       question: "How do my customers make payment?",
       answer:
-        "KiQi includes a payment feature that supports bank transfers and card payments worldwide. You will receive the money in your bank account immediately the payment is made (transaction fees apply, see subscription plans for more info).",
+        "KiKi includes a payment feature that supports bank transfers and card payments worldwide. You will receive the money in your bank account immediately the payment is made (transaction fees apply, see subscription plans for more info).",
     },
   ];
 

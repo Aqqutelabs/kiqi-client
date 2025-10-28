@@ -18,7 +18,7 @@ export default function CreatePressRelease() {
     "Show Preview",
     "Clear Content",
     "Upload Document",
-    "Use with Kiqi AI",
+    "Use with KiKi AI",
   ];
   const [activeTab, setActiveTab] = useState<number | null>(null);
   return (

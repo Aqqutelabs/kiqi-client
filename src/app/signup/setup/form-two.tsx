@@ -78,7 +78,7 @@ export default function FormTwo({
     <section className="flex flex-col items-center h-screen">
       {/* logo and steps */}
       <div className="flex flex-col items-center justify-center gap-5 my-4">
-        <img src="/kiqi-logo.svg" alt="Logo" />
+        <img src="/kiki-logo.svg" alt="Logo" />
         {/* steps */}
         <div className="flex items-center gap-2">
           {tabs.map((tab, index) => {
@@ -105,7 +105,7 @@ export default function FormTwo({
           Let’s get you setup
         </h2>
         <p className="text-gray-500 text-sm mt-2">
-          Customize your KiQi chatbot
+          Customize your KiKi chatbot
         </p>
       </div>
       <Card className="w-[95%] space-y-10">

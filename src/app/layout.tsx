@@ -8,8 +8,8 @@ import { ProductsProvider } from '@/context/ProductContext';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'KiQi',
-  description: 'Streamline your business with KiQi.',
+  title: 'KiKi',
+  description: 'Streamline your business with KiKi.',
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",

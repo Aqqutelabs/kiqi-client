@@ -38,7 +38,7 @@
 //     <AuthLayout>
 //       <Card>
 //         <div className="text-center mb-6">
-//           <h2 className="text-2xl font-bold text-gray-800">Login to KiQi</h2>
+//           <h2 className="text-2xl font-bold text-gray-800">Login to KiKi</h2>
 //         </div>
 
 //         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

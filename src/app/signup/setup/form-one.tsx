@@ -24,13 +24,13 @@ export default function FormOne({
   const goBack = (e: FormEvent) => {
     e.preventDefault();
     redirect("/signup");
-  }
+  };
   return (
     <section className="flex justify-center items-center h-screen bg-[var(--primary)]">
       <Card className="w-[500px]">
         {/* logo and steps */}
         <div className="flex flex-col items-center justify-center gap-5 my-4">
-          <img src="/kiqi-logo.svg" alt="Logo" />
+          <img src="/kiki-logo.svg" alt="Logo" />
           {/* steps */}
           <div className="flex items-center gap-2">
             {tabs.map((tab, index) => {

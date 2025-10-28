@@ -66,7 +66,7 @@ const AiGeneratePage = () => {
                     <div className="col-span-2 md:col-span-2 xl:col-span-1 bg-gray-50 flex flex-col h-full border-l">
                          <div className="p-4 border-b flex items-center gap-3">
                              <Wand2 className="text-purple-600"/>
-                             <h3 className="font-semibold">KIQI Ai</h3>
+                             <h3 className="font-semibold">KIKI Ai</h3>
                          </div>
                          <div className="flex-1 p-6 space-y-6 overflow-y-auto">
                             {chatHistory.map((msg, i) => (

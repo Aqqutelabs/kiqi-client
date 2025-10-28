@@ -31,6 +31,7 @@ import { Icon } from "./IconComponent";
 import { useAppDispatch } from "@/redux/hooks";
 import { logout } from "@/redux/slices/authSlice";
 import { persistor } from "@/redux/store";
+import toast from "react-hot-toast";
 
 // Reusable Type Definitions
 type NavLink = {
@@ -54,7 +55,7 @@ const sections: (NavSection | NavLink)[] = [
   {
     label: "Email",
     links: [
-      { href: "/email-campaigns", label: "Email Campaigns", icon: Mail },
+      { href: "/email-campaigns/dashboard", label: "Email Campaigns", icon: Mail },
       { href: "/email-campaigns/composer", label: "Create Email Campaign", icon: Pencil },
       { href: "/email-campaigns/email-lists", label: "Email Lists", icon: ListIcon },
     ],
@@ -158,13 +159,14 @@ export const Sidebar: React.FC = () => {
     dispatch(logout());
     await persistor.purge();
     router.push("/");
+    toast.success("Logged out successfully.")
   };
 
   return (
     <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col h-screen">
       {/* Logo */}
       <div className="h-16 flex justify-center items-center px-6 border-b border-gray-200">
-        <Image src="/main-logo.svg" alt="KiQi 2025" width={100} height={20} />
+        <Image src="/kiki-logo.svg" alt="KiKi 2025" width={100} height={20} />
       </div>
 
       {/* Navigation */}
