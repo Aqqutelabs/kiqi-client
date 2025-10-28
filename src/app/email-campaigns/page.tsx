@@ -135,13 +135,13 @@ export default function EmailCampaignDashboard() {
           <ChartCard
             title="Campaigns"
             className="xl:col-span-2"
-            headerContent={<div className="text-[#233E97] font-medium text-sm flex items-center gap-1 cursor-pointer">
-                View all <ArrowRight size={18}/>
-                </div>}>
+            >
             <div className="flex"></div>
             <DataTable
             columns={columns}
             data={data}
+            onDelete={() => {}}
+            onEdit={() => {}}
             />
           </ChartCard>
         </main>

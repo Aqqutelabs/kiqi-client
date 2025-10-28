@@ -4,6 +4,7 @@ import DashboardLayout from "@/components/ui/layout/DashboardLayout";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { motion } from "framer-motion";
 import { Column, DataTable } from "@/components/ui/DataTable";
+import toast from "react-hot-toast";
 
 // Define type for recipienr group list
 interface RecipientGroup {
@@ -67,7 +68,7 @@ export default function RecipientGroups() {
             columns={columns}
             data={data}
             onEdit={() => {}}
-            onDelete={() => {}}
+             onDelete={() => toast.success("Deleted successfully!")}
           />
         </Card>
       </motion.main>

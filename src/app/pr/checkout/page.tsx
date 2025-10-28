@@ -6,6 +6,7 @@ import DashboardLayout from "@/components/ui/layout/DashboardLayout";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { redirect } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function PRCheckoutPage() {
   const [selectedPayment, setSelectedPayment] = useState("paystack");
@@ -42,6 +43,11 @@ export default function PRCheckoutPage() {
   const formatPrice = (price: number) => {
     return `₦${price.toLocaleString()}`;
   };
+
+  const completePayment = () => {
+    toast.success("Payment Completed!")
+    redirect("/pr/dashboard");
+  }
 
   return (
     <DashboardLayout>
@@ -239,7 +245,7 @@ export default function PRCheckoutPage() {
                 </div>
 
                 <div className="space-y-4">
-                  <Button size={"lg"}>Complete Payment</Button>
+                  <Button size={"lg"} onClick={completePayment}>Complete Payment</Button>
                   <Button
                     variant={"tertiary"}
                     onClick={() => redirect("/pr/create/publisher-platform")}>
