@@ -64,7 +64,7 @@ const navigation: (NavHeading | NavLinkItem)[] = [
     label: "Overview",
     icon: LayoutDashboard,
   },
-  { type: "heading", label: "Campaigns" },
+  { type: "heading", label: "Email" },
   { type: "heading", label: "SMS" },
   { type: "link", label: "PR", href: "/pr/dashboard", icon: ReceiptText },
   { type: "heading", label: "Chatbot" },
@@ -78,7 +78,7 @@ export const Sidebar: React.FC = () => {
   const router = useRouter();
 
   // Dropdown state
-  const [campaignsOpen, setCampaignsOpen] = React.useState(false);
+  const [emailOpen, setEmailOpen] = React.useState(false);
   const [SMSOpen, setSMSOpen] = React.useState(false);
   const [financeOpen, setFinanceOpen] = React.useState(false);
   const [systemsOpen, setSystemsOpen] = React.useState(false);
@@ -91,7 +91,7 @@ export const Sidebar: React.FC = () => {
   };
 
   // Campaigns dropdown links
-  const campaignLinks = [
+  const emailLinks = [
     { href: "/email-campaigns", label: "Email Campaigns", icon: Mail },
     {
       href: "/email-campaigns/composer",
@@ -152,15 +152,15 @@ export const Sidebar: React.FC = () => {
         {navigation.map((item, index) => {
           switch (item.type) {
             case "heading":
-              if (item.label === "Campaigns") {
+              if (item.label === "Email") {
                 return (
                   <div key={index} className="mb-1">
                     <button
                       className="w-full flex items-center justify-between px-3 pt-4 pb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider focus:outline-none hover:text-gray-700"
-                      onClick={() => setCampaignsOpen((open) => !open)}
-                      aria-expanded={campaignsOpen}>
+                      onClick={() => setEmailOpen((open) => !open)}
+                      aria-expanded={emailOpen}>
                       <span>{item.label}</span>
-                      {campaignsOpen ? (
+                      {emailOpen ? (
                         <ChevronUp size={16} />
                       ) : (
                         <ChevronDown size={16} />
@@ -169,12 +169,12 @@ export const Sidebar: React.FC = () => {
                     <div
                       className={clsx(
                         "overflow-hidden transition-all duration-300",
-                        campaignsOpen
+                        emailOpen
                           ? "max-h-40 opacity-100"
                           : "max-h-0 opacity-0"
                       )}>
                       <ul className="pl-2">
-                        {campaignLinks.map((linkObj) => {
+                        {emailLinks.map((linkObj) => {
                           const isActive = pathname.startsWith(linkObj.href);
                           return (
                             <li key={linkObj.href}>

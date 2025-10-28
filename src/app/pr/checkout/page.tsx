@@ -174,11 +174,11 @@ export default function PRCheckoutPage() {
                     )}
                   </button>
 
-                  {/* digital Wallet */}
+                  {/* go credit */}
                   <button
-                    onClick={() => setSelectedPayment("digital-wallet")}
+                    onClick={() => setSelectedPayment("go-credit")}
                     className={`relative flex items-start p-4 border-2 rounded-xl transition-all ${
-                      selectedPayment === "digital-wallet"
+                      selectedPayment === "go-credit"
                         ? "border-blue-600 bg-blue-50"
                         : "border-gray-200 hover:border-gray-300"
                     }`}>
@@ -190,9 +190,9 @@ export default function PRCheckoutPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="font-semibold text-gray-900 mb-1">
-                          Digital Wallet
+                          Go Credit
                         </div>
-                        <div className="text-xs text-gray-500">Coming Soon</div>
+                        <div className="text-xs text-gray-500">In app credit, transfer with ease</div>
                       </div>
                     </div>
                     {selectedPayment === "digital-wallet" && (
