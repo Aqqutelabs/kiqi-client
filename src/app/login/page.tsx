@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, LockKeyhole, CircleUserRound } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { FormField } from '@/components/ui/FormField';
@@ -14,8 +14,8 @@ import { loginUser } from '@/redux/slices/authSlice';
 import { AppDispatch, RootState } from '@/redux/store';
 
 // Assuming Google and Metamask have their own logo components or are SVGs
-const GoogleIcon = () => <svg /* ... */ height="20" width="20" />; 
-const MetamaskIcon = () => <img src="/metamask-fox.svg" alt="Metamask" className="h-5 w-5" />;
+const GoogleIcon = () => <img src="/devicon_google.svg" alt="Google" className="h-5 w-5" />; 
+const MetamaskIcon = () => <img src="/wallet/metamask-fox.svg" alt="Metamask" className="h-5 w-5" />;
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -43,7 +43,7 @@ const LoginPage = () => {
 
   return (
     <AuthLayout>
-      <Card>
+      <Card className='w-[600px]'>
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800">Login to KiQi</h2>
         </div>
@@ -60,10 +60,10 @@ const LoginPage = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-            <FormField label="Email Address" id="email" name="email" type="email" placeholder="Enter Email Address" icon={<Mail className="text-gray-400" size={18}/>} required/>
+            <FormField label="Email Address" id="email" name="email" type="email" placeholder="Enter Email Address" icon={<CircleUserRound className="text-gray-400" size={18}/>} required/>
             
             <div className="relative">
-                <FormField label="Password" id="password" name="password" type={showPassword ? 'text' : 'password'} placeholder="Enter Password" icon={<Lock className="text-gray-400" size={18}/>} required/>
+                <FormField label="Password" id="password" name="password" type={showPassword ? 'text' : 'password'} placeholder="Enter Password" icon={<LockKeyhole className="text-gray-400" size={18}/>} required/>
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-10 text-gray-400">
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -71,10 +71,10 @@ const LoginPage = () => {
 
             <div className="flex items-center justify-between text-sm">
                 <label className="flex items-center">
-                    <input type="checkbox" className="h-4 w-4 rounded border-gray-300 text-[#3366FF] focus:ring-[#3366FF]" />
+                    <input type="checkbox" className="h-4 w-4 rounded border-gray-300 text-[var(--primary)] focus:ring-[#3366FF]" />
                     <span className="ml-2 text-gray-600">Remember Me</span>
                 </label>
-                <Link href="/auth/reset-password" className="font-medium text-[#3366FF] hover:underline">Forgot Password?</Link>
+                <Link href="/reset-password" className="font-medium text-[var(--primary)] hover:underline">Forgot Password?</Link>
             </div>
           
             {error && <p className="text-sm text-red-500">{error}</p>}
@@ -85,7 +85,7 @@ const LoginPage = () => {
         </form>
 
         <p className="mt-6 text-center text-sm text-gray-500">
-          Do not have an account? <Link href="/signup" className="font-medium text-[#3366FF] hover:underline">Sign Up</Link>
+          Do not have an account? <Link href="/signup" className="font-medium text-[var(--primary)] hover:underline">Sign Up</Link>
         </p>
       </Card>
     </AuthLayout>
