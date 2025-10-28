@@ -9,6 +9,7 @@ import { Column, DataTable } from "@/components/ui/DataTable";
 import { Trash2 } from "lucide-react";
 import SimpleFileInput from "@/components/ui/SimpleFileInput";
 import { redirect } from "next/navigation";
+import toast from "react-hot-toast";
 
 // Define type for recipient group list
 interface RecipientGroup {
@@ -94,7 +95,7 @@ export default function ManageRecipientGroups() {
             columns={columns}
             data={data}
             onEdit={() => {}}
-            onDelete={() => {}}
+            onDelete={() => toast.success("Deleted successfully!")}
           />
         </Card>
       </motion.main>

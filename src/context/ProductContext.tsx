@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState } from "react";
+import toast from "react-hot-toast";
 
 type ProductsContextType = {
   isAdded: boolean;
@@ -23,6 +24,7 @@ export const ProductsProvider = ({
 
   const handleAddToCart = () => {
     setIsAdded(true);
+    toast.success("Added to Cart!")
   };
   return (
     <ProductsContext.Provider

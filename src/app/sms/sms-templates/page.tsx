@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { Column, DataTable } from "@/components/ui/DataTable";
 import { FormField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
+import toast from "react-hot-toast";
 
 // Define type for sms drafts list
 interface SMSTemplates {
@@ -85,7 +86,7 @@ export default function SMSTemplates() {
             type="text"
             placeholder="Type message here"
           />
-          <Button>Save Template</Button>
+          <Button onClick={() =>  toast.success("Template saved successfully!")}>Save Template</Button>
         </div>
 
         {/* table */}
@@ -99,7 +100,7 @@ export default function SMSTemplates() {
             columns={columns}
             data={data}
             onEdit={() => {}}
-            onDelete={() => {}}
+            onDelete={() => toast.success("Template deleted successfully!")}
           />
         </Card>
       </motion.main>

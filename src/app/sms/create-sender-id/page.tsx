@@ -6,7 +6,7 @@ import DashboardLayout from "@/components/ui/layout/DashboardLayout";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { motion } from "framer-motion";
 import { Column, DataTable } from "@/components/ui/DataTable";
-import { Trash2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 // Define type for sender id list
 interface Sender {
@@ -37,6 +37,10 @@ export default function CreateSenderID() {
     { header: "Sample Message", accessor: "sampleMessage" },
   ];
 
+  const handleCreateSenderID = () => {
+    toast.success("Sender ID submitted successfully!");
+  }
+
   return (
     <DashboardLayout>
       <motion.main
@@ -66,7 +70,7 @@ export default function CreateSenderID() {
               type="text"
               placeholder="Attach a sample message to this ID"
             />
-            <Button>Submit sender ID</Button>
+            <Button onClick={handleCreateSenderID}>Submit sender ID</Button>
           </div>
         </Card>
         <Card>
@@ -79,7 +83,7 @@ export default function CreateSenderID() {
             columns={columns}
             data={data}
             onEdit={() => {}}
-            onDelete={() => {}}
+            onDelete={() => toast.success("Sender ID removed successfully!")}
           />
         </Card>
       </motion.main>

@@ -4,10 +4,10 @@ import { Card } from "@/components/ui/Card";
 import { Column, DataTable } from "@/components/ui/DataTable";
 import Filter from "@/components/ui/Filter";
 import DashboardLayout from "@/components/ui/layout/DashboardLayout";
-import Header from "@/components/ui/layout/Header";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import SearchInput from "@/components/ui/Search";
 import { StatCard, StatCardProps } from "@/components/ui/StatCard";
+import toast from "react-hot-toast";
 
 interface DistributionReport {
   id: number;
@@ -149,7 +149,7 @@ export default function PRDetails() {
             <Filter value="" onChange={() => {}} />
           </div>
         </div>
-        <DataTable columns={columns} data={data} />
+        <DataTable columns={columns} data={data} onDelete={() => toast.success("Deleted successfully!")} />
       </Card>
     </DashboardLayout>
   );

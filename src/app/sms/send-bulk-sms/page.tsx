@@ -9,8 +9,13 @@ import { motion } from "framer-motion";
 import { Calendar, Clock } from "lucide-react";
 import SimpleFileInput from "@/components/ui/SimpleFileInput";
 import { redirect } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function SendBulkSMS() {
+  const saveAsDraft = () => {
+    toast.success("Successfully saved as draft!");
+    redirect("/sms/sms-drafts")
+  }
   return (
     <DashboardLayout>
       <motion.main
@@ -78,9 +83,9 @@ export default function SendBulkSMS() {
             </div>
             {/* buttons */}
             <div className="flex flex-col md:flex-row md;items-center gap-5">
-                <Button size={"lg"}>Send Now</Button>
-                <Button size={"lg"} variant={"secondary"}>Save as Draft</Button>
-                <Button size={"lg"} variant={"tertiary"}>Schedule for Later</Button>
+                <Button size={"lg"} onClick={() => toast.success("Sent Successfully!")}>Send Now</Button>
+                <Button size={"lg"} variant={"secondary"} onClick={saveAsDraft}>Save as Draft</Button>
+                <Button size={"lg"} variant={"tertiary"} onClick={() => toast.success("Scheduled Successfully!")}>Schedule for Later</Button>
             </div>
           </div>
         </Card>
