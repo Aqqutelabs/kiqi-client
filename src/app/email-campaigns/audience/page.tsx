@@ -19,8 +19,8 @@ const subscribers = Array.from({ length: 12 }, (_, i) => ({
 const AudiencePage = () => {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
 
-  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.checked) {
+  const handleSelectAll = (e?: React.ChangeEvent<HTMLInputElement>) => {
+    if (e?.target.checked) {
       setSelectedRows(subscribers.map(sub => sub.id));
     } else {
       setSelectedRows([]);
@@ -60,7 +60,7 @@ const AudiencePage = () => {
                 <table className="min-w-full text-sm">
                     <thead className="bg-gray-100/70">
                         <tr className="text-left text-gray-600">
-                            <th className="p-3 w-12"><Checkbox id="select-all" checked={isAllSelected} onChange={handleSelectAll} label=""/></th>
+                            <th className="p-3 w-12"><Checkbox name="select-all" isChecked={isAllSelected} onChange={() => handleSelectAll()} label=""/></th>
                             <th className="p-3 font-medium">Name</th>
                             <th className="p-3 font-medium">Email Address</th>
                             <th className="p-3 font-medium">Subscribed</th>
@@ -70,7 +70,7 @@ const AudiencePage = () => {
                     <tbody className="divide-y divide-gray-100">
                         {subscribers.map(sub => (
                             <tr key={sub.id} className="text-gray-700">
-                                <td className="p-3"><Checkbox id={`cb-${sub.id}`} checked={selectedRows.includes(sub.id)} onChange={() => handleSelectRow(sub.id)} label=""/></td>
+                                <td className="p-3"><Checkbox name={`cb-${sub.id}`} isChecked={selectedRows.includes(sub.id)} onChange={() => handleSelectRow(sub.id)} label=""/></td>
                                 <td className="p-3">{sub.name}</td>
                                 <td className="p-3">{sub.email}</td>
                                 <td className="p-3">{sub.subscribed}</td>
