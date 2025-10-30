@@ -7,10 +7,10 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   MessageSquare,
-  Palette,
-  BookText,
-  Puzzle,
-  Contact,
+  // Palette,
+  // BookText,
+  // Puzzle,
+  // Contact,
   Mail,
   Pencil,
   List as ListIcon,
@@ -75,16 +75,16 @@ const sections: (NavSection | NavLink)[] = [
     label: "PR",
     icon: ReceiptText,
   },
-  {
-    label: "Chatbot",
-    links: [
-      { href: "/coming-soon", label: "Live Chats", icon: MessageSquare },
-      { href: "/coming-soon", label: "Customization", icon: Palette },
-      { href: "/coming-soon", label: "Knowledge Base", icon: BookText },
-      { href: "/coming-soon", label: "Integrations", icon: Puzzle },
-      { href: "/coming-soon", label: "Contacts", icon: Contact },
-    ],
-  },
+  // {
+  //   label: "Chatbot",
+  //   links: [
+  //     { href: "/coming-soon", label: "Live Chats", icon: MessageSquare },
+  //     { href: "/coming-soon", label: "Customization", icon: Palette },
+  //     { href: "/coming-soon", label: "Knowledge Base", icon: BookText },
+  //     { href: "/coming-soon", label: "Integrations", icon: Puzzle },
+  //     { href: "/coming-soon", label: "Contacts", icon: Contact },
+  //   ],
+  // },
   {
     label: "Finance",
     links: [
@@ -95,9 +95,9 @@ const sections: (NavSection | NavLink)[] = [
   {
     label: "System",
     links: [
-      { href: "/coming-soon", label: "Users and Roles", icon: Users },
-      { href: "/coming-soon", label: "Profile", icon: UserCircle },
-      { href: "/coming-soon", label: "Settings", icon: Settings },
+      { href: "/user-and-roles", label: "Users and Roles", icon: Users },
+      { href: "/profile", label: "Profile", icon: UserCircle },
+      { href: "/settings", label: "Settings", icon: Settings },
     ],
   },
 ];
