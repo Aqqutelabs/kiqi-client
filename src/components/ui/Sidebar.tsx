@@ -162,8 +162,9 @@ export const Sidebar: React.FC = () => {
     toast.success("Logged out successfully.")
   };
 
+  const pathname = usePathname();
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col h-screen">
+    <aside className={`${pathname.includes("/coming-soon") ? "hidden" : "md:flex"} w-64 bg-white border-r border-gray-200 hidden flex-col h-screen`}>
       {/* Logo */}
       <div className="h-16 flex justify-center items-center px-6 border-b border-gray-200">
         <Image src="/kiki-logo.svg" alt="KiKi 2025" width={100} height={20} />

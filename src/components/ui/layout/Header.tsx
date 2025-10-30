@@ -3,7 +3,7 @@ import React from 'react';
 import { Search, ChevronDown } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { logout } from '@/redux/slices/authSlice';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { User } from 'lucide-react';
 import Image from 'next/image';
 
@@ -26,8 +26,10 @@ const Header = () => {
     router.push('/');
   };
 
+  const pathname = usePathname();
+
   return (
-    <header className="flex-shrink-0 bg-white h-16 border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header className={`${pathname.includes("/coming-soon") ? "hidden" : "flex" } flex-shrink-0 bg-white h-16 border-b border-gray-200 items-center justify-between px-4 sm:px-6 lg:px-8`}>
       {/* Search Bar Section */}
       <div className="flex-1 min-w-0">
         <div className="relative w-full max-w-xs text-gray-400 focus-within:text-gray-600">
