@@ -88,7 +88,7 @@ const sections: (NavSection | NavLink)[] = [
   {
     label: "Finance",
     links: [
-      { href: "/coming-soon", label: "Wallet", icon: Wallet },
+      { href: "/wallet", label: "Wallet", icon: Wallet },
       { href: "/coming-soon", label: "Subscription", icon: Repeat },
     ],
   },

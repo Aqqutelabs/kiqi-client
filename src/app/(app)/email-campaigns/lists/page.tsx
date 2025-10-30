@@ -270,15 +270,15 @@ const EmailCampaignsListPage = () => {
                 </h3>
                 <form className="space-y-4 text-left" onSubmit={handleCreateList}>
                   <div>
-                    <label className="block text-sm font-medium mb-1 flex items-center gap-1"><FileText size={16}/> List Name</label>
+                    <label className="text-sm font-medium mb-1 flex items-center gap-1"><FileText size={16}/> List Name</label>
                     <Input name="email_listName" value={form.email_listName} onChange={handleFormChange} placeholder="e.g. Tech Conference Attendees 2025" required icon={<FileText size={16} className="text-gray-400"/>}/>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1 flex items-center gap-1"><Mail size={16}/> Emails (comma separated)</label>
+                    <label className="text-sm font-medium mb-1 flex items-center gap-1"><Mail size={16}/> Emails (comma separated)</label>
                     <Input name="emails" value={form.emails} onChange={handleFormChange} placeholder="john@example.com, jane@example.com" required icon={<Mail size={16} className="text-gray-400"/>}/>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1 flex items-center gap-1"><FileText size={16}/> File URLs (comma separated)</label>
+                    <label className="text-sm font-medium mb-1 flex items-center gap-1"><FileText size={16}/> File URLs (comma separated)</label>
                     <Input name="emailFiles" value={form.emailFiles} onChange={handleFormChange} placeholder="https://example.com/file.csv" icon={<FileText size={16} className="text-gray-400"/>}/>
                   </div>
                   {createEmailListError && <div className="text-red-500 flex items-center gap-1"><XCircle size={16}/>{createEmailListError}</div>}
@@ -297,15 +297,15 @@ const EmailCampaignsListPage = () => {
             </h3>
             <form className="space-y-4 text-left" onSubmit={handleStartCampaign}>
               <div>
-                <label className="block text-sm font-medium mb-1 flex items-center gap-1"><FileText size={16}/> Campaign Name</label>
+                <label className="text-sm font-medium mb-1 flex items-center gap-1"><FileText size={16}/> Campaign Name</label>
                 <Input name="campaignName" value={campaignForm.campaignName} onChange={handleStartCampaignChange} placeholder="e.g. September Newsletter" required icon={<FileText size={16} className="text-gray-400"/>}/>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 flex items-center gap-1"><Mail size={16}/> Subject</label>
+                <label className="text-sm font-medium mb-1 flex items-center gap-1"><Mail size={16}/> Subject</label>
                 <Input name="subject" value={campaignForm.subject} onChange={handleStartCampaignChange} placeholder="e.g. Welcome to Our September Newsletter!" required icon={<Mail size={16} className="text-gray-400"/>}/>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 flex items-center gap-1"><FileText size={16}/> Email Body (HTML)</label>
+                <label className="text-sm font-medium mb-1 flex items-center gap-1"><FileText size={16}/> Email Body (HTML)</label>
                 <textarea name="body" value={campaignForm.body} onChange={handleStartCampaignChange} placeholder="<h1>Hello!</h1><p>Thank you for subscribing...</p>" required className="w-full rounded-md border-0 bg-gray-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3366FF] min-h-[100px]"/>
               </div>
               <Button type="submit" className="w-full" disabled={status === 'loading'}>
