@@ -1,5 +1,5 @@
 import { RecentActivity } from "@/types/recent-activity";
-import { CreditCard, DollarSign, Gift, Users, Zap } from "lucide-react";
+import { DollarSign, Zap } from "lucide-react";
 
 // dummy data for stats
 export const stats = [
@@ -38,30 +38,7 @@ export const stats = [
   },
 ];
 
-// quick actions
-export const quick_actions = [
-  {
-    title: "Redeem GoCoins",
-    description: "Convert Credits to GoCoins",
-    icon: Gift,
-    color: "#E17100",
-    onClick: () => alert("CLICKED"),
-  },
-  {
-    title: "Top Up Credits",
-    description: "Purchase additional credits",
-    icon: CreditCard,
-    color: "#155DFC",
-    href: "/wallet/subscriptions",
-  },
-  {
-    title: "Invite & Earn",
-    description: "Get 500 coins per referral",
-    icon: Users,
-    color: "#27AE60",
-    href: "/wallet/refer",
-  },
-];
+
 
 // function to get light variant color
 

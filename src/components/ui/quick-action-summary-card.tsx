@@ -68,9 +68,10 @@ export default function SummaryCard({ action, hasIcon = true, swapped }: Props) 
         if (a.onClick) {
           return (
             <button
+              type="button"
               key={idx}
               onClick={a.onClick}
-              className={`${baseClasses} ${interactiveClasses}`}>
+              className={`${baseClasses} text-left ${interactiveClasses}`}>
               {content}
             </button>
           );
