@@ -2,6 +2,6 @@
 
 export default function ReferralPage() {
     return (
-        <section></section>
+        <section>refer</section>
     )
 }

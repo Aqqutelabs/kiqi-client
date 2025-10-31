@@ -2,13 +2,23 @@
 
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import SummaryCard from "@/components/ui/quick-action-summary-card";
-import { quick_actions, stats } from "@/lib/dummy-data/wallet";
+import Heading from "@/components/ui/TextHeading";
 import {
+  hexToRgba,
+  quick_actions,
+  recent_activity,
+  stats,
+} from "@/lib/dummy-data/wallet";
+import {
+  ArrowDownRight,
+  ArrowUpRight,
   Download,
   Funnel,
   TrendingDown,
   TrendingUp,
 } from "lucide-react";
+import Link from "next/link";
+import UsageOverview from "./usage-overview";
 
 type CustomStatProps = {
   title: string;
@@ -100,11 +110,14 @@ function CustomStatCard({
 }
 
 export default function WalletPage() {
-    return (
+  return (
     <section>
       {/* heading and action buttons */}
       <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
-        <PageHeader title="Wallet" subtitle=" Manage your credits and rewards" />
+        <PageHeader
+          title="Wallet"
+          subtitle=" Manage your credits and rewards"
+        />
         <div className="flex gap-1.5 md:gap-3 items-center">
           <div className="border border-[#0000001A] h-[36px] w-[88px] rounded-lg bg-white flex items-center justify-center gap-2 cursor-pointer">
             <Download size={14} />
@@ -144,8 +157,71 @@ export default function WalletPage() {
       </div>
 
       {/* quick actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <SummaryCard action={quick_actions}/>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+        <SummaryCard action={quick_actions} />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* chart */}
+        <UsageOverview/>
+
+        {/* recent activity */}
+        <div className="col-span-1 border border-[#E2E8F0] bg-white rounded-xl h-[540px] p-6">
+          {/* heading and link */}
+          <div className="flex justify-between items-center">
+            <Heading heading="Recent Activity" subtitle="Latest transactions" />
+            <Link
+              href={"/wallet/transaction-history"}
+              className="text-sm font-medium text-[var(--primary)] hover:underline">
+              View all
+            </Link>
+          </div>
+          {/* activity */}
+          <div className="my-6 space-y-2">
+            {recent_activity.slice(0, 6).map((a, index) => {
+              const dynamicColor =
+                a.type === "Added"
+                  ? "#27AE60"
+                  : a.type === "Deducted"
+                  ? "#E2173C"
+                  : "#E17100";
+              return (
+                <div
+                  key={index}
+                  className="flex justify-between items-center h-[62px] w-full border-b border-[#F1F5F9] py-3">
+                  {/* icon and title */}
+                  <div className="flex items-center gap-3">
+                    {/* icon */}
+                    <div
+                      className="size-10 flex justify-center items-center rounded-lg"
+                      style={{ backgroundColor: hexToRgba(dynamicColor, 0.1) }}>
+                      {a.type === "Added" || a.type === "Referral" ? (
+                        <ArrowDownRight size={20} color={dynamicColor} />
+                      ) : (
+                        <ArrowUpRight size={20} color={dynamicColor} />
+                      )}
+                    </div>
+                    {/* text */}
+                    <div className="space-y-0.5">
+                      <p className="text-sm text-[#0F172B]">{a.activity}</p>
+                      <p className="text-xs text-[#62748E]">{a.time}</p>
+                    </div>
+                  </div>
+                  {/* amount and currency */}
+                  <div className="space-y-0.5">
+                    <p className={`text-sm text-[${dynamicColor}]`}>
+                      {a.type === "Added" || a.type === "Referral" ? "+" : "-"}
+                      {a.amount}
+                    </p>
+                    <p className="text-xs text-end text-[#62748E]">
+                      {a.currency}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </section>
   );

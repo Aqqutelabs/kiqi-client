@@ -29,9 +29,9 @@ const Header = () => {
   const pathname = usePathname();
 
   return (
-    <header className={`${pathname.includes("/coming-soon") ? "hidden" : "flex" } flex-shrink-0 bg-white h-16 border-b border-gray-200 items-center justify-between px-4 sm:px-6 lg:px-8`}>
+    <header className={`${pathname.includes("/coming-soon") ? "hidden" : "flex" } flex-shrink-0 bg-white h-16 border-b border-gray-200 items-center justify-end px-4 sm:px-6 lg:px-8`}>
       {/* Search Bar Section */}
-      <div className="flex-1 min-w-0">
+      {/* <div className="flex-1 min-w-0">
         <div className="relative w-full max-w-xs text-gray-400 focus-within:text-gray-600">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
             <Search className="h-5 w-5" aria-hidden="true" />
@@ -44,7 +44,7 @@ const Header = () => {
             type="search"
           />
         </div>
-      </div>
+      </div> */}
 
       {/* User Menu Section */}
       <div className="ml-4 flex items-center space-x-3">
