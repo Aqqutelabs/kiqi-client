@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { FormField } from "@/components/ui/FormField";
+import { FormField } from "@/components/ui/forms/FormField";
 import { redirect } from "next/navigation";
 import { FormEvent } from "react";
 

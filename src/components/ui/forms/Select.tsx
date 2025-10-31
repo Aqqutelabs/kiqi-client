@@ -8,24 +8,38 @@ export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElemen
 }
 
 const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className, children, placeholder, ...props }, ref) => {
+  ({ className, children, placeholder, value, defaultValue, ...props }, ref) => {
+    const [hasValue, setHasValue] = React.useState(!!defaultValue || !!value);
+
+    const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setHasValue(!!e.target.value);
+      if (props.onChange) {
+        props.onChange(e);
+      }
+    };
+
     return (
       <div className="relative w-full">
         <select
           ref={ref}
+          value={value}
+          defaultValue={defaultValue}
+          onChange={handleChange}
           {...props}
           className={twMerge(
             clsx(
-              "flex h-11 w-full rounded-md border border-gray-100 bg-gray-200 px-3 py-2 text-sm placeholder:text-gray-400 outline-none focus:border-[#3366FF] appearance-none",
-              "focus:outline-none  focus:border-[#3366FF]",
+              "flex h-10 w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-[#3366FF] appearance-none bg-white",
+              "focus:outline-none focus:border-[#3366FF]",
               "hover:border-[#3366FF]/60 transition-all duration-200 ease-in-out",
               "disabled:bg-gray-100 disabled:cursor-not-allowed",
+              // Apply gray color when placeholder is showing
+              !hasValue && placeholder && "text-gray-400",
               className
             )
           )}
         >
           {placeholder && (
-            <option value="" disabled selected hidden>
+            <option value="" disabled hidden>
               {placeholder}
             </option>
           )}

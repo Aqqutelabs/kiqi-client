@@ -1,21 +1,25 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
 
-import { Eye, EyeOff, LockKeyhole, CircleUserRound } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { FormField } from '@/components/ui/FormField';
-import AuthLayout from '@/components/ui/layout/AuthLayout';
-import { loginUser } from '@/redux/slices/authSlice';
-import { AppDispatch, RootState } from '@/redux/store';
+import { Eye, EyeOff, LockKeyhole, CircleUserRound } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { FormField } from "@/components/ui/forms/FormField";
+import AuthLayout from "@/components/ui/layout/AuthLayout";
+import { loginUser } from "@/redux/slices/authSlice";
+import { AppDispatch, RootState } from "@/redux/store";
 
 // Assuming Google and Metamask have their own logo components or are SVGs
-const GoogleIcon = () => <img src="/devicon_google.svg" alt="Google" className="h-5 w-5" />; 
-const MetamaskIcon = () => <img src="/wallet/metamask-fox.svg" alt="Metamask" className="h-5 w-5" />;
+const GoogleIcon = () => (
+  <img src="/devicon_google.svg" alt="Google" className="h-5 w-5" />
+);
+const MetamaskIcon = () => (
+  <img src="/wallet/metamask-fox.svg" alt="Metamask" className="h-5 w-5" />
+);
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -25,67 +29,107 @@ const LoginPage = () => {
 
   // Reset auth error/status on mount to avoid showing stale errors
   React.useEffect(() => {
-    dispatch(require('@/redux/slices/authSlice').resetAuthState());
+    dispatch(require("@/redux/slices/authSlice").resetAuthState());
   }, [dispatch]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget as HTMLFormElement);
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
     const credentials = { email, password };
     dispatch(loginUser(credentials)).then((result) => {
-        if (loginUser.fulfilled.match(result)) {
-            router.push('/dashboard');
-        }
+      if (loginUser.fulfilled.match(result)) {
+        router.push("/dashboard");
+      }
     });
   };
 
   return (
     <AuthLayout>
-      <Card className='w-[600px]'>
+      <Card className="w-[600px]">
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800">Login to KiKi</h2>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Button variant="primary" className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"><GoogleIcon /> <span className="ml-2">Google</span></Button>
-            <Button variant="secondary"><MetamaskIcon /> <span className="ml-2">MetaMask</span></Button>
+          <Button
+            variant="primary"
+            className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50">
+            <GoogleIcon /> <span className="ml-2">Google</span>
+          </Button>
+          <Button variant="secondary">
+            <MetamaskIcon /> <span className="ml-2">MetaMask</span>
+          </Button>
         </div>
-        
+
         <div className="my-6 flex items-center">
-            <div className="flex-grow border-t border-gray-200"></div>
-            <span className="flex-shrink mx-4 text-xs text-gray-400">OR</span>
-            <div className="flex-grow border-t border-gray-200"></div>
+          <div className="flex-grow border-t border-gray-200"></div>
+          <span className="flex-shrink mx-4 text-xs text-gray-400">OR</span>
+          <div className="flex-grow border-t border-gray-200"></div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-            <FormField label="Email Address" id="email" name="email" type="email" placeholder="Enter Email Address" icon={<CircleUserRound className="text-gray-400" size={18}/>} required/>
-            
-            <div className="relative">
-                <FormField label="Password" id="password" name="password" type={showPassword ? 'text' : 'password'} placeholder="Enter Password" icon={<LockKeyhole className="text-gray-400" size={18}/>} required/>
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-10 text-gray-400">
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-            </div>
+          <FormField
+            label="Email Address"
+            id="email"
+            name="email"
+            type="email"
+            placeholder="Enter Email Address"
+            icon={<CircleUserRound className="text-gray-400" size={18} />}
+            required
+          />
 
-            <div className="flex items-center justify-between text-sm">
-                <label className="flex items-center">
-                    <input type="checkbox" className="h-4 w-4 rounded border-gray-300 text-[var(--primary)] focus:ring-[#3366FF]" />
-                    <span className="ml-2 text-gray-600">Remember Me</span>
-                </label>
-                <Link href="/reset-password" className="font-medium text-[var(--primary)] hover:underline">Forgot Password?</Link>
-            </div>
-          
-            {error && <p className="text-sm text-red-500">{error}</p>}
-            
-            <Button type="submit" className="w-full" disabled={status === 'loading'}>
-                {status === 'loading' ? 'Logging in...' : 'Log In'}
-            </Button>
+          <div className="relative">
+            <FormField
+              label="Password"
+              id="password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter Password"
+              icon={<LockKeyhole className="text-gray-400" size={18} />}
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-10 text-gray-400">
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between text-sm">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                className="h-4 w-4 rounded border-gray-300 text-[var(--primary)] focus:ring-[#3366FF]"
+              />
+              <span className="ml-2 text-gray-600">Remember Me</span>
+            </label>
+            <Link
+              href="/reset-password"
+              className="font-medium text-[var(--primary)] hover:underline">
+              Forgot Password?
+            </Link>
+          </div>
+
+          {error && <p className="text-sm text-red-500">{error}</p>}
+
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={status === "loading"}>
+            {status === "loading" ? "Logging in..." : "Log In"}
+          </Button>
         </form>
 
         <p className="mt-6 text-center text-sm text-gray-500">
-          Do not have an account? <Link href="/signup" className="font-medium text-[var(--primary)] hover:underline">Sign Up</Link>
+          Do not have an account?{" "}
+          <Link
+            href="/signup"
+            className="font-medium text-[var(--primary)] hover:underline">
+            Sign Up
+          </Link>
         </p>
       </Card>
     </AuthLayout>

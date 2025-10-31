@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import Checkbox from "@/components/ui/CheckBox";
-import { FormField } from "@/components/ui/FormField";
+import { FormField } from "@/components/ui/forms/FormField";
 import { Check } from "lucide-react";
 import { redirect } from "next/navigation";
 import { FormEvent, useState } from "react";

@@ -14,9 +14,11 @@ interface Actions {
 
 type Props = {
   action: Array<Actions>;
+  hasIcon?: boolean;
+  swapped?: boolean;
 };
 
-export default function SummaryCard({ action }: Props) {
+export default function SummaryCard({ action, hasIcon = true, swapped }: Props) {
   // const [redeemGoCoins, setRedeemGoCoins] = useState(false);
   return (
     <>
@@ -27,10 +29,10 @@ export default function SummaryCard({ action }: Props) {
           <div
             key={idx}
             className="border border-[#E2E8F0] p-4 rounded-lg h-[74px] w-full relative flex items-center gap-3 bg-white">
-            <ChevronRight
+           {hasIcon && <ChevronRight
               className="absolute right-2 top-2 text-gray-400"
               size={18}
-            />
+            />}
             {/* icon */}
             <div
               className="size-10 flex justify-center items-center rounded-lg"
@@ -38,7 +40,7 @@ export default function SummaryCard({ action }: Props) {
               <Icon size={20} color={a.color} />
             </div>
             {/* text */}
-            <div className="space-y-1">
+            <div className={`flex gap-0.5 ${swapped ? 'flex-col-reverse' : 'flex-col'}`}>
               <h5 className="text-sm text-[#0F172B]">{a.title}</h5>
               <p className="text-xs text-[#62748E]">{a.description}</p>
             </div>

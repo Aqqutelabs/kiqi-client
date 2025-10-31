@@ -13,8 +13,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
+import { Input } from "@/components/ui/forms/Input";
+import { Select } from "@/components/ui/forms/Select";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {

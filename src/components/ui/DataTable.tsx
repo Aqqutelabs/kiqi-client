@@ -26,12 +26,12 @@ export function DataTable<T extends { id: string | number }>({
   return (
     <div className="w-full overflow-x-auto">
       <table className="min-w-full bg-white">
-        <thead className="bg-gray-50">
+        <thead className="bg-[#D1DAF4] h-[66px]">
           <tr>
             {columns.map((col) => (
               <th
                 key={String(col.accessor)}
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                className="px-6 py-3 text-left text-xs font-medium text-[#0A0A0A] uppercase tracking-wider"
               >
                 {col.header}
               </th>
@@ -43,9 +43,9 @@ export function DataTable<T extends { id: string | number }>({
             )}
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
+        <tbody className="divide-y divide-gray-200 rounded-b-xl">
           {data.map((row) => (
-            <tr key={row.id} className="hover:bg-gray-50">
+            <tr key={row.id} className="bg-white h-20">
               {columns.map((col) => (
                 <td key={String(col.accessor)} className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                   {String(row[col.accessor])}

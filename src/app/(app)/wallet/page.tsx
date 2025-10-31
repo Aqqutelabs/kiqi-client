@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeader } from "@/components/ui/layout/PageHeader";
 import SummaryCard from "@/components/ui/quick-action-summary-card";
 import { quick_actions, stats } from "@/lib/dummy-data/wallet";
 import {
@@ -103,12 +104,7 @@ export default function WalletPage() {
     <section>
       {/* heading and action buttons */}
       <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
-        <div className="space-y-1">
-          <h4 className="text-xl font-medium text-[#42526D]">Wallet</h4>
-          <p className="text-sm text-[#62748E]">
-            Manage your credits and rewards
-          </p>
-        </div>
+        <PageHeader title="Wallet" subtitle=" Manage your credits and rewards" />
         <div className="flex gap-1.5 md:gap-3 items-center">
           <div className="border border-[#0000001A] h-[36px] w-[88px] rounded-lg bg-white flex items-center justify-center gap-2 cursor-pointer">
             <Download size={14} />

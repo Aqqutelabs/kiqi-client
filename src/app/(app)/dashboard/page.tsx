@@ -45,7 +45,7 @@ const DashboardOverviewPage = () => {
   }, [user, token, router]);
 
   return (
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
+        <main className="flex-1 overflow-y-auto space-y-6">
           {/* Stat Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="relative">

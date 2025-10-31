@@ -18,7 +18,7 @@ export default function SearchInput({
 }: SearchProps) {
     const [isFocused, setIsFocused] = useState(false);
   return (
-    <div className={`h-10 w-[260px] outline-none border border-[#F0F2F5] group rounded-lg px-3.5 text-sm flex gap-1 items-center ${isFocused ? 'border-blue-500' : 'border-gray-300'}`}>
+    <div className={`h-10 w-full outline-none border border-[#F0F2F5] group rounded-lg px-3.5 text-sm flex gap-1 items-center ${isFocused ? 'border-blue-500' : 'border-gray-300'}`}>
         <Search size={24} color="#98A2B3" />
         <input
         value={value}

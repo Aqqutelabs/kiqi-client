@@ -8,7 +8,7 @@ import { registerUser } from "@/redux/slices/authSlice";
 import { Lock, User, Eye, EyeOff, Link2, CircleUserRound } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { FormField } from "@/components/ui/FormField";
+import { FormField } from "@/components/ui/forms/FormField";
 import { toast } from "react-hot-toast";
 import AuthLayout from "@/components/ui/layout/AuthLayout";
 
@@ -64,10 +64,13 @@ const SignUpPage = () => {
             <img src="/devicon_google.svg" alt="Google" className="h-5 w-5" />
             Google
           </Button>
-          <Button onClick={() => redirect("/signup/connect-wallet")} variant="secondary" className="flex items-center gap-2">
-            <Link2/>
+          <Button
+            onClick={() => redirect("/signup/connect-wallet")}
+            variant="secondary"
+            className="flex items-center gap-2">
+            <Link2 />
             Connect Wallet
-        </Button>
+          </Button>
         </div>
 
         <div className="my-6 flex items-center">
@@ -138,7 +141,9 @@ const SignUpPage = () => {
             </p>
           </div>
           {registration.error && (
-            <p className="text-red-500 text-sm text-center">{registration.error}</p>
+            <p className="text-red-500 text-sm text-center">
+              {registration.error}
+            </p>
           )}
           <Button
             type="submit"

@@ -9,9 +9,9 @@ import React, { useState } from "react";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
+import { Input } from "@/components/ui/forms/Input";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
-import { Select } from "@/components/ui/Select";
+import { Select } from "@/components/ui/forms/Select";
 import { useDispatch, useSelector } from "react-redux";
 import { createSender, fetchSenders } from "@/redux/slices/campaignSlice";
 

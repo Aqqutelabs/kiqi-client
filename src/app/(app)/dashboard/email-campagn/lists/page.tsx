@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
+import { Input } from "@/components/ui/forms/Input";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { Textarea } from "@/components/ui/Textarea";
 

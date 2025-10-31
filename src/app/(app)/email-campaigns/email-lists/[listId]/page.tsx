@@ -7,7 +7,7 @@ import { useParams } from "next/navigation";
 // import { Input } from '@/components/atoms/Input';
 import { Trash2, Search, Filter, ChevronDown, Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { Input } from "@/components/ui/forms/Input";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import BASE_URL from "@/lib/utils/baseUrl";
 

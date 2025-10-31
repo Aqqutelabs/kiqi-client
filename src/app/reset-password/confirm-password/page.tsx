@@ -5,7 +5,7 @@ import { Lock } from "lucide-react";
 import React from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { FormField } from "@/components/ui/FormField";
+import { FormField } from "@/components/ui/forms/FormField";
 import AuthLayout from "@/components/ui/layout/AuthLayout";
 
 const ConfirmPasswordPage = () => {
