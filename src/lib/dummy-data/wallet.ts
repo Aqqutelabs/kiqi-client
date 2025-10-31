@@ -1,4 +1,5 @@
-import { CreditCard, DollarSign, Gift, Users, Zap } from "lucide-react";
+import { RecentActivity } from "@/types/recent-activity";
+import { DollarSign, Zap } from "lucide-react";
 
 // dummy data for stats
 export const stats = [
@@ -37,27 +38,7 @@ export const stats = [
   },
 ];
 
-// quick actions
-export const quick_actions = [
-  {
-    title: "Redeem GoCoins",
-    description: "Convert Credits to GoCoins",
-    icon: Gift,
-    color: "#E17100",
-  },
-  {
-    title: "Top Up Credits",
-    description: "Purchase additional credits",
-    icon: CreditCard,
-    color: "#155DFC",
-  },
-  {
-    title: "Invite & Earn",
-    description: "Get 500 coins per referral",
-    icon: Users,
-    color: "#27AE60",
-  },
-];
+
 
 // function to get light variant color
 
@@ -70,3 +51,50 @@ export function hexToRgba(hex: string, alpha = 0.1) {
 
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
+
+
+// recent activity
+export const recent_activity: RecentActivity[] = [
+  {
+    activity: "Plan Top-up",
+    time: "09:30 AM",
+    amount: "5,000",
+    currency: "GC",
+    type: "Added",
+  },
+  {
+    activity: "Published Access",
+    time: "02:15 PM",
+    amount: "1,200",
+    currency: "GC",
+    type: "Deducted",
+  },
+  {
+    activity: "Referral Bonus",
+    time: "11:45 AM",
+    amount: "500",
+    currency: "Coins",
+    type: "Referral",
+  },
+  {
+    activity: "Content Purchase",
+    time: "04:20 PM",
+    amount: "800",
+    currency: "GC",
+    type: "Deducted",
+  },
+  {
+    activity: "Reward Redemption",
+    time: "10:00 AM",
+    amount: "2,000",
+    currency: "GC",
+    type: "Added",
+  },
+  {
+    activity: "Platform Bundle",
+    time: "03:45 AM",
+    amount: "2,200",
+    currency: "GC",
+    type: "Deducted",
+  },
+];
