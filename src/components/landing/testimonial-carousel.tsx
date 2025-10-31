@@ -8,28 +8,28 @@ const TestimonialCarousel = () => {
   const testimonials = [
     {
       id: 1,
-      text: "As a fashion designer I always struggled with juggling sewing, content creation, and responding to clients, KiQi solved that for me!",
+      text: "As a fashion designer I always struggled with juggling sewing, content creation, and responding to clients, KiKi solved that for me!",
       author: "Kelly",
       title: "Fashion Designer",
       avatar: "K"
     },
     {
       id: 2,
-      text: "I tried KiQi once and I was sold. It so easy to use and even better at responding to customers than I am😂",
+      text: "I tried KiKi once and I was sold. It so easy to use and even better at responding to customers than I am😂",
       author: "David",
       title: "Freelance Social media manager",
       avatar: "D"
     },
     {
       id: 3,
-      text: "KiQi transformed my workflow completely. Managing multiple projects became effortless and my clients love the quick response times!",
+      text: "KiKi transformed my workflow completely. Managing multiple projects became effortless and my clients love the quick response times!",
       author: "Sarah",
       title: "Digital Marketing Consultant",
       avatar: "S"
     },
     {
       id: 4,
-      text: "The automation features in KiQi saved me hours every day. Now I can focus on what I do best while KiQi handles the rest seamlessly.",
+      text: "The automation features in KiKi saved me hours every day. Now I can focus on what I do best while KiKi handles the rest seamlessly.",
       author: "Michael",
       title: "E-commerce Store Owner",
       avatar: "M"
@@ -68,7 +68,7 @@ const TestimonialCarousel = () => {
       {/* Header */}
       <h2 className="font-bold text-center text-2xl md:text-[52px] leading-tight">
         See what others are saying <br className='hidden md:block' /> 
-        about <span className="text-[#0C31A1]">Kiqi</span>
+        about <span className="text-[#0C31A1]">KiKi</span>
       </h2>
 
       {/* Carousel Container */}

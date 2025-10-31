@@ -7,10 +7,10 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   MessageSquare,
-  Palette,
-  BookText,
-  Puzzle,
-  Contact,
+  // Palette,
+  // BookText,
+  // Puzzle,
+  // Contact,
   Mail,
   Pencil,
   List as ListIcon,
@@ -31,6 +31,7 @@ import { Icon } from "./IconComponent";
 import { useAppDispatch } from "@/redux/hooks";
 import { logout } from "@/redux/slices/authSlice";
 import { persistor } from "@/redux/store";
+import toast from "react-hot-toast";
 
 // Reusable Type Definitions
 type NavLink = {
@@ -54,7 +55,7 @@ const sections: (NavSection | NavLink)[] = [
   {
     label: "Email",
     links: [
-      { href: "/email-campaigns", label: "Email Campaigns", icon: Mail },
+      { href: "/email-campaigns/dashboard", label: "Email Campaigns", icon: Mail },
       { href: "/email-campaigns/composer", label: "Create Email Campaign", icon: Pencil },
       { href: "/email-campaigns/email-lists", label: "Email Lists", icon: ListIcon },
     ],
@@ -74,29 +75,29 @@ const sections: (NavSection | NavLink)[] = [
     label: "PR",
     icon: ReceiptText,
   },
-  {
-    label: "Chatbot",
-    links: [
-      { href: "/coming-soon", label: "Live Chats", icon: MessageSquare },
-      { href: "/coming-soon", label: "Customization", icon: Palette },
-      { href: "/coming-soon", label: "Knowledge Base", icon: BookText },
-      { href: "/coming-soon", label: "Integrations", icon: Puzzle },
-      { href: "/coming-soon", label: "Contacts", icon: Contact },
-    ],
-  },
+  // {
+  //   label: "Chatbot",
+  //   links: [
+  //     { href: "/coming-soon", label: "Live Chats", icon: MessageSquare },
+  //     { href: "/coming-soon", label: "Customization", icon: Palette },
+  //     { href: "/coming-soon", label: "Knowledge Base", icon: BookText },
+  //     { href: "/coming-soon", label: "Integrations", icon: Puzzle },
+  //     { href: "/coming-soon", label: "Contacts", icon: Contact },
+  //   ],
+  // },
   {
     label: "Finance",
     links: [
-      { href: "/coming-soon", label: "Wallet", icon: Wallet },
+      { href: "/wallet", label: "Wallet", icon: Wallet },
       { href: "/coming-soon", label: "Subscription", icon: Repeat },
     ],
   },
   {
     label: "System",
     links: [
-      { href: "/coming-soon", label: "Users and Roles", icon: Users },
-      { href: "/coming-soon", label: "Profile", icon: UserCircle },
-      { href: "/coming-soon", label: "Settings", icon: Settings },
+      { href: "/user-and-roles", label: "Users and Roles", icon: Users },
+      { href: "/profile", label: "Profile", icon: UserCircle },
+      { href: "/settings", label: "Settings", icon: Settings },
     ],
   },
 ];
@@ -158,13 +159,15 @@ export const Sidebar: React.FC = () => {
     dispatch(logout());
     await persistor.purge();
     router.push("/");
+    toast.success("Logged out successfully.")
   };
 
+  const pathname = usePathname();
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col h-screen">
+    <aside className={`${pathname.includes("/coming-soon") ? "hidden" : "md:flex"} w-64 bg-white border-r border-gray-200 hidden flex-col h-screen`}>
       {/* Logo */}
       <div className="h-16 flex justify-center items-center px-6 border-b border-gray-200">
-        <Image src="/main-logo.svg" alt="KiQi 2025" width={100} height={20} />
+        <Image src="/kiki-logo.svg" alt="KiKi 2025" width={100} height={20} />
       </div>
 
       {/* Navigation */}

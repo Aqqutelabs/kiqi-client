@@ -18,7 +18,7 @@ export default function LandingFooter() {
   ];
 
   return (
-    <div className="bg-[#111111] p-6 md:p-12 text-white">
+    <div className="bg-[var(--primary)] p-6 md:p-12 text-white">
       {/* main footer */}
       <div className="flex flex-col-reverse md:flex-row justify-between mb-20 h-3/4 gap-5 md:gap-0">
       {/* links and button */}
@@ -49,35 +49,35 @@ export default function LandingFooter() {
             ))}
           </div>
         </div>
-        {/* kiqi info and subscribe */}
+        {/* kiki info and subscribe */}
         <div className="w-full flex flex-col justify-between">
             <Image
-            src={"footer-logo.svg"}
-            alt="Kiqi Logo"
+            src={"/kiki-logo.svg"}
+            alt="KiKi Logo"
             height={165}
             width={160}
             />
-            <p className="text-[22px] leading-10 my-3">KiQi is an AI chatbot that helps business owners automate conversations with their customers, keep track of their revenue, chat with their business knowledge base and so much more.</p>
+            <p className="text-[22px] leading-10 my-3">KiKi is an AI chatbot that helps business owners automate conversations with their customers, keep track of their revenue, chat with their business knowledge base and so much more.</p>
 
             <div className="space-y-5">
                 <h3 className="text-[22px] leading-10 font-bold">Stay Up To Date</h3>
                 <div className="h-[66px] border border-[#A6A6A6] rounded-full flex justify-between items-center relative">
                     <input type="text" className="outline-none px-5" placeholder="Enter Your Email" />
-                    <button className="h-[60px] bg-[#0C31A1] w-[100px] md:w-[220px] rounded-full flex justify-center items-center absolute right-0">Subscribe</button>
+                    <button className="h-[60px] bg-[#000] w-[100px] md:w-[220px] rounded-full flex justify-center items-center absolute right-0">Subscribe</button>
                 </div>
             </div>
         </div>
       </div>
 
       {/* copyright and media links */}
-      <div className="border-t border-[#2E2E2F] flex flex-col md:flex-row items-center py-5 gap-5 md:gap-0">
+      <div className="border-t border-[#fff] flex flex-col md:flex-row items-center py-5 gap-5 md:gap-0">
         <div className="space-y-1 w-full">
           <p className="space-x-2 whitespace-nowrap">
-            <span>Kiqi</span>
+            <span>KiKi</span>
             <span>&copy;</span>
             <span>2024 All rights reserved.</span>
           </p>
-          <p className="text-sm text-[#797878]">
+          <p className="text-sm text-[#fefefe]">
             Privacy Policy Terms of service
           </p>
         </div>

@@ -44,17 +44,17 @@ export default function Home() {
 
   const gridBoxes = [
     {
-      title: "Tailor KiQi to your business",
+      title: "Tailor KiKi to your business",
       subtitle:
-        "KiQi is not just your regular AI chatbot, it understands your business and it can help your business grow faster.",
+        "KiKi is not just your regular AI chatbot, it understands your business and it can help your business grow faster.",
       lists: [
         "Upload your business data with the help of our interactive bot",
-        "Ask KiQi anything about your business",
+        "Ask KiKi anything about your business",
         "Generate text & media for Ads",
       ],
     },
     {
-      title: "Toggle KiQi on/off",
+      title: "Toggle KiKi on/off",
       subtitle: "Switch off AI mode and respond yourself when you want to.",
       lists: [
         "Respond to your customers instantly",
@@ -137,8 +137,8 @@ export default function Home() {
         <nav className="flex justify-between items-center">
           {/* logo */}
           <Image
-            src={"/kiqi-logo.svg"}
-            alt="KiQi 2025"
+            src={"/kiki-logo.svg"}
+            alt="KiKi 2025"
             height={66}
             width={140}
           />
@@ -148,8 +148,7 @@ export default function Home() {
             {navLinks.map((link, index) => (
               <li
                 key={index}
-                className="text-base text-[#111111] font-normal hover:text-[#0C31A1] cursor-pointer"
-              >
+                className="text-base text-[#111111] font-normal hover:text-[#0C31A1] cursor-pointer">
                 {link}
               </li>
             ))}
@@ -157,8 +156,12 @@ export default function Home() {
 
           {/* cta */}
           <div className="bg-[#111111] h-[58px] w-[260px] rounded-[10px] py-5 gap-10 hidden md:flex items-center justify-center">
-            <Link href="/login" className="text-sm text-white cursor-pointer">Sign In</Link>
-            <Link href="/signup" className="text-sm text-white cursor-pointer">Get Started</Link>
+            <Link href="/login" className="text-sm text-white cursor-pointer">
+              Sign In
+            </Link>
+            <Link href="/signup" className="text-sm text-white cursor-pointer">
+              Get Started
+            </Link>
           </div>
         </nav>
 
@@ -174,13 +177,13 @@ export default function Home() {
             />
 
             <h1 className="font-bold text-[28px] md:text-[52px]">
-              KiQi, <br className="hidden md:block" /> Your Easy To Use{" "}
+              KiKi, <br className="hidden md:block" /> Your Easy To Use{" "}
               <br className="hidden md:block" /> AI Sales Assistant
             </h1>
             <p className="text-base md:text-xl font-light my-12">
               Swamped with business tasks and can't keep up{" "}
               <br className="hidden md:block" />
-              with customer inquiries? Let KiQi handle it for you!
+              with customer inquiries? Let KiKi handle it for you!
             </p>
 
             <div className="flex flex-col md:flex-row gap-4 md:gap-8 items-center w-full md:w-[360px]">
@@ -223,7 +226,7 @@ export default function Home() {
             </p>
           </div>
           <h2 className="text-[#111111] text-[32px] md:text-[52px] text-center font-bold md:w-[677px]">
-            One Click Is All It Takes To Connect KiQi With Your Top Sales
+            One Click Is All It Takes To Connect KiKi With Your Top Sales
             Platforms
           </h2>
           <p className="text-[#797878] text-lg md:text-[27px] text-center font-normal">
@@ -281,8 +284,7 @@ export default function Home() {
           {gridBoxes.map((box, index) => (
             <div
               key={index}
-              className="md:h-[560px] rounded-[30px] bg-white p-8 space-y-4 md:space-y-10"
-            >
+              className="md:h-[560px] rounded-[30px] bg-white p-8 space-y-4 md:space-y-10">
               <h2 className="text-[#111111] font-bold text-2xl md:text-[38px]">
                 {box.title}
               </h2>
@@ -339,8 +341,7 @@ export default function Home() {
                   activePlanTab === tab.id
                     ? "bg-white text-[#1B223C] shadow-sm"
                     : "bg-transparent text-[#797878]"
-                }`}
-              >
+                }`}>
                 <p className="text-sm md:text-lg font-normal">{tab.name}</p>
               </div>
             ))}
@@ -356,14 +357,12 @@ export default function Home() {
                     key={plan.id}
                     className={`flex-shrink-0 h-auto md:h-[600px] w-[280px] sm:w-[320px] md:w-[360px] rounded-[20px] border border-[#E7EBFF] space-y-2 shadow-sm p-[20px] md:p-[30px] flex flex-col justify-between ${
                       isEven ? "bg-white" : "bg-[#BCCAFF21]"
-                    }`}
-                  >
+                    }`}>
                     {/* icon */}
                     <div
                       className={`size-10 rounded-[10px] flex justify-center items-center ${
                         isEven ? "bg-[#6A8AFF]" : "bg-white"
-                      }`}
-                    >
+                      }`}>
                       <Image
                         src={plan.icon}
                         alt="Icon"
@@ -376,8 +375,7 @@ export default function Home() {
                     <div
                       className={`space-y-5 ${
                         !isEven ? "text-[#0C31A1]" : "text-[#1B223C]"
-                      }`}
-                    >
+                      }`}>
                       <div className="space-y-4">
                         <h3 className="text-2xl md:text-3xl font-bold">
                           {plan.name}
@@ -398,15 +396,13 @@ export default function Home() {
                       <div
                         className={`${
                           isEven ? "bg-[#E7EBFF]" : "bg-white"
-                        } h-0.5 w-full`}
-                      ></div>
+                        } h-0.5 w-full`}></div>
 
                       <div className="space-y-2">
                         {plan.perks.map((p, idx) => (
                           <div
                             key={idx}
-                            className="flex gap-[11px] items-center text-sm md:text-base"
-                          >
+                            className="flex gap-[11px] items-center text-sm md:text-base">
                             <Image
                               src={isEven ? "/check-2.svg" : "/Check.svg"}
                               alt="Icon"
@@ -424,8 +420,7 @@ export default function Home() {
                         isEven
                           ? "bg-[#0C31A1] text-white"
                           : "border border-[#0C31A1] text-[#0C31A1]"
-                      }`}
-                    >
+                      }`}>
                       Get Started
                     </button>
                   </div>
@@ -440,7 +435,7 @@ export default function Home() {
         {/* getting started */}
         <div className="space-y-4 flex flex-col items-center my-20">
           <h2 className="font-bold text-center text-2xl md:text-[52px]">
-            Get started with <span className="text-[#0C31A1]">Kiqi</span>
+            Get started with <span className="text-[#0C31A1]">KiKi</span>
           </h2>
           <p className="text-center text-[#797878] font-normal text-sm md:text-2xl">
             Convert more conversations to sales.{" "}
