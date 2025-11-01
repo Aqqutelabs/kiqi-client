@@ -3,7 +3,8 @@
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import SummaryCard from "@/components/ui/quick-action-summary-card";
 import Heading from "@/components/ui/TextHeading";
-import { hexToRgba, recent_activity, stats } from "@/lib/dummy-data/wallet";
+import { recent_activity, stats } from "@/lib/dummy-data/wallet";
+import { hexToRgba } from "@/lib/utils";
 import {
   ArrowDownRight,
   ArrowRight,
@@ -255,6 +256,8 @@ export default function WalletPage() {
         </div>
       </div>
 
+
+      {/* redeem GoC modal */}
       <Modal
         isOpen={openModal}
         onClose={() => setOpenModal(false)}
@@ -339,7 +342,7 @@ export default function WalletPage() {
         <div className="flex items-center gap-4">
           <Button
             onClick={() => setOpenModal(false)}
-            variant={"tertiary"}
+            variant={"outline"}
             className="w-full">
             Cancel <X size={16} className="ml-3" />
           </Button>
