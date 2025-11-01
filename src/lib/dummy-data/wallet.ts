@@ -38,21 +38,6 @@ export const stats = [
   },
 ];
 
-
-
-// function to get light variant color
-
-export function hexToRgba(hex: string, alpha = 0.1) {
-  const cleanHex = hex.replace("#", "");
-  const bigint = parseInt(cleanHex, 16);
-  const r = (bigint >> 16) & 255;
-  const g = (bigint >> 8) & 255;
-  const b = bigint & 255;
-
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
-
-
 // recent activity
 export const recent_activity: RecentActivity[] = [
   {

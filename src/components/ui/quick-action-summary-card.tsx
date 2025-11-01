@@ -1,7 +1,7 @@
 
 "use client";
 
-import { hexToRgba } from "@/lib/dummy-data/wallet";
+import { hexToRgba } from "@/lib/utils";
 import { ChevronRight, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 
