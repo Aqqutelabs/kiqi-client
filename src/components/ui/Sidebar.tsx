@@ -17,8 +17,11 @@ import {
   ChevronRight,
   Pencil,
   ListIcon,
-  Play,
   House,
+  Send,
+  UserPlus,
+  FileEdit,
+  LayoutTemplate,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { useAppDispatch } from "@/redux/hooks";
@@ -125,11 +128,11 @@ const navigationConfig: NavSection[] = [
     type: "section",
     title: "SMS",
     items: [
-      { type: "link", href: "/sms/send-bulk-sms", label: "Send Bulk SMS", icon: Play },
-      { type: "link", href: "/sms/create-sender-id", label: "Create a Sender ID", icon: Play },
-      { type: "link", href: "/sms/manage-recipient-groups", label: "Manage Recipient Groups", icon: Play },
-      { type: "link", href: "/sms/sms-drafts", label: "SMS Drafts", icon: Play },
-      { type: "link", href: "/sms/sms-templates", label: "SMS Templates", icon: Play },
+     { type: "link", href: "/sms/send-bulk-sms", label: "Send Bulk SMS", icon: Send },
+{ type: "link", href: "/sms/create-sender-id", label: "Create a Sender ID", icon: UserPlus },
+{ type: "link", href: "/sms/manage-recipient-groups", label: "Manage Recipient Groups", icon: Users },
+{ type: "link", href: "/sms/sms-drafts", label: "SMS Drafts", icon: FileEdit },
+{ type: "link", href: "/sms/sms-templates", label: "SMS Templates", icon: LayoutTemplate },
     ],
   },
   {
