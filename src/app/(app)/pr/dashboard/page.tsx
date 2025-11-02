@@ -126,7 +126,7 @@ export default function PRDashboard() {
               <div className="flex items-center gap-2">
                 <SearchInput name="search" value="" onChange={() => {}} />
                 <Filter value="" onChange={() => {}} />
-                <Button onClick={() => redirect("/pr/create")}>
+                <Button onClick={() => redirect("/pr/create")} className="w-full">
                   Create New Press Release
                 </Button>
               </div>
