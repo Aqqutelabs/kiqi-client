@@ -4,21 +4,21 @@ import { CircleCheck, Globe, ChevronDown } from "lucide-react";
 const AuthLayout = ({ children }: { children: React.ReactNode }) => {
   const features = [
     {
-      title: "Lorem ipsum dolor sit amet",
+      title: "Manage everything in one place",
       content:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididun",
+        "Stay organized across projects, clients, and tasks without switching tools.",
       icon: "/users.svg",
     },
     {
-      title: "Lorem ipsum dolor sit amet",
+      title: "See what’s working in real-time",
       content:
-        "Receive detailed insights on all your numbers in real-time, see where visitors are coming from.",
+        "Track performance, monitor activities, and get insights that help you grow.",
       icon: "/check.svg",
     },
     {
-      title: "Lorem ipsum dolor sit amet",
+      title: "Security you can trust",
       content:
-        "Keep your team members and customers in the loop by sharing your dashboard public.",
+        "Your data stays safe, and your team stays connected with confidence.",
       icon: "shield-zap.svg",
     },
   ];
@@ -33,9 +33,9 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
           <h1 className="text-4xl lg:text-3xl font-medium text-[#1B223C] my-4 whitespace-nowrap">
             Streamline your business with KiKi.
           </h1>
-          <p className="text-[#606062] flex items-center gap-2 mt-2 text-sm">
-            <CircleCheck size={18} />
-            Lorem ipsum dolor sit amet
+          <p className="text-[#606062] flex items-start gap-2 mt-2 text-sm">
+            <CircleCheck size={20} />
+            Manage your workflows, campaigns, and updates—all in one simple dashboard.
           </p>
 
           {/* Features */}

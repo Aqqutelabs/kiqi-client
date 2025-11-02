@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import ProductSidebar from "@/app/(app)/pr/create/publisher-platform/product-details";
 import { useProducts } from "@/context/ProductContext";
+import { Button } from "./Button";
 
 export interface Products {
   id: string;
@@ -36,7 +37,7 @@ export default function ProductCard({ product }: ProductProps) {
         onClick={() => setIsSidebarOpen(true)}
         className="w-full h-[540px] border border-[#E2E8F0] rounded-2xl">
         {/* header */}
-        <div className="h-[140px] w-full rounded-t-2xl flex justify-center items-center bg-gradient-to-r from-[#F8FAFC] via-[#EFF6FF] to-[#EEF2FF] relative">
+        <div className="h-[140px] w-full rounded-t-2xl flex justify-center items-center border-b border-gray-200 relative">
           {product.productName}
           {product.isPopular && (
             <img
@@ -105,19 +106,15 @@ export default function ProductCard({ product }: ProductProps) {
           {/* Action Buttons */}
           <div className="flex gap-3 w-full">
             {!isAdded && (
-              <button
-                onClick={() => setIsSidebarOpen(true)}
-                className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors w-full cursor-pointer">
-                <Eye className="w-4 h-4" />
-                <span className="font-medium">View</span>
-              </button>
+             <Button onClick={() => setIsSidebarOpen(true)} size={"lg"} variant={"outline"} className="w-2/5">
+                <Eye size={18} className="mr-2" />
+                <span className="font-medium whitespace-nowrap">View</span>
+             </Button>
             )}
-            <button
-              onClick={handleAddToCart}
-              className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors bg-blue-900 text-white hover:bg-blue-800 w-full`}>
-              <ShoppingCart className="w-4 h-4" />
-              <span>{!isAdded ? "Add" : "Added"} to Cart</span>
-            </button>
+            <Button onClick={handleAddToCart} size={"lg"} className={isAdded ? "w-full" : "w-3/5"}>
+              <ShoppingCart size={18} className="mr-2" />
+              <span className="whitespace-nowrap">{!isAdded ? "Add" : "Added"} to Cart</span>
+            </Button>
           </div>
         </div>
       </div>
