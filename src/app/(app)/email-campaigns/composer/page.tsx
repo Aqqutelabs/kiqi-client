@@ -187,12 +187,12 @@ const CampaignComposerPage = () => {
 
   return (
     <motion.main
-      className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8"
+      className="flex-1 overflow-y-auto"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}>
-      <PageHeader title="Create a campaign" backLink="/email-campaigns/lists" />
-      <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl mx-auto">
+      <PageHeader title="Create a campaign" backLink="/email-campaigns/dashboard" />
+      <form onSubmit={handleSubmit} className="space-y-6 max-w-6xl mx-auto">
         <Card className="p-6 animate-fade-in">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="col-span-1 md:col-span-2">
