@@ -37,7 +37,7 @@ const AudiencePage = () => {
 
   return (
     <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 flex flex-col">
-      <PageHeader title="Audience" backLink="/dashboard/email-campaigns" />
+      <PageHeader title="Audience" backLink="/email-campaigns/dashboard" />
 
       <div className="bg-white rounded-lg shadow-md flex-1 flex flex-col">
         {/* Toolbar */}

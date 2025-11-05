@@ -70,7 +70,7 @@ export default function EmailCampaignAIPage() {
                   <Sparkles size={18} color="#233E97" />
                   <span>Smart compose</span>
                 </div>
-                <Button>
+                <Button onClick={() => redirect("/email-campaigns/ai/generate-email")}>
                   <MousePointer2  className="rotate-90" />
                 </Button>
               </div>

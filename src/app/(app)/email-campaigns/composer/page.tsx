@@ -8,16 +8,9 @@ import {
   Pilcrow,
   List,
   Link as LinkIcon,
-  Wand2,
-  ArrowRight,
-  Sparkles,
-  MousePointer2,
-  Paperclip,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Input } from "@/components/ui/forms/Input";
-import { Select } from "@/components/ui/forms/Select";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
@@ -29,6 +22,7 @@ import { toast } from "react-hot-toast";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Heading from "@/components/ui/TextHeading";
+import AIPromptBar from "@/components/ui/AiPromptBarSimple";
 
 const initialEmail = `Dear Flora,<br/><br/>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nisi arcu, elementum eget facilisis non, egestas sit amet justo. Cras ullamcorper lacus vel leo hendrerit molestie. Sed rhoncus congue commodo. Cras lorem velit, tempor et nulla a, interdum egestas tellus. Curabitur vestibulum est sed consectetur mollis. Vestibulum vel eros massa. Proin nec ultricies arcu. Fusce ac nunc augue. In massa erat, cursus a tincidunt sed, ultricies eu lectus. Sed tempus eget felis vestibulum accumsan. Nulla nec vestibulum dolor. Fusce lobortis felis quis mauris vehicula rhoncus. Donec ullamcorper leo in sapien luctus lacinia. Nulla facilisi. Morbi varius leo velit, vitae ultricies ex interdum ut.<br/><br/>Best regards,<br/>Rage Jean Paige.`;
 
@@ -234,31 +228,7 @@ return (
         </motion.div>
         
         {/* AI Prompt Bar */}
-        <motion.div
-          className="relative"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}>
-          <div className="p-0.5 bg-gradient-to-r from-[#7997F9] to-[#3D66EC] rounded-[1rem] w-full">
-            <div className="bg-[#F3F6F8] rounded-[calc(1rem-2px)] flex items-center px-4 py-2">
-              <input
-                type="text"
-                placeholder="Type here"
-                className="flex-1 outline-none border-none bg-transparent text-gray-800 placeholder:text-gray-400"
-              />
-              <div className="flex items-center gap-4 ml-4">
-                <div
-                  className="!text-[var(--primary)] whitespace-nowrap flex text-sm items-center cursor-pointer">
-                  <Sparkles size={16} className="mr-1.5"/> Use Ai
-                </div>
-                <Paperclip size={18} color="#42526D"/>
-                <Button>
-                  <MousePointer2 className="rotate-90" />
-                </Button>
-              </div>
-            </div>
-          </div>
-        </motion.div>
+        <AIPromptBar/>
         
         {/* Action Buttons */}
         <div className="flex w-4/5 gap-3 pt-2">

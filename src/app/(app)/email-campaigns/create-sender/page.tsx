@@ -1,19 +1,14 @@
 "use client";
 import React, { useState } from "react";
-// import DashboardLayout from '@/components/templates/DashboardLayout';
-// import { PageHeader } from '@/components/molecules/PageHeader';
-// import { Card } from '@/components/atoms/Card';
-// import { Button } from '@/components/atoms/Button';
-// import { Input } from '@/components/atoms/Input';
-// import { Select } from '@/components/atoms/Select';
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Input } from "@/components/ui/forms/Input";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { Select } from "@/components/ui/forms/Select";
 import { useDispatch, useSelector } from "react-redux";
 import { createSender, fetchSenders } from "@/redux/slices/campaignSlice";
+import { FormField } from "@/components/ui/forms/FormField";
+import { Column, DataTable } from "@/components/ui/DataTable";
 
 // Notification component (simple inline for demo)
 const Notification = ({
@@ -36,15 +31,12 @@ const Notification = ({
   </div>
 );
 
-const senderEmails = [
-  {
-    id: "1",
-    email: "Myemail@email.com",
-    date: "10-04-2025",
-    type: "Campaign",
-    name: "Emmanuel Jones",
-  },
-];
+type TableData = {
+  id: string;
+  senderEmail: string;
+  type: string;
+  sender: string;
+}
 
 const CreateSenderEmailPage = () => {
   const dispatch = useDispatch();
@@ -61,10 +53,17 @@ const CreateSenderEmailPage = () => {
   console.log("Full Redux State:", fullState);
   const status = useSelector((state: any) => state.campaign?.status ?? "idle");
   const error = useSelector((state: any) => state.campaign?.error ?? null);
+  console.error(error);
   const senders = useSelector(
     (state: any) => state.campaign?.senders?.data ?? []
   );
   console.log("Senders:", senders);
+
+  const headers: Column<TableData>[] = [
+    { header: "Sender Email", accessor: "senderEmail" },
+    { header: "Type", accessor: "type" },
+    { header: "Sender", accessor: "sender" },
+  ];
 
   React.useEffect(() => {
     setFetchLoading(true);
@@ -124,19 +123,17 @@ const CreateSenderEmailPage = () => {
           <h3 className="text-lg font-semibold mb-4 text-gray-800">
             Submit sender email
           </h3>
-          <form className="space-y-4 max-w-lg" onSubmit={handleSubmit}>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Sender Email
-              </label>
-              <Input
+        <hr className="text-gray-200 my-4" />
+          <form className="space-y-4" onSubmit={handleSubmit}>
+              <FormField
                 type="email"
+                id="email"
                 placeholder="Enter Sender Email"
+                label="Sender Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
-            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Type
@@ -144,26 +141,26 @@ const CreateSenderEmailPage = () => {
               <Select
                 value={type}
                 onChange={(e) => setType(e.target.value)}
-                required>
+                required
+                className="bg-[#00000014]"
+                >
                 <option value="campaign">Campaign</option>
                 <option value="message">Message</option>
                 <option value="single">Single</option>
               </Select>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Sender
-              </label>
-              <Input
+              <FormField
+                type="text"
+                id="email"
+                label="Sender Name"
                 placeholder="Enter a sender e.g company name"
                 value={sender}
                 onChange={(e) => setSender(e.target.value)}
                 required
               />
-            </div>
             <Button
               type="submit"
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto mt-5"
               disabled={status === "loading" || submitLoading}>
               {submitLoading ? "Submitting..." : "Submit sender Email"}
             </Button>
@@ -178,41 +175,17 @@ const CreateSenderEmailPage = () => {
             </span>
           </div>
           <div className="w-full overflow-x-auto">
-            {fetchLoading ? (
+            {fetchLoading && senders.length !== 0 ? (
               <div className="text-center py-8">Loading sender emails...</div>
+            ) : senders.length === 0 ? (
+              <p className="text-center mx-auto">No data yet.</p>
             ) : (
-              <table className="min-w-full bg-white text-sm">
-                <thead className="bg-gray-100/70">
-                  <tr className="text-left text-gray-600">
-                    <th className="p-3 font-medium">Sender Email</th>
-                    <th className="p-3 font-medium">Type</th>
-                    <th className="p-3 font-medium">Sender</th>
-                    <th className="p-3 font-medium">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {senders.map((row: any) => (
-                    <tr key={row.id}>
-                      <td className="p-3">{row.senderEmail}</td>
-                      <td className="p-3">{row.type}</td>
-                      <td className="p-3">{row.senderName}</td>
-                      <td className="p-3">
-                        <div className="flex gap-2">
-                          <Button variant="tertiary" size="sm">
-                            Edit
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            className="!p-2">
-                            <Trash2 size={16} />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <DataTable
+              columns={headers}
+              data={senders}
+              onEdit={() => {}}
+              onDelete={() => {}}
+              />
             )}
           </div>
         </Card>
