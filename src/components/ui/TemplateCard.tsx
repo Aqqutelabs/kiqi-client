@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 type TemplateCardProps = {
     heading: string;
     subtitle: string;
@@ -14,7 +16,7 @@ export default function TemplateCard({
     tags,
 }: TemplateCardProps) {
     return (
-        <div className="bg-[#D1DAF442] py-5 px-4 space-y-4 rounded-xl h-[190px] w-full">
+        <Link href={"/email-campaigns/ai/generate-email"} className="bg-[#D1DAF442] py-5 px-4 space-y-4 rounded-xl h-[190px] w-full block cursor-pointer">
             {/* heading and sub */}
             <div className="space-y-2">
                 <h3 className="font-medium text-[#1B223C] text-base">{heading}</h3>
@@ -28,6 +30,6 @@ export default function TemplateCard({
                     </span>
                 ))}
             </div>
-        </div>
+        </Link>
     )
 }

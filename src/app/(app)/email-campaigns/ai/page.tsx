@@ -15,6 +15,7 @@ import {
   SlidersHorizontal,
   Sparkles,
 } from "lucide-react";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export default function EmailCampaignAIPage() {
@@ -69,8 +70,8 @@ export default function EmailCampaignAIPage() {
                   <Sparkles size={18} color="#233E97" />
                   <span>Smart compose</span>
                 </div>
-                <Button>
-                  <MousePointer2 />
+                <Button onClick={() => redirect("/email-campaigns/ai/generate-email")}>
+                  <MousePointer2  className="rotate-90" />
                 </Button>
               </div>
             </div>
@@ -110,13 +111,13 @@ export default function EmailCampaignAIPage() {
               placeholder="Search templates"
             />
           </div>
-          <div className="flex items-center gap-2 text-[#233E97] cursor-pointer text-sm">
+          <Link href={"/email-campaigns/ai/templates"} className="flex items-center gap-2 text-[#233E97] cursor-pointer text-sm">
             <span>View All</span>
             <ChevronRight size={18} />
-          </div>
+          </Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {templates.map((template, index) => (
+            {templates.slice(0,3).map((template, index) => (
                 <TemplateCard
                 key={index}
                 heading={template.heading}
