@@ -14,6 +14,7 @@ interface DataTableProps<T> {
   onEdit?: (item: T) => void;
   onDelete?: (item: T) => void;
   onView?: (id: string | number) => string; // Returns the URL for the detail page
+  extraActions?: (item: T) => React.ReactNode;
 }
 
 export function DataTable<T extends { id: string | number }>({
@@ -21,7 +22,8 @@ export function DataTable<T extends { id: string | number }>({
   data,
   onEdit,
   onDelete,
-  onView
+  onView,
+  extraActions,
 }: DataTableProps<T>) {
   return (
     <div className="w-full overflow-x-auto">
@@ -36,8 +38,8 @@ export function DataTable<T extends { id: string | number }>({
                 {col.header}
               </th>
             ))}
-            {(onEdit || onDelete || onView) && (
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+            {(onEdit || onDelete || onView || extraActions) && (
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-800 uppercase tracking-wider">
                 Actions
               </th>
             )}
@@ -51,7 +53,7 @@ export function DataTable<T extends { id: string | number }>({
                   {String(row[col.accessor])}
                 </td>
               ))}
-              {(onEdit || onDelete || onView) && (
+              {(onEdit || onDelete || onView || extraActions) && (
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div className="flex justify-end items-center gap-2">
                     {onView && (
@@ -72,6 +74,7 @@ export function DataTable<T extends { id: string | number }>({
                         Delete
                       </Button>
                     )}
+                    {extraActions && extraActions(row)}
                   </div>
                 </td>
               )}

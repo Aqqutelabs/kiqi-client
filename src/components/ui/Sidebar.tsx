@@ -22,6 +22,9 @@ import {
   UserPlus,
   FileEdit,
   LayoutTemplate,
+  ChartPie,
+  Mailbox,
+  SquareDashedKanban,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { useAppDispatch } from "@/redux/hooks";
@@ -68,24 +71,11 @@ const navigationConfig: NavSection[] = [
     type: "section",
     title: "Campaigns",
     items: [
-      {
-        type: "link",
-        href: "/email-campaigns/dashboard",
-        label: "Email Campaigns",
-        icon: Mail,
-      },
-      {
-        type: "link",
-        href: "/email-campaigns/composer",
-        label: "Create Email Campaign",
-        icon: Pencil,
-      },
-      {
-        type: "link",
-        href: "/email-campaigns/email-lists",
-        label: "Email Lists",
-        icon: ListIcon,
-      },
+      { type: "link", href: "/email-campaigns/dashboard", label: "Email Campaigns", icon: Mail, },  
+      { type: "link", href: "/email-campaigns/templates", label: "Templates", icon: SquareDashedKanban, },  
+      { type: "link", href: "/email-campaigns/mailbox", label: "Mailbox", icon: Mailbox, },  
+      { type: "link", href: "/email-campaigns/analytics", label: "Analytics", icon: ChartPie, },  
+      { type: "link", href: "/email-campaigns/email-lists", label: "Email Lists", icon: ListIcon, },
     ],
   },
   //  {
@@ -228,7 +218,7 @@ export const Sidebar: React.FC = () => {
       {/* Header */}
       <div className="h-16 flex-shrink-0 flex items-center px-6 border-b border-gray-200">
         <Image
-          src="/main-logo.svg"
+          src="/kiki-logo.svg"
           alt="KiQi 2025"
           height={20}
           width={100}

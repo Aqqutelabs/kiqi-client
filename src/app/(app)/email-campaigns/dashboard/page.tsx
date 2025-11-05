@@ -12,6 +12,16 @@ import {
 } from "recharts";
 import { Column, DataTable } from "@/components/ui/DataTable";
 import toast from "react-hot-toast";
+import { Card } from "@/components/ui/Card";
+import Heading from "@/components/ui/TextHeading";
+import { PageHeader } from "@/components/ui/layout/PageHeader";
+import { useState } from "react";
+import SearchInput from "@/components/ui/forms/Search";
+import Filter from "@/components/ui/Filter";
+import { Button } from "@/components/ui/Button";
+import { Plus, Sparkles } from "lucide-react";
+import { Modal } from "@/components/ui/Modal";
+import { redirect } from "next/navigation";
 // Define type for campaign data
 interface Campaign {
   id: number;
@@ -24,38 +34,6 @@ interface Campaign {
   date: string;
 }
 export default function EmailCampaignDashboard() {
-  // dashboard statistics
-  const dashboard_stats: StatCardProps[] = [
-    {
-      title: "Emails Sent",
-      value: "1.8K",
-      change: "1.3",
-      changeType: "increase",
-    },
-    {
-      title: "Avg. open rate",
-      value: "88.60%",
-      change: "1.3",
-      changeType: "increase",
-    },
-    {
-      title: "Unsubscribe rate",
-      value: "3.60%",
-      change: "1.3",
-      changeType: "increase",
-    },
-    {
-      title: "Active subscribers",
-      value: "2.5K",
-      change: "1.3",
-      changeType: "increase",
-    },
-  ];
-  // bar chart data
-  const barChartData = Array.from({ length: 30 }, (_, i) => ({
-    name: `${i + 1}`,
-    uv: Math.floor(Math.random() * 400) + 50,
-  }));
   // table columns and data
   const columns: Column<Campaign>[] = [
     { header: "Name", accessor: "name" },
@@ -88,57 +66,78 @@ export default function EmailCampaignDashboard() {
       date: "2024-03-05",
     },
   ];
+
+  const [tab, setTab] = useState("All");
+  const tabs = ["All", "Active", "Scheduled", "Completed"];
+
+  const [openCreateModal, setOpenCreateModal] = useState(false);
+
   return (
-    <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
-      {/* Stat Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {dashboard_stats.map((stat, index) => (
-          <StatCard
-            key={index}
-            title={stat.title}
-            value={stat.value}
-            change={stat.change}
-            changeType={stat.changeType}
-          />
-        ))}
-      </div>
-
-      {/* emails sent chart */}
-      <ChartCard
-        title="Emails Sent"
-        className="xl:col-span-2"
-        headerContent={
-          <div className="text-sm bg-gray-100 px-3 py-1 rounded-md">
-            05 Feb - 06 March
-          </div>
-        }>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart
-            data={barChartData}
-            margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
-            <XAxis
-              dataKey="name"
-              axisLine={false}
-              tickLine={false}
-              style={{ fontSize: 12 }}
-            />
-            <YAxis axisLine={false} tickLine={false} style={{ fontSize: 12 }} />
-            <Tooltip cursor={{ fill: "rgba(51, 102, 255, 0.1)" }} />
-            <Bar dataKey="uv" fill="#233E97" radius={[4, 4, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-      </ChartCard>
-
+    <main className="flex-1 overflow-y-auto space-y-6">
+      <PageHeader title="Email Campaigns" backLink="/dashboard" />
       {/* campaigns table */}
-      <ChartCard title="Campaigns" className="xl:col-span-2">
-        <div className="flex"></div>
-        <DataTable
-          columns={columns}
-          data={data}
-          onDelete={() => toast.success("Campaign deleted successfully.")}
-          onEdit={() => {}}
-        />
-      </ChartCard>
+      <Card>
+        <div className="space-y-4">
+          <Heading heading="Campaigns" />
+          <hr className="text-gray-200" />
+
+          {/* tabs and filter */}
+          <div className="flex justify-between items-center">
+            {/* tabs */}
+            <div className="flex gap-4.5 bg-[#F6F3F7] py-1 px-10">
+              {tabs.map((t) => (
+                <button
+                  key={t}
+                  className={`px-2 py-1 rounded font-medium text-sm w-[90px] cursor-pointer ${
+                    tab === t ? "bg-[#233E97] text-[#ECEDEE]" : "text-gray-700"
+                  }`}
+                  onClick={() => setTab(t)}>
+                  {t}
+                </button>
+              ))}
+            </div>
+            {/* filters */}
+            <div className="flex gap-2">
+              <SearchInput value="" onChange={() => {}} name="" />
+              <Filter value="" onChange={() => {}} />
+              <Button
+                className="w-full"
+                onClick={() => setOpenCreateModal(true)}>
+                <Plus size={18} className="mr-1" />
+                Create Campaign
+              </Button>
+            </div>
+          </div>
+
+          <DataTable
+            columns={columns}
+            data={data}
+            extraActions={(item) => (
+              <Button onClick={() => console.log(item)}>Add Email</Button>
+            )}
+          />
+        </div>
+      </Card>
+
+      <Modal
+        isOpen={openCreateModal}
+        onClose={() => setOpenCreateModal(false)}
+        width="400px">
+        <div className="space-y-6 my-5">
+          <Heading heading="Create Email Campaign" className="text-center" />
+          {/* choices */}
+          <div className="space-y-4">
+            <button onClick={() => redirect("/email-campaigns/ai")} className="border border-[#E2E8F0] bg-linear-to-r from-[#233E9726] to-[#C4C4C400] h-[50px] rounded-md py-3.5 px-11.5 flex justify-center items-center gap-2.5 w-full cursor-pointer">
+              <Sparkles size={20} color="#1B223C"/>
+              <p className="text-[#1B223C] text-sm font-medium">Create with KiKi Ai</p>
+            </button>
+            <button onClick={() => redirect("/email-campaigns/composer")} className="border border-[#E2E8F0] h-[50px] rounded-md py-3.5 px-11.5 flex justify-center items-center gap-2.5 w-full cursor-pointer">
+              <Plus size={20} color="#1B223C"/>
+              <p className="text-[#1B223C] text-sm font-medium">Create Manually</p>
+            </button>
+          </div>
+        </div>
+      </Modal>
     </main>
   );
 }
