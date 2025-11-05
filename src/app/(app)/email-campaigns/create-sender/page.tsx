@@ -118,7 +118,7 @@ const CreateSenderEmailPage = () => {
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         <PageHeader
           title="Create a sender email"
-          backLink="/dashboard/email-campaigns"
+          backLink="/email-campaigns/dashboard"
         />
         <Card className="mb-8 p-6">
           <h3 className="text-lg font-semibold mb-4 text-gray-800">

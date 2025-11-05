@@ -10,6 +10,9 @@ import {
   Link as LinkIcon,
   Wand2,
   ArrowRight,
+  Sparkles,
+  MousePointer2,
+  Paperclip,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -25,8 +28,9 @@ import {
 import { toast } from "react-hot-toast";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import Heading from "@/components/ui/TextHeading";
 
-const initialEmail = `Dear Flora,<br/><br/>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nisl arcu, elementum eget facilisis non, elementum et est. Cras ullamcorper lacus vel nisl mattis, sit amet lobortis est convallis. Sed rhoncus congue interdum.<br/><br/>Sed tempus eget felis vel accumsan. Nulla nec vestibulum dolor. Fusce lobortis felis quis mauris vestibulum, eu sodales arcu interdum.<br/><br/>Proin nec ultricies est. In massa erat, cursus et ultrices vel, condimentum et est. Nam in massa nec nulla vestibulum accumsan. Nullam nec vestibulum dolor.<br/><br/>Best regards,<br/>Rage Jean Paige.`;
+const initialEmail = `Dear Flora,<br/><br/>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nisi arcu, elementum eget facilisis non, egestas sit amet justo. Cras ullamcorper lacus vel leo hendrerit molestie. Sed rhoncus congue commodo. Cras lorem velit, tempor et nulla a, interdum egestas tellus. Curabitur vestibulum est sed consectetur mollis. Vestibulum vel eros massa. Proin nec ultricies arcu. Fusce ac nunc augue. In massa erat, cursus a tincidunt sed, ultricies eu lectus. Sed tempus eget felis vestibulum accumsan. Nulla nec vestibulum dolor. Fusce lobortis felis quis mauris vehicula rhoncus. Donec ullamcorper leo in sapien luctus lacinia. Nulla facilisi. Morbi varius leo velit, vitae ultricies ex interdum ut.<br/><br/>Best regards,<br/>Rage Jean Paige.`;
 
 // A simple toolbar button component for the editor
 const ToolbarButton = ({
@@ -185,75 +189,24 @@ const CampaignComposerPage = () => {
     setActiveFormats(formats);
   };
 
-  return (
+return (
     <motion.main
-      className="flex-1 overflow-y-auto"
+      className="flex-1 overflow-y-auto bg-gray-50"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}>
       <PageHeader title="Create a campaign" backLink="/email-campaigns/dashboard" />
-      <form onSubmit={handleSubmit} className="space-y-6 max-w-6xl mx-auto">
-        <Card className="p-6 animate-fade-in">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="col-span-1 md:col-span-2">
-              <Input
-                name="campaignName"
-                value={form.campaignName}
-                onChange={handleInputChange}
-                placeholder="Campaign Name"
-                required
-              />
-            </div>
-            <div className="col-span-1 md:col-span-2">
-              <Input
-                name="senderEmail"
-                value={form.senderEmail}
-                onChange={handleInputChange}
-                placeholder="Sender Email"
-                required
-              />
-            </div>
-            <Input
-              name="subjectLine"
-              value={form.subjectLine}
-              onChange={handleInputChange}
-              placeholder="Subject Line"
-              required
-            />
-            <Select
-              name="emailListId"
-              value={form.emailListId}
-              onChange={handleInputChange}
-              required>
-              <option value="" disabled>
-                Select Email List
-              </option>
-              {listsStatus === "loading" ? (
-                <option>Loading...</option>
-              ) : lists && lists.length > 0 ? (
-                lists.map((list: any) => (
-                  <option key={list._id || list.id} value={list._id || list.id}>
-                    {list.email_listName || list.name}
-                  </option>
-                ))
-              ) : (
-                <option>No lists found</option>
-              )}
-            </Select>
-          </div>
-        </Card>
-        {/* Editor Card */}
+      <form onSubmit={handleSubmit} className="space-y-6 w-full px-4 pb-8">
+        {/* Write Email Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}>
-          <Card className="shadow-lg border-cyan-200">
-            <h3 className="text-lg font-semibold p-4 border-b bg-cyan-50 rounded-t">
-              Write Email
-            </h3>
+          <Card className="shadow-sm">
+            <Heading heading="Write Email" className="border-b border-gray-200 pb-4"/>
             {/* Toolbar */}
             <motion.div
-              className="flex flex-wrap gap-1 p-2 border-b bg-white sticky top-0 z-10"
+              className="flex flex-wrap gap-1 px-6 py-3 border-b border-gray-200 bg-white"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}>
@@ -268,47 +221,65 @@ const CampaignComposerPage = () => {
             </motion.div>
             {/* Editor Area */}
             <motion.div
-              className="p-4 text-gray-700 leading-relaxed focus:outline-none min-h-[300px] bg-gray-50 rounded-b shadow-sm border border-gray-200 transition-all duration-300 hover:shadow-md focus:ring-2 focus:ring-cyan-300 focus:bg-white"
+              className="px-6 py-4 text-gray-800 leading-relaxed focus:outline-none min-h-[400px] bg-white"
               contentEditable
               ref={editorRef}
               onInput={handleEditorChange}
               onFocus={updateActiveFormats}
               onClick={updateActiveFormats}
               tabIndex={0}
-              style={{ transition: "box-shadow 0.2s, background 0.2s" }}
               aria-label="Email editor"
             />
           </Card>
         </motion.div>
+        
         {/* AI Prompt Bar */}
         <motion.div
           className="relative"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}>
-          {/* <Input 
-                            placeholder="Type here"
-                            className="h-14 p-4 pr-32"
-                        /> */}
-          {/* <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
-                            <Button variant="tertiary" size="sm" className="!bg-white border"><Wand2 size={16} className="mr-1"/> Use Ai</Button>
-                            <Button className="h-9 w-9 p-0"><ArrowRight size={20}/></Button>
-                        </div> */}
+          <div className="p-0.5 bg-gradient-to-r from-[#7997F9] to-[#3D66EC] rounded-[1rem] w-full">
+            <div className="bg-[#F3F6F8] rounded-[calc(1rem-2px)] flex items-center px-4 py-2">
+              <input
+                type="text"
+                placeholder="Type here"
+                className="flex-1 outline-none border-none bg-transparent text-gray-800 placeholder:text-gray-400"
+              />
+              <div className="flex items-center gap-4 ml-4">
+                <div
+                  className="!text-[var(--primary)] whitespace-nowrap flex text-sm items-center cursor-pointer">
+                  <Sparkles size={16} className="mr-1.5"/> Use Ai
+                </div>
+                <Paperclip size={18} color="#42526D"/>
+                <Button>
+                  <MousePointer2 className="rotate-90" />
+                </Button>
+              </div>
+            </div>
+          </div>
         </motion.div>
+        
         {/* Action Buttons */}
-        <div className="flex flex-wrap gap-4 pt-4">
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Sending..." : "Create Campaign"}
+        <div className="flex w-4/5 gap-3 pt-2">
+          <Button 
+            type="submit" 
+            disabled={isSubmitting}
+            className="w-full"
+            >
+            {isSubmitting ? "Sending..." : "Send Now"}
           </Button>
           <Button
             type="button"
-            variant="secondary"
+            variant={"secondary"}
+            className="w-full"
             onClick={() => toast.success("Draft saved successfully!")}>
             Save as Draft
           </Button>
           <Button
             type="button"
-            className="!bg-cyan-500 hover:!bg-cyan-600 !text-white"
+            variant={"tertiary"}
+            className="w-full"
             onClick={() => toast.success("Campaign scheduled successfully!")}>
             Schedule for Later
           </Button>
