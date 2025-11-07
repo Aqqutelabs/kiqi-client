@@ -104,7 +104,7 @@ const EmailListDetailPage = () => {
     <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 flex flex-col">
       <PageHeader
         title={list ? list.email_listName : "Email List"}
-        backLink="/dashboard"
+        backLink="/email-campaigns/email-lists"
       />
       <div className="bg-white rounded-lg shadow-md flex-1 flex flex-col">
         <div className="p-4 border-b flex flex-wrap gap-4 justify-between items-center">

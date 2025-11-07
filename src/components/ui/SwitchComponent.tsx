@@ -1,7 +1,7 @@
 type ToggleProps = {
   label?: string;
   name: string;
-  isChecked: boolean;
+  isChecked?: boolean;
   onChange: (checked: boolean) => void;
 };
 

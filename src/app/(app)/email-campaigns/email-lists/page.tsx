@@ -16,6 +16,7 @@ import {
   clearCreateEmailListStatus,
 } from "@/redux/slices/campaignSlice";
 import { toast } from "react-hot-toast";
+import { FormField } from "@/components/ui/forms/FormField";
 
 const ManageEmailListPage = () => {
   const dispatch = useAppDispatch();
@@ -34,6 +35,7 @@ const ManageEmailListPage = () => {
   });
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const fileUploadRef = useRef<any>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
@@ -160,7 +162,7 @@ const ManageEmailListPage = () => {
         <h3 className="text-lg font-semibold mb-4 text-gray-800">
           Create Email List
         </h3>
-        <form className="space-y-6 max-w-xl" onSubmit={handleSubmit}>
+        <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
             <label className="block text-sm font-medium mb-1">List Name</label>
             <Input
@@ -175,9 +177,9 @@ const ManageEmailListPage = () => {
             <label className="block text-sm font-medium mb-1">
               Add Email Address (Option 1)
             </label>
-            <Textarea
+            <FormField
               name="emails"
-              rows={3}
+              id="emails"
               value={form.emails}
               onChange={handleFormChange}
               placeholder="Enter email addresses here. Each line: 'email fullName', e.g. john@example.com John Doe, jane@example.com Jane Doe."
@@ -187,12 +189,9 @@ const ManageEmailListPage = () => {
             <label className="block text-sm font-medium mb-1">
               Upload Email Address CSV (Option 2)
             </label>
-            <input
-              type="file"
-              accept=".csv"
-              ref={fileInputRef}
-              onChange={handleCsvUpload}
-              className="block w-full text-sm text-gray-700 border border-gray-300 rounded px-3 py-2 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              <FileUpload
+                ref={fileUploadRef}
+                onChange={(files) => files && handleCsvUpload({ target: { files } } as React.ChangeEvent<HTMLInputElement>)}
             />
           </div>
           {createEmailListStatus === "loading" || isSubmitting ? (
@@ -269,25 +268,19 @@ const ManageEmailListPage = () => {
                     </td>
                     <td className="p-3">
                       <div className="flex items-center gap-2">
-                        <Link href={`/email-campaigns/email-lists/${list._id}`}>
+                        <Link href={`/email-campaigns/email-lists/${list._id}`} className="block w-2/4">
                           <Button
                             size="sm"
-                            className="!bg-cyan-500 hover:!bg-cyan-600 text-white">
+                            className="!bg-cyan-500 hover:!bg-cyan-600 text-white w-full">
                             View List
-                          </Button>
-                        </Link>
-                        <Link
-                          href={`/email-campaigns/email-lists/${list._id}/edit`}>
-                          <Button size="sm" variant="secondary">
-                            Edit
                           </Button>
                         </Link>
                         <Button
                           variant="destructive"
                           size="sm"
-                          className="!p-2"
+                          className="!p-2 w-2/4"
                           onClick={() => handleDelete(list._id)}>
-                          <Trash2 size={16} />
+                            <Trash2 size={16}/>
                         </Button>
                       </div>
                     </td>
