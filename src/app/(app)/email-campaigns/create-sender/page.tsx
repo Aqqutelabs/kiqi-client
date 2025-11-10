@@ -4,10 +4,10 @@ import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
-import { Select } from "@/components/ui/forms/Select";
+import { Select } from "@/components/ui/Select";
 import { useDispatch, useSelector } from "react-redux";
 import { createSender, fetchSenders } from "@/redux/slices/campaignSlice";
-import { FormField } from "@/components/ui/forms/FormField";
+import { FormField } from "@/components/ui/FormField";
 import { Column, DataTable } from "@/components/ui/DataTable";
 
 // Notification component (simple inline for demo)
@@ -36,7 +36,7 @@ type TableData = {
   senderEmail: string;
   type: string;
   sender: string;
-}
+};
 
 const CreateSenderEmailPage = () => {
   const dispatch = useDispatch();
@@ -123,17 +123,17 @@ const CreateSenderEmailPage = () => {
           <h3 className="text-lg font-semibold mb-4 text-gray-800">
             Submit sender email
           </h3>
-        <hr className="text-gray-200 my-4" />
+          <hr className="text-gray-200 my-4" />
           <form className="space-y-4" onSubmit={handleSubmit}>
-              <FormField
-                type="email"
-                id="email"
-                placeholder="Enter Sender Email"
-                label="Sender Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+            <FormField
+              type="email"
+              id="email"
+              placeholder="Enter Sender Email"
+              label="Sender Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Type
@@ -142,22 +142,21 @@ const CreateSenderEmailPage = () => {
                 value={type}
                 onChange={(e) => setType(e.target.value)}
                 required
-                className="bg-[#00000014]"
-                >
+                className="bg-[#00000014]">
                 <option value="campaign">Campaign</option>
                 <option value="message">Message</option>
                 <option value="single">Single</option>
               </Select>
             </div>
-              <FormField
-                type="text"
-                id="email"
-                label="Sender Name"
-                placeholder="Enter a sender e.g company name"
-                value={sender}
-                onChange={(e) => setSender(e.target.value)}
-                required
-              />
+            <FormField
+              type="text"
+              id="email"
+              label="Sender Name"
+              placeholder="Enter a sender e.g company name"
+              value={sender}
+              onChange={(e) => setSender(e.target.value)}
+              required
+            />
             <Button
               type="submit"
               className="w-full sm:w-auto mt-5"
@@ -181,10 +180,10 @@ const CreateSenderEmailPage = () => {
               <p className="text-center mx-auto">No data yet.</p>
             ) : (
               <DataTable
-              columns={headers}
-              data={senders}
-              onEdit={() => {}}
-              onDelete={() => {}}
+                columns={headers}
+                data={senders}
+                onEdit={() => {}}
+                onDelete={() => {}}
               />
             )}
           </div>

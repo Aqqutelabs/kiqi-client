@@ -3,8 +3,8 @@
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
-import { Select } from "@/components/ui/forms/Select";
-import SimpleFileInput from "@/components/ui/forms/SimpleFileInput";
+import { Select } from "@/components/ui/Select";
+import SimpleFileInput from "@/components/ui/SimpleFileInput";
 import { Textarea } from "@/components/ui/Textarea";
 import Heading from "@/components/ui/TextHeading";
 import { motion } from "framer-motion";

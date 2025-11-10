@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/Button";
 import Filter from "@/components/ui/Filter";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import ProductCard, { Products } from "@/components/ui/ProductCard";
-import SearchInput from "@/components/ui/forms/Search";
+import SearchInput from "@/components/ui/Search";
 import { motion } from "framer-motion";
 import { redirect } from "next/navigation";
 

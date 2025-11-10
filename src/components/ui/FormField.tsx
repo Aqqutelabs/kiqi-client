@@ -1,5 +1,5 @@
 import * as React from "react";
-import { InputProps, Input } from "@/components/ui/forms/Input";
+import { InputProps, Input } from "@/components/ui/Input";
 import { twMerge } from "tailwind-merge";
 import clsx from "clsx";
 

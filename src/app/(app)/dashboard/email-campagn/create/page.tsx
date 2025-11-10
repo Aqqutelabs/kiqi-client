@@ -3,10 +3,10 @@ import React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Input } from "@/components/ui/forms/Input";
+import { Input } from "@/components/ui/Input";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
-import { Select } from "@/components/ui/forms/Select";
-import SimpleFileInput from "@/components/ui/forms/SimpleFileInput";
+import { Select } from "@/components/ui/Select";
+import SimpleFileInput from "@/components/ui/SimpleFileInput";
 
 const CreateCampaignPage = () => {
   return (

@@ -4,8 +4,8 @@ import Link from "next/link";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { FileUpload } from "@/components/ui/forms/FileUpload";
-import { Input } from "@/components/ui/forms/Input";
+import { FileUpload } from "@/components/ui/FileUpload";
+import { Input } from "@/components/ui/Input";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { Textarea } from "@/components/ui/Textarea";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
@@ -16,7 +16,7 @@ import {
   clearCreateEmailListStatus,
 } from "@/redux/slices/campaignSlice";
 import { toast } from "react-hot-toast";
-import { FormField } from "@/components/ui/forms/FormField";
+import { FormField } from "@/components/ui/FormField";
 
 const ManageEmailListPage = () => {
   const dispatch = useAppDispatch();
@@ -189,9 +189,14 @@ const ManageEmailListPage = () => {
             <label className="block text-sm font-medium mb-1">
               Upload Email Address CSV (Option 2)
             </label>
-              <FileUpload
-                ref={fileUploadRef}
-                onChange={(files) => files && handleCsvUpload({ target: { files } } as React.ChangeEvent<HTMLInputElement>)}
+            <FileUpload
+              ref={fileUploadRef}
+              onChange={(files) =>
+                files &&
+                handleCsvUpload({
+                  target: { files },
+                } as React.ChangeEvent<HTMLInputElement>)
+              }
             />
           </div>
           {createEmailListStatus === "loading" || isSubmitting ? (
@@ -268,7 +273,9 @@ const ManageEmailListPage = () => {
                     </td>
                     <td className="p-3">
                       <div className="flex items-center gap-2">
-                        <Link href={`/email-campaigns/email-lists/${list._id}`} className="block w-2/4">
+                        <Link
+                          href={`/email-campaigns/email-lists/${list._id}`}
+                          className="block w-2/4">
                           <Button
                             size="sm"
                             className="!bg-cyan-500 hover:!bg-cyan-600 text-white w-full">
@@ -280,7 +287,7 @@ const ManageEmailListPage = () => {
                           size="sm"
                           className="!p-2 w-2/4"
                           onClick={() => handleDelete(list._id)}>
-                            <Trash2 size={16}/>
+                          <Trash2 size={16} />
                         </Button>
                       </div>
                     </td>
