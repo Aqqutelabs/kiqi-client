@@ -3,10 +3,10 @@
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import Checkbox from "@/components/ui/CheckBox";
-import DateInput from "@/components/ui/forms/DateInput";
-import { FormField } from "@/components/ui/forms/FormField";
-import { Select } from "@/components/ui/forms/Select";
-import TimeInput from "@/components/ui/forms/TimeInput";
+import DateInput from "@/components/ui/DateInput";
+import { FormField } from "@/components/ui/FormField";
+import { Select } from "@/components/ui/Select";
+import TimeInput from "@/components/ui/TimeInput";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { Modal } from "@/components/ui/Modal";
 import ToggleSwitch from "@/components/ui/SwitchComponent";
@@ -348,19 +348,26 @@ export default function CampaignSettings() {
             onClick={() => setSuccessModal(true)}>
             Save Settings
           </Button>
-          <Button size={"lg"} className="w-full" variant={"secondary"} onClick={() => toast.success("Sent successfully!")}>
+          <Button
+            size={"lg"}
+            className="w-full"
+            variant={"secondary"}
+            onClick={() => toast.success("Sent successfully!")}>
             Send Now
           </Button>
         </div>
       </div>
 
-      <Modal isOpen={successModal} onClose={() => setSuccessModal(false)} width="450px">
+      <Modal
+        isOpen={successModal}
+        onClose={() => setSuccessModal(false)}
+        width="450px">
         <div className="flex flex-col justify-center items-center gap-6">
           <CircleCheck color="#009B54" size={64} />
           <Heading
-          heading="Successful!"
-          subtitle="Your campaign has been created successfully."
-          className="text-center"
+            heading="Successful!"
+            subtitle="Your campaign has been created successfully."
+            className="text-center"
           />
           <Button onClick={() => redirect("/email-campaigns/dashboard")}>
             Back to Dashboard

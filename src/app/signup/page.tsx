@@ -8,7 +8,7 @@ import { registerUser } from "@/redux/slices/authSlice";
 import { Lock, User, Eye, EyeOff, Link2, CircleUserRound } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { FormField } from "@/components/ui/forms/FormField";
+import { FormField } from "@/components/ui/FormField";
 import { toast } from "react-hot-toast";
 import AuthLayout from "@/components/ui/layout/AuthLayout";
 

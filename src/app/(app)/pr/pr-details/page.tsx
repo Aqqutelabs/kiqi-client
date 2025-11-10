@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/Card";
 import { Column, DataTable } from "@/components/ui/DataTable";
 import Filter from "@/components/ui/Filter";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
-import SearchInput from "@/components/ui/forms/Search";
+import SearchInput from "@/components/ui/Search";
 import { StatCard, StatCardProps } from "@/components/ui/StatCard";
 import toast from "react-hot-toast";
 
