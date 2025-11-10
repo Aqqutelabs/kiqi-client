@@ -36,8 +36,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { ReduxProvider } from '@/components/provider/ReduxProvider';
-import ToasterClient from './ToasterClient';
+import ClientLayout from '@/components/layout/ClientLayout';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -56,13 +55,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <ReduxProvider>
-          <ToasterClient />
-          {children}
-        </ReduxProvider>
-      </body>
-    </html>
+    <ClientLayout className={`${inter.className} antialiased`}>
+      {children}
+    </ClientLayout>
   );
 }
