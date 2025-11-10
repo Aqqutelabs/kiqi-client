@@ -8,6 +8,7 @@ interface ModalProps {
   onClose: () => void;
   children: React.ReactNode;
   showCloseButton?: boolean;
+  width?: string;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -15,6 +16,7 @@ export const Modal: React.FC<ModalProps> = ({
   onClose,
   children,
   showCloseButton = true,
+  width,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -47,13 +49,14 @@ export const Modal: React.FC<ModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 transition-opacity"
       role="dialog"
       aria-modal="true"
     >
       <div
         ref={modalRef}
-        className="relative bg-white rounded-xl shadow-xl p-6 sm:p-8 m-4 w-full max-w-md"
+        style={{ width: width }}
+        className="relative bg-white rounded-xl shadow-xl p-4 sm:p-4 m-4 w-full"
       >
         {showCloseButton && (
           <button

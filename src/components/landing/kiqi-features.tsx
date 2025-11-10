@@ -20,7 +20,7 @@ export default function KiQiFeatures() {
 
     return (
         <div className="h-fit bg-[#0C31A1] rounded-[30px] text-white p-5 md:p-10">
-            <h1 className="text-center text-[52px] font-bold">KiQi Features</h1>
+            <h1 className="text-center text-[52px] font-bold">KiKi Features</h1>
             <ul className="flex flex-col md:flex-row items-center gap-10 justify-center text-2xl font-normal my-10">
                 {features.map(feature => (
                     <li 

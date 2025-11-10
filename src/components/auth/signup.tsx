@@ -15,7 +15,7 @@
 //             <div className="w-full max-w-4xl m-4 md:grid md:grid-cols-2 md:gap-10 items-center">
 //                 {/* Left Side Info Panel - Hidden on Mobile */}
 //                 <div className="hidden md:flex flex-col text-white space-y-8 p-4">
-//                     <h1 className="text-4xl font-bold">Streamline your business with KiQi.</h1>
+//                     <h1 className="text-4xl font-bold">Streamline your business with KiKi.</h1>
 //                     <div className="space-y-6">
 //                         <div className="flex items-start space-x-3">
 //                             <CheckCircle className="mt-1 flex-shrink-0" />

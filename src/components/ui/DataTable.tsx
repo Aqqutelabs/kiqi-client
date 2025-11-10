@@ -1,7 +1,7 @@
 import React from 'react';
-// import { Button } from '@/components/atoms/Button';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, Eye } from 'lucide-react';
 import { Button } from './Button';
+import Link from 'next/link';
 
 export interface Column<T> {
   header: string;
@@ -13,6 +13,8 @@ interface DataTableProps<T> {
   data: T[];
   onEdit?: (item: T) => void;
   onDelete?: (item: T) => void;
+  onView?: (id: string | number) => string; // Returns the URL for the detail page
+  extraActions?: (item: T) => React.ReactNode;
 }
 
 export function DataTable<T extends { id: string | number }>({
@@ -20,40 +22,59 @@ export function DataTable<T extends { id: string | number }>({
   data,
   onEdit,
   onDelete,
+  onView,
+  extraActions,
 }: DataTableProps<T>) {
   return (
     <div className="w-full overflow-x-auto">
       <table className="min-w-full bg-white">
-        <thead className="bg-gray-50">
+        <thead className="bg-[#D1DAF4] h-[66px]">
           <tr>
             {columns.map((col) => (
               <th
                 key={String(col.accessor)}
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                className="px-6 py-3 text-left text-xs font-medium text-[#0A0A0A] uppercase tracking-wider"
               >
                 {col.header}
               </th>
             ))}
-            {(onEdit || onDelete) && (
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+            {(onEdit || onDelete || onView || extraActions) && (
+              <th className="px-6 py-3 text-right text-xs font-medium text-gray-800 uppercase tracking-wider">
                 Actions
               </th>
             )}
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
+        <tbody className="divide-y divide-gray-200 rounded-b-xl">
           {data.map((row) => (
-            <tr key={row.id} className="hover:bg-gray-50">
+            <tr key={row.id} className="bg-white h-20">
               {columns.map((col) => (
                 <td key={String(col.accessor)} className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                   {String(row[col.accessor])}
                 </td>
               ))}
-              {(onEdit || onDelete) && (
+              {(onEdit || onDelete || onView || extraActions) && (
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <div className="flex justify-end items-center space-x-2">
-                    {onEdit && <Button variant="tertiary" size="sm" onClick={() => onEdit(row)}>Edit</Button>}
-                    {onDelete && <Button variant="destructive" size="sm" onClick={() => onDelete(row)}>Delete</Button>}
+                  <div className="flex justify-end items-center gap-2">
+                    {onView && (
+                      <Link href={onView(row.id)}>
+                        <Button variant="tertiary" size="sm">
+                          <Eye className="w-4 h-4 mr-1" />
+                          View
+                        </Button>
+                      </Link>
+                    )}
+                    {onEdit && (
+                      <Button variant="tertiary" size="sm" onClick={() => onEdit(row)}>
+                        Edit
+                      </Button>
+                    )}
+                    {onDelete && (
+                      <Button variant="destructive" size="sm" onClick={() => onDelete(row)}>
+                        Delete
+                      </Button>
+                    )}
+                    {extraActions && extraActions(row)}
                   </div>
                 </td>
               )}
