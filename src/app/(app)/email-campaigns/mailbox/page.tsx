@@ -80,7 +80,7 @@ export default function Mailbox() {
                   {email.subject}
                 </h3>
                 <p className="text-sm">{email.preview}</p>
-              </div>
+              </div>l
             </div>
             <span className="text-sm text-gray-500">{email.time}</span>
           </div>
