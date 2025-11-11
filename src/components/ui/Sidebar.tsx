@@ -25,6 +25,7 @@ import {
   ChartPie,
   Mailbox,
   SquareDashedKanban,
+  Gift,
 } from "lucide-react";
 import { clsx } from "clsx";
 import { useAppDispatch } from "@/redux/hooks";
@@ -74,7 +75,7 @@ const navigationConfig: NavSection[] = [
       { type: "link", href: "/email-campaigns/dashboard", label: "Email Campaigns", icon: Mail, },  
       { type: "link", href: "/email-campaigns/templates", label: "Templates", icon: SquareDashedKanban, },  
       { type: "link", href: "/email-campaigns/mailbox", label: "Mailbox", icon: Mailbox, },  
-      { type: "link", href: "/email-campaigns/analytics", label: "Analytics", icon: ChartPie, },  
+      { type: "link", href: "/coming-soon", label: "Analytics", icon: ChartPie, },  
       { type: "link", href: "/email-campaigns/email-lists", label: "Email Lists", icon: ListIcon, },
     ],
   },
@@ -137,9 +138,15 @@ const navigationConfig: NavSection[] = [
       },
       {
         type: "link",
-        href: "/coming-soon",
-        label: "Subscription",
+        href: "/subscriptions",
+        label: "Subscriptions",
         icon: Repeat,
+      },
+       {
+        type: "link",
+        href: "/refer",
+        label: "Invite and Earn",
+        icon: Gift,
       },
     ],
   },

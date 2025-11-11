@@ -46,7 +46,9 @@ export default function PRCheckoutPage() {
   const completePayment = () => {
     toast.success("Payment Completed!")
     redirect("/pr/dashboard");
-  }
+  };
+
+  const [showBalance, setShowBalance] = useState(false);
 
   return (
       <>
@@ -182,7 +184,7 @@ export default function PRCheckoutPage() {
                     {/* go credit */}
                     <button
                       onClick={() => setSelectedPayment("go-credit")}
-                      className={`relative flex items-start p-4 border-2 rounded-xl transition-all ${
+                      className={`relative flex flex-col items-start p-4 border-2 rounded-xl transition-all duration-300 ${
                         selectedPayment === "go-credit"
                           ? "border-blue-600 bg-blue-50"
                           : "border-gray-200 hover:border-gray-300"
@@ -200,9 +202,15 @@ export default function PRCheckoutPage() {
                           <div className="text-xs text-gray-500">In app credit, transfer with ease</div>
                         </div>
                       </div>
-                      {selectedPayment === "digital-wallet" && (
+                      {selectedPayment === "go-credit" && (
                         <div className="absolute top-3 right-3 w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
                           <div className="w-2 h-2 bg-white rounded-full"></div>
+                        </div>
+                      )}
+                      {selectedPayment === "go-credit" && (
+                        <div className="flex justify-between items-center w-full mt-6">
+                          <button className="bg-blue-700 h-6 w-16 text-white text-xs rounded-md cursor-pointer">Top Up</button>
+                          <p className="text-[10px] text-gray-600">Available balance: 1800 GoCredit</p>
                         </div>
                       )}
                     </button>

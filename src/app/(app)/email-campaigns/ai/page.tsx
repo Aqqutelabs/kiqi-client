@@ -94,16 +94,16 @@ export default function EmailCampaignAIPage() {
       </div>
 
       {/* create manually button */}
-      <div className="flex justify-center items-center mt-6">
+      {/* <div className="flex justify-center items-center mt-6">
         <Button
           size={"lg"}
           onClick={() => redirect("/email-campaigns/composer")}>
           <Plus size={16} className="mr-1.5" />
           Create Manually
         </Button>
-      </div>
+      </div> */}
 
-      <div className="space-y-4 align-bottom mt-10">
+      <div className="space-y-4 align-bottom mt-20">
         <Heading heading="Templates" />
         <div className="flex justify-between items-center">
           <div className="w-[290px]">
@@ -115,7 +115,7 @@ export default function EmailCampaignAIPage() {
             />
           </div>
           <Link
-            href={"/email-campaigns/ai/templates"}
+            href={"/email-campaigns/templates"}
             className="flex items-center gap-2 text-[#233E97] cursor-pointer text-sm">
             <span>View All</span>
             <ChevronRight size={18} />

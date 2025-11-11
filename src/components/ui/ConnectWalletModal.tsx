@@ -1,12 +1,14 @@
 "use client";
 
 import { Card } from "@/components/ui/Card";
-import AuthLayout from "@/components/ui/layout/AuthLayout";
+import { Modal } from "@/components/ui/Modal";
 import { X } from "lucide-react";
 import { redirect } from "next/navigation";
 import { useState } from "react";
+import Heading from "./TextHeading";
+import { Button } from "./Button";
 
-export default function ConnectWallet() {
+export default function ConnectWallet({ isOpen, onClose }: {isOpen: boolean; onClose: () => void;}) {
   const [activeTab, setActiveTab] = useState<number | null>(null);
   const wallets = [
     { id: 1, name: "Metamask", img: "/wallet/metamask-fox.svg" },
@@ -16,12 +18,9 @@ export default function ConnectWallet() {
     { id: 5, name: "Phantom Wallet", img: "/wallet/phantom-logo.svg" },
   ];
   return (
-    <AuthLayout>
-      <Card className="w-[600px]">
-        <div className="flex justify-between items-center">
-          <p className="font-medium text-lg text-[#1B223C]">Connect Wallet</p>
-          <X onClick={() => redirect("/signup")} className="cursor-pointer" />
-        </div>
+      <Modal width="600px" isOpen={isOpen} onClose={onClose}>
+        {/* <p className="font-medium text-lg text-[#1B223C]">Connect Solana Wallet</p> */}
+        <Heading heading="Connect Solana Wallet" className="text-center"/>
         <div className="space-y-4 my-4">
           {wallets.map((wallet) => {
             const isActive = activeTab === wallet.id;
@@ -38,7 +37,10 @@ export default function ConnectWallet() {
             );
           })}
         </div>
-      </Card>
-    </AuthLayout>
+        <div className="flex justify-between items-center">
+          <Button variant={"outline"} onClick={onClose}>Cancel</Button>
+          <Button>Proceed</Button>
+        </div>
+      </Modal>
   );
 }
