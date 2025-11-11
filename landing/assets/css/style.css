@@ -126,10 +126,32 @@ body {
     color: #1dd1a1;
 }
 
+.featured-padded{
+    padding: 20px;
+}
+.featured-padded .rounded-xxl{
+    border-radius: 32px;
+}
+
+.featured-padded.box2{
+    padding: 0px;
+    margin-top: -50px;
+}
+
+.featured-padded.box2 .rounded-xxl{
+    border-radius: 0px;
+}
+
 .marketing-main {
     font-size: 60px;
     font-weight: 900;
     color: #fff;
+    font-family: 'Plus Jakarta Sans';
+}
+
+.marketing-main.light {
+    font-size: 40px;
+    font-weight: 600;
 }
 
 .shadow-lift {
@@ -307,6 +329,15 @@ body {
     color: #fff;
 }
 
+
+.ticker.light {
+    background: #f4f4f4;
+    color: #000;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    margin-top: -48px;
+}
+
 .ticker-viewport {
     overflow: hidden;
     position: relative;
@@ -335,6 +366,12 @@ body {
     align-items: center;
     gap: 0.5rem;
     opacity: 0.95;
+}
+
+.ticker-group li img{
+    height: 25px;
+    min-width: 30px;
+    object-fit: cover;
 }
 
 /*Pause on hover */
@@ -1109,7 +1146,7 @@ body {
 
 /* Buttons */
 .btn-pill {
-    border-radius: 999px;
+    border-radius: 15px;
     padding: .75rem 1.1rem;
     font-weight: 600;
 }
