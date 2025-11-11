@@ -102,7 +102,9 @@ export default function EmailCampaignDashboard() {
               <Filter value="" onChange={() => {}} />
               <Button
                 className="w-full"
-                onClick={() => setOpenCreateModal(true)}>
+                onClick={() => redirect("/email-campaigns/ai")}
+                // change to setOpenCreateModal if need be
+                > 
                 <Plus size={18} className="mr-1" />
                 Create Campaign
               </Button>

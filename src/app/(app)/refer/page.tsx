@@ -354,7 +354,7 @@ function NextMilestoneCard() {
         <p className="text-2xl font-bold text-[#233E97] mb-1">
           +{milestoneData.bonusReward.toLocaleString()}
         </p>
-        <p className="text-xs text-[#64748B]">GoCoins</p>
+        <p className="text-xs text-[#64748B]">GoCredits</p>
       </div>
     </div>
   );
@@ -387,7 +387,7 @@ function HowItWorks() {
       <p className="text-[#0F172B]">How It Works</p>
       <div className="space-y-4">
         {howItWorks.map((step, idx) => (
-          <div className="flex items-start justify-between">
+          <div className="flex items-start justify-start">
             {/* step count */}
             <div
               className="size-11 rounded-full flex justify-center items-center text-sm font-medium"

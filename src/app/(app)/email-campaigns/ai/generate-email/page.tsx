@@ -4,20 +4,22 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import Heading from "@/components/ui/TextHeading";
-import { 
-  Atom, 
-  Copy, 
-  FolderInput, 
-  Share2, 
-  Sparkles, 
-  ThumbsDown, 
-  ThumbsUp, 
+import {
+  Atom,
+  Copy,
+  FolderInput,
+  Share2,
+  Sparkles,
+  ThumbsDown,
+  ThumbsUp,
   X,
 } from "lucide-react";
 import AIPromptBar from "@/components/ui/AiPromptBarSimple";
 import React from "react";
 import { RichTextToolbar } from "@/components/ui/RichTextToolbar";
 import { redirect } from "next/navigation";
+import { FormField } from "@/components/ui/FormField";
+import { Select } from "@/components/ui/Select";
 
 export default function AIGeneratedEmail() {
   const editorRef = React.useRef<HTMLDivElement>(null);
@@ -41,6 +43,26 @@ export default function AIGeneratedEmail() {
       {/* heading */}
       <Card>
         <PageHeader title="AI Generated Email" backLink="/email-campaigns/ai" />
+
+        {/* subject line */}
+        <FormField
+          label="Add a subject line for this campaign"
+          id="subjectLine"
+          placeholder="Enter a subject line"
+          className="bg-transparent mt-2 h-14 mb-5"
+        />
+
+        {/* email footer customization */}
+        <div className="space-y-1 w-full">
+          <label className="text-[#1B223C] text-sm">
+            Email Footer Customization
+          </label>
+          <Select
+            placeholder="Default branded footer"
+            className="bg-transparent mt-2 h-14">
+            <option>Default branded footer</option>
+          </Select>
+        </div>
       </Card>
 
       {/* cards */}
@@ -48,9 +70,9 @@ export default function AIGeneratedEmail() {
         {/* generated email */}
         <Card className="col-span-3">
           <Heading heading="Generated Email" />
-          
+
           {/* Format Toolbar */}
-          <RichTextToolbar 
+          <RichTextToolbar
             editorRef={editorRef}
             activeFormats={activeFormats}
             onUpdateFormats={updateActiveFormats}
@@ -60,15 +82,15 @@ export default function AIGeneratedEmail() {
           <div className="flex justify-between items-center my-5">
             <ul className="flex items-center gap-6 text-sm text-[#606062]">
               <li className="cursor-pointer hover:text-gray-800">
-                <Share2 size={15} className="mr-2 inline-block"/>
+                <Share2 size={15} className="mr-2 inline-block" />
                 <span>Share</span>
               </li>
               <li className="cursor-pointer hover:text-gray-800">
-                <FolderInput size={15} className="mr-2 inline-block"/>
+                <FolderInput size={15} className="mr-2 inline-block" />
                 <span>Export</span>
               </li>
               <li className="cursor-pointer hover:text-gray-800">
-                <Atom size={15} className="mr-2 inline-block"/>
+                <Atom size={15} className="mr-2 inline-block" />
                 <span>Regenerate</span>
               </li>
             </ul>
@@ -92,7 +114,7 @@ export default function AIGeneratedEmail() {
           </div>
 
           {/* email body */}
-          <div 
+          <div
             ref={editorRef}
             contentEditable
             onFocus={updateActiveFormats}
@@ -122,7 +144,11 @@ export default function AIGeneratedEmail() {
               Best Regards, <br /> Captain Jean Kristen
             </p>
           </div>
-          <Button size={"lg"} onClick={() => redirect("/email-campaigns/settings")}>Send Email</Button>
+          <Button
+            size={"lg"}
+            onClick={() => redirect("/email-campaigns/settings")}>
+            Send Email
+          </Button>
         </Card>
 
         {/* kiki ai */}

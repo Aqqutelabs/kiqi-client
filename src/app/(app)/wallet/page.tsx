@@ -25,6 +25,7 @@ import UsageOverview from "./usage-overview";
 import { useState } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
+import ConnectWallet from "@/components/ui/ConnectWalletModal";
 
 type CustomStatProps = {
   title: string;
@@ -118,6 +119,7 @@ function CustomStatCard({
 export default function WalletPage() {
   // state for redeem GoC modal
   const [openModal, setOpenModal] = useState(false);
+  const [connectWallet, setConnectWallet] = useState(false);
   // quick actions
   const quick_actions = [
     {
@@ -132,14 +134,14 @@ export default function WalletPage() {
       description: "Purchase additional credits",
       icon: CreditCard,
       color: "#155DFC",
-      href: "/wallet/subscriptions",
+      href: "/subscriptions",
     },
     {
       title: "Invite & Earn",
       description: "Get 500 coins per referral",
       icon: Users,
       color: "#27AE60",
-      href: "/wallet/refer",
+      href: "/refer",
     },
   ];
   return (
@@ -346,11 +348,13 @@ export default function WalletPage() {
             className="w-full">
             Cancel <X size={16} className="ml-3" />
           </Button>
-          <Button className="w-full">
+          <Button className="w-full" onClick={() => { setOpenModal(false); setConnectWallet(true) }}>
             Continue <ArrowRight size={16} className="ml-3" />
           </Button>
         </div>
       </Modal>
+
+      <ConnectWallet isOpen={connectWallet} onClose={() => setConnectWallet(false)}/>
     </section>
   );
 }

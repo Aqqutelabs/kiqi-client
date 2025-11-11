@@ -7,10 +7,10 @@ import { useState } from "react";
 
 type Subscriptions = {
   id: string;
-  plan: "Starter" | "Enterprise" | "Professional";
+  plan: "Free" | "Starter" | "Enterprise" | "Professional";
   description: string;
   price: string;
-  altGoC: string;
+  altGoC?: string;
   perks: string[];
 };
 
@@ -18,6 +18,19 @@ export default function SubscriptionsPage() {
   const subscriptions: Subscriptions[] = [
     {
       id: "1",
+      plan: "Free",
+      description: "Perfect for individuals getting started",
+      price: "0",
+      // altGoC: "0",
+      perks: [
+        "1,000 Go Credits per month",
+        "Access to 3+ publishers",
+        "Minimal analytics",
+        "Email support",
+      ],
+    },
+    {
+      id: "2",
       plan: "Starter",
       description: "Perfect for individuals getting started",
       price: "15K",
@@ -31,7 +44,7 @@ export default function SubscriptionsPage() {
       ],
     },
     {
-      id: "2",
+      id: "3",
       plan: "Professional",
       description: "Best for growing teams and professionals",
       price: "35K",
@@ -47,7 +60,7 @@ export default function SubscriptionsPage() {
       ],
     },
     {
-      id: "3",
+      id: "4",
       plan: "Enterprise",
       description: "For large organizations with custom needs",
       price: "85K",
@@ -65,7 +78,7 @@ export default function SubscriptionsPage() {
     },
   ];
 
-  const [selectedPlan, setSelectedPlan] = useState<string | null>("3");
+  const [selectedPlan, setSelectedPlan] = useState<string | null>("0");
 
   return (
     <section className="space-y-4">
@@ -76,7 +89,7 @@ export default function SubscriptionsPage() {
       />
 
       {/* cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {subscriptions.map((sub) => {
           const activePlan = selectedPlan === sub.id;
           const isEnterprise = sub.plan === "Enterprise";

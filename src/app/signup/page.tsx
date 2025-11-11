@@ -2,15 +2,24 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { registerUser } from "@/redux/slices/authSlice";
-import { Lock, User, Eye, EyeOff, Link2, CircleUserRound } from "lucide-react";
+import {
+  Lock,
+  User,
+  Eye,
+  EyeOff,
+  Link2,
+  CircleUserRound,
+  Phone,
+} from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { FormField } from "@/components/ui/FormField";
 import { toast } from "react-hot-toast";
 import AuthLayout from "@/components/ui/layout/AuthLayout";
+import ConnectWallet from "../../components/ui/ConnectWalletModal";
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -20,11 +29,13 @@ const SignUpPage = () => {
     email: "",
     password: "",
     orgName: "",
+    phoneNumber: "",
   });
   const dispatch = useAppDispatch();
   const router = useRouter();
   const registration = useAppSelector((state) => state.auth.registration);
   const authToken = useAppSelector((state) => state.auth.token);
+  const [connectWallet, setConnectWallet] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -32,23 +43,69 @@ const SignUpPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await dispatch(
-      registerUser({
-        firstName: form.firstName,
-        lastName: form.lastName,
-        email: form.email,
-        password: form.password,
-        organizationName: form.orgName,
-      })
-    );
-  };
 
-  React.useEffect(() => {
-    if (registration.status === "succeeded" && authToken) {
-      toast.success(registration.message || "User registered successfully!");
-      router.push("/signup/setup");
+    // Validate all fields are filled
+    if (
+      !form.firstName.trim() ||
+      !form.lastName.trim() ||
+      !form.email.trim() ||
+      !form.password.trim() ||
+      !form.orgName.trim() ||
+      !form.phoneNumber.trim()
+    ) {
+      toast.error("Please fill in all required fields");
+      return;
     }
-  }, [registration.status, registration.message, authToken, router]);
+
+    // Validate password minimum length
+    if (form.password.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+
+    // Validate phone number format (basic validation)
+    const phoneRegex = /^[+]?[\d\s-()]+$/;
+    if (!phoneRegex.test(form.phoneNumber)) {
+      toast.error("Please enter a valid phone number");
+      return;
+    }
+
+    // Combine first name and last name into fullName
+    const fullName = `${form.firstName.trim()} ${form.lastName.trim()}`;
+
+    try {
+      const resultAction = await dispatch(
+        registerUser({
+          fullName: fullName,
+          firstName: form.firstName,
+          lastName: form.lastName,
+          email: form.email.trim(),
+          password: form.password,
+          organizationName: form.orgName.trim(),
+          phoneNumber: form.phoneNumber.trim(),
+        })
+      );
+
+      // Check if registration was successful
+      if (registerUser.fulfilled.match(resultAction)) {
+        toast.success(
+          "Account created successfully! Setting up your profile..."
+        );
+        // Short delay to ensure toast is visible before redirect
+        setTimeout(() => {
+          router.push("/signup/setup");
+        }, 1000);
+      } else if (registerUser.rejected.match(resultAction)) {
+        toast.error(
+          (resultAction.payload as string) ||
+            "Registration failed. Please try again."
+        );
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred. Please try again.");
+      console.error("Registration error:", error);
+    }
+  };
 
   return (
     <AuthLayout>
@@ -56,7 +113,7 @@ const SignUpPage = () => {
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
           Register with:
         </h2>
-        {/* Simplified Social Buttons for brevity */}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Button
             variant="primary"
@@ -65,7 +122,7 @@ const SignUpPage = () => {
             Google
           </Button>
           <Button
-            onClick={() => redirect("/signup/connect-wallet")}
+            onClick={() => setConnectWallet(true)}
             variant="secondary"
             className="flex items-center gap-2">
             <Link2 />
@@ -89,6 +146,7 @@ const SignUpPage = () => {
               icon={<User size={18} className="text-gray-400" />}
               value={form.firstName}
               onChange={handleChange}
+              required
             />
             <FormField
               label="Last Name"
@@ -98,8 +156,10 @@ const SignUpPage = () => {
               icon={<User size={18} className="text-gray-400" />}
               value={form.lastName}
               onChange={handleChange}
+              required
             />
           </div>
+
           <FormField
             label="Email Address"
             id="email"
@@ -109,7 +169,9 @@ const SignUpPage = () => {
             icon={<CircleUserRound size={18} className="text-gray-400" />}
             value={form.email}
             onChange={handleChange}
+            required
           />
+
           <FormField
             label="Organization/Business Name"
             id="orgName"
@@ -118,38 +180,58 @@ const SignUpPage = () => {
             icon={<CircleUserRound size={18} className="text-gray-400" />}
             value={form.orgName}
             onChange={handleChange}
+            required
           />
-          <div className="relative">
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <FormField
-              label="Password"
-              id="password"
-              name="password"
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              icon={<Lock size={18} className="text-gray-400" />}
-              value={form.password}
+              label="Phone Number"
+              id="phoneNumber"
+              name="phoneNumber"
+              type="tel"
+              placeholder="+234 999 999 9898"
+              icon={<Phone size={18} className="text-gray-400" />}
+              value={form.phoneNumber}
               onChange={handleChange}
+              required
             />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-10 text-gray-400">
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-            <p className="text-xs text-gray-500 mt-1">
-              Minimum of 8 Characters
-            </p>
+            <div className="relative">
+              <FormField
+                label="Password"
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                icon={<Lock size={18} className="text-gray-400" />}
+                value={form.password}
+                onChange={handleChange}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-10 text-gray-400 hover:text-gray-600">
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+              {/* <p className="text-xs text-gray-500 mt-1">
+                Minimum of 8 Characters
+              </p> */}
+            </div>
           </div>
+
           {registration.error && (
             <p className="text-red-500 text-sm text-center">
               {registration.error}
             </p>
           )}
+
           <Button
             type="submit"
             className="w-full !mt-6"
             disabled={registration.status === "loading"}>
-            {registration.status === "loading" ? "Signing Up..." : "Sign Up"}
+            {registration.status === "loading"
+              ? "Creating Account..."
+              : "Sign Up"}
           </Button>
         </form>
 
@@ -162,6 +244,11 @@ const SignUpPage = () => {
           </Link>
         </p>
       </Card>
+
+      <ConnectWallet
+        isOpen={connectWallet}
+        onClose={() => setConnectWallet(false)}
+      />
     </AuthLayout>
   );
 };

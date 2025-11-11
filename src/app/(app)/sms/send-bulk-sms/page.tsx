@@ -9,6 +9,8 @@ import { Calendar, Clock } from "lucide-react";
 import SimpleFileInput from "@/components/ui/SimpleFileInput";
 import { redirect } from "next/navigation";
 import toast from "react-hot-toast";
+import { Textarea } from "@/components/ui/Textarea";
+import Checkbox from "@/components/ui/CheckBox";
 
 export default function SendBulkSMS() {
   const saveAsDraft = () => {
@@ -47,7 +49,7 @@ export default function SendBulkSMS() {
             </div>
           </div>
           {/* reciepient number */}
-          <div className="border-y border-[#E2E8F0] py-4 space-y-6">
+          <div className="border-y border-[#E2E8F0] py-4 space-y-4">
             <FormField
               label="Enter Recipients Phone Number (Optional)"
               id="recipient_phone_number"
@@ -77,15 +79,15 @@ export default function SendBulkSMS() {
             />
           </div>
           {/* compose message */}
-          <div className="flex flex-col md:flex-row items-end gap-4">
-            <FormField
-              label="Compose Message"
+          <div className="space-y-4">
+            <label className="text-sm">Compose Message</label>
+            <Textarea
+              showToolbar
               id="compose_message"
               name="compose_message"
-              type="text"
               placeholder="Type message here"
             />
-            <div className="w-full md:w-[300px]">
+            <div className="flex justify-end">
               <Button
                 size={"lg"}
                 onClick={() => redirect("/sms/sms-templates")}>
@@ -93,6 +95,21 @@ export default function SendBulkSMS() {
               </Button>
             </div>
           </div>
+
+          {/* delivery time */}
+          <div className="space-y-3">
+            <h4 className="font-medium text-sm text-[#1B223C]">
+              Delivery Time
+            </h4>
+
+            <Checkbox
+              name="later"
+              label="Schedule for later"
+              isChecked={false}
+              onChange={() => {}}
+            />
+          </div>
+
           {/* buttons */}
           <div className="flex flex-col md:flex-row md;items-center gap-5">
             <Button

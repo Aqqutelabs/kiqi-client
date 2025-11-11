@@ -14,6 +14,8 @@ const apiLogin = async (credentials: any) => {
 };
 
 interface RegisterPayload {
+  fullName: string;
+  phoneNumber: string;
   firstName: string;
   lastName: string;
   email: string;

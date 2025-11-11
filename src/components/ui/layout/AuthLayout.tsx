@@ -25,7 +25,7 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="min-h-screen w-full flex flex-col lg:flex-row">
       {/* Left Side - Info Panel */}
-      <div className="w-full lg:w-[40%] bg-white p-8 lg:py-10 lg:px-14 hidden md:flex flex-col justify-between">
+      <div className="w-full lg:w-[40%] bg-white p-8 lg:py-10 lg:px-14 hidden lg:flex flex-col justify-between">
         <div>
           {/* Logo */}
           <img src="/kiki-logo.svg" alt="Logo" className="w-[100px]" />

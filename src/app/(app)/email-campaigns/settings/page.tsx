@@ -11,13 +11,15 @@ import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { Modal } from "@/components/ui/Modal";
 import ToggleSwitch from "@/components/ui/SwitchComponent";
 import Heading from "@/components/ui/TextHeading";
-import { CircleCheck } from "lucide-react";
+import { CircleCheck, ChevronDown, ChevronUp } from "lucide-react";
 import { redirect } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
 export default function CampaignSettings() {
   const [successModal, setSuccessModal] = useState(false);
+  const [advancedSettings, setAdvancedSettings] = useState(false);
+
   return (
     <Card>
       <PageHeader
@@ -33,51 +35,14 @@ export default function CampaignSettings() {
         {/* rest of component */}
         <div className="px-8 py-4 space-y-5">
           {/* campaign name */}
-          <FormField
-            label="Campaign Name"
-            id="campaignName"
-            placeholder="Enter campaign name"
-          />
-
-          {/* subject line */}
-          <FormField
-            label="Add a subject line for this campaign"
-            id="subjectLine"
-            placeholder="Enter a subject line"
-          />
-          {/* campaign type */}
-          <div className="space-y-3">
-            <h4 className="font-medium text-sm text-[#1B223C]">
-              Campaign Type
-            </h4>
-            <div className="flex flex-col md:flex-row items-center gap-3">
-              <Checkbox
-                name="welcome-email"
-                label="Welcome Email"
-                isChecked={false}
-                onChange={() => {}}
-              />
-              <Checkbox
-                name="promotional-email"
-                label="Promotional Email"
-                isChecked={false}
-                onChange={() => {}}
-              />
-              <Checkbox
-                name="newsletter"
-                label="Newsletter"
-                isChecked={false}
-                onChange={() => {}}
-              />
-              <Checkbox
-                name="abandoned-cart"
-                label="Abandoned Cart"
-                isChecked={false}
-                onChange={() => {}}
-              />
-            </div>
+          <div className="space-y-1 w-full">
+            <label className="text-[#1B223C] text-sm">Campaign Name</label>
+            <Select
+              placeholder="Select campaign name"
+              className="bg-[#00000014]">
+              <option value="">Campaign 1</option>
+            </Select>
           </div>
-
           {/* divider */}
           <hr className="text-gray-200" />
 
@@ -105,15 +70,8 @@ export default function CampaignSettings() {
           </div>
 
           {/* reply to email */}
-          <div className="flex items-end gap-4">
-            <div className="space-y-1 w-full">
-              <label className="text-[#1B223C] text-sm">Reply-to Email</label>
-              <Select
-                placeholder="Select sender email"
-                className="bg-[#00000014]">
-                <option value="">John Doe</option>
-              </Select>
-            </div>
+          <div className="space-y-4">
+            <label className="text-[#1B223C] text-sm">Reply-to Email</label>
             <Checkbox
               name="no-reply"
               label="No Reply"
@@ -142,168 +100,161 @@ export default function CampaignSettings() {
             </Button>
           </div>
 
-          {/* exclude list */}
-          <div className="space-y-3">
-            <h4 className="font-medium text-sm text-[#1B223C]">
-              Exclude Lists
-            </h4>
-            <div className="flex flex-col md:flex-row items-center gap-3">
-              <Checkbox
-                name="unsubscribed"
-                label="Unsubscribed"
-                isChecked={false}
-                onChange={() => {}}
-              />
-              <Checkbox
-                name="bounced"
-                label="Bounced"
-                isChecked={false}
-                onChange={() => {}}
-              />
-              <Checkbox
-                name="inactive"
-                label="Inactive"
-                isChecked={false}
-                onChange={() => {}}
-              />
-            </div>
-          </div>
+          {/* Advanced Settings Accordion */}
+          <div className="border border-[#E2E8F0] rounded-lg overflow-hidden">
+            <button
+              onClick={() => setAdvancedSettings(!advancedSettings)}
+              className="w-full flex items-center justify-between px-6 py-4 bg-[#F8FAFC] hover:bg-[#F1F5F9] transition-colors">
+              <h4 className="font-semibold text-base text-[#1B223C]">
+                Advanced Settings
+              </h4>
+              {advancedSettings ? (
+                <ChevronUp className="text-[#64748B]" size={20} />
+              ) : (
+                <ChevronDown className="text-[#64748B]" size={20} />
+              )}
+            </button>
 
-          {/* recipient email address */}
-          <FormField
-            label="Recipient Email Address (Optional)"
-            id="recipientEmail"
-            placeholder="Enter the name of the Sender or the name of your Business or Organization"
-          />
+            {advancedSettings && (
+              <div className="px-6 py-5 space-y-5 bg-white">
+                {/* exclude list */}
+                <div className="space-y-3">
+                  <h4 className="font-medium text-sm text-[#1B223C]">
+                    Exclude Lists
+                  </h4>
+                  <div className="flex flex-col md:flex-row items-center gap-3">
+                    <Checkbox
+                      name="unsubscribed"
+                      label="Unsubscribed"
+                      isChecked={false}
+                      onChange={() => {}}
+                    />
+                    <Checkbox
+                      name="bounced"
+                      label="Bounced"
+                      isChecked={false}
+                      onChange={() => {}}
+                    />
+                    <Checkbox
+                      name="inactive"
+                      label="Inactive"
+                      isChecked={false}
+                      onChange={() => {}}
+                    />
+                  </div>
+                </div>
 
-          {/* divider */}
-          <hr className="text-gray-200" />
+                {/* recipient email address */}
+                <FormField
+                  label="Recipient Email Address (Optional)"
+                  id="recipientEmail"
+                  placeholder="Enter the name of the Sender or the name of your Business or Organization"
+                />
 
-          {/* resend settings */}
-          <div className="space-y-3">
-            <h4 className="font-medium text-sm text-[#1B223C]">
-              Resend Settings
-            </h4>
-            <div className="flex flex-col md:flex-row items-center gap-3">
-              <Checkbox
-                name="resend-unopened"
-                label="Resend to unopened emails"
-                isChecked={false}
-                onChange={() => {}}
-              />
-              <Checkbox
-                name="dont-resend"
-                label="Don't resend"
-                isChecked={false}
-                onChange={() => {}}
-              />
-            </div>
-          </div>
+                {/* divider */}
+                <hr className="text-gray-200" />
 
-          {/* wait time */}
-          <FormField label="Wait Time" id="waitTime" placeholder="E.g 2 days" />
+                {/* resend settings */}
+                <div className="space-y-3">
+                  <h4 className="font-medium text-sm text-[#1B223C]">
+                    Resend Settings
+                  </h4>
+                  <div className="flex flex-col md:flex-row items-center gap-3">
+                    <Checkbox
+                      name="resend-unopened"
+                      label="Resend to unopened emails"
+                      isChecked={false}
+                      onChange={() => {}}
+                    />
+                    <Checkbox
+                      name="dont-resend"
+                      label="Don't resend"
+                      isChecked={false}
+                      onChange={() => {}}
+                    />
+                  </div>
+                </div>
 
-          {/* divider */}
-          <hr className="text-gray-200" />
+                {/* wait time */}
+                <FormField
+                  label="Wait Time"
+                  id="waitTime"
+                  placeholder="E.g 2 days"
+                />
 
-          {/* fallbacks */}
-          <div className="space-y-2 text-[#1B223C]">
-            <Heading sm heading="Fallbacks" />
-            <FormField
-              label="Alternative Text"
-              id="fallbackSubjectLine"
-              placeholder="Enter a fallback subject line"
-            />
-            <div className="flex justify-between items-center mt-4">
-              <p className="text-sm">
-                If personalization fails, use alternative text
-              </p>
-              <ToggleSwitch name="useAltText" onChange={() => {}} />
-            </div>
-            <div className="flex justify-between items-center">
-              <p className="text-sm">
-                If contact is duplicated in multiple segments, only send once
-              </p>
-              <ToggleSwitch name="sendOnce" onChange={() => {}} />
-            </div>
-          </div>
+                {/* divider */}
+                <hr className="text-gray-200" />
 
-          {/* divider */}
-          <hr className="text-gray-200" />
+                {/* fallbacks */}
+                <div className="space-y-2 text-[#1B223C]">
+                  <Heading sm heading="Fallbacks" />
+                  <FormField
+                    label="Alternative Text"
+                    id="fallbackSubjectLine"
+                    placeholder="Enter a fallback subject line"
+                  />
+                  <div className="flex gap-4 items-center mt-4 w-fit flex-row-reverse">
+                    <p className="text-sm">
+                      If personalization fails, use alternative text
+                    </p>
+                    <ToggleSwitch name="useAltText" onChange={() => {}} />
+                  </div>
+                  <div className="flex gap-4 items-center mt-4 w-fit flex-row-reverse">
+                    <p className="text-sm">
+                      If contact is duplicated in multiple segments, only send
+                      once
+                    </p>
+                    <ToggleSwitch name="sendOnce" onChange={() => {}} />
+                  </div>
+                </div>
 
-          {/* daily send limit */}
-          <FormField
-            label="Daily Send Limit (Max)"
-            id="dailySendLimit"
-            placeholder="5000 emails per day"
-          />
+                {/* divider */}
+                <hr className="text-gray-200" />
 
-          {/* batch sending */}
-          <FormField
-            label="Batch Sending"
-            id="batchSending"
-            placeholder="500 every 10 minutes"
-          />
+                {/* daily send limit */}
+                <FormField
+                  label="Daily Send Limit (Max)"
+                  id="dailySendLimit"
+                  placeholder="5000 emails per day"
+                />
 
-          {/* divider */}
-          <hr className="text-gray-200" />
+                {/* batch sending */}
+                <FormField
+                  label="Batch Sending"
+                  id="batchSending"
+                  placeholder="500 every 10 minutes"
+                />
 
-          {/* email compliance */}
-          <div className="text-[#1B223C]">
-            <Heading sm heading="Email Compliance" />
-            <div className="flex justify-between items-center my-2">
-              <p className="text-sm">Include unsubscribed link</p>
-              <ToggleSwitch
-                name="includeUnsubscribedLink"
-                onChange={() => {}}
-              />
-            </div>
-            <div className="flex justify-between items-center">
-              <p className="text-sm">Include permission reminder</p>
-              <ToggleSwitch
-                name="includePermissionReminder"
-                onChange={() => {}}
-              />
-            </div>
-            {/* permission reminder */}
-            <FormField
-              label="Permission Reminder"
-              id="permissionReminder"
-              placeholder="You are receiving this email because you signed up for our newsletter at ..."
-            />
-          </div>
+                {/* divider */}
+                <hr className="text-gray-200" />
 
-          {/* divider */}
-          <hr className="text-gray-200" />
+                {/* email compliance */}
+                <div className="text-[#1B223C]">
+                  <Heading sm heading="Email Compliance" />
+                  <div className="flex gap-4 items-center w-fit flex-row-reverse my-2">
+                    <p className="text-sm">Include unsubscribed link</p>
+                    <ToggleSwitch
+                      name="includeUnsubscribedLink"
+                      onChange={() => {}}
+                    />
+                  </div>
+                  <div className="flex gap-4 items-center w-fit flex-row-reverse">
+                    <p className="text-sm">Include permission reminder</p>
+                    <ToggleSwitch
+                      name="includePermissionReminder"
+                      onChange={() => {}}
+                    />
+                  </div>
+                  {/* permission reminder */}
+                  <FormField
+                    label="Permission Reminder"
+                    id="permissionReminder"
+                    placeholder="You are receiving this email because you signed up for our newsletter at ..."
+                  />
+                </div>
 
-          {/* email footer customization */}
-          <div className="space-y-1 w-full">
-            <label className="text-[#1B223C] text-sm">
-              Email Footer Customization
-            </label>
-            <Select
-              placeholder="Default branded footer"
-              className="bg-[#00000014]">
-              <option>Default branded footer</option>
-            </Select>
-          </div>
-
-          {/* ai smart send optimization */}
-          <div className="text-[#1B223C]">
-            <Heading sm heading="AI Smart Send Optimization" />
-            <div className="flex justify-between items-center my-2">
-              <p className="text-sm">
-                Send at best time for each contact (based on historical open
-                times)
-              </p>
-              <ToggleSwitch name="sendTime" onChange={() => {}} />
-            </div>
-            <div className="flex justify-between items-center">
-              <p className="text-sm">
-                Predict click-through rate based on subject + copy
-              </p>
-              <ToggleSwitch name="predictRate" onChange={() => {}} />
-            </div>
+              </div>
+            )}
           </div>
 
           {/* delivery time */}
@@ -311,32 +262,19 @@ export default function CampaignSettings() {
             <h4 className="font-medium text-sm text-[#1B223C]">
               Delivery Time
             </h4>
-            <div className="flex flex-col md:flex-row items-center gap-3">
-              <Checkbox
-                name="now"
-                label="Send Now"
-                isChecked={false}
-                onChange={() => {}}
-              />
-              <Checkbox
-                name="later"
-                label="Schedule for later"
-                isChecked={false}
-                onChange={() => {}}
-              />
-            </div>
+
+            <Checkbox
+              name="later"
+              label="Schedule for later"
+              isChecked={false}
+              onChange={() => {}}
+            />
           </div>
 
           {/* schedule date */}
           <div className="flex flex-col md:flex-row items-end gap-3 w-[800px]">
             <DateInput label="Schedule Date" />
             <TimeInput label="Schedule Time" />
-            <Checkbox
-              name="send-in-recipients"
-              label="Send in recipients local time"
-              isChecked={false}
-              onChange={() => {}}
-            />
           </div>
         </div>
 
