@@ -73,7 +73,7 @@ const SignUpPage = () => {
       toast.success("Account created successfully! Setting up your profile...");
       // Short delay to ensure toast is visible before redirect
       setTimeout(() => {
-        router.push("/signup/setup");
+        router.push("/dashboard");
       }, 1500);
     } else if (registerUser.rejected.match(resultAction)) {
       toast.error(resultAction.payload as string || "Registration failed. Please try again.");
