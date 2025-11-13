@@ -25,6 +25,9 @@
     --kiki-muted: rgba(255, 255, 255, 0.72);
     --kiki-radius: 14px;
     --kiki-gap: 20px;
+    --tst-accent: #0ea5e9;
+    --tst-card: #e9f8fc;
+    --tst-muted: #58636b;
 }
 
 @font-face {
@@ -2454,7 +2457,8 @@ body {
     background: linear-gradient(180deg, #2669b4 0%, #287ec4 100%);
     box-shadow: inset 0 -6px 12px rgba(0, 0, 0, 0.06);
 }
-.kiki-icon img{
+
+.kiki-icon img {
     height: 40px;
 }
 
@@ -2472,7 +2476,6 @@ body {
     line-height: 1.2;
 }
 
-/* small badge / star style used in screenshot */
 .kiki-small-badge {
     color: #ffde7a;
     font-weight: 700;
@@ -2499,4 +2502,250 @@ body {
     .kiki-panel {
         padding: 20px;
     }
+}
+
+/* brands testimonials */
+
+.tst-wrapper {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* Top heading + logos */
+.tst-heading {
+    text-align: center;
+    margin-bottom: 18px;
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.tst-logos {
+    display: flex;
+    gap: 10%;
+    justify-content: center;
+    align-items: center;
+    padding: 18px 6px 28px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+}
+
+.tst-logo {
+    width: 40px;
+    opacity: .35;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    filter: grayscale(1);
+}
+
+/* Carousel container */
+.tst-carousel-wrap {
+    position: relative;
+    margin-bottom: 22px;
+}
+
+/* Ensure owl nav clickable and visible */
+.tst-owl .owl-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 80;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.tst-owl .owl-nav button {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: none;
+    background: #fff;
+    box-shadow: 0 8px 22px rgba(4, 24, 48, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 90;
+}
+
+.tst-owl .owl-nav button:focus {
+    outline: 2px solid rgba(14, 165, 233, .18);
+}
+
+/* place right arrow */
+.tst-owl .owl-nav .owl-next {
+    left: auto;
+    right: -26px;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* make sure nothing overlays the nav */
+.tst-owl .owl-stage-outer {
+    padding: 0 50px;
+}
+
+/* gives space for navs */
+.tst-owl .owl-stage {
+    z-index: 10;
+}
+
+/* testimonial card */
+.tst-card {
+    background: var(--tst-card);
+    border-radius: 14px;
+    padding: 26px;
+    min-height: 210px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 8px 20px rgba(10, 30, 60, 0.04);
+}
+
+.tst-quote {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #0f2b36;
+    margin-bottom: 14px;
+    letter-spacing: -0.01em;
+}
+
+.tst-footer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.tst-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: 0 6px 14px rgba(12, 40, 86, 0.06);
+}
+
+.tst-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.tst-author {
+    font-weight: 700;
+    font-size: .92rem;
+    color: #0b2b32;
+}
+
+.tst-role {
+    font-size: .82rem;
+    color: var(--tst-muted);
+}
+
+/* left circular arrow icon inside the carousel (like screenshot) */
+.tst-inline-nav {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: #0ea5e9;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    box-shadow: 0 10px 30px rgba(14, 165, 233, 0.18);
+    cursor: pointer;
+    z-index: 95;
+}
+
+/* guarantee block */
+.tst-guarantee {
+    margin-top: 22px;
+    background: linear-gradient(90deg, #1aa7d9, #0aa3d4);
+    color: #fff;
+    padding: 24px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 18px 40px rgba(10, 160, 210, 0.12);
+}
+
+.tst-guarantee .tst-seal {
+    width: 68px;
+    height: 68px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: inset 0 -6px 10px rgba(0, 0, 0, 0.06);
+}
+
+.tst-guarantee .tst-seal img {
+    height: 100px;
+}
+
+.tst-guarantee .tst-text h4 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+}
+
+.tst-guarantee .tst-text p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.95);
+    font-size: .92rem;
+    opacity: .95;
+}
+
+/* responsive */
+@media (max-width: 991.98px) {
+    .tst-owl .owl-stage-outer {
+        padding: 0 36px;
+    }
+
+    .tst-logos {
+        gap: 18px;
+    }
+
+    .tst-guarantee {
+        flex-direction: column;
+        text-align: center;
+        padding: 16px;
+        gap: 10px;
+    }
+
+    .tst-guarantee .tst-text h4 {
+        font-size: .98rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .tst-owl .owl-nav {
+        display: none;
+    }
+
+    /* hide side nav on very small screens (touch gestures work) */
+    .tst-owl .owl-stage-outer {
+        padding: 0 12px;
+    }
+}
+
+.tst-owl .owl-nav .owl-next {
+    position: absolute;
+    right: -20px;
+}
+
+.tst-owl .owl-nav .owl-prev {
+    position: absolute;
+    left: -20px;
+    top: -20px;
 }

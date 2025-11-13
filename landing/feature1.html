@@ -619,6 +619,133 @@
     </div>
 
 
+    <!-- brands testimony -->
+    <div class="tst-wrapper mt-5">
+
+        <h3 class="tst-heading">Some Brands We've Helped Feature</h3>
+
+        <div class="tst-logos" aria-hidden="true">
+            <img class="tst-logo" src="assets/img/brand1.png" alt="brand1">
+            <img class="tst-logo" src="assets/img/brand2.png" alt="brand2">
+            <img class="tst-logo" src="assets/img/brand3.png" alt="brand3">
+            <img class="tst-logo" src="assets/img/brand4.png" alt="brand4">
+            <img class="tst-logo" src="assets/img/brand5.png" alt="brand5">
+            <img class="tst-logo" src="assets/img/brand6.png" alt="brand6">
+        </div>
+
+        <!-- carousel -->
+        <div class="tst-carousel-wrap">
+
+            <div class="owl-carousel tst-owl" id="tst-owl">
+
+                <div class="item px-2">
+                    <div class="tst-card">
+                        <div class="tst-quote">
+                            “Kiki PR got our funding announcement on TechCabal and BusinessDay within 24 hours. Our
+                            inbound investor emails tripled.”
+                        </div>
+
+                        <div class="tst-footer">
+                            <div class="tst-avatar">
+                                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=60" alt="Temi A"></div>
+                            <div>
+                                <div class="tst-author">Temi A.</div>
+                                <div class="tst-role">Fintech Founder</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 2 -->
+                <div class="item px-2">
+                    <div class="tst-card">
+                        <div class="tst-quote">
+                            “We looked like a small shop before. After Kiki PR, we looked like a real brand. Sales grew
+                            35% in 2 weeks.”
+                        </div>
+
+                        <div class="tst-footer">
+                            <div class="tst-avatar">
+                                <img src="assets/img/testify.png" alt="Chidi O">
+                            </div>
+                            <div>
+                                <div class="tst-author">Chidi O.</div>
+                                <div class="tst-role">E-commerce CMO</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="item px-2">
+                    <div class="tst-card">
+                        <div class="tst-quote">
+                            “I don't have time for PR. Kiki drafted it in one click and sent me links I could share with
+                            clients immediately.”
+                        </div>
+
+                        <div class="tst-footer">
+                            <div class="tst-avatar"><img
+                                    src="assets/img/testify.png"
+                                    alt="Lara K"></div>
+                            <div>
+                                <div class="tst-author">Lara K.</div>
+                                <div class="tst-role">Agency Owner</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="item px-2">
+                    <div class="tst-card">
+                        <div class="tst-quote">“Kiki PR made us look credible overnight — the best investment for our
+                            brand awareness.”</div>
+                        <div class="tst-footer">
+                            <div class="tst-avatar"><img
+                                    src="assets/img/testify.png"
+                                    alt="Test A"></div>
+                            <div>
+                                <div class="tst-author">Alex P.</div>
+                                <div class="tst-role">Founder</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="item px-2">
+                    <div class="tst-card">
+                        <div class="tst-quote">“Fast, simple, and measurable — our campaign ROI improved after Kiki
+                            handled our coverage.”</div>
+                        <div class="tst-footer">
+                            <div class="tst-avatar"><img
+                                    src="assets/img/testify.png"
+                                    alt="Test B"></div>
+                            <div>
+                                <div class="tst-author">Sade R.</div>
+                                <div class="tst-role">Marketing Lead</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Guarantee block -->
+        <div class="centralize col-lg-12">
+            <div class="tst-guarantee col-lg-6">
+                <div class="tst-seal" aria-hidden="true">
+                    <img src="assets/img/satisfy.png" alt="">
+                </div>
+                <div class="tst-text">
+                    <h4>Your Success Is Guaranteed.</h4>
+                    <p>If you don’t get published on the outlets you paid for, you get your money back. No excuses. No
+                        risks.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <!-- FAQ -->
     <section class="py-5 d-flex ">
         <div class="container-xxl ">
@@ -785,6 +912,31 @@
                 992: { items: 3 }
             }
         });
+
+        const $owl = $('#tst-owl');
+
+        $owl.owlCarousel({
+            loop: true,
+            margin: 20,
+            nav: true,
+            dots: false,
+            navText: ['‹', '›'],
+            responsive: {
+                0: { items: 1 },
+                576: { items: 1.2, stagePadding: 10 },
+                768: { items: 2 },
+                992: { items: 3 }
+            }
+        });
+
+        // Make inline left circle work as previous
+        $('#tst-inline-prev').on('click', function () { $owl.trigger('prev.owl.carousel'); });
+
+        // Ensure nav buttons are clickable even when stage padding present
+        $('.tst-owl .owl-nav button').css('pointer-events', 'auto');
+
+        // Optional: pause on hover
+        $owl.on('mouseover', function () { $owl.trigger('stop.owl.autoplay'); });
     </script>
 </body>
 
