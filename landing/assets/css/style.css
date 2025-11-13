@@ -11,6 +11,20 @@
     --uxc-border: #bfe4fb;
     --uxc-text: #243447;
     --uxc-muted: #6b7785;
+    --prms-accent: #0b76d1;
+    --prms-accent-2: #2b9cf5;
+    --prms-muted: #65707a;
+    --prms-card-border: #e9f3fb;
+    --prms-shadow: 0 18px 40px rgba(32, 68, 123, 0.06);
+    --prms-radius: 14px;
+    --kiki-bg-1: #04102a;
+    --kiki-bg-2: #3b3b2b;
+    --kiki-accent: #ffd94a;
+    --kiki-card-bg: rgba(255, 255, 255, 0.04);
+    --kiki-card-border: rgba(255, 255, 255, 0.06);
+    --kiki-muted: rgba(255, 255, 255, 0.72);
+    --kiki-radius: 14px;
+    --kiki-gap: 20px;
 }
 
 @font-face {
@@ -1896,25 +1910,25 @@ body {
 
 .hero-subpill {
     display: inline-block;
-    padding: .4rem 1rem;
+    padding: 0.4rem 1rem;
     border-radius: 999px;
     background: var(--pill-bg);
     font-weight: 600;
     color: #0b5f7a;
-    margin-bottom: .5rem
+    margin-bottom: 0.5rem;
 }
 
 .hero-title {
     font-size: 2.5rem;
     font-weight: 800;
-    margin-bottom: .5rem
+    margin-bottom: 0.5rem;
 }
 
 .hero-lead {
     color: #6b7280;
     max-width: 760px;
     margin: 0 auto 1.75rem;
-    font-size: 1.025rem
+    font-size: 1.025rem;
 }
 
 /* Left card */
@@ -1922,33 +1936,33 @@ body {
     background: var(--panel-bg);
     border-radius: 14px;
     padding: 1rem;
-    border: 1px solid rgba(0, 0, 0, 0.03)
+    border: 1px solid rgba(0, 0, 0, 0.03);
 }
 
 .usecase-item {
     background: transparent;
     border: 0;
-    padding: .65rem 0;
+    padding: 0.65rem 0;
     display: flex;
     align-items: center;
-    gap: .75rem
+    gap: 0.75rem;
 }
 
 .usecase-item i {
     font-size: 1.05rem;
     min-width: 28px;
-    text-align: center
+    text-align: center;
 }
 
 .usecase-item .label {
-    font-weight: 600
+    font-weight: 600;
 }
 
 .usecase-item.selected {
     background: white;
-    padding: .5rem;
+    padding: 0.5rem;
     border-radius: 8px;
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02)
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
 }
 
 /* Right visual */
@@ -1966,26 +1980,25 @@ body {
 }
 
 .visual-wrap::before {
-    content: '';
+    content: "";
     position: absolute;
     left: 70px;
     bottom: -30px;
     background-image: url(../img/frame1.png);
     height: 200px;
     width: 200px;
-    opacity: .4;
+    opacity: 0.4;
 }
 
-
 .visual-wrap::after {
-    content: '';
+    content: "";
     position: absolute;
     right: 50px;
     top: -30px;
     background-image: url(../img/frame2.png);
     height: 200px;
     width: 200px;
-    opacity: .4;
+    opacity: 0.4;
     transform: rotate(90deg);
 }
 
@@ -2021,7 +2034,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12)
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
 }
 
 .badge-target img {
@@ -2030,7 +2043,7 @@ body {
 
 .badge-target .bi {
     font-size: 1.35rem;
-    color: #e23b3b
+    color: #e23b3b;
 }
 
 .badge-medal {
@@ -2044,7 +2057,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12)
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
 }
 
 .badge-medal img {
@@ -2053,21 +2066,21 @@ body {
 
 .badge-medal .bi {
     font-size: 1.35rem;
-    color: #f1c40f
+    color: #f1c40f;
 }
 
 /* responsive tweaks */
 @media (max-width: 767.98px) {
     .hero-title {
-        font-size: 1.75rem
+        font-size: 1.75rem;
     }
 
     .visual-wrap {
-        padding: 1rem
+        padding: 1rem;
     }
 
     .photo-frame {
-        max-width: 260px
+        max-width: 260px;
     }
 }
 
@@ -2094,13 +2107,13 @@ body {
     font-size: 1.05rem;
     font-weight: 700;
     color: var(--uxc-text);
-    margin-bottom: .25rem;
+    margin-bottom: 0.25rem;
 }
 
 .uxc-card .uxc-sub {
-    font-size: .92rem;
+    font-size: 0.92rem;
     color: var(--uxc-muted);
-    margin-bottom: .8rem;
+    margin-bottom: 0.8rem;
 }
 
 .uxc-card .uxc-features {
@@ -2109,9 +2122,9 @@ body {
 }
 
 .uxc-card .uxc-features li {
-    margin: .35rem 0;
+    margin: 0.35rem 0;
     color: var(--uxc-text);
-    font-size: .94rem;
+    font-size: 0.94rem;
 }
 
 .uxc-card .uxc-image-wrap {
@@ -2175,5 +2188,315 @@ body {
 
     .uxc-card .uxc-image-wrap img {
         height: 90px;
+    }
+}
+
+/* PR made simple */
+
+.prms-wrapper {
+    max-width: 920px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 0 18px;
+}
+
+.prms-kicker {
+    display: inline-block;
+    background: #e9f8ff;
+    color: var(--prms-accent);
+    font-size: 0.82rem;
+    padding: 6px 12px;
+    border-radius: 999px;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.prms-headline {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin: 6px 0 8px;
+    letter-spacing: -0.02em;
+}
+
+.prms-sub {
+    color: var(--prms-muted);
+    font-size: 0.96rem;
+    margin-bottom: 28px;
+    line-height: 1.45;
+    max-width: 720px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Grid / cards container */
+.prms-steps {
+    margin-top: 18px;
+    margin-bottom: 28px;
+}
+
+/* common card */
+.prms-card {
+    background: white;
+    border: 1px solid var(--prms-card-border);
+    border-radius: var(--prms-radius);
+    box-shadow: var(--prms-shadow);
+    min-height: 120px;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+}
+
+.prms-card--large {
+    height: 100%;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: left;
+    overflow: hidden;
+    background: #265fae;
+}
+
+.prms-illustration {
+    border-radius: 12px;
+    overflow: hidden;
+    flex: 0 0 190px;
+    height: 190px;
+    display: block;
+}
+
+.prms-illustration img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* left large card elements */
+.prms-card--large .prms-large-illustration {
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.prms-card--large .prms-large-illustration img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.prms-large-title {
+    font-weight: 700;
+    color: white;
+    font-size: 1.05rem;
+    margin-top: 8px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.prms-large-caption {
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 0.95rem;
+    opacity: 0.95;
+}
+
+/* small stacked cards on right */
+.prms-stack .prms-card {
+    min-height: 120px;
+    align-items: flex-start;
+}
+
+.prms-stack .prms-illustration {
+    flex: 0 0 84px;
+    height: 84px;
+    border-radius: 8px;
+}
+
+.prms-card .prms-title {
+    font-weight: 700;
+    font-size: 0.98rem;
+    margin-bottom: 6px;
+    color: #112133;
+}
+
+.prms-card .prms-body {
+    color: var(--prms-muted);
+    font-size: 0.92rem;
+    line-height: 1.28;
+}
+
+/* bottom wide card */
+.prms-bottom-card {
+    margin-top: 18px;
+    padding: 18px;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+}
+
+.prms-bottom-card .prms-illustration {
+    flex: 0 0 240px;
+    height: 200px;
+    border-radius: 10px;
+}
+
+.prms-cta-wrap {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.prms-cta {
+    display: inline-block;
+    background: linear-gradient(90deg, var(--prms-accent), var(--prms-accent-2));
+    color: #fff;
+    padding: 12px 26px;
+    border-radius: 12px;
+    font-weight: 700;
+    box-shadow: 0 18px 36px rgba(43, 156, 245, 0.18),
+        inset 0 -4px 12px rgba(0, 0, 0, 0.07);
+    text-decoration: none;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.prms-cta:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 26px 46px rgba(43, 156, 245, 0.22);
+}
+
+/* small responsive tweaks */
+@media (min-width: 992px) {
+    .prms-left-col {
+        padding-right: 12px;
+    }
+
+    .prms-right-col {
+        padding-left: 12px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .prms-wrapper {
+        padding: 0 12px;
+    }
+
+    .prms-illustration {
+        display: none;
+    }
+
+    .prms-card--large {
+        min-height: 220px;
+    }
+}
+
+/* why kiki PR works */
+.kiki-panel-wrap {
+    max-width: 1150px;
+    margin: 0 auto;
+    padding: 28px;
+}
+
+.kiki-panel {
+    background: linear-gradient(120deg, var(--kiki-bg-1) 0%, rgba(48, 47, 41, 1) 40%, rgba(55, 50, 38, 0.85) 100%);
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 18px 40px rgba(2, 8, 23, 0.18);
+    color: white;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.kiki-heading {
+    text-align: left;
+    font-weight: 900;
+    color: var(--kiki-accent);
+    font-size: 2rem;
+    margin-top: 15px;
+    margin-bottom: 50px;
+    padding-left: 12px;
+}
+
+/* grid container for the six tiles */
+.kiki-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--kiki-gap);
+}
+
+/* individual feature card */
+.kiki-tile {
+    background: var(--kiki-card-bg);
+    border: 1px solid var(--kiki-card-border);
+    border-radius: 12px;
+    padding: 14px;
+    min-height: 130px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+    transition: transform .14s ease, box-shadow .14s ease;
+    backdrop-filter: blur(6px);
+    cursor: pointer;
+}
+
+.kiki-tile:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28);
+}
+
+.kiki-icon {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: linear-gradient(180deg, #2669b4 0%, #287ec4 100%);
+    box-shadow: inset 0 -6px 12px rgba(0, 0, 0, 0.06);
+}
+.kiki-icon img{
+    height: 40px;
+}
+
+/* tile title + description */
+.kiki-title {
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: #ffffff;
+    margin-bottom: 4px;
+}
+
+.kiki-desc {
+    color: var(--kiki-muted);
+    font-size: 1rem;
+    line-height: 1.2;
+}
+
+/* small badge / star style used in screenshot */
+.kiki-small-badge {
+    color: #ffde7a;
+    font-weight: 700;
+    margin-right: 6px;
+}
+
+/* Responsive */
+@media (max-width: 991.98px) {
+    .kiki-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 575.98px) {
+    .kiki-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .kiki-heading {
+        text-align: center;
+        padding-left: 0;
+    }
+
+    .kiki-panel {
+        padding: 20px;
     }
 }
