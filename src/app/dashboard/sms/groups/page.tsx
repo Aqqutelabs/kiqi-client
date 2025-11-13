@@ -1,17 +1,11 @@
 'use client';
 import React from 'react';
 import Link from 'next/link';
-// import DashboardLayout from '@/components/templates/DashboardLayout';
-// import { PageHeader } from '@/components/molecules/PageHeader';
-// import { Card } from '@/components/atoms/Card';
-// import { Button } from '@/components/atoms/Button';
-// import { Input } from '@/components/atoms/Input';
 import { Trash2 } from 'lucide-react';
 import { PageHeader } from '@/components/ui/layout/PageHeader';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import DashboardLayout from '@/components/ui/layout/DashboardLayout';
 
 const groups = [
     { id: '1', name: 'Group 1', date: '10-04-2025', count: 45 },
@@ -21,7 +15,7 @@ const groups = [
 
 const ManageRecipientGroupsPage = () => {
     return (
-        <DashboardLayout>
+        <>
             <PageHeader title="Manage Recipient Groups" backLink="/dashboard/sms/send" />
             <Card className="mb-8">
                 {/* Form to create a recipient group */}
@@ -74,7 +68,7 @@ const ManageRecipientGroupsPage = () => {
                     </tbody>
                 </table>
             </Card>
-        </DashboardLayout>
+        </>
     );
 };
 export default ManageRecipientGroupsPage;

@@ -1,7 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { Trash2, Loader2 } from 'lucide-react';
-import DashboardLayout from '@/components/ui/layout/DashboardLayout';
 import { PageHeader } from '@/components/ui/layout/PageHeader';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -38,7 +37,7 @@ const CreateSenderIdPage = () => {
   };
 
   return (
-    <DashboardLayout>
+    <>
       <PageHeader title="Create a Sender ID" backLink="/dashboard/sms/send" />
       <Card className="mb-8">
         <h3 className="text-lg font-semibold mb-4">Create a Sender ID</h3>
@@ -131,7 +130,7 @@ const CreateSenderIdPage = () => {
             </tbody>
         </table>
       </Card>
-    </DashboardLayout>
+    </>
   );
 };
 export default CreateSenderIdPage;

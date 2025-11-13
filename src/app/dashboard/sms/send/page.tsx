@@ -1,13 +1,12 @@
 'use client';
 import React from 'react';
 import Link from 'next/link';
-import DashboardLayout from '@/components/templates/DashboardLayout';
-import { PageHeader } from '@/components/molecules/PageHeader';
-import { Button } from '@/components/atoms/Button';
-import { Select } from '@/components/atoms/Select';
-import { Textarea } from '@/components/atoms/Textarea';
-import { Input } from '@/components/atoms/Input';
-import FormSection from '@/components/molecules/FormSection';
+import { PageHeader } from '@/components/ui/layout/PageHeader';
+import { Button } from '@/components/ui/Button';
+import { Select } from '@/components/ui/Select';
+import { Textarea } from '@/components/ui/Textarea';
+import { Input } from '@/components/ui/Input';
+import FormSection from '@/components/ui/FormSection';
 
 // Helper for form fields with labels
 const FormField = ({ label, children, helperText }: { label: string; children: React.ReactNode; helperText?: string }) => (
@@ -20,7 +19,7 @@ const FormField = ({ label, children, helperText }: { label: string; children: R
 
 const SendBulkSmsPage = () => {
   return (
-    <DashboardLayout>
+    <>
       <PageHeader title="Send Bulk Sms" backLink="/dashboard/overview" />
       <div className="space-y-8">
         <FormSection title="Send Bulk Sms">
@@ -73,7 +72,7 @@ const SendBulkSmsPage = () => {
             <Button type="button" className="!bg-cyan-500 hover:!bg-cyan-600">Schedule for Later</Button>
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 
