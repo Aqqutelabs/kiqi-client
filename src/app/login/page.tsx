@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Eye, EyeOff, LockKeyhole, CircleUserRound } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { FormField } from "@/components/ui/forms/FormField";
+import { FormField } from "@/components/ui/FormField";
 import AuthLayout from "@/components/ui/layout/AuthLayout";
 import { loginUser } from "@/redux/slices/authSlice";
 import { AppDispatch, RootState } from "@/redux/store";

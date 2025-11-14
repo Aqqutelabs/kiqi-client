@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/Card";
 import { Column, DataTable } from "@/components/ui/DataTable";
 import Filter from "@/components/ui/Filter";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
-import SearchInput from "@/components/ui/forms/Search";
+import SearchInput from "@/components/ui/Search";
 import { StatCard, StatCardProps } from "@/components/ui/StatCard";
 import Heading from "@/components/ui/TextHeading";
 import { redirect } from "next/navigation";
@@ -126,7 +126,9 @@ export default function PRDashboard() {
               <div className="flex items-center gap-2">
                 <SearchInput name="search" value="" onChange={() => {}} />
                 <Filter value="" onChange={() => {}} />
-                <Button onClick={() => redirect("/pr/create")} className="w-full">
+                <Button
+                  onClick={() => redirect("/pr/create")}
+                  className="w-full">
                   Create New Press Release
                 </Button>
               </div>

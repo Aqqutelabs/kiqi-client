@@ -3,8 +3,8 @@
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
-import { Select } from "@/components/ui/forms/Select";
-import SimpleFileInput from "@/components/ui/forms/SimpleFileInput";
+import { Select } from "@/components/ui/Select";
+import SimpleFileInput from "@/components/ui/SimpleFileInput";
 import { Textarea } from "@/components/ui/Textarea";
 import Heading from "@/components/ui/TextHeading";
 import { motion } from "framer-motion";
@@ -16,9 +16,9 @@ export default function CreatePressRelease() {
     "Show Preview",
     "Clear Content",
     "Upload Document",
-    "Use with KiKi AI",
   ];
   const [activeTab, setActiveTab] = useState<number | null>(null);
+  const [prContent, setPrContent] = useState("");
   return (
     <motion.main
       className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6"
@@ -53,7 +53,7 @@ export default function CreatePressRelease() {
           subtitle="Use the toolbar to format your text with bold, italic, headers, lists, and more."
           className="mb-4"
         />
-        <Textarea showToolbar />
+        <Textarea showToolbar value={prContent} onChange={(e) => setPrContent(e.target.value)} />
         <div className="flex items-center gap-2 mt-4">
           {suggestions.map((suggestion, idx) => {
             const isActive = activeTab === idx;
@@ -78,7 +78,9 @@ export default function CreatePressRelease() {
           subtitle="This is how your formatted content will appear."
           className="mb-4"
         />
-        <Textarea />
+        <div className="flex min-h-[120px] w-full border border-gray-300 text-gray-500 cursor-not-allowed bg-[#ECECF04D] px-3 py-2 text-sm rounded-md">
+          {prContent}
+        </div>
       </Card>
       <div className="flex justify-end items-center">
         <Button

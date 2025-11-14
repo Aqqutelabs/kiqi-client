@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { CircleUserRound } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { FormField } from "@/components/ui/forms/FormField";
+import { FormField } from "@/components/ui/FormField";
 
 const ResetPasswordPage = () => {
   const router = useRouter();

@@ -4,7 +4,7 @@ import { Trash2, Search, Filter, ChevronDown, Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { Pagination } from "@/components/ui/Pagination";
-import { Select } from "@/components/ui/forms/Select";
+import { Select } from "@/components/ui/Select";
 import Checkbox from "@/components/ui/CheckBox";
 // import { Checkbox } from '@/components/ui/Checkbox';
 

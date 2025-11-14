@@ -5,10 +5,10 @@ import Link from "next/link";
 import { redirect, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { registerUser } from "@/redux/slices/authSlice";
-import { Lock, User, Eye, EyeOff, Link2, CircleUserRound } from "lucide-react";
+import { Lock, User, Eye, EyeOff, Link2, CircleUserRound, Phone } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { FormField } from "@/components/ui/forms/FormField";
+import { FormField } from "@/components/ui/FormField";
 import { toast } from "react-hot-toast";
 import AuthLayout from "@/components/ui/layout/AuthLayout";
 
@@ -20,11 +20,11 @@ const SignUpPage = () => {
     email: "",
     password: "",
     orgName: "",
+    phoneNumber: "",
   });
   const dispatch = useAppDispatch();
   const router = useRouter();
   const registration = useAppSelector((state) => state.auth.registration);
-  const authToken = useAppSelector((state) => state.auth.token);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -32,23 +32,53 @@ const SignUpPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await dispatch(
+    
+    // Validate all fields are filled
+    if (!form.firstName.trim() || !form.lastName.trim() || !form.email.trim() || 
+        !form.password.trim() || !form.orgName.trim() || !form.phoneNumber.trim()) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    // Validate password minimum length
+    if (form.password.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+
+    // Validate phone number format (basic validation)
+    const phoneRegex = /^[+]?[\d\s-()]+$/;
+    if (!phoneRegex.test(form.phoneNumber)) {
+      toast.error("Please enter a valid phone number");
+      return;
+    }
+
+    // Combine first name and last name into fullName
+    const fullName = `${form.firstName.trim()} ${form.lastName.trim()}`;
+
+    const resultAction = await dispatch(
       registerUser({
+        fullName: fullName,
         firstName: form.firstName,
         lastName: form.lastName,
-        email: form.email,
+        email: form.email.trim(),
         password: form.password,
-        organizationName: form.orgName,
+        organizationName: form.orgName.trim(),
+        phoneNumber: form.phoneNumber.trim(),
       })
     );
-  };
 
-  React.useEffect(() => {
-    if (registration.status === "succeeded" && authToken) {
-      toast.success(registration.message || "User registered successfully!");
-      router.push("/signup/setup");
+    // Check if registration was successful
+    if (registerUser.fulfilled.match(resultAction)) {
+      toast.success("Account created successfully! Setting up your profile...");
+      // Short delay to ensure toast is visible before redirect
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 1500);
+    } else if (registerUser.rejected.match(resultAction)) {
+      toast.error(resultAction.payload as string || "Registration failed. Please try again.");
     }
-  }, [registration.status, registration.message, authToken, router]);
+  };
 
   return (
     <AuthLayout>
@@ -56,7 +86,7 @@ const SignUpPage = () => {
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
           Register with:
         </h2>
-        {/* Simplified Social Buttons for brevity */}
+        
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Button
             variant="primary"
@@ -89,6 +119,7 @@ const SignUpPage = () => {
               icon={<User size={18} className="text-gray-400" />}
               value={form.firstName}
               onChange={handleChange}
+              required
             />
             <FormField
               label="Last Name"
@@ -98,8 +129,10 @@ const SignUpPage = () => {
               icon={<User size={18} className="text-gray-400" />}
               value={form.lastName}
               onChange={handleChange}
+              required
             />
           </div>
+          
           <FormField
             label="Email Address"
             id="email"
@@ -109,7 +142,21 @@ const SignUpPage = () => {
             icon={<CircleUserRound size={18} className="text-gray-400" />}
             value={form.email}
             onChange={handleChange}
+            required
           />
+          
+          <FormField
+            label="Phone Number"
+            id="phoneNumber"
+            name="phoneNumber"
+            type="tel"
+            placeholder="+234 999 999 9898"
+            icon={<Phone size={18} className="text-gray-400" />}
+            value={form.phoneNumber}
+            onChange={handleChange}
+            required
+          />
+          
           <FormField
             label="Organization/Business Name"
             id="orgName"
@@ -118,7 +165,9 @@ const SignUpPage = () => {
             icon={<CircleUserRound size={18} className="text-gray-400" />}
             value={form.orgName}
             onChange={handleChange}
+            required
           />
+          
           <div className="relative">
             <FormField
               label="Password"
@@ -129,27 +178,30 @@ const SignUpPage = () => {
               icon={<Lock size={18} className="text-gray-400" />}
               value={form.password}
               onChange={handleChange}
+              required
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-10 text-gray-400">
+              className="absolute right-3 top-10 text-gray-400 hover:text-gray-600">
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
             <p className="text-xs text-gray-500 mt-1">
               Minimum of 8 Characters
             </p>
           </div>
+          
           {registration.error && (
             <p className="text-red-500 text-sm text-center">
               {registration.error}
             </p>
           )}
+          
           <Button
             type="submit"
             className="w-full !mt-6"
             disabled={registration.status === "loading"}>
-            {registration.status === "loading" ? "Signing Up..." : "Sign Up"}
+            {registration.status === "loading" ? "Creating Account..." : "Sign Up"}
           </Button>
         </form>
 

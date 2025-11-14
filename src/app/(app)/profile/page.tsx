@@ -1,9 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
-import { FormField } from "@/components/ui/forms/FormField";
+import { FormField } from "@/components/ui/FormField";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
-import SimpleFileInput from "@/components/ui/forms/SimpleFileInput";
+import SimpleFileInput from "@/components/ui/SimpleFileInput";
 import Heading from "@/components/ui/TextHeading";
 
 export default function ProfilePage() {

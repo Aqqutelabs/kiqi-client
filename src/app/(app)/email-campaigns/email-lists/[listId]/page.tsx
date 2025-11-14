@@ -7,7 +7,7 @@ import { useParams } from "next/navigation";
 // import { Input } from '@/components/atoms/Input';
 import { Trash2, Search, Filter, ChevronDown, Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/forms/Input";
+import { Input } from "@/components/ui/Input";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import BASE_URL from "@/lib/utils/baseUrl";
 
@@ -104,7 +104,7 @@ const EmailListDetailPage = () => {
     <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 flex flex-col">
       <PageHeader
         title={list ? list.email_listName : "Email List"}
-        backLink="/dashboard"
+        backLink="/email-campaigns/email-lists"
       />
       <div className="bg-white rounded-lg shadow-md flex-1 flex flex-col">
         <div className="p-4 border-b flex flex-wrap gap-4 justify-between items-center">

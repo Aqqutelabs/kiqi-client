@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
 import campaignReducer from './slices/campaignSlice';
+import smsReducer from './slices/smsSlice';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import { combineReducers } from 'redux';
@@ -8,6 +9,7 @@ import { combineReducers } from 'redux';
 const rootReducer = combineReducers({
   auth: authReducer,
   campaign: campaignReducer,
+  sms: smsReducer,
 });
 
 const persistConfig = {

@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { motion } from "framer-motion";
 import { Column, DataTable } from "@/components/ui/DataTable";
-import { FormField } from "@/components/ui/forms/FormField";
+import { FormField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import toast from "react-hot-toast";
 

@@ -1,9 +1,9 @@
 "use client";
 
 import { Card } from "@/components/ui/Card";
-import DateInput from "@/components/ui/forms/DateInput";
-import SearchInput from "@/components/ui/forms/Search";
-import { Select } from "@/components/ui/forms/Select";
+import DateInput from "@/components/ui/DateInput";
+import SearchInput from "@/components/ui/Search";
+import { Select } from "@/components/ui/Select";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import SummaryCard from "@/components/ui/quick-action-summary-card";
 import { ArrowDownLeft, ArrowUpRight, Coins, Gift } from "lucide-react";
@@ -11,20 +11,19 @@ import { useState } from "react";
 import { DataTable, Column } from "@/components/ui/DataTable";
 
 interface Transactions {
-    id: string;
-    transactionID: string;
-    date: string;
-    type: "Debit" | "Credit" | "Referral" | "Conversion" | "Purchase" | "Refund" ;
-    description: string;
-    amount: string;
-    balance: string;
-    status: "Completed" | "Failed" | "Pending";
-};
-
+  id: string;
+  transactionID: string;
+  date: string;
+  type: "Debit" | "Credit" | "Referral" | "Conversion" | "Purchase" | "Refund";
+  description: string;
+  amount: string;
+  balance: string;
+  status: "Completed" | "Failed" | "Pending";
+}
 
 export default function TransactionHistoryPage() {
-    const transaction_cards = [
-        {
+  const transaction_cards = [
+    {
       title: "₦187,500 GC",
       description: "Total Credits",
       icon: ArrowDownLeft,
@@ -63,34 +62,34 @@ export default function TransactionHistoryPage() {
 
   const data: Transactions[] = [
     {
-        id: "1",
-        transactionID: "TXN-001",
-        date: "Oct 28, 2025, 02:30 PM",
-        type: "Credit",
-        description: "Subscription purchase - Pro Plan",
-        amount: "+50,000 GC",
-        balance: "150,000 GC",
-        status: "Completed",
+      id: "1",
+      transactionID: "TXN-001",
+      date: "Oct 28, 2025, 02:30 PM",
+      type: "Credit",
+      description: "Subscription purchase - Pro Plan",
+      amount: "+50,000 GC",
+      balance: "150,000 GC",
+      status: "Completed",
     },
-      {
-        id: "2",
-        transactionID: "TXN-001",
-        date: "Oct 28, 2025, 02:30 PM",
-        type: "Debit",
-        description: "Subscription purchase - Pro Plan",
-        amount: "+50,000 GC",
-        balance: "150,000 GC",
-        status: "Failed",
+    {
+      id: "2",
+      transactionID: "TXN-001",
+      date: "Oct 28, 2025, 02:30 PM",
+      type: "Debit",
+      description: "Subscription purchase - Pro Plan",
+      amount: "+50,000 GC",
+      balance: "150,000 GC",
+      status: "Failed",
     },
-      {
-        id: "3",
-        transactionID: "TXN-001",
-        date: "Oct 28, 2025, 02:30 PM",
-        type: "Refund",
-        description: "Subscription purchase - Pro Plan",
-        amount: "+50,000 GC",
-        balance: "150,000 GC",
-        status: "Pending",
+    {
+      id: "3",
+      transactionID: "TXN-001",
+      date: "Oct 28, 2025, 02:30 PM",
+      type: "Refund",
+      description: "Subscription purchase - Pro Plan",
+      amount: "+50,000 GC",
+      balance: "150,000 GC",
+      status: "Pending",
     },
   ];
 
@@ -127,10 +126,7 @@ export default function TransactionHistoryPage() {
       </div>
 
       {/* table */}
-      <DataTable
-      columns={headers}
-      data={data}
-      />
+      <DataTable columns={headers} data={data} />
     </section>
   );
 }

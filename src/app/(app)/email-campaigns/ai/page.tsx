@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import SearchInput from "@/components/ui/forms/Search";
+import SearchInput from "@/components/ui/Search";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import TemplateCard from "@/components/ui/TemplateCard";
 import Heading from "@/components/ui/TextHeading";
@@ -70,8 +70,11 @@ export default function EmailCampaignAIPage() {
                   <Sparkles size={18} color="#233E97" />
                   <span>Smart compose</span>
                 </div>
-                <Button onClick={() => redirect("/email-campaigns/ai/generate-email")}>
-                  <MousePointer2  className="rotate-90" />
+                <Button
+                  onClick={() =>
+                    redirect("/email-campaigns/ai/generate-email")
+                  }>
+                  <MousePointer2 className="rotate-90" />
                 </Button>
               </div>
             </div>
@@ -91,16 +94,16 @@ export default function EmailCampaignAIPage() {
       </div>
 
       {/* create manually button */}
-      <div className="flex justify-center items-center mt-6">
+      {/* <div className="flex justify-center items-center mt-6">
         <Button
           size={"lg"}
           onClick={() => redirect("/email-campaigns/composer")}>
           <Plus size={16} className="mr-1.5" />
           Create Manually
         </Button>
-      </div>
+      </div> */}
 
-      <div className="space-y-4 align-bottom mt-10">
+      <div className="space-y-4 align-bottom mt-20">
         <Heading heading="Templates" />
         <div className="flex justify-between items-center">
           <div className="w-[290px]">
@@ -111,21 +114,23 @@ export default function EmailCampaignAIPage() {
               placeholder="Search templates"
             />
           </div>
-          <Link href={"/email-campaigns/ai/templates"} className="flex items-center gap-2 text-[#233E97] cursor-pointer text-sm">
+          <Link
+            href={"/email-campaigns/templates"}
+            className="flex items-center gap-2 text-[#233E97] cursor-pointer text-sm">
             <span>View All</span>
             <ChevronRight size={18} />
           </Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {templates.slice(0,3).map((template, index) => (
-                <TemplateCard
-                key={index}
-                heading={template.heading}
-                subtitle={template.subtitle}
-                description={template.description}
-                tags={template.tags}
-                />
-            ))}
+          {templates.slice(0, 3).map((template, index) => (
+            <TemplateCard
+              key={index}
+              heading={template.heading}
+              subtitle={template.subtitle}
+              description={template.description}
+              tags={template.tags}
+            />
+          ))}
         </div>
       </div>
     </Card>

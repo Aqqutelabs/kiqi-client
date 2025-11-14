@@ -16,7 +16,7 @@ import { Card } from "@/components/ui/Card";
 import Heading from "@/components/ui/TextHeading";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { useState } from "react";
-import SearchInput from "@/components/ui/forms/Search";
+import SearchInput from "@/components/ui/Search";
 import Filter from "@/components/ui/Filter";
 import { Button } from "@/components/ui/Button";
 import { Plus, Sparkles } from "lucide-react";
@@ -102,7 +102,9 @@ export default function EmailCampaignDashboard() {
               <Filter value="" onChange={() => {}} />
               <Button
                 className="w-full"
-                onClick={() => setOpenCreateModal(true)}>
+                onClick={() => redirect("/email-campaigns/ai")}
+                // change to setOpenCreateModal if need be
+                > 
                 <Plus size={18} className="mr-1" />
                 Create Campaign
               </Button>
@@ -127,13 +129,21 @@ export default function EmailCampaignDashboard() {
           <Heading heading="Create Email Campaign" className="text-center" />
           {/* choices */}
           <div className="space-y-4">
-            <button onClick={() => redirect("/email-campaigns/ai")} className="border border-[#E2E8F0] bg-linear-to-r from-[#233E9726] to-[#C4C4C400] h-[50px] rounded-md py-3.5 px-11.5 flex justify-center items-center gap-2.5 w-full cursor-pointer">
-              <Sparkles size={20} color="#1B223C"/>
-              <p className="text-[#1B223C] text-sm font-medium">Create with KiKi Ai</p>
+            <button
+              onClick={() => redirect("/email-campaigns/ai")}
+              className="border border-[#E2E8F0] bg-linear-to-r from-[#233E9726] to-[#C4C4C400] h-[50px] rounded-md py-3.5 px-11.5 flex justify-center items-center gap-2.5 w-full cursor-pointer">
+              <Sparkles size={20} color="#1B223C" />
+              <p className="text-[#1B223C] text-sm font-medium">
+                Create with KiKi Ai
+              </p>
             </button>
-            <button onClick={() => redirect("/email-campaigns/composer")} className="border border-[#E2E8F0] h-[50px] rounded-md py-3.5 px-11.5 flex justify-center items-center gap-2.5 w-full cursor-pointer">
-              <Plus size={20} color="#1B223C"/>
-              <p className="text-[#1B223C] text-sm font-medium">Create Manually</p>
+            <button
+              onClick={() => redirect("/email-campaigns/composer")}
+              className="border border-[#E2E8F0] h-[50px] rounded-md py-3.5 px-11.5 flex justify-center items-center gap-2.5 w-full cursor-pointer">
+              <Plus size={20} color="#1B223C" />
+              <p className="text-[#1B223C] text-sm font-medium">
+                Create Manually
+              </p>
             </button>
           </div>
         </div>
