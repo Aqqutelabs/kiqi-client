@@ -1,6 +1,0 @@
-{
-    "rewrites": [
-        { "source": "/learn", "destination": "https://gokiki.app/learn"},
-        { "source": "/learn/:path*", "destination": "https://gokiki.app/learn/:path*" }
-    ]
-}
