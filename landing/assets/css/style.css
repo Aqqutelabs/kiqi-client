@@ -167,6 +167,13 @@ body {
     margin-top: -50px;
 }
 
+
+.featured-padded.box3 {
+    padding: 0px;
+    margin-top: -50px;
+    background: linear-gradient(180deg, rgba(37, 147, 197, 1) 0%, rgba(23, 93, 130, 1) 60%, rgba(0, 0, 0, 1) 100%);
+}
+
 .featured-padded.box2 .rounded-xxl {
     border-radius: 0px;
 }
@@ -181,6 +188,12 @@ body {
 .marketing-main.light {
     font-size: 40px;
     font-weight: 600;
+}
+
+.text-shaded{
+    background: linear-gradient (180deg, #fee785, #fff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .shadow-lift {
@@ -212,6 +225,13 @@ body {
     height: 520px;
     object-fit: cover;
     object-position: center;
+}
+.photo-card.email-market{
+    background: transparent;
+}
+.photo-card.email-market img{
+    object-fit: contain;
+    height: 280px;
 }
 
 .photo-outline {
@@ -2894,4 +2914,28 @@ body {
     .vis-photo img {
         height: auto;
     }
+}
+
+
+/* ================ */
+/* features page 2 */
+/* ================ */
+.em-left,.em-right{
+    height: 120px;
+    width: 120px;
+    border-radius: 10px;
+    position: absolute;
+    border: solid 3px #f1c40f;
+}
+.em-left{
+    left: 320px;
+    bottom: -100px;
+    transform: rotate(-10deg);
+}
+.em-right{
+    height: 150px;
+    width: 150px;
+    right: 320px;
+    bottom: -120px;
+    transform: rotate(10deg);
 }
