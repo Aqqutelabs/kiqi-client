@@ -156,11 +156,11 @@ export default function Home() {
 
           {/* cta */}
           <div className="bg-[#111111] h-[58px] w-[260px] rounded-[10px] py-5 gap-10 hidden md:flex items-center justify-center">
-            <Link href="/login" className="text-sm text-white cursor-pointer">
+            {/* <Link href="/login" className="text-sm text-white cursor-pointer">
               Sign In
-            </Link>
-            <Link href="/signup" className="text-sm text-white cursor-pointer">
-              Get Started
+            </Link> */}
+            <Link href="/waitlist" className="text-sm text-white cursor-pointer">
+              Join Waitlist
             </Link>
           </div>
         </nav>
