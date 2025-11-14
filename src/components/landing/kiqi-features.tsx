@@ -1,62 +1,36 @@
-"use client";
+// components/Features.tsx
+import Image from 'next/image'
+import React from 'react'
 
-import Image from "next/image";
-import { useState } from "react";
-import { LuCirclePlay } from "react-icons/lu";
-
-export default function KiQiFeatures() {
-    const features = [
-        {id: 1, name: "Omnichannel Chat"},
-        {id: 2, name: "Pending Orders"},
-        {id: 3, name: "Knowledge Base"},
-        {id: 4, name: "Analytics"},
-    ];
-
-    const [activeTab, setActiveTab] = useState(1);
-
-    const changeTab = (index: number) => {
-        setActiveTab(index);
-    }
-
-    return (
-        <div className="h-fit bg-[#0C31A1] rounded-[30px] text-white p-5 md:p-10">
-            <h1 className="text-center text-[52px] font-bold">KiKi Features</h1>
-            <ul className="flex flex-col md:flex-row items-center gap-10 justify-center text-2xl font-normal my-10">
-                {features.map(feature => (
-                    <li 
-                    key={feature.id}
-                    onClick={() => changeTab(feature.id)}
-                    className={`cursor-pointer transition-all duration-300 ${activeTab === feature.id ? 'underline font-bold' : ''}`}
-                    >
-                        {feature.name}
-                    </li>
-                ))}
-            </ul>
-            {activeTab === 1 && (
-                <div className="relative w-full h-[620px]">
-                    <Image src="/regions.svg" alt="Chat" fill/>
-                </div>
-            )}
-            {activeTab === 2 && (
-                <div className="relative w-full h-[620px]">
-                    <Image src="/regions.svg" alt="Chat" fill/>
-                </div>
-            )}
-            {activeTab === 3 && (
-                <div className="relative w-full h-[620px]">
-                    <Image src="/regions.svg" alt="Chat" fill/>
-                </div>
-            )}
-            {activeTab === 4 && (
-                <div className="relative w-full h-[620px]">
-                    <Image src="/regions.svg" alt="Chat" fill/>
-                </div>
-            )}
-
-            <div className="flex gap-2 items-center justify-center mt-6">
-              <LuCirclePlay color="#fff" size={20} />
-              <p className="text-lg">Watch full Demo Video</p>
-            </div>
+export default function Features() {
+  return (
+    <section id="features" className="py-12 bg-white">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold">Kiki Features</h2>
+          <p className="text-gray-600 mt-2">Clear analytics, deliverability focus, and automation that’s simple enough for beginners.</p>
         </div>
-    )
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="p-6 rounded-lg shadow-sm">
+            <Image src="/assets/img/feature1.png" alt="Engagement" width={600} height={400} />
+            <h3 className="mt-4 font-semibold">Engagement score simplified</h3>
+            <p className="text-sm text-gray-600 mt-2">Auto-generate meaningful content and more.</p>
+          </div>
+
+          <div className="p-6 rounded-lg shadow-sm">
+            <Image src="/assets/img/feature2.png" alt="Growth" width={600} height={400} />
+            <h3 className="mt-4 font-semibold">Subscriber growth trends</h3>
+            <p className="text-sm text-gray-600 mt-2">Insights to grow faster.</p>
+          </div>
+
+          <div className="p-6 rounded-lg shadow-sm">
+            <Image src="/assets/img/feature3.png" alt="Security" width={600} height={400} />
+            <h3 className="mt-4 font-semibold">Encrypted data protection</h3>
+            <p className="text-sm text-gray-600 mt-2">Security-first storage & delivery.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
 }

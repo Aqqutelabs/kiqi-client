@@ -1,146 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { FaArrowLeftLong, FaArrowRightLong } from "react-icons/fa6";
+// components/Testimonials.tsx
+import React from 'react'
 
-const TestimonialCarousel = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
-
+export default function Testimonials() {
   const testimonials = [
-    {
-      id: 1,
-      text: "As a fashion designer I always struggled with juggling sewing, content creation, and responding to clients, KiKi solved that for me!",
-      author: "Kelly",
-      title: "Fashion Designer",
-      avatar: "K"
-    },
-    {
-      id: 2,
-      text: "I tried KiKi once and I was sold. It so easy to use and even better at responding to customers than I am😂",
-      author: "David",
-      title: "Freelance Social media manager",
-      avatar: "D"
-    },
-    {
-      id: 3,
-      text: "KiKi transformed my workflow completely. Managing multiple projects became effortless and my clients love the quick response times!",
-      author: "Sarah",
-      title: "Digital Marketing Consultant",
-      avatar: "S"
-    },
-    {
-      id: 4,
-      text: "The automation features in KiKi saved me hours every day. Now I can focus on what I do best while KiKi handles the rest seamlessly.",
-      author: "Michael",
-      title: "E-commerce Store Owner",
-      avatar: "M"
-    }
-  ];
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  // Calculate max slides based on items per view
-  const itemsPerView = isMobile ? 1 : 2;
-  const maxSlides = testimonials.length - itemsPerView;
-
-  const nextSlide = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex >= maxSlides ? 0 : prevIndex + 1
-    );
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex === 0 ? maxSlides : prevIndex - 1
-    );
-  };
+    { quote: 'Kiki solved that for me!', name: 'Kelly', role: 'Fashion Designer', img: 'https://i.pravatar.cc/80?img=5' },
+    { quote: 'I tried Kiki once and I was sold.', name: 'David', role: 'Social media manager', img: 'https://i.pravatar.cc/80?img=15' },
+    { quote: 'Our newsletter finally ships on time.', name: 'Alex', role: 'E-commerce Owner', img: 'https://i.pravatar.cc/80?img=23' },
+  ]
 
   return (
-    <div className="w-full md:max-w-5xl mx-auto my-20 px-0 md:px-4">
-      {/* Header */}
-      <h2 className="font-bold text-center text-2xl md:text-[52px] leading-tight">
-        See what others are saying <br className='hidden md:block' /> 
-        about <span className="text-[#0C31A1]">KiKi</span>
-      </h2>
+    <section className="py-12 bg-white">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 className="text-2xl font-bold mb-6">See what others are saying about KiKi</h2>
 
-      {/* Carousel Container */}
-      <div className="relative my-14 h-fit">
-        <div className="flex gap-4 overflow-scroll md:overflow-hidden scrollbar-hide">
-          <div 
-            className="flex transition-transform duration-300 ease-in-out"
-            style={{ 
-              transform: `translateX(-${currentIndex * (isMobile ? 100 : 50)}%)` 
-            }}
-          >
-            {testimonials.map(testimonial => (
-              <div
-                key={testimonial.id}
-                className="w-2/4 md:w-[450px] h-auto flex-shrink-0 bg-white rounded-[20px] md:rounded-[30px] p-4 md:p-6 border border-[#797878] mx-2 flex flex-col justify-between"
-              >
-                <div className="mb-4 flex-1">
-                  <p className="text-[#111111] text-lg md:text-2xl lg:text-3xl xl:text-[38px] leading-relaxed font-bold">
-                    '{testimonial.text}'
-                  </p>
-                </div>
-                
-                <div className="flex items-center mt-auto">
-                  <div className="w-8 h-8 md:w-10 md:h-10 bg-gray-300 rounded-full flex items-center justify-center mr-3">
-                    <span className="text-white font-semibold text-xs md:text-sm">
-                      {testimonial.avatar}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900 text-sm md:text-base">
-                      {testimonial.author}
-                    </p>
-                    <p className="text-gray-500 text-xs md:text-sm">
-                      {testimonial.title}
-                    </p>
-                  </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {testimonials.map((t, i) => (
+            <div key={i} className="p-6 rounded-lg shadow-sm text-left">
+              <p className="text-gray-700 mb-4">‘{t.quote}’</p>
+              <div className="flex items-center gap-3">
+                <img src={t.img} alt={t.name} className="w-12 h-12 rounded-full" />
+                <div>
+                  <div className="font-semibold">{t.name}</div>
+                  <div className="text-sm text-gray-500">{t.role}</div>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Navigation Buttons - Only show on larger screens */}
-        <button
-          onClick={prevSlide}
-          className="hidden md:block absolute -left-6 lg:-left-10 top-1/2 transform -translate-y-1/2 bg-[#0C31A1] hover:bg-[#0a2890] text-white rounded-full p-2 lg:p-3 shadow-lg transition-colors"
-        >
-          <FaArrowLeftLong size={16} className="lg:w-5 lg:h-5" />
-        </button>
-
-        <button
-          onClick={nextSlide}
-          className="hidden md:block absolute -right-6 lg:-right-10 top-1/2 transform -translate-y-1/2 bg-gray-400 hover:bg-gray-500 text-white rounded-full p-2 lg:p-3 shadow-lg transition-colors"
-        >
-          <FaArrowRightLong size={16} className="lg:w-5 lg:h-5" />
-        </button>
-
-        {/* Mobile Navigation Dots */}
-        <div className="flex md:hidden justify-center mt-6 space-x-2">
-          {testimonials.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentIndex(index)}
-              className={`w-2 h-2 rounded-full transition-colors ${
-                index === currentIndex ? 'bg-[#0C31A1]' : 'bg-gray-300'
-              }`}
-            />
+            </div>
           ))}
         </div>
       </div>
-    </div>
-  );
-};
-
-export default TestimonialCarousel;
+    </section>
+  )
+}
