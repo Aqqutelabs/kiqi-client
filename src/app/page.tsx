@@ -213,7 +213,7 @@ export default function Home() {
           </div>
           <div className="w-full md:w-1/4 relative rounded-[30px] h-full">
             <Image
-              src={"/hero-group.svg"}
+              src={"/kiki Ai-hero.png"}
               alt="Hero Image"
               fill
               className="object-cover rounded-[30px]"
