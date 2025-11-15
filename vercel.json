@@ -1,1 +1,8 @@
-
+{
+    "rewrites": [
+        { 
+            "source": "/learn/:path*", 
+            "destination": "https://gokiki.app/learn/:path*" 
+        }
+    ]
+}

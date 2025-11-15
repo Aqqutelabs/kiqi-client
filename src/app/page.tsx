@@ -1,5 +1,5 @@
 "use client";
-import Head from 'next/head'
+import Navbar from '@/components/landing/navbar';
 import Script from 'next/script'
 import { useEffect, useState } from 'react'
 
@@ -12,59 +12,12 @@ export default function Home() {
 
     return (
         <>
-            <nav className="topbar navbar navbar-expand-lg navbar-light bg-white py-3">
-                <div className="container">
-                    <a className="navbar-brand d-flex align-items-center" href="#">
-                        <img src="/assets/img/logo.png" alt="" />
-                    </a>
-
-                    <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                        <span className="navbar-toggler-icon"></span>
-                    </button>
-
-                    <div className="collapse navbar-collapse" id="navbarNav">
-                        <ul className="navbar-nav mx-auto">
-                            <li className="nav-item">
-                                <a className="nav-link active" href="#">Home</a>
-                            </li>
-                            <li className="nav-item dropdown">
-                                <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                    Feature
-                                </a>
-                                <ul className="dropdown-menu">
-                                    <li><a className="dropdown-item" href="#">Feature 1</a></li>
-                                    <li><a className="dropdown-item" href="#">Feature 2</a></li>
-                                    <li><a className="dropdown-item" href="#">Feature 3</a></li>
-                                </ul>
-                            </li>
-                            <li className="nav-item dropdown">
-                                <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                    Services
-                                </a>
-                                <ul className="dropdown-menu">
-                                    <li><a className="dropdown-item" href="#">Service 1</a></li>
-                                    <li><a className="dropdown-item" href="#">Service 2</a></li>
-                                    <li><a className="dropdown-item" href="#">Service 3</a></li>
-                                </ul>
-                            </li>
-                            <li className="nav-item">
-                                <a className="nav-link" href="#">Pricing</a>
-                            </li>
-                        </ul>
-
-                        <div className="d-flex">
-                            <button className="btn btn-sign-in">Sign In</button>
-                            <button className="btn btn-get-started">Get Started</button>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-
+            <Navbar/>
+            
             <section className="py-4 py-lg-5">
                 <div className="container-xxl">
                     <div className="hero rounded-xxl px-4 px-lg-5 py-5">
                         <div className="row align-items-center gy-5">
-                            {/* Left: text + CTAs */}
                             <div className="col-lg-6">
                                 <h1 className="marketing-main">
                                     Email Marketing<br />Without the Headache
@@ -154,11 +107,10 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* TICKER */}
             <section className="ticker">
                 <div className="container-xxl">
                     <div className="ticker-viewport">
-                        <div className="ticker-track" style={{ '--speed': '28s' } as any}>
+                        <div className="ticker-track">
                             <ul className="ticker-group">
                                 <li><i className="bi bi-check2-circle me-2"></i>Quick campaigns</li>
                                 <li><i className="bi bi-people me-2"></i>Subscribers on autopilot</li>
@@ -180,7 +132,6 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* INBOX MAGIC */}
             <section className="py-5 text-center">
                 <div className="container-xxl">
                     <span className="badge rounded-pill bg-warning-subtle text-warning-emphasis fw-semibold px-3 py-2 mb-3">Inbox
@@ -231,13 +182,11 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* KIKI FEATURES */}
             <section className="features-section py-5 py-lg-6">
                 <div className="container-xxl">
                     <div className="features-wrap rounded-xxl p-5 text-center">
                         <h2 className="fw-bold display-6 mb-3">Kiki Features</h2>
 
-                        {/* Tabs (static UI for now) */}
                         <div className="d-flex justify-content-center">
                             <ul className="nav nav-pills feature-tabs justify-content-center gap-1 mb-5" role="tablist">
                                 <li className="nav-item" role="presentation">
@@ -266,10 +215,8 @@ export default function Home() {
             </section>
 
             <div className="container d-flex flex-column align-items-center">
-                {/* Heading */}
                 <div className="heading demo-box">
                     <div className="play-icon">
-                        {/* Play SVG icon */}
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="black" className="bi bi-play-fill"
                             viewBox="0 0 16 16">
                             <path d="M11.596 8.697l-6.363 3.692A.5.5 0 0 1 4.5 11.92V4.08a.5.5 0 0 1 .733-.442l6.363 3.692a.5.5 0 0 1 0 .866z" />
@@ -290,7 +237,6 @@ export default function Home() {
                 </div>
             </div>
 
-            {/* SMARTER EMAILS / SAFER DATA */}
             <section className="analytics-section py-5">
                 <div className="container-xxl">
                     <div className="analytics-wrap rounded-xxl px-lg-15  py-5 text-center text-white">
@@ -366,7 +312,6 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* RECENT BLOGS */}
             <section className="bg-primary py-5 ">
                 <div className="container-xxl" data-scroller>
                     <div className="d-flex align-items-end justify-content-between mb-3">
@@ -450,7 +395,6 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* Blend with PR starts here */}
             <section className="py-5">
                 <div className="container-xxl">
                     <div className="pr-blend rounded-xxl p-4 p-lg-5">
@@ -482,18 +426,13 @@ export default function Home() {
                 </div>
             </section>
 
-
-
-            {/* PRICING */}
             <section className="py-5" id="pricing">
                 <div className="container-xxl">
-                    {/* Header */}
                     <div className="text-center mb-4">
                         <span className="badge rounded-pill bg-body-secondary text-body fw-semibold px-3 py-2">Pricing Plans</span>
                         <h2 className="fw-bold display-6 mt-3 mb-2">Find Your Perfect Plan</h2>
                         <p className="text-secondary mb-3">Choose the plan that grows with you. Start free, scale when you’re ready, cancel anytime.</p>
 
-                        {/* Toggle */}
                         <div className="btn-group pricing-toggle" role="group" aria-label="Billing period">
                             <input type="radio" className="btn-check" name="billing" id="bill-monthly" defaultChecked />
                             <label className="btn btn-light border me-1" htmlFor="bill-monthly">Monthly</label>
@@ -504,9 +443,7 @@ export default function Home() {
                         <div className="small text-secondary mt-2 pricing-save d-none">Save 15% when billed yearly</div>
                     </div>
 
-                    {/* Cards */}
                     <div className="row g-4 align-items-stretch">
-                        {/* Free */}
                         <div className="col-md-6 col-lg-3">
                             <article className="plan-card h-100">
                                 <div className="plan-top">
@@ -533,7 +470,6 @@ export default function Home() {
                             </article>
                         </div>
 
-                        {/* Solo (featured) */}
                         <div className="col-md-6 col-lg-3">
                             <article className="plan-card plan-featured h-100 text-white">
                                 <div className="plan-top">

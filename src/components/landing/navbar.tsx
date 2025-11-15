@@ -1,33 +1,52 @@
 // components/Navbar.tsx
-import Link from 'next/link'
-import Image from 'next/image'
 import React from 'react'
 
 export default function Navbar() {
-  return (
-    <nav className="bg-white shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center">
-              <Image src="/assets/img/logo.png" alt="KiKi" width={44} height={44} />
-              <span className="ml-2 font-semibold">KiKi</span>
-            </Link>
-          </div>
+    return (
+        <nav className="topbar navbar navbar-expand-lg navbar-light bg-white py-3">
+            <div className="container">
+                <a className="navbar-brand d-flex align-items-center" href="#">
+                    <img src="/assets/img/logo.png" alt="" />
+                </a>
+                <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span className="navbar-toggler-icon"></span>
+                </button>
+                <div className="collapse navbar-collapse" id="navbarNav">
+                    <ul className="navbar-nav mx-auto">
+                        <li className="nav-item">
+                            <a className="nav-link active" href="#">Home</a>
+                        </li>
+                        <li className="nav-item dropdown">
+                            <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                Feature
+                            </a>
+                            <ul className="dropdown-menu">
+                                <li><a className="dropdown-item" href="#">Feature 1</a></li>
+                                <li><a className="dropdown-item" href="#">Feature 2</a></li>
+                                <li><a className="dropdown-item" href="#">Feature 3</a></li>
+                            </ul>
+                        </li>
+                        <li className="nav-item dropdown">
+                            <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                Services
+                            </a>
+                            <ul className="dropdown-menu">
+                                <li><a className="dropdown-item" href="#">Service 1</a></li>
+                                <li><a className="dropdown-item" href="#">Service 2</a></li>
+                                <li><a className="dropdown-item" href="#">Service 3</a></li>
+                            </ul>
+                        </li>
+                        <li className="nav-item">
+                            <a className="nav-link" href="#">Pricing</a>
+                        </li>
+                    </ul>
 
-          <div className="hidden md:flex items-center space-x-6">
-            <Link href="#">Home</Link>
-            <Link href="#features">Feature</Link>
-            <Link href="#services">Services</Link>
-            <Link href="#pricing">Pricing</Link>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button className="px-3 py-1 rounded-md">Sign In</button>
-            <button className="bg-sky-600 text-white px-4 py-2 rounded-md">Get Started</button>
-          </div>
-        </div>
-      </div>
-    </nav>
-  )
+                    <div className="d-flex">
+                        <button className="btn btn-sign-in">Sign In</button>
+                        <button className="btn btn-get-started">Get Started</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    )
 }
