@@ -106,7 +106,7 @@ const WaitlistPage = () => {
       setShowSuccessModal(true);
       setTimeout(() => {
         router.push('/waitlist/success');
-      }, 2000);
+      }, 1000);
     } catch (error: any) {
       console.error('Error:', error);
 

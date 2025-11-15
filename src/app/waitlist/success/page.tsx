@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { CheckCircle2, ArrowRight, Mail, Share2, MessageCircle } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 
 const SuccessPage = () => {
   useEffect(() => {
@@ -134,6 +135,9 @@ const SuccessPage = () => {
                 </span>
               </li>
             </ol>
+            <Link href={"/waitlist"}>
+              <Button className='mt-5' variant={"primary"}>Back to Waitlist</Button>
+            </Link>
           </div>
 
         
