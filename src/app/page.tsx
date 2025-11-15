@@ -17,25 +17,26 @@ type ButtonProps = {
   icon?: React.ReactNode;
   content: string;
   className?: string;
+ link: string
 };
 
-function Button({ variant, icon, content, className }: ButtonProps) {
+function Button({ variant, icon, content, className, link }: ButtonProps) {
   const classes = `${
     variant === "primary"
       ? "bg-[#0C31A1] text-white"
       : variant === "secondary"
       ? "bg-transparent border border-white text-white"
       : "bg-white text-[#111111]"
-  } h-[58px] w-full rounded-[10px] flex justify-center items-center relative text-sm ${className}`;
+  } h-[58px] w-full rounded-[10px] flex justify-center items-center relative text-sm block ${className}`;
   return (
-    <button className={classes}>
+    <Link href={link} className={classes}>
       {content}
       {icon && (
         <div className="bg-[#020617] size-[30px] rounded-full border border-white flex justify-center items-center text-white absolute -right-3.5 rotate-45">
           {icon}
         </div>
       )}
-    </button>
+    </Link>
   );
 }
 
@@ -190,9 +191,10 @@ export default function Home() {
               <Button
                 content="Start For Free"
                 variant="plain"
+                link="/waitlist"
                 icon={<GoArrowUp />}
               />
-              <Button content="Watch Demo" variant="secondary" />
+              <Button content="Watch Demo" variant="secondary" link="" />
             </div>
 
             <div className="flex flex-col md:flex-row gap-6 items-start md:items-center my-8">
@@ -302,6 +304,7 @@ export default function Home() {
               <div className="w-full md:w-[280px]">
                 <Button
                   content="Start For Free"
+                  link="/waitlist"
                   variant="primary"
                   icon={<GoArrowUp />}
                 />
@@ -415,14 +418,15 @@ export default function Home() {
                       </div>
                     </div>
 
-                    <button
+                    <Link
+                      href={"/waitlist"}
                       className={`h-[50px] md:h-[58px] w-full rounded-[10px] flex justify-center items-center text-sm md:text-base ${
                         isEven
                           ? "bg-[#0C31A1] text-white"
                           : "border border-[#0C31A1] text-[#0C31A1]"
                       }`}>
                       Get Started
-                    </button>
+                    </Link>
                   </div>
                 );
               })}
@@ -480,6 +484,7 @@ export default function Home() {
           <div className="w-full md:w-[280px] mt-10">
             <Button
               content="Start For Free"
+              link="/waitlist"
               variant="primary"
               icon={<GoArrowUp />}
             />
