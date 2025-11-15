@@ -17,7 +17,7 @@ type ButtonProps = {
   icon?: React.ReactNode;
   content: string;
   className?: string;
- link: string
+  link: string;
 };
 
 function Button({ variant, icon, content, className, link }: ButtonProps) {
@@ -145,7 +145,7 @@ export default function Home() {
           />
 
           {/* links */}
-          <ul className="hidden md:flex items-center gap-4">
+          {/* <ul className="hidden md:flex items-center gap-4">
             {navLinks.map((link, index) => (
               <li
                 key={index}
@@ -153,14 +153,16 @@ export default function Home() {
                 {link}
               </li>
             ))}
-          </ul>
+          </ul> */}
 
           {/* cta */}
           <div className="bg-[#111111] h-[58px] w-[260px] rounded-[10px] py-5 gap-10 hidden md:flex items-center justify-center">
             {/* <Link href="/login" className="text-sm text-white cursor-pointer">
               Sign In
             </Link> */}
-            <Link href="/waitlist" className="text-sm text-white cursor-pointer">
+            <Link
+              href="/waitlist"
+              className="text-sm text-white cursor-pointer">
               Join Waitlist
             </Link>
           </div>
@@ -178,26 +180,27 @@ export default function Home() {
             />
 
             <h1 className="font-bold text-[28px] md:text-[52px]">
-              KiKi, <br className="hidden md:block" /> Your Easy To Use{" "}
-              <br className="hidden md:block" /> AI Sales Assistant
+              Email Marketing <br className="hidden md:block" />
+               Without the Hassle
             </h1>
             <p className="text-base md:text-xl font-light my-12">
-              Swamped with business tasks and can't keep up{" "}
+              Launch Campaigns, grow subcribers
               <br className="hidden md:block" />
-              with customer inquiries? Let KiKi handle it for you!
+             and drive sales - without learning "Email Marketing"
             </p>
 
-            <div className="flex flex-col md:flex-row gap-4 md:gap-8 items-center w-full md:w-[360px]">
+            <div className="flex flex-col md:flex-row gap-4 md:gap-8 items-center w-full md:w-[300px]">
               <Button
-                content="Start For Free"
+                content="Join Waitlist"
                 variant="plain"
                 link="/waitlist"
                 icon={<GoArrowUp />}
               />
-              <Button content="Watch Demo" variant="secondary" link="" />
+              
+              {/* <Button content="Watch Demo" variant="secondary" link="" /> */}
             </div>
 
-            <div className="flex flex-col md:flex-row gap-6 items-start md:items-center my-8">
+            <div className="flex flex-col gap-6 items-start my-8">
               <div className="flex gap-2 items-center">
                 <FaCircleCheck color="#4CAF50" size={20} />
                 <p className="text-sm">No technical experience required</p>
@@ -221,7 +224,7 @@ export default function Home() {
         <LandingCarousel />
 
         {/* easy integration */}
-        <div className="flex flex-col justify-center items-center gap-6 my-20">
+        {/* <div className="flex flex-col justify-center items-center gap-6 my-20">
           <div className="bg-[#0C31A133] h-[34px] w-[220px] rounded-full flex justify-center items-center">
             <p className="text-[#0C31A1] text-xs md:text-sm">
               Easy Integration
@@ -269,12 +272,12 @@ export default function Home() {
               </p>
             </div>
           </div>
-        </div>
+        </div> */}
 
-        <KiQiFeatures />
+        {/* <KiQiFeatures /> */}
 
         {/* grid section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 bg-[#E6E6E6] rounded-[30px] p-4 md:p-10">
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-10 bg-[#E6E6E6] rounded-[30px] p-4 md:p-10">
           <div className="md:h-[560px] rounded-[30px] relative">
             <Image
               src={"/grid-image-1.svg"}
@@ -319,12 +322,12 @@ export default function Home() {
               className="object-cover rounded-[30px]"
             />
           </div>
-        </div>
+        </div> */}
 
-        <BlogCarousel />
+        {/* <BlogCarousel /> */}
 
         {/* plans */}
-        <div className="space-y-4 flex flex-col items-center my-20 px-4 md:px-10">
+        {/* <div className="space-y-4 flex flex-col items-center my-20 px-4 md:px-10">
           <h2 className="font-bold text-center text-2xl md:text-[52px] capitalize">
             Find your perfect plan
           </h2>
@@ -334,7 +337,6 @@ export default function Home() {
             Over 500% return on investment guaranteed for your business.
           </p>
 
-          {/* tabs */}
           <div className="bg-[#FBFBFB] rounded-2xl h-[60px] md:h-[73px] w-full max-w-[320px] md:max-w-[290px] p-2.5 border border-[#E7EBFF] flex items-center justify-between">
             {tabs.map((tab) => (
               <div
@@ -350,7 +352,6 @@ export default function Home() {
             ))}
           </div>
 
-          {/* plans scroll */}
           <div className="w-full overflow-x-auto scrollbar-hide">
             <div className="flex items-stretch gap-4 py-6 md:py-12 min-w-max">
               {plans.map((plan) => {
@@ -361,7 +362,6 @@ export default function Home() {
                     className={`flex-shrink-0 h-auto md:h-[600px] w-[280px] sm:w-[320px] md:w-[360px] rounded-[20px] border border-[#E7EBFF] space-y-2 shadow-sm p-[20px] md:p-[30px] flex flex-col justify-between ${
                       isEven ? "bg-white" : "bg-[#BCCAFF21]"
                     }`}>
-                    {/* icon */}
                     <div
                       className={`size-10 rounded-[10px] flex justify-center items-center ${
                         isEven ? "bg-[#6A8AFF]" : "bg-white"
@@ -374,7 +374,6 @@ export default function Home() {
                       />
                     </div>
 
-                    {/* details */}
                     <div
                       className={`space-y-5 ${
                         !isEven ? "text-[#0C31A1]" : "text-[#1B223C]"
@@ -432,12 +431,12 @@ export default function Home() {
               })}
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* testimony */}
-        <TestimonialCarousel />
+        {/* <TestimonialCarousel /> */}
         {/* getting started */}
-        <div className="space-y-4 flex flex-col items-center my-20">
+        {/* <div className="space-y-4 flex flex-col items-center my-20">
           <h2 className="font-bold text-center text-2xl md:text-[52px]">
             Get started with <span className="text-[#0C31A1]">KiKi</span>
           </h2>
@@ -489,10 +488,10 @@ export default function Home() {
               icon={<GoArrowUp />}
             />
           </div>
-        </div>
-        <FAQ />
+        </div> */}
+        {/* <FAQ /> */}
       </section>
-      <LandingFooter />
+      {/* <LandingFooter /> */}
     </>
   );
 }
