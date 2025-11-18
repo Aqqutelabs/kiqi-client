@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --primary: #233E97;
+  --primary: #233e97;
 }
 
 @keyframes slide {
@@ -15,13 +15,37 @@
 
 /* Hide scrollbar but keep scrolling */
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
 }
 
+/* for full sidebar */
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 0;
+}
 
+.sidebar-nav::-webkit-scrollbar {
+  width: 8px;
+}
 
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: #c9d1da;
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+/* Firefox scrollbar */
+.sidebar-nav {
+  scrollbar-width: thin;
+  scrollbar-color: #c9d1da transparent;
+}
