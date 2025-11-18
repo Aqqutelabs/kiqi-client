@@ -145,7 +145,7 @@ export default function Home() {
           />
 
           {/* links */}
-          {/* <ul className="hidden md:flex items-center gap-4">
+          <ul className="hidden md:flex items-center gap-4">
             {navLinks.map((link, index) => (
               <li
                 key={index}
@@ -153,17 +153,17 @@ export default function Home() {
                 {link}
               </li>
             ))}
-          </ul> */}
+          </ul>
 
           {/* cta */}
           <div className="bg-[#111111] h-[58px] w-[260px] rounded-[10px] py-5 gap-10 hidden md:flex items-center justify-center">
-            {/* <Link href="/login" className="text-sm text-white cursor-pointer">
+            <Link href="/login" className="text-sm text-white cursor-pointer">
               Sign In
-            </Link> */}
+            </Link>
             <Link
-              href="/waitlist"
+              href="/signup"
               className="text-sm text-white cursor-pointer">
-              Join Waitlist
+              Sign up
             </Link>
           </div>
         </nav>
@@ -189,7 +189,7 @@ export default function Home() {
              and drive sales - without learning "Email Marketing"
             </p>
 
-            <div className="flex flex-col md:flex-row gap-4 md:gap-8 items-center w-full md:w-[300px]">
+            <div className="flex flex-col md:flex-row gap-4 md:gap-5 items-center w-full md:w-[360px]">
               <Button
                 content="Join Waitlist"
                 variant="plain"
@@ -197,7 +197,7 @@ export default function Home() {
                 icon={<GoArrowUp />}
               />
               
-              {/* <Button content="Watch Demo" variant="secondary" link="" /> */}
+              <Button content="Watch Demo" variant="secondary" link="" />
             </div>
 
             <div className="flex flex-col gap-6 items-start my-8">
@@ -224,7 +224,7 @@ export default function Home() {
         <LandingCarousel />
 
         {/* easy integration */}
-        {/* <div className="flex flex-col justify-center items-center gap-6 my-20">
+        <div className="flex flex-col justify-center items-center gap-6 my-20">
           <div className="bg-[#0C31A133] h-[34px] w-[220px] rounded-full flex justify-center items-center">
             <p className="text-[#0C31A1] text-xs md:text-sm">
               Easy Integration
@@ -272,12 +272,12 @@ export default function Home() {
               </p>
             </div>
           </div>
-        </div> */}
+        </div>
 
-        {/* <KiQiFeatures /> */}
+        <KiQiFeatures />
 
         {/* grid section */}
-        {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-10 bg-[#E6E6E6] rounded-[30px] p-4 md:p-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 bg-[#E6E6E6] rounded-[30px] p-4 md:p-10">
           <div className="md:h-[560px] rounded-[30px] relative">
             <Image
               src={"/grid-image-1.svg"}
@@ -322,12 +322,12 @@ export default function Home() {
               className="object-cover rounded-[30px]"
             />
           </div>
-        </div> */}
+        </div>
 
-        {/* <BlogCarousel /> */}
+        <BlogCarousel />
 
         {/* plans */}
-        {/* <div className="space-y-4 flex flex-col items-center my-20 px-4 md:px-10">
+        <div className="space-y-4 flex flex-col items-center my-20 px-4 md:px-10">
           <h2 className="font-bold text-center text-2xl md:text-[52px] capitalize">
             Find your perfect plan
           </h2>
@@ -431,12 +431,12 @@ export default function Home() {
               })}
             </div>
           </div>
-        </div> */}
+        </div>
 
         {/* testimony */}
-        {/* <TestimonialCarousel /> */}
+        <TestimonialCarousel />
         {/* getting started */}
-        {/* <div className="space-y-4 flex flex-col items-center my-20">
+        <div className="space-y-4 flex flex-col items-center my-20">
           <h2 className="font-bold text-center text-2xl md:text-[52px]">
             Get started with <span className="text-[#0C31A1]">KiKi</span>
           </h2>
@@ -488,10 +488,10 @@ export default function Home() {
               icon={<GoArrowUp />}
             />
           </div>
-        </div> */}
-        {/* <FAQ /> */}
+        </div>
+        <FAQ />
       </section>
-      {/* <LandingFooter /> */}
+      <LandingFooter />
     </>
   );
 }
