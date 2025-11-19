@@ -155,7 +155,7 @@ const ManageEmailListPage = () => {
   };
 
   return (
-    <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+    <main className="flex-1 overflow-y-auto  ">
       <PageHeader title="Email List" backLink="/email-campaigns/dashboard" />
 
       <Card className="mb-8 p-6">

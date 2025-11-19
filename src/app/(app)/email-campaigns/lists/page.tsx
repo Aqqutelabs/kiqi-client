@@ -232,7 +232,7 @@ const EmailCampaignsListPage = () => {
 
   return (
     <>
-      <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+      <main className="flex-1 overflow-y-auto  ">
         <div className="flex justify-between items-center mb-6">
           <PageHeader
             title="Email Campaigns"

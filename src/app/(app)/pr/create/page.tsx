@@ -12,16 +12,12 @@ import { redirect } from "next/navigation";
 import { useState } from "react";
 
 export default function CreatePressRelease() {
-  const suggestions = [
-    "Show Preview",
-    "Clear Content",
-    "Upload Document",
-  ];
+  const suggestions = ["Show Preview", "Clear Content", "Upload Document"];
   const [activeTab, setActiveTab] = useState<number | null>(null);
   const [prContent, setPrContent] = useState("");
   return (
     <motion.main
-      className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6"
+      className="flex-1 overflow-y-auto   space-y-6"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}>
@@ -53,7 +49,11 @@ export default function CreatePressRelease() {
           subtitle="Use the toolbar to format your text with bold, italic, headers, lists, and more."
           className="mb-4"
         />
-        <Textarea showToolbar value={prContent} onChange={(e) => setPrContent(e.target.value)} />
+        <Textarea
+          showToolbar
+          value={prContent}
+          onChange={(e) => setPrContent(e.target.value)}
+        />
         <div className="flex items-center gap-2 mt-4">
           {suggestions.map((suggestion, idx) => {
             const isActive = activeTab === idx;

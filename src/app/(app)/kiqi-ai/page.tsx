@@ -58,7 +58,7 @@ const TemplateCard = ({ title, desc }: { title: string; desc: string }) => (
 const KiQiAiPage = () => {
   return (
     <div className="flex-1 flex flex-col">
-      <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+      <main className="flex-1 overflow-y-auto  ">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-3">
             <Wand2 className="text-purple-600" size={28} />
