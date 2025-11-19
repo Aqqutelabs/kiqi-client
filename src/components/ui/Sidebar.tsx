@@ -251,11 +251,11 @@ export const Sidebar: React.FC = () => {
       )}
       <aside
         className={`
-          fixed top-0 left-0 h-screen w-4/5 md:w-[300px] z-40
+          fixed top-0 left-0 w-4/5 md:w-[300px] z-40
           bg-white border-r border-gray-200 flex flex-col
           transform transition-transform duration-300 ease-in-out
           ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
-          md:translate-x-0 md:static md:block
+          md:translate-x-0 h-screen
         `}>
         {/* Header */}
         <div className="h-16 flex-shrink-0 flex items-center px-5 border-b border-gray-200">

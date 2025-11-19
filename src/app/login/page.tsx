@@ -5,13 +5,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Eye, EyeOff, LockKeyhole, CircleUserRound } from "lucide-react";
+import { Eye, EyeOff, LockKeyhole, CircleUserRound, Link2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { FormField } from "@/components/ui/FormField";
 import AuthLayout from "@/components/ui/layout/AuthLayout";
 import { loginUser } from "@/redux/slices/authSlice";
 import { AppDispatch, RootState } from "@/redux/store";
+import ConnectWallet from "@/components/ui/ConnectWalletModal";
 
 // Assuming Google and Metamask have their own logo components or are SVGs
 const GoogleIcon = () => (
@@ -26,6 +27,7 @@ const LoginPage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const { status, error } = useSelector((state: RootState) => state.auth);
+  const [openConnectWalletModal, setOpenConnectWalletModal] = useState(false);
 
   // Reset auth error/status on mount to avoid showing stale errors
   React.useEffect(() => {
@@ -58,8 +60,12 @@ const LoginPage = () => {
             className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50">
             <GoogleIcon /> <span className="ml-2">Google</span>
           </Button>
-          <Button variant="secondary">
-            <MetamaskIcon /> <span className="ml-2">MetaMask</span>
+          <Button
+            onClick={() => setOpenConnectWalletModal(true)}
+            variant="secondary"
+            className="flex items-center gap-2">
+            <Link2 />
+            Log in using Wallet
           </Button>
         </div>
 
@@ -132,6 +138,11 @@ const LoginPage = () => {
           </Link>
         </p>
       </Card>
+      <ConnectWallet
+        isOpen={openConnectWalletModal}
+        onClose={() => setOpenConnectWalletModal(false)}
+        mode="login"
+      />
     </AuthLayout>
   );
 };

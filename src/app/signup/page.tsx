@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { registerUser } from "@/redux/slices/authSlice";
 import { Lock, User, Eye, EyeOff, Link2, CircleUserRound, Phone } from "lucide-react";
@@ -220,6 +220,7 @@ const SignUpPage = () => {
       <ConnectWallet
       isOpen={openConnectWalletModal}
       onClose={() => setOpenConnectWalletModal(false)}
+      mode="signup"
       />
     </AuthLayout>
   );

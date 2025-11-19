@@ -5,6 +5,7 @@ import { ReduxProvider } from '@/components/provider/ReduxProvider';
 import ToasterClient from './ToasterClient';
 import { ProductsProvider } from '@/context/ProductContext';
 import { SidebarProvider } from '@/context/SidebarContext';
+import { WalletProvider } from '@/context/WalletContext';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -28,8 +29,10 @@ export default function RootLayout({
         <SidebarProvider>
           <ProductsProvider>
             <ReduxProvider>
-              <ToasterClient />
-              {children}
+              <WalletProvider>
+                <ToasterClient />
+                {children}
+              </WalletProvider>
             </ReduxProvider>
           </ProductsProvider>
         </SidebarProvider>
