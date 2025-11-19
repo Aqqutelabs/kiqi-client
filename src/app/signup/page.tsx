@@ -11,9 +11,11 @@ import { Card } from "@/components/ui/Card";
 import { FormField } from "@/components/ui/FormField";
 import { toast } from "react-hot-toast";
 import AuthLayout from "@/components/ui/layout/AuthLayout";
+import ConnectWallet from "@/components/ui/ConnectWalletModal";
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [openConnectWalletModal, setOpenConnectWalletModal] = useState(false);
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -95,7 +97,7 @@ const SignUpPage = () => {
             Google
           </Button>
           <Button
-            onClick={() => redirect("/signup/connect-wallet")}
+            onClick={() => setOpenConnectWalletModal(true)}
             variant="secondary"
             className="flex items-center gap-2">
             <Link2 />
@@ -214,6 +216,11 @@ const SignUpPage = () => {
           </Link>
         </p>
       </Card>
+
+      <ConnectWallet
+      isOpen={openConnectWalletModal}
+      onClose={() => setOpenConnectWalletModal(false)}
+      />
     </AuthLayout>
   );
 };

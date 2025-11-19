@@ -4,6 +4,7 @@ import './globals.css';
 import { ReduxProvider } from '@/components/provider/ReduxProvider';
 import ToasterClient from './ToasterClient';
 import { ProductsProvider } from '@/context/ProductContext';
+import { SidebarProvider } from '@/context/SidebarContext';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -24,12 +25,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ProductsProvider>
-          <ReduxProvider>
-            <ToasterClient />
-            {children}
-          </ReduxProvider>
-        </ProductsProvider>
+        <SidebarProvider>
+          <ProductsProvider>
+            <ReduxProvider>
+              <ToasterClient />
+              {children}
+            </ReduxProvider>
+          </ProductsProvider>
+        </SidebarProvider>
       </body>
     </html>
   );
