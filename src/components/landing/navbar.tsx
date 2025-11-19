@@ -14,7 +14,7 @@ function NavLink({ href, exact = false, children, className = "" }: NavLinkProps
     const { pathname } = useRouter();
     const isActive = exact ? pathname === href : pathname.startsWith(href);
     return (
-        <Link href={href} legacyBehavior>
+        <Link href={href}>
             <a
                 className={`${className} nav-link ${isActive ? "active" : ""}`}
                 aria-current={isActive ? "page" : undefined}
@@ -29,7 +29,7 @@ export default function Navbar() {
     return (
         <nav className="topbar navbar navbar-expand-lg navbar-light bg-white py-3">
             <div className="container">
-                <Link href="/" legacyBehavior>
+                <Link href="/">
                     <a className="navbar-brand d-flex align-items-center">
                         <img src="/assets/img/logo.png" alt="logo" />
                     </a>
