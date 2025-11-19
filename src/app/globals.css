@@ -1578,6 +1578,14 @@ body {
     color: #6b7280;
 }
 
+.accordion-button:not(.collapsed):after{
+    display: none;
+}
+
+.accordion-button{
+    border: none !important;
+    padding: 10px 20px !important;
+}
 /* FAQ ends here */
 
 /* Responsive tweaks */
