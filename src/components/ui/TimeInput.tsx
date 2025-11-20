@@ -144,7 +144,7 @@ const TimeInput: React.FC<TimeInputProps> = ({
   const minutes = Array.from({ length: 60 }, (_, i) => i);
 
   return (
-    <div className={`relative w-full ${className}`}>
+    <div className={`relative max-w-[450px] ${className}`}>
       {label && (
         <label className="text-sm capitalize font-medium text-gray-900 block mb-2">
           {label}
@@ -168,7 +168,7 @@ const TimeInput: React.FC<TimeInputProps> = ({
       {isPickerOpen && (
         <div
           ref={pickerRef}
-          className="absolute top-full left-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-50 p-4 w-full min-w-[280px]"
+          className="absolute bottom-full left-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-50 p-4 w-4/5 min-w-[280px]"
         >
           <div className="flex gap-2 mb-3">
             {/* Hours Column */}
@@ -178,7 +178,7 @@ const TimeInput: React.FC<TimeInputProps> = ({
               </div>
               <div
                 ref={hourScrollRef}
-                className="h-40 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 rounded border border-gray-200"
+                className="h-40 overflow-y-auto scrollbar-hide rounded border border-gray-200"
               >
                 {hours.map((hour) => (
                   <button
@@ -204,7 +204,7 @@ const TimeInput: React.FC<TimeInputProps> = ({
               </div>
               <div
                 ref={minuteScrollRef}
-                className="h-40 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 rounded border border-gray-200"
+                className="h-40 overflow-y-auto scrollbar-hide rounded border border-gray-200"
               >
                 {minutes.map((minute) => (
                   <button

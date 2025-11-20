@@ -45,45 +45,45 @@ const navigationConfig: NavSection[] = [
         label: "Overview",
         icon: "/sidebar-icons/overview.svg",
       },
-      {
-        type: "link",
-        href: "/pr/dashboard",
-        label: "PR",
-        icon: "/sidebar-icons/pr.svg",
-      },
     ],
   },
   {
     type: "section",
     title: "Campaigns",
     items: [
-      {
-        type: "dropdown",
-        label: "Social Media",
-        icon: "/sidebar-icons/social-media.svg",
-        items: [
-          {
-            type: "link",
-            href: "/campaigns/social/whatsapp",
-            label: "Whatsapp",
-          },
-          {
-            type: "link",
-            href: "/campaigns/social/facebook",
-            label: "Facebook",
-          },
-          {
-            type: "link",
-            href: "/campaigns/social/instagram",
-            label: "Instagram",
-          },
-          {
-            type: "link",
-            href: "/campaigns/social/kollective-marketer",
-            label: "Kollective Marketer",
-          },
-        ],
+       {
+        type: "link",
+        href: "/pr/dashboard",
+        label: "PR",
+        icon: "/sidebar-icons/pr.svg",
       },
+      // {
+      //   type: "dropdown",
+      //   label: "Social Media",
+      //   icon: "/sidebar-icons/social-media.svg",
+      //   items: [
+      //     {
+      //       type: "link",
+      //       href: "/campaigns/social/whatsapp",
+      //       label: "Whatsapp",
+      //     },
+      //     {
+      //       type: "link",
+      //       href: "/campaigns/social/facebook",
+      //       label: "Facebook",
+      //     },
+      //     {
+      //       type: "link",
+      //       href: "/campaigns/social/instagram",
+      //       label: "Instagram",
+      //     },
+      //     {
+      //       type: "link",
+      //       href: "/campaigns/social/kollective-marketer",
+      //       label: "Kollective Marketer",
+      //     },
+      //   ],
+      // },
       // {
       //   type: "link",
       //   href: "/analytics",
@@ -260,7 +260,7 @@ export const Sidebar: React.FC = () => {
         {/* Header */}
         <div className="h-16 flex-shrink-0 flex items-center px-5 border-b border-gray-200">
           <Image
-            src="/main-logo.svg"
+            src="/kiki-logo.svg"
             alt="KiQi 2025"
             height={24}
             width={60}

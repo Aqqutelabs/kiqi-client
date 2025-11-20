@@ -11,6 +11,7 @@ import { redirect } from "next/navigation";
 import toast from "react-hot-toast";
 import { Textarea } from "@/components/ui/Textarea";
 import Checkbox from "@/components/ui/CheckBox";
+import { Select } from "@/components/ui/Select";
 
 export default function SendBulkSMS() {
   const saveAsDraft = () => {
@@ -33,13 +34,20 @@ export default function SendBulkSMS() {
         <div className="space-y-5 my-5">
           {/* select sender id */}
           <div className="flex flex-col md:flex-row items-end gap-4">
-            <FormField
-              label="Select Sender ID"
-              id="sender_id"
-              name="sender_id"
-              type="text"
-              placeholder="Select the name of your Business, Organization"
-            />
+            <div className="space-y-2 w-full">
+              <p className="text-sm">Select Sender ID</p>
+              <Select
+                id="sender_id"
+                name="sender_id"
+                placeholder="Select the name of your Business, Organization"
+                className="bg-gray-100 h-11"
+              >
+                <option value="eren-yeager">Eren Yeager</option>
+                <option value="mikasa-ackerman">Mikasa Ackerman</option>
+                <option value="armin-arlet">Armin Arlet</option>
+              </Select>
+
+            </div>
             <div className="w-full md:w-[300px]">
               <Button
                 size={"lg"}
@@ -114,7 +122,7 @@ export default function SendBulkSMS() {
           <div className="flex flex-col md:flex-row md;items-center gap-5">
             <Button
               size={"lg"}
-              onClick={() => toast.success("Sent Successfully!")}>
+              onClick={() => {toast.success("Sent successfully!"); redirect("/sms/recipient-groups")}}>
               Send Now
             </Button>
             <Button size={"lg"} variant={"secondary"} onClick={saveAsDraft}>
