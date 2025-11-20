@@ -2,6 +2,7 @@
 import React from 'react';
 import { Search, ChevronDown } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { selectUser } from '@/redux/selectors/authSelectors';
 import { logout } from '@/redux/slices/authSlice';
 import { usePathname, useRouter } from 'next/navigation';
 import { User } from 'lucide-react';
@@ -10,7 +11,7 @@ import Image from 'next/image';
 const Header = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const user = useAppSelector(state => state.auth.user);
+  const user = useAppSelector(selectUser);
   console.log('i am the user', user);
   const displayName = user
     ? ('firstName' in user && 'lastName' in user && user.firstName && user.lastName

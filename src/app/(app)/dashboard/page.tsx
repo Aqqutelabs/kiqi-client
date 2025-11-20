@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { StatCard } from '@/components/ui/StatCard';
 import { ChartCard } from '@/components/ui/ChartCard';
 import { useAppSelector } from '@/redux/hooks';
+import { selectUser, selectToken } from '@/redux/selectors/authSelectors';
 import { useRouter } from 'next/navigation';
 
 // --- MOCK DATA ---
@@ -34,8 +35,8 @@ const topQueries = [
 const satisfactionData = [{ name: 'satisfaction', value: 75.55, fill: '#3366FF' }];
 
 const DashboardOverviewPage = () => {
-  const user = useAppSelector(state => state.auth.user);
-  const token = useAppSelector(state => state.auth.token);
+  const user = useAppSelector(selectUser);
+  const token = useAppSelector(selectToken);
   const router = useRouter();
 
   useEffect(() => {

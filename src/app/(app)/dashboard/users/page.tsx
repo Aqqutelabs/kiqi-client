@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import apiClient from '@/lib/utils/apiClient';
 import { useAppSelector } from '@/redux/hooks';
+import { selectToken } from '@/redux/selectors/authSelectors';
 
 const initialSenderData = {
   nickname: '',
@@ -18,7 +19,7 @@ const initialSenderData = {
 };
 
 const UsersPage = () => {
-  const token = useAppSelector((state) => state.auth.token);
+  const token = useAppSelector(selectToken);
   const [senderData, setSenderData] = useState(initialSenderData);
   const [isVerifying, setIsVerifying] = useState(false);
   const [verified, setVerified] = useState(false);
