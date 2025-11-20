@@ -4,6 +4,9 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { selectAuth } from '@/redux/selectors/authSelectors';
+import { resetAuthState } from '@/redux/slices/authSlice';
 
 import { Eye, EyeOff, LockKeyhole, CircleUserRound, Link2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -24,14 +27,17 @@ const MetamaskIcon = () => (
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   const router = useRouter();
   const { status, error } = useSelector((state: RootState) => state.auth);
   const [openConnectWalletModal, setOpenConnectWalletModal] = useState(false);
 
+  // const { status, error } = useAppSelector(selectAuth);
+
   // Reset auth error/status on mount to avoid showing stale errors
   React.useEffect(() => {
-    dispatch(require("@/redux/slices/authSlice").resetAuthState());
+    // clear any stale auth UI state on mount
+    dispatch(resetAuthState());
   }, [dispatch]);
 
   const handleSubmit = (e: React.FormEvent) => {
