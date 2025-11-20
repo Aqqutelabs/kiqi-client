@@ -134,7 +134,7 @@ const CreateSenderEmailPage = () => {
               onChange={(e) => setEmail(e.target.value)}
               required
             />
-            <div>
+            {/* <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Type
               </label>
@@ -147,7 +147,7 @@ const CreateSenderEmailPage = () => {
                 <option value="message">Message</option>
                 <option value="single">Single</option>
               </Select>
-            </div>
+            </div> */}
             <FormField
               type="text"
               id="email"

@@ -51,18 +51,6 @@ export default function AIGeneratedEmail() {
           placeholder="Enter a subject line"
           className="bg-transparent mt-2 h-14 mb-5"
         />
-
-        {/* email footer customization */}
-        <div className="space-y-1 w-full">
-          <label className="text-[#1B223C] text-sm">
-            Email Footer Customization
-          </label>
-          <Select
-            placeholder="Default branded footer"
-            className="bg-transparent mt-2 h-14">
-            <option>Default branded footer</option>
-          </Select>
-        </div>
       </Card>
 
       {/* cards */}
@@ -123,25 +111,10 @@ export default function AIGeneratedEmail() {
             tabIndex={0}>
             <p>Dear Flora</p>
             <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
-              nisi arcu, elementum eget facilisis non, egestas sit amet justo.
-              Cras ullamcorper lacus vel leo hendrerit molestie. Sed rhoncus
-              congue commodo.
+              Hi, it’s John from John’s Butter. Our fresh, homemade butter is ready for you—rich, creamy, and made with love. Order your jar today and taste the difference. Thank you for supporting good, honest food.
             </p>
             <p>
-              Cras lorem velit, tempor et nulla a, interdum egestas tellus.
-              Curabitur vestibulum est sed consectetur mollis. Vestibulum vel
-              eros massa. Proin nec ultricies arcu. Fusce ac nunc augue. In
-              massa erat, cursus a tincidunt sed, ultricies eu lectus.{" "}
-            </p>
-            <p>
-              Sed tempus eget felis vestibulum accumsan. Nulla nec vestibulum
-              dolor. Fusce lobortis felis quis mauris vehicula rhoncus. Donec
-              ullamcorper leo in sapien luctus lacinia. Nulla facilisi. Morbi
-              varius leo velit, vitae ultricies ex interdum ut.
-            </p>
-            <p>
-              Best Regards, <br /> Captain Jean Kristen
+              Warm Regards, <br /> John of Johns Butter
             </p>
           </div>
           <Button
@@ -149,6 +122,17 @@ export default function AIGeneratedEmail() {
             onClick={() => redirect("/email-campaigns/settings")}>
             Send Email
           </Button>
+          {/* email footer customization */}
+        <div className="space-y-1 w-full mt-60">
+          <label className="text-[#1B223C] text-sm">
+            Email Footer Customization
+          </label>
+          <Select
+            placeholder="Default branded footer"
+            className="bg-transparent mt-2 h-14">
+            <option>Default branded footer</option>
+          </Select>
+        </div>
         </Card>
 
         {/* kiki ai */}
@@ -172,9 +156,7 @@ export default function AIGeneratedEmail() {
                 className="size-8 object-cover rounded-full"
               />
               <div className="mt-2 px-2.5 pb-1.5 text-[#1B223C]">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
-                nisi arcu, elementum eget facilisis non, egestas sit amet justo.
-                Cras ullamcorper lacus vel leo hendrerit molestie.
+                Write a short, friendly promotional email for John’s Butter, highlighting its fresh, homemade quality and encouraging customers to order a jar today.
                 <span className="block text-[#606062] text-xs mt-2">15:42</span>
               </div>
             </div>

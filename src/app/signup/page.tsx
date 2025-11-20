@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { selectAuth } from '@/redux/selectors/authSelectors';
 import { registerUser, resetAuthState } from "@/redux/slices/authSlice";
@@ -12,9 +12,11 @@ import { Card } from "@/components/ui/Card";
 import { FormField } from "@/components/ui/FormField";
 import { toast } from "react-hot-toast";
 import AuthLayout from "@/components/ui/layout/AuthLayout";
+import ConnectWallet from "@/components/ui/ConnectWalletModal";
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [openConnectWalletModal, setOpenConnectWalletModal] = useState(false);
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -106,7 +108,7 @@ const SignUpPage = () => {
             Google
           </Button>
           <Button
-            onClick={() => redirect("/signup/connect-wallet")}
+            onClick={() => setOpenConnectWalletModal(true)}
             variant="secondary"
             className="flex items-center gap-2">
             <Link2 />
@@ -225,6 +227,12 @@ const SignUpPage = () => {
           </Link>
         </p>
       </Card>
+
+      <ConnectWallet
+      isOpen={openConnectWalletModal}
+      onClose={() => setOpenConnectWalletModal(false)}
+      mode="signup"
+      />
     </AuthLayout>
   );
 };

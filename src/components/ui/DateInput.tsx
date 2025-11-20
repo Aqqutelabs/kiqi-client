@@ -137,7 +137,7 @@ const DateInput: React.FC<DateInputProps> = ({
   const days = getDaysInMonth(currentMonth);
 
   return (
-    <div className={`relative w-full ${className}`}>
+    <div className={`relative max-w-[450px] ${className}`}>
      {label && <label className="text-sm capitalize font-medium text-gray-900 block mb-2">
         {label}
       </label>}
@@ -158,7 +158,7 @@ const DateInput: React.FC<DateInputProps> = ({
       {isCalendarOpen && (
         <div
           ref={calendarRef}
-          className="absolute top-full left-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-50 p-4 w-full">
+          className="absolute bottom-full left-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-50 p-4 w-full">
           {/* Calendar Header */}
           <div className="flex items-center justify-between mb-4">
             <button
