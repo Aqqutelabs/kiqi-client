@@ -111,7 +111,10 @@ export default function AIGeneratedEmail() {
             tabIndex={0}>
             <p>Dear Flora</p>
             <p>
-              Hi, it’s John from John’s Butter. Our fresh, homemade butter is ready for you—rich, creamy, and made with love. Order your jar today and taste the difference. Thank you for supporting good, honest food.
+              Hi, it’s John from John’s Butter. Our fresh, homemade butter is
+              ready for you—rich, creamy, and made with love. Order your jar
+              today and taste the difference. Thank you for supporting good,
+              honest food.
             </p>
             <p>
               Warm Regards, <br /> John of Johns Butter
@@ -123,16 +126,16 @@ export default function AIGeneratedEmail() {
             Send Email
           </Button>
           {/* email footer customization */}
-        <div className="space-y-1 w-full mt-60">
-          <label className="text-[#1B223C] text-sm">
-            Email Footer Customization
-          </label>
-          <Select
-            placeholder="Default branded footer"
-            className="bg-transparent mt-2 h-14">
-            <option>Default branded footer</option>
-          </Select>
-        </div>
+          <div className="space-y-1 w-full mt-60">
+            <label className="text-[#1B223C] text-sm">
+              Email Footer Customization
+            </label>
+            <Select
+              placeholder="Default branded footer"
+              className="bg-transparent mt-2 h-14">
+              <option>Default branded footer</option>
+            </Select>
+          </div>
         </Card>
 
         {/* kiki ai */}
@@ -156,7 +159,9 @@ export default function AIGeneratedEmail() {
                 className="size-8 object-cover rounded-full"
               />
               <div className="mt-2 px-2.5 pb-1.5 text-[#1B223C]">
-                Write a short, friendly promotional email for John’s Butter, highlighting its fresh, homemade quality and encouraging customers to order a jar today.
+                Write a short, friendly promotional email for John’s Butter,
+                highlighting its fresh, homemade quality and encouraging
+                customers to order a jar today.
                 <span className="block text-[#606062] text-xs mt-2">15:42</span>
               </div>
             </div>
@@ -165,12 +170,17 @@ export default function AIGeneratedEmail() {
               <div className="flex justify-center items-center bg-[var(--primary)] p-2 rounded-full">
                 <Sparkles size={15} color="white" />
               </div>
-              <div className="mt-2 px-2.5 pb-1.5 text-[#1B223C]">
-                Lorem ipsum, dolor sit amet consectetur adipisicing elit. Culpa
-                cumque officiis veritatis nostrum. Quasi ut obcaecati ipsam,
-                tenetur voluptatum harum ab, ratione soluta similique explicabo
-                voluptate provident minima molestias voluptatem minus odit qui
-                reprehenderit quas sint eaque error est suscipit!
+              <div className="mt-2 px-2.5 pb-1.5 text-[#1B223C] space-y-5">
+                <p>Dear Flora</p>
+                <p>
+                  Hi, it’s John from John’s Butter. Our fresh, homemade butter
+                  is ready for you—rich, creamy, and made with love. Order your
+                  jar today and taste the difference. Thank you for supporting
+                  good, honest food.
+                </p>
+                <p>
+                  Warm Regards, <br /> John of Johns Butter
+                </p>
                 <span className="block text-[#606062] text-xs mt-2">15:42</span>
               </div>
             </div>
