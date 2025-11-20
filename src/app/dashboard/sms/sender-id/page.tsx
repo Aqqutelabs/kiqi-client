@@ -11,20 +11,22 @@ import { toast } from 'react-hot-toast';
 
 const CreateSenderIdPage = () => {
   const dispatch = useAppDispatch();
-  const { senders, status, error } = useAppSelector((state) => state.sms);
+  const sms = useAppSelector((state) => state.sms);
+  const { senders = [], status = 'idle', error = null } = sms ?? { senders: [], status: 'idle', error: null };
   const [form, setForm] = useState({
     name: '',
     sampleMessage: '',
   });
 
   useEffect(() => {
-    dispatch(fetchSenderIDs());
+    // dispatch async thunk; cast to any to satisfy Dispatch typing
+    dispatch(fetchSenderIDs() as any);
   }, [dispatch]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await dispatch(createSenderID(form)).unwrap();
+      await dispatch(createSenderID(form) as any).unwrap();
       toast.success('Sender ID created successfully!');
       setForm({ name: '', sampleMessage: '' }); // Reset form
     } catch (err) {

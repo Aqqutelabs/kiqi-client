@@ -4,7 +4,8 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { registerUser } from "@/redux/slices/authSlice";
+import { selectAuth } from '@/redux/selectors/authSelectors';
+import { registerUser, resetAuthState } from "@/redux/slices/authSlice";
 import { Lock, User, Eye, EyeOff, Link2, CircleUserRound, Phone } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -26,7 +27,17 @@ const SignUpPage = () => {
   });
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const registration = useAppSelector((state) => state.auth.registration);
+  const { registration } = useAppSelector(selectAuth);
+
+  // Reset any transient auth/registration state when entering the signup page
+  // This prevents stale 'loading' states from persisted Redux state on page reloads
+  React.useEffect(() => {
+    dispatch(resetAuthState());
+    return () => {
+      // Ensure transient registration state is cleared when leaving
+      dispatch(resetAuthState());
+    };
+  }, [dispatch]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });

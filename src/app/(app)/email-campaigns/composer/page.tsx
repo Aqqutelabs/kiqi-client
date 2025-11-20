@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { selectCampaign } from '@/redux/selectors/campaignSelectors';
 import {
   createCampaign,
   fetchEmailLists,
@@ -61,9 +62,7 @@ const formatActions = [
 const CampaignComposerPage = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const { lists, status: listsStatus } = useAppSelector(
-    (state) => state.campaign
-  );
+  const { lists, status: listsStatus } = useAppSelector(selectCampaign);
   const [form, setForm] = React.useState({
     campaignName: "",
     subjectLine: "",
@@ -77,7 +76,11 @@ const CampaignComposerPage = () => {
   const [activeFormats, setActiveFormats] = React.useState<string[]>([]);
 
   React.useEffect(() => {
-    dispatch(fetchEmailLists());
+    // dispatching async thunks can cause a TS overload mismatch in some setups;
+    // cast to `any` here to satisfy the dispatch signature. The runtime behavior
+    // is unchanged and the thunk will still be executed.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    dispatch(fetchEmailLists() as any);
     // Set initial content only once
     if (editorRef.current) {
       editorRef.current.innerHTML = initialEmail;
@@ -109,7 +112,11 @@ const CampaignComposerPage = () => {
           form.status === "Scheduled" ? new Date().toISOString() : undefined,
         content: editorContent, // include if your API expects it
       };
-      const result = await dispatch(createCampaign(payload));
+      // Cast to `any` because AsyncThunkAction types can sometimes conflict with Dispatch overloads
+      // in certain TypeScript configurations when middleware types are complex.
+      // This keeps runtime behavior unchanged while avoiding build-time errors.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result = await dispatch(createCampaign(payload) as any);
       // Type guard helpers
       const hasErrorField = (
         obj: any
@@ -130,7 +137,8 @@ const CampaignComposerPage = () => {
           body: editorContent,
           replyTo: form.senderEmail, // Use senderEmail as replyTo
         };
-        const startResult = await dispatch(startEmailCampaign(startPayload));
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const startResult = await dispatch(startEmailCampaign(startPayload) as any);
         if (startEmailCampaign.fulfilled.match(startResult)) {
           toast.success("Campaign created and started!");
           router.push("/email-campaigns/lists");

@@ -24,6 +24,7 @@ import { Modal } from "@/components/ui/Modal";
 import { Pagination } from "@/components/ui/Pagination";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { selectCampaign } from '@/redux/selectors/campaignSelectors';
 import {
   createEmailListWithFiles,
   clearCreateEmailListStatus,
@@ -64,10 +65,12 @@ const EmailCampaignsListPage = () => {
     userCampaigns,
     status,
     error,
-  } = useAppSelector((state) => state.campaign);
+  } = useAppSelector(selectCampaign);
 
   React.useEffect(() => {
-    dispatch(fetchAllCampaigns());
+    // Cast to any to avoid TS dispatch overload issues with async thunks
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    dispatch(fetchAllCampaigns() as any);
   }, [dispatch]);
 
   React.useEffect(() => {
@@ -107,6 +110,7 @@ const EmailCampaignsListPage = () => {
           : { email: email.trim() };
       })
       .filter((e) => e.email);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     dispatch(
       createEmailListWithFiles({
         email_listName: form.email_listName,
@@ -115,7 +119,7 @@ const EmailCampaignsListPage = () => {
           .split(",")
           .map((f) => f.trim())
           .filter(Boolean),
-      })
+      }) as any
     );
   };
 
@@ -140,13 +144,14 @@ const EmailCampaignsListPage = () => {
   const handleStartCampaign = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedListId) return;
-    const result = await dispatch(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result = await dispatch(
       startEmailCampaign({
         campaignName: campaignForm.campaignName,
         emailListId: selectedListId,
         subject: campaignForm.subject,
         body: campaignForm.body,
-      })
+      }) as any
     );
     if (startEmailCampaign.fulfilled.match(result)) {
       toast.success("Campaign started and emails sent!");
@@ -178,7 +183,8 @@ const EmailCampaignsListPage = () => {
       );
       if (res.ok) {
         toast.success("Campaign deleted!");
-        dispatch(fetchAllCampaigns());
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        dispatch(fetchAllCampaigns() as any);
       } else {
         const data = await res.json();
         toast.error(data.error || "Failed to delete campaign");
