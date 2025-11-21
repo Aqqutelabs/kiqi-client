@@ -164,7 +164,7 @@ export default function WalletPage() {
     axios
       .get(`${BASE_URL}/api/v1/subscriptions/details`, {
         headers: {
-          Authorization: `Bearer ${token}`, // <— your token here
+          Authorization: `Bearer ${token}`, 
         },
       })
       .then((res) => {

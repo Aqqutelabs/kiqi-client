@@ -121,8 +121,9 @@ export default function SubscriptionsPage() {
         }
       );
 
-      if (res.data.authorization_url) {
-        window.location.href = res.data.authorization_url;
+      const paymentLink = res.data.data.authorizationUrl;
+      if (paymentLink) {
+        window.location.href = paymentLink;
       }
     } catch (error) {
       console.error("Payment failed", error);
