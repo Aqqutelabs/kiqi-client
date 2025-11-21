@@ -60,28 +60,51 @@ const CreateSenderEmailPage = () => {
     return value.trim();
   };
 
+  // sanitize auth token so header value contains no invalid characters
+  const sanitizeAuthToken = (tok: any) => {
+    if (!tok && tok !== 0) return null;
+    try {
+      let t = String(tok);
+      // trim whitespace
+      t = t.replace(/^\s+|\s+$/g, "");
+      // remove surrounding quotes if present
+      if ((t.startsWith('"') && t.endsWith('"')) || (t.startsWith("'") && t.endsWith("'"))) {
+        t = t.slice(1, -1);
+      }
+      // strip newline / carriage returns
+      t = t.replace(/\r|\n/g, "");
+      return t;
+    } catch (e) {
+      return null;
+    }
+  };
+
   const handleRequestVerification = async (e?: React.FormEvent) => {
     e?.preventDefault();
     setSubmitLoading(true);
     try {
-      const body = {
-        nickname,
-        from_email,
-        from_name,
-        reply_to,
-        reply_to_name,
-        address,
-        city,
+      // exact payload shape required by backend
+      const payload = {
+        nickname: nickname,
+        from_email: from_email,
+        from_name: from_name,
+        reply_to: reply_to,
+        reply_to_name: reply_to_name,
+        address: address,
+        city: city,
         state: stateVal,
-        zip,
-        country,
+        zip: zip,
+        country: country,
       };
-      const headers = authToken
-        ? { headers: { Authorization: `Bearer ${authToken}` } }
+      // avoid leaking token value in logs; only log presence
+      console.log('auth token present:', !!authToken);
+      const cleanToken = sanitizeAuthToken(authToken);
+      const headers = cleanToken
+        ? { headers: { Authorization: `Bearer ${cleanToken}` } }
         : {};
       const resp = await apiClient.post(
         `${BASE_URL}/api/v1/senders/sendgrid/request-verification`,
-        body,
+        payload,
         headers
       );
       if (resp && resp.error === false && resp.data) {
@@ -105,8 +128,9 @@ const CreateSenderEmailPage = () => {
     }
     setConfirmLoading(true);
     try {
-      const headers = authToken
-        ? { headers: { Authorization: `Bearer ${authToken}` } }
+      const cleanToken = sanitizeAuthToken(authToken);
+      const headers = cleanToken
+        ? { headers: { Authorization: `Bearer ${cleanToken}` } }
         : {};
       const resp = await apiClient.post(
         `${BASE_URL}/api/v1/senders/sendgrid/confirm-verification`,

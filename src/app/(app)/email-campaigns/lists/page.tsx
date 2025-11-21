@@ -15,6 +15,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
+import BASE_URL from '@/lib/utils/baseUrl';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
@@ -173,9 +174,7 @@ const EmailCampaignsListPage = () => {
             : null
           : null;
       const res = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
-        }/api/v1/campaigns/${campaignId}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || BASE_URL}/api/v1/campaigns/${campaignId}`,
         {
           method: "DELETE",
           headers: token ? { Authorization: `Bearer ${token}` } : {},

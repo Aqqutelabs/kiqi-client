@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import apiClient from '@/lib/utils/apiClient';
+import BASE_URL from '@/lib/utils/baseUrl';
 import { useAppSelector } from '@/redux/hooks';
 import { selectToken } from '@/redux/selectors/authSelectors';
 
@@ -36,7 +37,7 @@ const UsersPage = () => {
     setError('');
     setSuccess('');
     try {
-      await apiClient.post('http://localhost:8000/api/v1/senders/verify', senderData, {
+      await apiClient.post(`${BASE_URL}/api/v1/senders/verify`, senderData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setVerified(true);
