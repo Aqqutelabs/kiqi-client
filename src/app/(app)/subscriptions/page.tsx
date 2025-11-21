@@ -4,21 +4,30 @@ import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { Check, Gem } from "lucide-react";
 import { useState } from "react";
+import BASE_URL from "@/lib/utils/baseUrl";
+import axios from "axios";
 
 type Subscriptions = {
   id: string;
   plan: "Free" | "Starter" | "Enterprise" | "Professional";
+  name: string;
   description: string;
   price: string;
   altGoC?: string;
   perks: string[];
 };
 
+function convertPriceToKobo(price: string) {
+  const numeric = Number(price.replace("K", "")) * 1000;
+  return numeric * 100; // to kobo
+}
+
 export default function SubscriptionsPage() {
   const subscriptions: Subscriptions[] = [
     {
       id: "1",
       plan: "Free",
+      name: "Free",
       description: "Perfect for individuals getting started",
       price: "0",
       // altGoC: "0",
@@ -32,6 +41,7 @@ export default function SubscriptionsPage() {
     {
       id: "2",
       plan: "Starter",
+      name: "Basic",
       description: "Perfect for individuals getting started",
       price: "15K",
       altGoC: "6,000",
@@ -46,6 +56,7 @@ export default function SubscriptionsPage() {
     {
       id: "3",
       plan: "Professional",
+      name: "Pro",
       description: "Best for growing teams and professionals",
       price: "35K",
       altGoC: "14,000",
@@ -62,6 +73,7 @@ export default function SubscriptionsPage() {
     {
       id: "4",
       plan: "Enterprise",
+      name: "Enterprise",
       description: "For large organizations with custom needs",
       price: "85K",
       altGoC: "34,000",
@@ -79,6 +91,43 @@ export default function SubscriptionsPage() {
   ];
 
   const [selectedPlan, setSelectedPlan] = useState<string | null>("0");
+  const handleSubscribe = async (plan: Subscriptions) => {
+    if (selectedPlan != plan.id) {
+      setSelectedPlan(plan.id);
+      return;
+    }
+
+    try {
+      const token =
+        typeof window !== "undefined"
+          ? JSON.parse(localStorage.getItem("persist:root") || "{}").auth
+            ? JSON.parse(
+                JSON.parse(localStorage.getItem("persist:root") || "{}").auth
+              ).token
+            : null
+          : null;
+      const res = await axios.post(
+        `${BASE_URL}/api/v1/subscriptions/subscribe`,
+        {
+          planId: plan.id,
+          planName: plan.name,
+          paymentMethod: "paystack",
+          //amount: convertPriceToKobo(plan.price),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (res.data.authorization_url) {
+        window.location.href = res.data.authorization_url;
+      }
+    } catch (error) {
+      console.error("Payment failed", error);
+    }
+  };
 
   return (
     <section className="space-y-4">
@@ -97,7 +146,8 @@ export default function SubscriptionsPage() {
             <div
               onClick={() => setSelectedPlan(sub.id)}
               key={sub.id}
-              className="border border-[#E7EBFF] shadow-md bg-white w-full h-full rounded-xl p-5.5 flex flex-col justify-between relative hover:shadow-lg transition-shadow overflow-hidden">
+              className="border border-[#E7EBFF] shadow-md bg-white w-full h-full rounded-xl p-5.5 flex flex-col justify-between relative hover:shadow-lg transition-shadow overflow-hidden"
+            >
               {/* enterprise specific design - positioned behind everything */}
               {isEnterprise && (
                 <img
@@ -119,13 +169,15 @@ export default function SubscriptionsPage() {
                   <h4
                     className={`font-medium text-2xl ${
                       isEnterprise ? "text-[#0C31A1]" : "text-[#1B223C]"
-                    }`}>
+                    }`}
+                  >
                     {sub.plan}
                   </h4>
                   <p
                     className={`text-sm ${
                       isEnterprise ? "text-[#3C3C3C]" : "text-[#797878]"
-                    }`}>
+                    }`}
+                  >
                     {sub.description}
                   </p>
                   <p className="flex items-end gap-2">
@@ -150,7 +202,8 @@ export default function SubscriptionsPage() {
                       key={idx}
                       className={`text-sm flex items-center gap-2.5 ${
                         isEnterprise ? "text-[#0C31A1]" : "text-[#42526D]"
-                      }`}>
+                      }`}
+                    >
                       <Check
                         size={15}
                         color={isEnterprise ? "#0C31A1" : "#42526D"}
@@ -162,10 +215,18 @@ export default function SubscriptionsPage() {
               </div>
 
               {/* button */}
-              <Button
+              {/* <Button
                 variant={activePlan ? "primary" : "outline"}
                 className="w-full relative z-10"
                 size={"lg"}>
+                {activePlan ? "Selected" : "Select Plan"}
+              </Button> */}
+              <Button
+                onClick={() => handleSubscribe(sub)}
+                variant={activePlan ? "primary" : "outline"}
+                className="w-full relative z-10"
+                size={"lg"}
+              >
                 {activePlan ? "Selected" : "Select Plan"}
               </Button>
             </div>
