@@ -1,195 +1,216 @@
 "use client";
 import React, { useState } from "react";
-import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
-import { Select } from "@/components/ui/Select";
 import { useDispatch, useSelector } from "react-redux";
-import { createSender, fetchSenders } from "@/redux/slices/campaignSlice";
 import { FormField } from "@/components/ui/FormField";
 import { Column, DataTable } from "@/components/ui/DataTable";
+import BASE_URL from "@/lib/utils/baseUrl";
+import apiClient from "@/lib/utils/apiClient";
+import { toast } from "react-hot-toast";
 
-// Notification component (simple inline for demo)
-const Notification = ({
-  message,
-  type,
-  onClose,
-}: {
-  message: string;
-  type: "success" | "error";
-  onClose: () => void;
-}) => (
-  <div
-    className={`fixed top-4 right-4 z-50 px-4 py-2 rounded shadow-lg text-white ${
-      type === "success" ? "bg-green-600" : "bg-red-600"
-    }`}>
-    {message}
-    <button className="ml-4 text-white" onClick={onClose}>
-      ×
-    </button>
-  </div>
-);
-
-type TableData = {
-  id: string;
-  senderEmail: string;
+type SenderData = {
+  senderName: string;
   type: string;
-  sender: string;
+  senderEmail: string;
+  user_id: string;
+  verified: boolean;
+  _id: string;
+  sendgridId?: string;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 const CreateSenderEmailPage = () => {
   const dispatch = useDispatch();
-  const [email, setEmail] = useState("");
-  const [sender, setSender] = useState("");
-  const [type, setType] = useState("campaign");
-  const [notification, setNotification] = useState<{
-    message: string;
-    type: "success" | "error";
-  } | null>(null);
+  const authToken = useSelector((state: any) => state.auth?.token ?? null);
+  const [nickname, setNickname] = useState("");
+  const [from_email, setFromEmail] = useState("");
+  const [from_name, setFromName] = useState("");
+  const [reply_to, setReplyTo] = useState("");
+  const [reply_to_name, setReplyToName] = useState("");
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [stateVal, setStateVal] = useState("");
+  const [zip, setZip] = useState("");
+  const [country, setCountry] = useState("");
+
+  // Using global react-hot-toast for notifications
+
   const [submitLoading, setSubmitLoading] = useState(false);
-  const [fetchLoading, setFetchLoading] = useState(false);
-  const fullState = useSelector((state: any) => state);
-  console.log("Full Redux State:", fullState);
-  const status = useSelector((state: any) => state.campaign?.status ?? "idle");
-  const error = useSelector((state: any) => state.campaign?.error ?? null);
-  console.error(error);
-  const senders = useSelector(
-    (state: any) => state.campaign?.senders?.data ?? []
-  );
-  console.log("Senders:", senders);
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
-  const headers: Column<TableData>[] = [
-    { header: "Sender Email", accessor: "senderEmail" },
-    { header: "Type", accessor: "type" },
-    { header: "Sender", accessor: "sender" },
-  ];
+  // Holds the server returned sender object after request-verification
+  const [senderData, setSenderData] = useState<SenderData | null>(null);
 
-  React.useEffect(() => {
-    setFetchLoading(true);
-    dispatch<any>(fetchSenders()).finally(() => setFetchLoading(false));
-  }, [dispatch]);
+  // Input where user pastes the emailed link or token
+  const [pastedValue, setPastedValue] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // helper to extract token from a pasted URL or raw token
+  const extractToken = (value: string) => {
+    if (!value) return null;
+    // try query param token=...
+    const qMatch = value.match(/[?&]token=([^&\s]+)/i);
+    if (qMatch && qMatch[1]) return qMatch[1];
+    // try token in path like /confirm/abcd
+    const pathMatch = value.match(/([A-Za-z0-9-_]{8,})$/);
+    if (pathMatch && pathMatch[1]) return pathMatch[1];
+    // otherwise assume the whole value is the token
+    return value.trim();
+  };
+
+  const handleRequestVerification = async (e?: React.FormEvent) => {
+    e?.preventDefault();
     setSubmitLoading(true);
     try {
-      const resultAction = await dispatch<any>(
-        createSender({ email, sender, type })
+      const body = {
+        nickname,
+        from_email,
+        from_name,
+        reply_to,
+        reply_to_name,
+        address,
+        city,
+        state: stateVal,
+        zip,
+        country,
+      };
+      const headers = authToken
+        ? { headers: { Authorization: `Bearer ${authToken}` } }
+        : {};
+      const resp = await apiClient.post(
+        `${BASE_URL}/api/v1/senders/sendgrid/request-verification`,
+        body,
+        headers
       );
-      if (createSender.fulfilled.match(resultAction)) {
-        setNotification({
-          message: "Sender email created successfully!",
-          type: "success",
-        });
-        setEmail("");
-        setSender("");
-        setType("campaign");
-        // Refetch senders after successful creation
-        setFetchLoading(true);
-        dispatch<any>(fetchSenders()).finally(() => setFetchLoading(false));
+      if (resp && resp.error === false && resp.data) {
+        setSenderData(resp.data as SenderData);
+        toast.success(resp.message || "Verification initiated");
       } else {
-        setNotification({
-          message:
-            resultAction.payload?.message || "Failed to create sender email",
-          type: "error",
-        });
+        toast.error(resp.message || "Failed to initiate verification");
       }
-    } catch (err) {
-      setNotification({
-        message: "An unexpected error occurred",
-        type: "error",
-      });
+    } catch (err: any) {
+      toast.error(err?.message || String(err) || "Request failed");
     } finally {
       setSubmitLoading(false);
     }
   };
 
+  const handleConfirmVerification = async () => {
+    const token = extractToken(pastedValue);
+    if (!token) {
+      toast.error("No token found in pasted value");
+      return;
+    }
+    setConfirmLoading(true);
+    try {
+      const headers = authToken
+        ? { headers: { Authorization: `Bearer ${authToken}` } }
+        : {};
+      const resp = await apiClient.post(
+        `${BASE_URL}/api/v1/senders/sendgrid/confirm-verification`,
+        { token },
+        headers
+      );
+      if (resp && resp.error === false && resp.data) {
+        setSenderData(resp.data as SenderData);
+        toast.success(resp.message || "Sender verified");
+      } else {
+        toast.error(resp.message || "Confirmation failed");
+      }
+    } catch (err: any) {
+      toast.error(err?.message || String(err) || "Confirm failed");
+    } finally {
+      setConfirmLoading(false);
+    }
+  };
+
   return (
     <>
-      {notification && (
-        <Notification
-          message={notification.message}
-          type={notification.type}
-          onClose={() => setNotification(null)}
-        />
-      )}
+      {/* toasts are handled by the global ToasterClient component */}
       <main className="flex-1 overflow-y-auto">
-        <PageHeader
-          title="Create a sender email"
-          backLink="/email-campaigns/dashboard"
-        />
-        <Card className="mb-8 p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-800">
-            Submit sender email
-          </h3>
-          <hr className="text-gray-200 my-4" />
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <FormField
-              type="email"
-              id="email"
-              placeholder="Enter Sender Email"
-              label="Sender Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            {/* <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Type
-              </label>
-              <Select
-                value={type}
-                onChange={(e) => setType(e.target.value)}
-                required
-                className="bg-[#00000014]">
-                <option value="campaign">Campaign</option>
-                <option value="message">Message</option>
-                <option value="single">Single</option>
-              </Select>
-            </div> */}
-            <FormField
-              type="text"
-              id="email"
-              label="Sender Name"
-              placeholder="Enter a sender e.g company name"
-              value={sender}
-              onChange={(e) => setSender(e.target.value)}
-              required
-            />
-            <Button
-              type="submit"
-              className="w-full sm:w-auto mt-5"
-              disabled={status === "loading" || submitLoading}>
-              {submitLoading ? "Submitting..." : "Submit sender Email"}
-            </Button>
+        <PageHeader title="Create a sender email" backLink="/email-campaigns/dashboard" />
+
+        <Card className="mb-6 p-6">
+          <h3 className="text-lg font-semibold mb-2">Create & Verify SendGrid Sender</h3>
+          <p className="text-sm text-gray-500 mb-4">Fill the form to initiate SendGrid verification. A confirmation link will be emailed to the sender address.</p>
+
+          <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={handleRequestVerification}>
+            <FormField label="Nickname" id="nickname" value={nickname} onChange={(e:any) => setNickname(e.target.value)} placeholder="e.g. My Company" required />
+            <FormField label="From Email" id="from_email" type="email" value={from_email} onChange={(e:any) => setFromEmail(e.target.value)} placeholder="you@company.com" required />
+            <FormField label="From Name" id="from_name" value={from_name} onChange={(e:any) => setFromName(e.target.value)} placeholder="Your Name or Company" required />
+            <FormField label="Reply To Email" id="reply_to" type="email" value={reply_to} onChange={(e:any) => setReplyTo(e.target.value)} placeholder="reply@company.com" required />
+            <FormField label="Reply To Name" id="reply_to_name" value={reply_to_name} onChange={(e:any) => setReplyToName(e.target.value)} placeholder="Reply Name" />
+            <FormField label="Address" id="address" value={address} onChange={(e:any) => setAddress(e.target.value)} placeholder="Street address" />
+            <FormField label="City" id="city" value={city} onChange={(e:any) => setCity(e.target.value)} placeholder="City" />
+            <FormField label="State" id="state" value={stateVal} onChange={(e:any) => setStateVal(e.target.value)} placeholder="State" />
+            <FormField label="ZIP" id="zip" value={zip} onChange={(e:any) => setZip(e.target.value)} placeholder="Postal code" />
+            <FormField label="Country" id="country" value={country} onChange={(e:any) => setCountry(e.target.value)} placeholder="Country" />
+
+            <div className="col-span-1 md:col-span-2 flex gap-3 items-center">
+              <Button type="submit" className="transition-transform transform hover:scale-105" disabled={submitLoading}>
+                {submitLoading ? "Initiating..." : "Initiate Verification"}
+              </Button>
+              <Button type="button" className="bg-gray-100 text-gray-800" onClick={() => {
+                setNickname(""); setFromEmail(""); setFromName(""); setReplyTo(""); setReplyToName(""); setAddress(""); setCity(""); setStateVal(""); setZip(""); setCountry("");
+              }}>Reset</Button>
+            </div>
           </form>
         </Card>
 
-        <Card className="p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">Sender Emails</h3>
-            <span className="text-sm text-gray-500">
-              Total Emails: {fetchLoading ? "Loading..." : senders.length}
-            </span>
-          </div>
-          <div className="w-full overflow-x-auto">
-            {fetchLoading && senders.length !== 0 ? (
-              <div className="text-center py-8">Loading sender emails...</div>
-            ) : senders.length === 0 ? (
-              <p className="text-center mx-auto">No data yet.</p>
-            ) : (
-              <DataTable
-                columns={headers}
-                data={senders}
-                onEdit={() => {}}
-                onDelete={() => {}}
-              />
-            )}
-          </div>
-        </Card>
+        {senderData && (
+          <Card className="p-6 mb-6 transition-opacity duration-300">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-lg font-medium">Sender Created</h4>
+                <p className="text-sm text-gray-500">ID: <span className="font-mono">{senderData._id}</span></p>
+              </div>
+              <div className={`px-3 py-1 rounded text-sm ${senderData.verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                {senderData.verified ? 'Verified' : 'Pending Verification'}
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <p className="text-sm text-gray-600">Sender Name</p>
+                <div className="font-medium">{senderData.senderName}</div>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Sender Email</p>
+                <div className="font-medium">{senderData.senderEmail}</div>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">SendGrid ID</p>
+                <div className="font-medium">{senderData.sendgridId ?? '—'}</div>
+              </div>
+            </div>
+
+            <hr className="my-4" />
+
+            <div className="space-y-3">
+              <h5 className="font-semibold">Confirm Identity (paste emailed link)</h5>
+              <p className="text-sm text-gray-500">Open the inbox for <span className="font-medium">{senderData.senderEmail}</span>, locate the SendGrid confirmation email, copy the confirmation link and paste it below. The app will extract the token automatically.</p>
+
+              <textarea value={pastedValue} onChange={(e) => setPastedValue(e.target.value)} placeholder="Paste full link or token here" className="w-full border p-2 rounded resize-none" rows={2} />
+
+              <div className="flex gap-2">
+                <Button onClick={handleConfirmVerification} disabled={confirmLoading || senderData.verified} className="transition-transform transform hover:scale-105">
+                  {confirmLoading ? 'Confirming...' : (senderData.verified ? 'Already Verified' : 'Extract & Confirm')}
+                </Button>
+                <Button type="button" className="bg-gray-100 text-gray-800" onClick={() => setPastedValue('')}>Clear</Button>
+              </div>
+
+              <div className="text-sm text-gray-600">
+                <strong>Tip:</strong> If your email client shows a button, right-click it and copy link address. If it shows a short link, open it and copy the URL from the browser address bar.
+              </div>
+            </div>
+          </Card>
+        )}
+
       </main>
     </>
   );
 };
+
 export default CreateSenderEmailPage;
