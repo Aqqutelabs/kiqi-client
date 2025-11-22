@@ -77,8 +77,23 @@ export const fetchEmailLists = createAsyncThunk<
       `${BASE_URL}/api/v1/email-lists/user/me`,
       token ? { headers: { Authorization: `Bearer ${token}` } } : {}
     );
-    console.log('the response', response.data);
-    return response.data;
+    // API may return an array directly or an object containing `data`.
+    console.log('the response', response);
+    let rawLists: any[] = [];
+    if (Array.isArray(response)) rawLists = response;
+    else if (response && Array.isArray(response.data)) rawLists = response.data;
+    else if (response && Array.isArray(response.lists)) rawLists = response.lists;
+    else rawLists = [];
+
+    // Normalize to our EmailList shape: { id, name, count, createdAt }
+    const normalized = rawLists.map((it: any) => ({
+      id: it._id || it.id || '',
+      name: it.email_listName || it.email_list_name || it.name || it.listName || '',
+      count: (it.emails && Array.isArray(it.emails)) ? it.emails.length : (it.count ?? 0),
+      createdAt: it.createdAt || it.created_at || ''
+    }));
+
+    return normalized;
   } catch (error: any) {
     return thunkAPI.rejectWithValue(error.response.data);
   }

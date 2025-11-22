@@ -6,6 +6,7 @@ import ToggleSwitch from "@/components/ui/SwitchComponent";
 import { ChevronDown } from "lucide-react";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { selectToken } from "@/redux/selectors/authSelectors";
+import { selectCampaignLists } from '@/redux/selectors/campaignSelectors';
 import apiClient from "@/lib/utils/apiClient";
 import BASE_URL from "@/lib/utils/baseUrl";
 import { toast } from "react-hot-toast";
@@ -125,7 +126,7 @@ export default function SettingsPage() {
     const [autoStart, setAutoStart] = React.useState(true);
     const [selectedListId, setSelectedListId] = React.useState<string>("");
     const dispatch = useAppDispatch();
-    const availableLists = useAppSelector((s:any) => s.campaigns?.lists ?? []);
+    const availableLists = useAppSelector(selectCampaignLists);
     const [scheduledAt, setScheduledAt] = React.useState("");
     const [loading, setLoading] = React.useState(false);
     const draftLoadRef = React.useRef(false);
@@ -147,7 +148,14 @@ export default function SettingsPage() {
       }
 
       // fetch available email lists for the user
-      dispatch(fetchEmailLists() as any);
+      (async () => {
+        try {
+          const res = await dispatch(fetchEmailLists() as any);
+          console.log('Fetched email lists:', res);
+        } catch (err) {
+          console.error('Failed to fetch email lists:', err);
+        }
+      })();
     }, [dispatch]);
 
     // Persist draft when user edits fields so navigating away keeps changes
@@ -187,6 +195,7 @@ export default function SettingsPage() {
       const payload: any = {
         campaignName: campaignName.trim(),
         subjectLine: subjectLine.trim(),
+        body: generatedBody?.trim(),
         senderId: senderId.trim(),
         autoStart: !!autoStart,
         audience: { emailLists: lists },
@@ -260,7 +269,7 @@ export default function SettingsPage() {
             <select value={selectedListId} onChange={(e) => setSelectedListId(e.target.value)} className="border rounded px-3 py-2 w-full bg-white focus:ring-2 focus:ring-[#233E97]">
               <option value="">-- Select an email list --</option>
               {availableLists.map((l: any) => (
-                <option key={l._id || l.id || l} value={l._id || l.id || l}>{l.name || l.listName || (l._id || l.id)}</option>
+                <option key={l.id || l._id || l} value={l.id || l._id || l}>{l.name || l.email_listName || l.listName || (l.id || l._id || l)}</option>
               ))}
             </select>
             <span className="text-xs text-gray-500 mt-1">Lists are fetched from your account.</span>
