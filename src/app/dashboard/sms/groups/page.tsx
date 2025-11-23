@@ -12,6 +12,7 @@ const groups = [
     { id: '2', name: 'Group 2', date: '10-04-2025', count: 45 },
     { id: '3', name: 'Group 3', date: '10-04-2025', count: 45 },
 ];
+console.log("Adding this for test, will remove later");
 
 const ManageRecipientGroupsPage = () => {
     return (
