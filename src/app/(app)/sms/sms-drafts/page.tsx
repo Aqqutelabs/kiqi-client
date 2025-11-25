@@ -41,6 +41,7 @@ interface ApiResponse<T> {
   data: T;
   message?: string;
   success?: boolean;
+  error?: boolean;
 }
 
 interface UpdateDraftRequest {
@@ -67,6 +68,7 @@ function EditDraftModal({
   isLoading 
 }: EditDraftModalProps) {
   const [message, setMessage] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (draft) {
@@ -87,7 +89,14 @@ function EditDraftModal({
       return;
     }
 
-    await onSave(draft._id, message);
+    setIsSaving(true);
+    try {
+      await onSave(draft._id, message);
+    } catch (error) {
+      // Error is handled in parent component
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleClose = () => {
@@ -149,16 +158,23 @@ function EditDraftModal({
             variant="secondary" 
             onClick={handleClose} 
             className="flex-1"
-            // disabled={isLoading}
+            disabled={isSaving}
           >
             Cancel
           </Button>
           <Button 
             type="submit" 
-            // disabled={isLoading || !message.trim()} 
+            disabled={isSaving || !message.trim()} 
             className="flex-1"
           >
-            Save Changes
+            {isSaving ? (
+              <>
+                <Loader className="size-4 animate-spin mr-2" />
+                Saving...
+              </>
+            ) : (
+              "Save Changes"
+            )}
           </Button>
         </div>
       </form>
@@ -209,7 +225,7 @@ function DeleteConfirmModal({
         </Button>
         <Button 
           type="button"
-          variant="tertiary"
+          variant="destructive"
           onClick={handleConfirm} 
           className="flex-1"
           disabled={isLoading}
@@ -235,7 +251,7 @@ export default function SMSDrafts() {
 
   const [drafts, setDrafts] = useState<SMSDraftTable[]>([]);
   const [isFetching, setIsFetching] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [editingDraft, setEditingDraft] = useState<SMSDraft | null>(null);
   const [deletingDraft, setDeletingDraft] = useState<SMSDraftTable | null>(null);
@@ -264,12 +280,13 @@ export default function SMSDrafts() {
     }
   }, [token]);
 
-  // API Functions
   const fetchDrafts = async (): Promise<SMSDraft[]> => {
     if (!token) {
       throw new Error("Authentication required");
     }
 
+    console.log("Making request to:", `${BASE_URL}/api/v1/drafts`);
+    console.log("Token exists:", !!token);
     const response = await axios.get<ApiResponse<SMSDraft[]>>(
       `${BASE_URL}/api/v1/drafts`,
       {
@@ -280,7 +297,14 @@ export default function SMSDrafts() {
       }
     );
 
-    return response.data.data || [];
+    // Handle different response structures
+    if (response.data.data) {
+      return response.data.data;
+    } else if (Array.isArray(response.data)) {
+      return response.data;
+    } else {
+      return [];
+    }
   };
 
   const updateDraft = async (
@@ -302,7 +326,12 @@ export default function SMSDrafts() {
       }
     );
 
-    return response.data.data || response.data;
+    // Normalize response: some endpoints return { data: ... } while others return the resource directly
+    const respData: any = response.data;
+    if (respData && respData.data) {
+      return respData.data as SMSDraft;
+    }
+    return respData as SMSDraft;
   };
 
   const deleteDraft = async (id: string): Promise<void> => {
@@ -311,7 +340,7 @@ export default function SMSDrafts() {
     }
 
     await axios.delete(
-      `${BASE_URL}/api/v1/drafts/${id}`,
+      `${BASE_URL}/api/v1/sms/drafts/${id}`, // Fixed endpoint
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -331,7 +360,6 @@ export default function SMSDrafts() {
 
         if (status === 401) {
           toast.error("Session expired. Please log in again.");
-          router.push("/login");
         } else if (status === 404) {
           toast.error("Draft not found. It may have been deleted.");
         } else if (status === 400) {
@@ -354,7 +382,7 @@ export default function SMSDrafts() {
   const fetchDraftsData = async () => {
     setIsFetching(true);
     try {
-      console.log("Fetching drafts...");
+      console.log("Fetching drafts from:", `${BASE_URL}/api/v1/sms/drafts`);
       const draftsData = await fetchDrafts();
       console.log("Drafts fetched:", draftsData);
       
@@ -385,11 +413,10 @@ export default function SMSDrafts() {
   const handleEdit = (draft: SMSDraftTable) => {
     console.log("Editing draft:", draft);
     setEditingDraft(draft.fullDraft);
-    setIsEditing(true);
   };
 
   const handleSaveEdit = async (id: string, message: string) => {
-    setIsEditing(true);
+    setIsSaving(true);
     try {
       console.log("Updating draft:", id, "with message:", message);
 
@@ -415,13 +442,13 @@ export default function SMSDrafts() {
           : draft
       ));
 
-      setIsEditing(false);
       setEditingDraft(null);
       toast.success("Draft updated successfully!");
     } catch (error: any) {
       handleApiError(error, "update draft");
+      throw error; // Re-throw to handle in modal
     } finally {
-      setIsEditing(false);
+      setIsSaving(false);
     }
   };
 
@@ -458,7 +485,6 @@ export default function SMSDrafts() {
   const handleSendDraft = (draft: SMSDraftTable) => {
     console.log("Preparing to send draft:", draft);
     // Redirect to send page with draft data
-    // You can pass the draft ID as a query parameter
     router.push(`/sms/send-bulk-sms?draftId=${draft.id}`);
     toast.success("Loading draft for sending...");
   };
@@ -526,14 +552,13 @@ export default function SMSDrafts() {
 
       {/* Edit Modal */}
       <EditDraftModal
-        isOpen={isEditing && editingDraft !== null}
+        isOpen={!!editingDraft}
         onClose={() => {
-          setIsEditing(false);
           setEditingDraft(null);
         }}
         draft={editingDraft}
         onSave={handleSaveEdit}
-        isLoading={isEditing}
+        isLoading={isSaving}
       />
 
       {/* Delete Confirmation Modal */}
