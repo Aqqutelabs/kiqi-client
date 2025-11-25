@@ -1,5 +1,5 @@
 import Heading from "@/components/ui/TextHeading";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   AreaChart,
   Area,
@@ -9,6 +9,8 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import BASE_URL from "@/lib/utils/baseUrl";
+import axios from "axios";
 
 // Generate random data for 6 months
 const generateData = () => {
@@ -20,9 +22,12 @@ const generateData = () => {
   }));
 };
 
+
 export default function UsageOverview() {
   const [activeTab, setActiveTab] = useState("30D");
   const data = generateData();
+
+
 
   return (
     <div className="col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -110,7 +115,7 @@ export default function UsageOverview() {
           </AreaChart>
         </ResponsiveContainer>
       </div>
-// Shared content for both link a
+ {/* Shared content for both link a */}
       {/* Stats Cards */}
       <div className="grid grid-cols-3 gap-6">
         <div>
