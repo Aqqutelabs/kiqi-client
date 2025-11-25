@@ -80,7 +80,7 @@ export function DataTable<T extends { id: string | number }>({
             data.map((row) => (
               <tr key={row.id} className="bg-white h-20">
                 {columns.map((col) => (
-                  <td key={String(col.accessor)} className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                  <td key={String(col.accessor)} className="px-6 py-4 whitespace-wrap text-sm text-gray-700 w-[500px]">
                     {String(row[col.accessor])}
                   </td>
                 ))}
