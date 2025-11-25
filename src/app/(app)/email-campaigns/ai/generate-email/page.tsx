@@ -10,12 +10,15 @@ import {
   FolderInput,
   Share2,
   Sparkles,
+  ArrowRight,
   ThumbsDown,
   ThumbsUp,
   X,
+  SendHorizontal,
 } from "lucide-react";
-import AIPromptBar from "@/components/ui/AiPromptBarSimple";
-import React from "react";
+// Note: We are simulating the look of AIPromptBar using standard inputs 
+// to ensure your logic (context, tone, sendMessage) continues to work.
+import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
@@ -28,6 +31,7 @@ import { Select } from "@/components/ui/Select";
 
 export default function AIGeneratedEmail() {
   const editorRef = React.useRef<HTMLDivElement>(null);
+  const kikiPanelRef = React.useRef<HTMLDivElement>(null);
   const [activeFormats, setActiveFormats] = React.useState<string[]>([]);
 
   // Update active formats for toolbar highlighting
@@ -35,6 +39,9 @@ export default function AIGeneratedEmail() {
     const formats: string[] = [];
     if (document.queryCommandState("bold")) formats.push("bold");
     if (document.queryCommandState("italic")) formats.push("italic");
+    if (document.queryCommandState("underline")) formats.push("underline");
+    if (document.queryCommandState("strikeThrough")) formats.push("strikeThrough");
+    if (document.queryCommandState("insertUnorderedList")) formats.push("insertUnorderedList");
     setActiveFormats(formats);
   };
 
@@ -42,7 +49,6 @@ export default function AIGeneratedEmail() {
   const authToken = useSelector((state: any) => state.auth?.token ?? null);
 
   // Chat state
-  // start with an empty chat; UI will show a simple placeholder prompting the user to start
   const [chat, setChat] = React.useState<Array<{ role: "user" | "ai"; message: string; time: string; raw?: any }>>([]);
 
   // Input fields
@@ -54,8 +60,10 @@ export default function AIGeneratedEmail() {
   const [applied, setApplied] = React.useState(false);
   const [continueThread, setContinueThread] = React.useState(false);
 
-  // Main panel messages (for Apply Changes)
-  const [mainPanelMessages, setMainPanelMessages] = React.useState<Array<string>>([]);
+  // Main panel content (for Apply Changes) - single editable string
+  const [mainPanelContent, setMainPanelContent] = React.useState<string>("");
+
+  const router = useRouter();
 
   // Helper: sanitize token
   const sanitizeAuthToken = (tok: any) => {
@@ -94,8 +102,7 @@ export default function AIGeneratedEmail() {
       const headers = cleanToken
         ? { headers: { Authorization: `Bearer ${cleanToken}` } }
         : {};
-      // Backend expects either { context, tone } for new email
-      // or { context, tone, continueThread: true } when continuing
+      
       const payload: any = { context, tone };
       if (continueThread) payload.continueThread = true;
       const resp = await apiClient.post(`${BASE_URL}/api/v1/ai-email/generate-email`, payload, headers);
@@ -103,9 +110,7 @@ export default function AIGeneratedEmail() {
       // Helper: normalize response data into plain text
       const normalizeToPlainText = (d: any) => {
         if (d == null) return "";
-        // Prefer d.content if present
         let content = d.content ?? d;
-        // If content is a string that looks like JSON, try parsing
         if (typeof content === "string") {
           const trimmed = content.trim();
           if ((trimmed.startsWith("{") && trimmed.endsWith("}")) || (trimmed.startsWith("[") && trimmed.endsWith("]"))) {
@@ -115,16 +120,12 @@ export default function AIGeneratedEmail() {
                 if (parsed.subject || parsed.body) {
                   return `${parsed.subject ? parsed.subject + "\n\n" : ""}${parsed.body ?? ""}`.trim();
                 }
-                // If it's an object without subject/body, try to join values into text
                 return Object.values(parsed).filter(Boolean).join("\n\n");
               }
-            } catch (e) {
-              // not JSON, fall through
-            }
+            } catch (e) { }
           }
           return content;
         }
-        // If content is an object
         if (typeof content === "object") {
           if (content.subject || content.body) {
             return `${content.subject ? content.subject + "\n\n" : ""}${content.body ?? ""}`.trim();
@@ -134,7 +135,6 @@ export default function AIGeneratedEmail() {
         return String(content);
       };
 
-      // Accept response if success is true or success is undefined (older/simple formats)
       if (resp && (resp.success === undefined || resp.success === true)) {
         const data = resp.data ?? resp;
         const plain = normalizeToPlainText(data);
@@ -166,6 +166,31 @@ export default function AIGeneratedEmail() {
     }
   };
 
+  // Auto-scroll kiki panel when chat updates or while loading
+  React.useEffect(() => {
+    try {
+      const el = kikiPanelRef.current;
+      if (!el) return;
+      // scroll to bottom smoothly
+      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+    } catch (e) {
+      // ignore
+    }
+  }, [chat, loading]);
+
+  // Pulse/animate apply button when a new AI message arrives
+  const [animateApply, setAnimateApply] = React.useState(false);
+  React.useEffect(() => {
+    if (!chat || chat.length === 0) return;
+    const last = chat[chat.length - 1];
+    if (last.role === 'ai') {
+      setAnimateApply(true);
+      const t = setTimeout(() => setAnimateApply(false), 2000);
+      return () => clearTimeout(t);
+    }
+    return;
+  }, [chat]);
+
   // Apply changes to main panel
   const handleApplyChanges = () => {
     const aiMsgs = chat.filter((msg) => msg.role === "ai");
@@ -174,29 +199,40 @@ export default function AIGeneratedEmail() {
       return;
     }
     const last = aiMsgs[aiMsgs.length - 1].message;
-    setMainPanelMessages([last]);
+    // Update React-controlled content (avoids direct DOM writes)
+    setMainPanelContent(last);
+
     setApplied(true);
     toast.success("Message applied to main panel!");
     setTimeout(() => setApplied(false), 2000);
   };
 
-  // Memoize last AI message for button state
-  const lastAiMessage = React.useMemo(() => {
-    const ai = chat.filter((m) => m.role === "ai");
-    return ai.length ? ai[ai.length - 1].message : null;
-  }, [chat]);
-
-  const router = useRouter();
+  // Apply latest AI message to main editor (used by button next to Send)
+  const handleApplyLatest = () => {
+    const aiMsgs = chat.filter((msg) => msg.role === 'ai');
+    if (aiMsgs.length === 0) {
+      toast.error('No AI messages to apply');
+      return;
+    }
+    const last = aiMsgs[aiMsgs.length - 1].message;
+    // Update React-controlled content (no direct DOM writes)
+    setMainPanelContent(last);
+    setApplied(true);
+    toast.success('Latest AI message applied to main panel');
+    setTimeout(() => setApplied(false), 1500);
+  };
 
   // Send current applied main panel message to Settings page as a draft
   const sendToSettings = () => {
-    if (!mainPanelMessages || mainPanelMessages.length === 0 || !mainPanelMessages[0]) {
+    const content = mainPanelContent || editorRef.current?.innerText || '';
+
+    if (!content) {
       toast.error("No generated message applied to send");
       return;
     }
     const draft = {
       subjectLine: subjectLine || "",
-      body: mainPanelMessages[0],
+      body: content,
     };
     try {
       localStorage.setItem("kiqi_campaign_draft", JSON.stringify(draft));
@@ -207,10 +243,20 @@ export default function AIGeneratedEmail() {
     }
   };
 
+  // Handle manual typing in the contentEditable div
+  const handleEditorInput = (e: React.FormEvent<HTMLDivElement>) => {
+    const content = e.currentTarget.innerText;
+    setMainPanelContent(content);
+    updateActiveFormats();
+  };
+
   return (
     <section className="space-y-4">
+      {/* heading */}
       <Card>
         <PageHeader title="AI Generated Email" backLink="/email-campaigns/ai" />
+
+        {/* subject line */}
         <FormField
           label="Add a subject line for this campaign"
           id="subjectLine"
@@ -221,52 +267,102 @@ export default function AIGeneratedEmail() {
         />
       </Card>
 
+      {/* cards */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 h-screen">
-        {/* Main panel: shows applied messages */}
+        {/* generated email */}
         <Card className="col-span-3">
           <Heading heading="Generated Email" />
-          <div className="my-5">
-            <AnimatePresence>
-              {mainPanelMessages.length > 0 ? (
-                <motion.div
-                  key={0}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  transition={{ duration: 0.3 }}
-                  className="mb-4 p-4 bg-[#F3F6F8] rounded shadow"
-                >
-                  <textarea
-                    value={mainPanelMessages[0]}
-                    onChange={(e) => setMainPanelMessages([e.target.value])}
-                    rows={12}
-                    className="w-full resize-none bg-transparent border-none outline-none text-[#1B223C] text-base whitespace-pre-wrap"
-                  />
-                </motion.div>
-              ) : (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-gray-400">No messages applied yet.</motion.div>
-              )}
-            </AnimatePresence>
+
+          {/* Format Toolbar */}
+          <RichTextToolbar
+            editorRef={editorRef}
+            activeFormats={activeFormats}
+            onUpdateFormats={updateActiveFormats}
+          />
+
+          {/* tools and actions - Visual only from reference, logic wired where applicable */}
+          {/* <div className="flex justify-between items-center my-5">
+            <ul className="flex items-center gap-6 text-sm text-[#606062]">
+              <li className="cursor-pointer hover:text-gray-800">
+                <Share2 size={15} className="mr-2 inline-block" />
+                <span>Share</span>
+              </li>
+              <li className="cursor-pointer hover:text-gray-800">
+                <FolderInput size={15} className="mr-2 inline-block" />
+                <span>Export</span>
+              </li>
+              <li className="cursor-pointer hover:text-gray-800" onClick={handleApplyChanges}>
+                <Atom size={15} className="mr-2 inline-block" />
+                <span>{applied ? "Applied" : "Apply Latest"}</span>
+              </li>
+            </ul>
+            <div className="flex items-center gap-6">
+              <ThumbsUp
+                size={15}
+                color="#606062"
+                className="cursor-pointer hover:text-[var(--primary)]"
+              />
+              <ThumbsDown
+                size={15}
+                color="#606062"
+                className="cursor-pointer hover:text-[var(--primary)]"
+              />
+              <Copy
+                size={15}
+                color="#606062"
+                className="cursor-pointer hover:text-[var(--primary)]"
+                onClick={() => {
+                   const text = editorRef.current?.innerText || "";
+                   if(text) { navigator.clipboard.writeText(text); toast.success("Copied!"); }
+                }}
+              />
+            </div>
+          </div> */}
+
+          {/* email body - Replaced Textarea with ContentEditable to match reference UI */}
+          <div
+            ref={editorRef}
+            contentEditable
+            onInput={handleEditorInput}
+            onFocus={updateActiveFormats}
+            onClick={updateActiveFormats}
+            className="space-y-5 text-[#1B223C] text-base my-5 focus:outline-none min-h-[300px]"
+            tabIndex={0}
+            suppressContentEditableWarning={true}
+          >
+            {/* Render the React-controlled content. We avoid setting innerHTML with raw HTML
+                to keep things simple — replace newlines with <br/> for visual line breaks. */}
+            {mainPanelContent ? (
+              <div className="whitespace-pre-wrap">{mainPanelContent}</div>
+            ) : (
+              <p className="text-gray-400">Your AI generated email will appear here...</p>
+            )}
           </div>
-          <div className="flex gap-3">
-            <Button
-              size="lg"
-              onClick={handleApplyChanges}
-              disabled={
-                applied || !lastAiMessage || (mainPanelMessages.length > 0 && mainPanelMessages[0] === lastAiMessage)
-              }
-              className="transition-transform transform hover:scale-105"
+
+          <Button
+            size={"lg"}
+            onClick={sendToSettings}
+          >
+            Send Email
+          </Button>
+
+          {/* email footer customization */}
+          <div className="space-y-1 w-full mt-20">
+            <label className="text-[#1B223C] text-sm">
+              Email Footer Customization
+            </label>
+            <Select
+              placeholder="Default branded footer"
+              className="bg-transparent mt-2 h-14"
             >
-              {applied ? "Applied!" : "Apply Changes"}
-            </Button>
-            <Button size="lg" variant="secondary" onClick={sendToSettings} disabled={!mainPanelMessages.length} className="transition-transform transform hover:scale-105">
-              Send to Settings
-            </Button>
+              <option>Default branded footer</option>
+            </Select>
           </div>
         </Card>
 
-        {/* Kiqi AI chat side panel */}
+        {/* kiki ai */}
         <Card className="col-span-2 flex flex-col justify-between">
+          {/* heading and close button */}
           <div className="flex justify-between items-center">
             <div className="flex gap-3 items-center">
               <Sparkles color="#1B223C" size={20} />
@@ -276,88 +372,121 @@ export default function AIGeneratedEmail() {
               <X size={20} color="gray" />
             </button>
           </div>
-          <div className="space-y-5 overflow-y-auto max-h-[70vh]">
+
+          {/* Chat Messages Area */}
+          <div ref={kikiPanelRef} className="space-y-5 overflow-y-auto flex-1 pr-2">
             <AnimatePresence>
-              {chat.length > 0 ? (
-                chat.map((msg, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, x: msg.role === "user" ? 40 : -40 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: msg.role === "user" ? 40 : -40 }}
-                    transition={{ duration: 0.3 }}
-                    className={`flex gap-2 items-start ${msg.role === "user" ? "flex-row" : "flex-row-reverse"}`}
-                  >
-                    {msg.role === "user" ? (
-                      <img src="https://res.cloudinary.com/dygn4o3nv/image/upload/v1750431090/diego-hernandez-MSepzbKFz10-unsplash_zmv8um.jpg" alt="Customer" className="size-8 object-cover rounded-full" />
-                    ) : (
-                      <div className="flex justify-center items-center bg-[var(--primary)] p-2 rounded-full">
-                        <Sparkles size={15} color="white" />
-                      </div>
-                    )}
-                    <div className="mt-2 px-2.5 pb-1.5 text-[#1B223C] bg-[#F3F6F8] rounded shadow max-w-[80%]">
-                      <pre className="whitespace-pre-wrap text-base">{msg.message}</pre>
-                      <span className="block text-[#606062] text-xs mt-2">{msg.time}</span>
-                    </div>
-                  </motion.div>
-                ))
-              ) : (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-gray-400 px-2 py-6 text-center">
-                  Start a conversation
-                </motion.div>
-              )}
+                {chat.length > 0 ? (
+                   chat.map((msg, idx) => (
+                    <motion.div 
+                        key={idx}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="flex gap-2 items-start"
+                    >
+                        {msg.role === "user" ? (
+                             <img
+                                src="https://res.cloudinary.com/dygn4o3nv/image/upload/v1750431090/diego-hernandez-MSepzbKFz10-unsplash_zmv8um.jpg"
+                                alt="Customer"
+                                className="size-8 object-cover rounded-full"
+                              />
+                        ) : (
+                            <div className="flex justify-center items-center bg-[var(--primary)] p-2 rounded-full min-w-8 h-8">
+                                <Sparkles size={15} color="white" />
+                            </div>
+                        )}
+                        
+                        <div className="mt-2 px-2.5 pb-1.5 text-[#1B223C] w-full">
+                            <p className="whitespace-pre-wrap">{msg.message}</p>
+                            <span className="block text-[#606062] text-xs mt-2">{msg.time}</span>
+                        </div>
+                    </motion.div>
+                   ))
+                ) : (
+                    <div className="text-gray-400 text-center py-10">Start by describing your email...</div>
+                )}
             </AnimatePresence>
+            
             {loading && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-end py-2 px-3">
-                <div className="inline-flex items-center px-3 py-2 bg-[#F3F6F8] rounded-full">
-                  <span className="inline-block w-2 h-2 bg-[var(--primary)] rounded-full animate-bounce" style={{ animationDelay: '0s' }} />
-                  <span className="inline-block w-2 h-2 bg-[var(--primary)] rounded-full animate-bounce ml-1" style={{ animationDelay: '0.12s' }} />
-                  <span className="inline-block w-2 h-2 bg-[var(--primary)] rounded-full animate-bounce ml-1" style={{ animationDelay: '0.24s' }} />
-                </div>
-              </motion.div>
+                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-2 items-start">
+                    <div className="flex justify-center items-center bg-[var(--primary)] p-2 rounded-full min-w-8 h-8">
+                        <Sparkles size={15} color="white" />
+                    </div>
+                    <div className="mt-2 px-2.5 bg-[#F3F6F8] rounded-full p-2">
+                        <div className="flex gap-1">
+                            <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" />
+                            <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce delay-100" />
+                            <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce delay-200" />
+                        </div>
+                    </div>
+                 </motion.div>
             )}
+            
             {error && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-2 text-red-500">
-                {error}
-              </motion.div>
+                <div className="text-red-500 text-sm text-center">{error}</div>
             )}
           </div>
-          {/* Prompt input */}
-          <div className="mt-4">
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-3">
-                <input id="continueThread" type="checkbox" checked={continueThread} onChange={(e:any)=>setContinueThread(e.target.checked)} className="mt-1" />
-                <label htmlFor="continueThread" className="text-sm text-gray-700">Continue most recent thread</label>
-              </div>
-              <div className="text-xs text-gray-500">If unchecked, a new email will be created for your account (no recipient required).</div>
-            </div>
-            <FormField
-              label="Context / Question"
-              id="context"
-              value={context}
-              onChange={(e: any) => setContext(e.target.value)}
-              placeholder="What is the meaning of my name"
-              required
-            />
-            <FormField
-              label="Tone"
-              id="tone"
-              value={tone}
-              onChange={(e: any) => setTone(e.target.value)}
-              placeholder="Professional"
-              required
-            />
-            <Button onClick={sendMessage} disabled={loading || !context.trim()} className="mt-2 transition-transform transform hover:scale-105">
-              {loading ? (
-                <div className="inline-flex items-center">
-                  <span className="inline-block w-2 h-2 bg-white rounded-full animate-bounce mr-1" style={{ animationDelay: '0s' }} />
-                  <span className="inline-block w-2 h-2 bg-white rounded-full animate-bounce mr-1" style={{ animationDelay: '0.12s' }} />
-                  <span className="inline-block w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.24s' }} />
+
+          {/* Prompt Bar Area - Custom styling to match AI Prompt Bar but keeping logic */}
+          <div className="mt-auto pt-4 bg-white">
+            
+            {/* Logic controls (Tone/Thread) - Styled minimally to sit above input */}
+            <div className="flex items-center gap-3 mb-2 px-1">
+                <select 
+                    value={tone} 
+                    onChange={(e) => setTone(e.target.value)} 
+                    className="text-xs border-none bg-[#F3F6F8] rounded-md px-2 py-1 outline-none text-gray-600 cursor-pointer"
+                >
+                    <option value="Professional">Professional</option>
+                    <option value="Friendly">Friendly</option>
+                    <option value="Urgent">Urgent</option>
+                    <option value="Persuasive">Persuasive</option>
+                </select>
+
+                <div className="flex items-center gap-2">
+                    <input 
+                        id="continueThread" 
+                        type="checkbox" 
+                        checked={continueThread} 
+                        onChange={(e)=>setContinueThread(e.target.checked)} 
+                        className="accent-[var(--primary)] w-3 h-3"
+                    />
+                    <label htmlFor="continueThread" className="text-xs text-gray-500 cursor-pointer">Continue thread</label>
                 </div>
-              ) : (
-                "Send"
-              )}
-            </Button>
+            </div>
+
+            {/* Input that looks like AIPromptBar */}
+            <div className="relative flex items-center w-full">
+                <input
+                  value={context}
+                  onChange={(e) => setContext(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && !loading && sendMessage()}
+                  placeholder="Describe the changes you want..."
+                  className="w-full bg-[#F3F6F8] rounded-xl pl-4 pr-12 py-3 outline-none text-sm text-[#1B223C] placeholder:text-gray-400"
+                />
+                {/* Apply latest generated content into main panel (icon button) */}
+                <button
+                  onClick={handleApplyLatest}
+                  type="button"
+                  title="Apply latest AI message to main panel"
+                  disabled={chat.filter((m) => m.role === 'ai').length === 0}
+                  className={`absolute right-12 p-2 rounded-full transition-all shadow-sm flex items-center justify-center ${
+                    chat.filter((m) => m.role === 'ai').length === 0
+                      ? 'bg-gray-100 text-gray-400 pointer-events-none'
+                      : 'bg-gradient-to-tr from-[#1E3A8A] to-[#233E97] text-white hover:scale-105'
+                  } ${animateApply ? 'animate-pulse' : ''}`}
+                >
+                  <ArrowRight size={16} />
+                </button>
+
+                <button 
+                  onClick={sendMessage} 
+                  disabled={loading || !context.trim()}
+                  className="absolute right-2 p-1.5 bg-[var(--primary)] rounded-lg hover:opacity-90 disabled:opacity-50 transition-all"
+                >
+                  <SendHorizontal size={16} color="white" />
+                </button>
+            </div>
           </div>
         </Card>
       </div>

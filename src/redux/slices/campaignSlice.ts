@@ -42,15 +42,33 @@ const initialState: CampaignsState = {
 // --- SENDER ASYNC THUNKS ---
 
 export const fetchSenders = createAsyncThunk<
-  SenderEmail[], void, { rejectValue: ApiError }
+  SenderEmail[], void, { rejectValue: ApiError, state: { auth: { token: string | null } } }
 >('campaigns/fetchSenders', async (_, thunkAPI) => {
   try {
-    const response = await apiClient.get(`${BASE_URL}/senderEmail/`);
-    console.log('Fetched senders:', response.data);
-    return response.data;
+    const url = `${BASE_URL}/api/v1/senders`;
+    const token = thunkAPI.getState().auth.token;
+    console.log('fetchSenders: requesting', url, 'token=', !!token);
+    const response = await apiClient.get(url, token ? { headers: { Authorization: `Bearer ${token}` } } : {});
+    // Response may be an array or an object { error:false, data:[...] }
+    let raw: any[] = [];
+    if (Array.isArray(response)) raw = response;
+    else if (response && Array.isArray(response.data)) raw = response.data;
+    else raw = [];
+
+    console.log('fetchSenders: raw response length=', raw.length, 'sample=', raw[0]);
+
+    const normalized: SenderEmail[] = raw.map((s: any) => ({
+      id: s._id || s.id || '',
+      email: s.senderEmail || s.email || '',
+      sender: s.senderName || s.sender || '',
+      type: s.type || 'service',
+      verified: !!s.verified,
+    }));
+    console.log('fetchSenders: normalized senders count=', normalized.length);
+    return normalized;
   } catch (error: any) {
     console.error('Error fetching senders:', error);
-    return thunkAPI.rejectWithValue(error.response.data);
+    return thunkAPI.rejectWithValue(error.response?.data || { message: error.message });
   }
 });
 
@@ -73,12 +91,14 @@ export const fetchEmailLists = createAsyncThunk<
 >('campaigns/fetchEmailLists', async (_, thunkAPI) => {
   try {
     const token = thunkAPI.getState().auth.token;
+    const url = `${BASE_URL}/api/v1/email-lists/user/me`;
+    console.log('fetchEmailLists: token=', !!token, 'url=', url);
     const response = await apiClient.get(
-      `${BASE_URL}/api/v1/email-lists/user/me`,
+      url,
       token ? { headers: { Authorization: `Bearer ${token}` } } : {}
     );
     // API may return an array directly or an object containing `data`.
-    console.log('the response', response);
+    console.log('fetchEmailLists: raw response=', response && (response.data ?? response));
     let rawLists: any[] = [];
     if (Array.isArray(response)) rawLists = response;
     else if (response && Array.isArray(response.data)) rawLists = response.data;
@@ -93,9 +113,11 @@ export const fetchEmailLists = createAsyncThunk<
       createdAt: it.createdAt || it.created_at || ''
     }));
 
+    console.log('fetchEmailLists: normalized count=', normalized.length, 'sample=', normalized[0]);
     return normalized;
   } catch (error: any) {
-    return thunkAPI.rejectWithValue(error.response.data);
+    console.error('fetchEmailLists: error', error);
+    return thunkAPI.rejectWithValue(error?.response?.data ?? { message: error.message });
   }
 });
 
