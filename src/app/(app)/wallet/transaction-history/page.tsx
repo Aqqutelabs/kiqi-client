@@ -7,8 +7,10 @@ import { Select } from "@/components/ui/Select";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import SummaryCard from "@/components/ui/quick-action-summary-card";
 import { ArrowDownLeft, ArrowUpRight, Coins, Gift } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DataTable, Column } from "@/components/ui/DataTable";
+import axios from "axios";
+import BASE_URL from "@/lib/utils/baseUrl";
 
 interface Transactions {
   id: string;
@@ -22,6 +24,37 @@ interface Transactions {
 }
 
 export default function TransactionHistoryPage() {
+  const [transactions, setTransactions] = useState<Transactions[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch transactions
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const token =
+          typeof window !== "undefined"
+            ? JSON.parse(localStorage.getItem("persist:root") || "{}").auth
+              ? JSON.parse(
+                  JSON.parse(localStorage.getItem("persist:root") || "{}").auth
+                ).token
+              : null
+            : null;
+        const res = await axios.get(`${BASE_URL}/api/v1/transactions`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setTransactions(res.data.data || res.data);
+      } catch (err) {
+        setError("Failed to load transactions");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTransactions();
+  }, []);
   const transaction_cards = [
     {
       title: "₦187,500 GC",
@@ -60,38 +93,38 @@ export default function TransactionHistoryPage() {
     { header: "Status", accessor: "status" },
   ];
 
-  const data: Transactions[] = [
-    {
-      id: "1",
-      transactionID: "TXN-001",
-      date: "Oct 28, 2025, 02:30 PM",
-      type: "Credit",
-      description: "Subscription purchase - Pro Plan",
-      amount: "+50,000 GC",
-      balance: "150,000 GC",
-      status: "Completed",
-    },
-    {
-      id: "2",
-      transactionID: "TXN-001",
-      date: "Oct 28, 2025, 02:30 PM",
-      type: "Debit",
-      description: "Subscription purchase - Pro Plan",
-      amount: "+50,000 GC",
-      balance: "150,000 GC",
-      status: "Failed",
-    },
-    {
-      id: "3",
-      transactionID: "TXN-001",
-      date: "Oct 28, 2025, 02:30 PM",
-      type: "Refund",
-      description: "Subscription purchase - Pro Plan",
-      amount: "+50,000 GC",
-      balance: "150,000 GC",
-      status: "Pending",
-    },
-  ];
+  // const data: Transactions[] = [
+  //   {
+  //     id: "1",
+  //     transactionID: "TXN-001",
+  //     date: "Oct 28, 2025, 02:30 PM",
+  //     type: "Credit",
+  //     description: "Subscription purchase - Pro Plan",
+  //     amount: "+50,000 GC",
+  //     balance: "150,000 GC",
+  //     status: "Completed",
+  //   },
+  //   {
+  //     id: "2",
+  //     transactionID: "TXN-001",
+  //     date: "Oct 28, 2025, 02:30 PM",
+  //     type: "Debit",
+  //     description: "Subscription purchase - Pro Plan",
+  //     amount: "+50,000 GC",
+  //     balance: "150,000 GC",
+  //     status: "Failed",
+  //   },
+  //   {
+  //     id: "3",
+  //     transactionID: "TXN-001",
+  //     date: "Oct 28, 2025, 02:30 PM",
+  //     type: "Refund",
+  //     description: "Subscription purchase - Pro Plan",
+  //     amount: "+50,000 GC",
+  //     balance: "150,000 GC",
+  //     status: "Pending",
+  //   },
+  // ];
 
   return (
     <section className="space-y-5">
@@ -126,7 +159,13 @@ export default function TransactionHistoryPage() {
       </div>
 
       {/* table */}
-      <DataTable columns={headers} data={data} />
+      {/* <DataTable columns={headers} data={data} /> */}
+      {loading && <p>Loading transactions...</p>}
+      {error && <p className="text-red-500">{error}</p>}
+
+      {!loading && !error && (
+        <DataTable columns={headers} data={transactions} />
+      )}
     </section>
   );
 }

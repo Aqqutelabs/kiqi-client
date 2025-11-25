@@ -3,7 +3,7 @@
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import SummaryCard from "@/components/ui/quick-action-summary-card";
 import Heading from "@/components/ui/TextHeading";
-import { recent_activity, stats } from "@/lib/dummy-data/wallet";
+import { recent_activity, stats as dummyStats } from "@/lib/dummy-data/wallet";
 import { hexToRgba } from "@/lib/utils";
 import {
   ArrowDownRight,
@@ -19,13 +19,17 @@ import {
   Users,
   Wallet,
   X,
+  DollarSign,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import UsageOverview from "./usage-overview";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import ConnectWallet from "@/components/ui/ConnectWalletModal";
+import BASE_URL from "@/lib/utils/baseUrl";
+import axios from "axios";
 
 type CustomStatProps = {
   title: string;
@@ -62,7 +66,8 @@ function CustomStatCard({
       <div className="flex gap-3 items-center">
         <div
           className="size-10 rounded-lg flex justify-center items-center"
-          style={{ backgroundColor: color }}>
+          style={{ backgroundColor: color }}
+        >
           <span className="text-white text-sm">{icon}</span>
         </div>
         <div>
@@ -87,10 +92,11 @@ function CustomStatCard({
           <div
             className="h-full rounded-l-full transition-all duration-500 ease-out"
             style={{
-              width: "50%",
+              width: `${percent}%`,
               background: color,
               boxShadow: `0 0 6px ${color}`,
-            }}></div>
+            }}
+          ></div>
         </div>
 
         {/* conditional link or percent stat */}
@@ -120,6 +126,7 @@ export default function WalletPage() {
   // state for redeem GoC modal
   const [openModal, setOpenModal] = useState(false);
   const [connectWallet, setConnectWallet] = useState(false);
+  const [stats, setStats] = useState(dummyStats);
   // quick actions
   const quick_actions = [
     {
@@ -144,6 +151,58 @@ export default function WalletPage() {
       href: "/refer",
     },
   ];
+
+  useEffect(() => {
+    const token =
+      typeof window !== "undefined"
+        ? JSON.parse(localStorage.getItem("persist:root") || "{}").auth
+          ? JSON.parse(
+              JSON.parse(localStorage.getItem("persist:root") || "{}").auth
+            ).token
+          : null
+        : null;
+    axios
+      .get(`${BASE_URL}/api/v1/subscriptions/details`, {
+        headers: {
+          Authorization: `Bearer ${token}`, 
+        },
+      })
+      .then((res) => {
+        const { usage, subscription } = res.data.data;
+        const coins = usage.monthly_credits / 2.5;
+
+        setStats([
+          {
+            title: "GoCredits",
+            amount: usage.remaining_credits.toLocaleString(),
+            currency: "GC",
+            color: "#233E97",
+            percent: Math.round(
+              (usage.remaining_credits / usage.monthly_credits) * 100
+            ).toString(),
+            barText: "Monthly limit",
+            barAmount: `${usage.monthly_credits.toLocaleString()} GC`,
+            info: "vs last month",
+            icon: Zap, // fallback to dummy icon
+            isPositive: true,
+          },
+          {
+            // Go Coins
+            ...dummyStats[1],
+            amount: coins.toLocaleString(),
+          },
+          {
+            ...dummyStats[2], // Current Plan card
+            amount: subscription.planName,
+            barAmount: new Date(subscription.endDate).toLocaleDateString(
+              "en-US",
+              { month: "short", day: "numeric", year: "numeric" }
+            ),
+          },
+        ]);
+      })
+      .catch((err) => console.error(err));
+  }, []);
   return (
     <section>
       {/* heading and action buttons */}
@@ -206,7 +265,8 @@ export default function WalletPage() {
             <Heading heading="Recent Activity" subtitle="Latest transactions" />
             <Link
               href={"/wallet/transaction-history"}
-              className="text-sm font-medium text-[var(--primary)] hover:underline">
+              className="text-sm font-medium text-[var(--primary)] hover:underline"
+            >
               View all
             </Link>
           </div>
@@ -222,13 +282,15 @@ export default function WalletPage() {
               return (
                 <div
                   key={index}
-                  className="flex justify-between items-center h-[62px] w-full border-b border-[#F1F5F9] py-3">
+                  className="flex justify-between items-center h-[62px] w-full border-b border-[#F1F5F9] py-3"
+                >
                   {/* icon and title */}
                   <div className="flex items-center gap-3">
                     {/* icon */}
                     <div
                       className="size-10 flex justify-center items-center rounded-lg"
-                      style={{ backgroundColor: hexToRgba(dynamicColor, 0.1) }}>
+                      style={{ backgroundColor: hexToRgba(dynamicColor, 0.1) }}
+                    >
                       {a.type === "Added" || a.type === "Referral" ? (
                         <ArrowDownRight size={20} color={dynamicColor} />
                       ) : (
@@ -258,12 +320,12 @@ export default function WalletPage() {
         </div>
       </div>
 
-
       {/* redeem GoC modal */}
       <Modal
         isOpen={openModal}
         onClose={() => setOpenModal(false)}
-        width="600px">
+        width="600px"
+      >
         <PageHeader
           title="Redeem GoCoins"
           subtitle="Convert your GoCoins to Go Credits"
@@ -345,16 +407,26 @@ export default function WalletPage() {
           <Button
             onClick={() => setOpenModal(false)}
             variant={"outline"}
-            className="w-full">
+            className="w-full"
+          >
             Cancel <X size={16} className="ml-3" />
           </Button>
-          <Button className="w-full" onClick={() => { setOpenModal(false); setConnectWallet(true) }}>
+          <Button
+            className="w-full"
+            onClick={() => {
+              setOpenModal(false);
+              setConnectWallet(true);
+            }}
+          >
             Continue <ArrowRight size={16} className="ml-3" />
           </Button>
         </div>
       </Modal>
 
-      <ConnectWallet isOpen={connectWallet} onClose={() => setConnectWallet(false)}/>
+      <ConnectWallet
+        isOpen={connectWallet}
+        onClose={() => setConnectWallet(false)}
+      />
     </section>
   );
 }
