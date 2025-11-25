@@ -5,7 +5,8 @@ import { FormField } from "@/components/ui/FormField";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { motion } from "framer-motion";
 import { Column, DataTable } from "@/components/ui/DataTable";
-import { Trash2, Loader } from "lucide-react";
+import { Modal } from "@/components/ui/Modal";
+import { Loader } from "lucide-react";
 import SimpleFileInput from "@/components/ui/SimpleFileInput";
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
@@ -21,6 +22,161 @@ interface ApiResponse<T> {
   data: T;
 }
 
+// Edit Modal Component
+interface EditGroupModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  group: RecipientGroup | null;
+  onSave: (id: string, data: CreateRecipientGroupRequest) => Promise<void>;
+  isLoading: boolean;
+}
+
+function EditGroupModal({ isOpen, onClose, group, onSave, isLoading }: EditGroupModalProps) {
+  const [formData, setFormData] = useState({
+    name: "",
+    contacts: ""
+  });
+
+  useEffect(() => {
+    if (group) {
+      setFormData({
+        name: group.groupName,
+        contacts: group.contacts?.join(', ') || ""
+      });
+    }
+  }, [group]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!group) return;
+
+    const contactsArray = formData.contacts
+      .split(',')
+      .map(contact => contact.trim())
+      .filter(contact => contact.length > 0);
+
+    if (!formData.name.trim()) {
+      toast.error("Group name is required");
+      return;
+    }
+
+    if (contactsArray.length === 0) {
+      toast.error("At least one phone number is required");
+      return;
+    }
+
+    await onSave(group.id, {
+      name: formData.name.trim(),
+      contacts: contactsArray
+    });
+  };
+
+  const handleChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} width="500px">
+      <h4 className="text-lg font-medium text-gray-900 mb-4">Edit Group</h4>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <FormField
+          label="Group Name"
+          id="edit-name"
+          name="name"
+          type="text"
+          placeholder="Enter group name"
+          value={formData.name}
+          onChange={(e) => handleChange("name", e.target.value)}
+          required
+        />
+        <FormField
+          label="Phone Numbers"
+          id="edit-contacts"
+          name="contacts"
+          type="text"
+          placeholder="Enter phone numbers separated by commas, e.g., 08012345678,08087654321"
+          value={formData.contacts}
+          onChange={(e) => handleChange("contacts", e.target.value)}
+          required
+        />
+        <div className="flex gap-3 pt-4">
+          <Button type="button" variant="outline" onClick={onClose} className="flex-1" disabled={isLoading}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isLoading} className="flex-1">
+            {isLoading ? (
+              <>
+                <Loader className="size-4 animate-spin mr-2" />
+                Saving...
+              </>
+            ) : (
+              "Save Changes"
+            )}
+          </Button>
+        </div>
+      </form>
+    </Modal>
+  );
+}
+
+// Delete Confirmation Modal
+interface DeleteConfirmModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => Promise<void>;
+  groupName: string;
+  isLoading: boolean;
+}
+
+function DeleteConfirmModal({
+  isOpen,
+  onClose,
+  onConfirm,
+  groupName,
+  isLoading,
+}: DeleteConfirmModalProps) {
+  const handleConfirm = async () => {
+    await onConfirm();
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} width="400px">
+      <h4 className="text-lg font-medium text-gray-900 mb-3">Delete Group</h4>
+      <p className="text-sm text-gray-600 mb-4">
+        Are you sure you want to delete the group <strong>"{groupName}"</strong>? 
+        This action cannot be undone.
+      </p>
+      <div className="flex gap-3">
+        <Button 
+          type="button" 
+          variant="secondary" 
+          onClick={onClose} 
+          className="flex-1"
+          disabled={isLoading}
+        >
+          Cancel
+        </Button>
+        <Button 
+          type="button"
+          variant="destructive"
+          onClick={handleConfirm} 
+          className="flex-1"
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <>
+              <Loader className="size-4 animate-spin mr-2" />
+              Deleting...
+            </>
+          ) : (
+            "Delete"
+          )}
+        </Button>
+      </div>
+    </Modal>
+  );
+}
+
 export default function ManageRecipientGroups() {
   const token = useAppSelector(selectToken);
   
@@ -32,6 +188,11 @@ export default function ManageRecipientGroups() {
   const [data, setData] = useState<RecipientGroup[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingGroup, setEditingGroup] = useState<RecipientGroup | null>(null);
+  const [deletingGroup, setDeletingGroup] = useState<RecipientGroup | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // Table columns
   const columns: Column<RecipientGroup>[] = [
@@ -84,7 +245,7 @@ export default function ManageRecipientGroups() {
       setData(groupsData);
 
       if (groupsData.length === 0) {
-        toast.error("No recipient groups found");
+        toast.success("No recipient groups found");
       }
     } catch (error: unknown) {
       handleApiError(error, "fetching recipient groups");
@@ -101,6 +262,32 @@ export default function ManageRecipientGroups() {
       {
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  };
+
+  const updateRecipientGroup = async (id: string, requestData: CreateRecipientGroupRequest) => {
+    const response = await axios.put<RecipientGroupApiResponse>(
+      `${BASE_URL}/api/v1/sms/groups/${id}`,
+      requestData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  };
+
+  const deleteRecipientGroup = async (id: string) => {
+    const response = await axios.delete(
+      `${BASE_URL}/api/v1/sms/groups/${id}`,
+      {
+        headers: {
           Authorization: `Bearer ${token}`,
         },
       }
@@ -127,13 +314,6 @@ export default function ManageRecipientGroups() {
 
     if (contactsArray.length === 0) {
       toast.error("Please add at least one contact");
-      return;
-    }
-
-    // Validate phone numbers (basic validation)
-    const invalidContacts = contactsArray.filter(contact => !/^\d+$/.test(contact));
-    if (invalidContacts.length > 0) {
-      toast.error(`Invalid phone numbers: ${invalidContacts.join(', ')}`);
       return;
     }
 
@@ -172,21 +352,60 @@ export default function ManageRecipientGroups() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    try {
-      // Optional: Add API call to delete from server
-      // await axios.delete(`${BASE_URL}/api/v1/sms/recipient-groups/${id}`, {
-      //   headers: {
-      //     "Authorization": `Bearer ${token}`,
-      //   },
-      // });
+  const handleEdit = (group: RecipientGroup) => {
+    setEditingGroup(group);
+    setIsEditing(true);
+  };
 
+  const handleSaveEdit = async (id: string, data: CreateRecipientGroupRequest) => {
+    setIsLoading(true);
+    try {
+      const updatedGroup = await updateRecipientGroup(id, data);
+
+      // Update local state
+      setData(prev => prev.map(item => 
+        item.id === id 
+          ? {
+              ...item,
+              groupName: updatedGroup.name,
+              totalContactsInList: updatedGroup.contacts?.length || 0,
+              contacts: updatedGroup.contacts || [],
+            }
+          : item
+      ));
+
+      setIsEditing(false);
+      setEditingGroup(null);
+      toast.success("Group updated successfully!");
+    } catch (error: unknown) {
+      handleApiError(error, "updating group");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteClick = (group: RecipientGroup) => {
+    setDeletingGroup(group);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deletingGroup) return;
+
+    setIsDeleting(true);
+    try {
+      await deleteRecipientGroup(deletingGroup.id);
+      
       // Remove from local state
-      setData(prev => prev.filter(item => item.id !== id));
+      setData(prev => prev.filter(item => item.id !== deletingGroup.id));
+      
       toast.success("Recipient group deleted successfully!");
+      setShowDeleteModal(false);
+      setDeletingGroup(null);
     } catch (error) {
-      console.error("Error deleting recipient group:", error);
-      toast.error("Failed to delete recipient group.");
+      handleApiError(error, "deleting recipient group");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -284,7 +503,14 @@ export default function ManageRecipientGroups() {
               onClick={handleCreateRecipientGroup}
               disabled={isLoading || !token}
             >
-              {isLoading ? "Creating..." : "Create Recipient Group"}
+              {isLoading ? (
+                <>
+                  <Loader className="size-4 animate-spin mr-2" />
+                  Creating...
+                </>
+              ) : (
+                "Create Recipient Group"
+              )}
             </Button>
           </div>
         </div>
@@ -300,6 +526,7 @@ export default function ManageRecipientGroups() {
               size="sm"
               onClick={fetchRecipientGroups}
               disabled={isFetching}
+              title="Refresh groups"
             >
               <Loader className={`size-5 ${isFetching ? "animate-spin" : ""}`} />
             </Button>
@@ -309,11 +536,43 @@ export default function ManageRecipientGroups() {
         <DataTable
           columns={columns}
           data={data}
-          onEdit={() => {}}
-          onDelete={(item) => handleDelete(item.id)}
+          onEdit={handleEdit}
+          onDelete={handleDeleteClick}
           isLoading={isFetching}
         />
+
+        {/* Empty state */}
+        {!isFetching && data.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-gray-500 mb-2">No recipient groups found</p>
+            <p className="text-sm text-gray-400">Create your first group above to get started</p>
+          </div>
+        )}
       </Card>
+
+      {/* Edit Modal */}
+      <EditGroupModal
+        isOpen={isEditing}
+        onClose={() => {
+          setIsEditing(false);
+          setEditingGroup(null);
+        }}
+        group={editingGroup}
+        onSave={handleSaveEdit}
+        isLoading={isLoading}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setDeletingGroup(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        groupName={deletingGroup?.groupName || ""}
+        isLoading={isDeleting}
+      />
     </motion.main>
   );
 }

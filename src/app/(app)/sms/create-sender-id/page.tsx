@@ -96,6 +96,64 @@ function EditSenderModal({ isOpen, onClose, sender, onSave, isLoading }: EditSen
   );
 }
 
+// Delete Confirmation Modal
+interface DeleteConfirmModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => Promise<void>;
+  senderName: string;
+  isLoading: boolean;
+}
+
+function DeleteConfirmModal({
+  isOpen,
+  onClose,
+  onConfirm,
+  senderName,
+  isLoading,
+}: DeleteConfirmModalProps) {
+  const handleConfirm = async () => {
+    await onConfirm();
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} width="400px">
+      <h4 className="text-lg font-medium text-gray-900 mb-3">Delete Sender ID</h4>
+      <p className="text-sm text-gray-600 mb-4">
+        Are you sure you want to delete the sender ID <strong>"{senderName}"</strong>? 
+        This action cannot be undone.
+      </p>
+      <div className="flex gap-3">
+        <Button 
+          type="button" 
+          variant="secondary" 
+          onClick={onClose} 
+          className="flex-1"
+          disabled={isLoading}
+        >
+          Cancel
+        </Button>
+        <Button 
+          type="button"
+          variant="destructive"
+          onClick={handleConfirm} 
+          className="flex-1"
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <>
+              <Loader className="size-4 animate-spin mr-2" />
+              Deleting...
+            </>
+          ) : (
+            "Delete"
+          )}
+        </Button>
+      </div>
+    </Modal>
+  );
+}
+
 export default function CreateSenderID() {
   const token = useAppSelector(selectToken);
   
@@ -107,8 +165,11 @@ export default function CreateSenderID() {
   const [data, setData] = useState<Sender[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingSender, setEditingSender] = useState<Sender | null>(null);
+  const [deletingSender, setDeletingSender] = useState<Sender | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // Table columns
   const columns: Column<Sender>[] = [
@@ -195,6 +256,23 @@ export default function CreateSenderID() {
     return response.data;
   };
 
+  const deleteSender = async (id: string): Promise<void> => {
+    if (!token) {
+      throw new Error("Authentication required");
+    }
+
+    const response = await axios.delete(
+      `${BASE_URL}/api/v1/sms/sender/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    
+    return response.data;
+  };
+
   // Event Handlers
   const handleCreateSender = async () => {
     if (!formData.name.trim()) {
@@ -266,13 +344,28 @@ export default function CreateSenderID() {
     }
   };
 
-  const handleDelete = (sender: Sender) => {
+  const handleDeleteClick = (sender: Sender) => {
+    setDeletingSender(sender);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deletingSender) return;
+
+    setIsDeleting(true);
     try {
-      setData(prev => prev.filter(item => item.id !== sender.id));
-      toast.success("Sender ID removed successfully!");
-    } catch (error) {
-      console.error("Error deleting sender ID:", error);
-      toast.error("Failed to delete sender ID.");
+      await deleteSender(deletingSender.id);
+      
+      // Remove from local state
+      setData(prev => prev.filter(item => item.id !== deletingSender.id));
+      
+      toast.success("Sender ID deleted successfully!");
+      setShowDeleteModal(false);
+      setDeletingSender(null);
+    } catch (error: unknown) {
+      handleApiError(error, "deleting sender ID");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -375,7 +468,7 @@ export default function CreateSenderID() {
           columns={columns}
           data={data}
           onEdit={handleEdit}
-          onDelete={handleDelete}
+          onDelete={handleDeleteClick}
           isLoading={isFetching}
         />
       </Card>
@@ -390,6 +483,18 @@ export default function CreateSenderID() {
         sender={editingSender}
         onSave={handleSaveEdit}
         isLoading={isLoading}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setDeletingSender(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        senderName={deletingSender?.name || ""}
+        isLoading={isDeleting}
       />
     </motion.main>
   );
