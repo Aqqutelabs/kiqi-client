@@ -28,12 +28,12 @@ export default function RootLayout({
       <body className={inter.className}>
         <SidebarProvider>
           <ProductsProvider>
-            <ReduxProvider>
-              <WalletProvider>
-                <ToasterClient />
-                {children}
-              </WalletProvider>
-            </ReduxProvider>
+              <ReduxProvider>
+                <WalletProvider>
+                  <ToasterClient />
+                  {children}
+                </WalletProvider>
+              </ReduxProvider>
           </ProductsProvider>
         </SidebarProvider>
       </body>
