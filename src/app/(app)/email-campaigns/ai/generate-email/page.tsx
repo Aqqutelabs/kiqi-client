@@ -207,6 +207,19 @@ export default function AIGeneratedEmail() {
     setTimeout(() => setApplied(false), 2000);
   };
 
+  // Apply a specific AI message by index
+  const handleApplyMessage = (idx: number) => {
+    const msg = chat[idx];
+    if (!msg || msg.role !== 'ai') {
+      toast.error('No AI message to apply');
+      return;
+    }
+    setMainPanelContent(msg.message);
+    setApplied(true);
+    toast.success('AI message applied to main panel');
+    setTimeout(() => setApplied(false), 1500);
+  };
+
   // Apply latest AI message to main editor (used by button next to Send)
   const handleApplyLatest = () => {
     const aiMsgs = chat.filter((msg) => msg.role === 'ai');
@@ -378,32 +391,62 @@ export default function AIGeneratedEmail() {
             <AnimatePresence>
                 {chat.length > 0 ? (
                    chat.map((msg, idx) => (
-                    <motion.div 
-                        key={idx}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="flex gap-2 items-start"
-                    >
-                        {msg.role === "user" ? (
-                             <img
-                                src="https://res.cloudinary.com/dygn4o3nv/image/upload/v1750431090/diego-hernandez-MSepzbKFz10-unsplash_zmv8um.jpg"
-                                alt="Customer"
-                                className="size-8 object-cover rounded-full"
-                              />
-                        ) : (
-                            <div className="flex justify-center items-center bg-[var(--primary)] p-2 rounded-full min-w-8 h-8">
-                                <Sparkles size={15} color="white" />
-                            </div>
-                        )}
-                        
-                        <div className="mt-2 px-2.5 pb-1.5 text-[#1B223C] w-full">
-                            <p className="whitespace-pre-wrap">{msg.message}</p>
-                            <span className="block text-[#606062] text-xs mt-2">{msg.time}</span>
+                  <motion.div 
+                    key={idx}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex gap-3 items-start"
+                  >
+                    {msg.role === "user" ? (
+                      <img
+                        src="https://res.cloudinary.com/dygn4o3nv/image/upload/v1750431090/diego-hernandez-MSepzbKFz10-unsplash_zmv8um.jpg"
+                        alt="You"
+                        className="w-8 h-8 object-cover rounded-full mt-2"
+                        />
+                    ) : (
+                      <div className="flex justify-center items-center bg-[var(--primary)] p-2 rounded-full min-w-8 h-8 mt-2">
+                        <Sparkles size={15} color="white" />
+                      </div>
+                    )}
+
+                    {/* Message bubble */}
+                    <div className="mt-1 w-full relative">
+                      {msg.role === 'user' ? (
+                        <div className="bg-[#F3F6F8] text-sm text-[#1B223C] rounded-xl p-3">
+                          <p className="whitespace-pre-wrap">{msg.message}</p>
+                          <span className="block text-[#606062] text-xs mt-2">{msg.time}</span>
                         </div>
-                    </motion.div>
+                      ) : (
+                        <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-4 text-sm text-[#1B223C]">
+                          <p className="whitespace-pre-wrap">{msg.message}</p>
+                          <span className="block text-[#606062] text-xs mt-3">{msg.time}</span>
+                        </div>
+                      )}
+
+                      {msg.role === 'ai' && (
+                        <>
+                          {/* Overlay apply icon (top-right) */}
+                          <button
+                            onClick={() => handleApplyMessage(idx)}
+                            title="Apply this AI message"
+                            className="absolute right-2 top-2 p-2 rounded-full shadow-md bg-gradient-to-tr from-[#1E3A8A] to-[#233E97] text-white hover:scale-105"
+                          >
+                            <ArrowRight size={14} />
+                          </button>
+
+                          {/* Bottom apply button (end of response) */}
+                          {/* <div className="flex justify-end mt-2">
+                            <Button size="sm" onClick={() => handleApplyMessage(idx)} className="bg-[#233E97] text-white px-3 py-1.5 rounded-md hover:opacity-95">
+                              Apply
+                            </Button>
+                          </div> */}
+                        </>
+                      )}
+                    </div>
+                  </motion.div>
                    ))
                 ) : (
-                    <div className="text-gray-400 text-center py-10">Start by describing your email...</div>
+                  <div className="text-gray-400 text-center py-6">Start by describing your email...</div>
                 )}
             </AnimatePresence>
             
@@ -427,65 +470,74 @@ export default function AIGeneratedEmail() {
             )}
           </div>
 
-          {/* Prompt Bar Area - Custom styling to match AI Prompt Bar but keeping logic */}
-          <div className="mt-auto pt-4 bg-white">
-            
-            {/* Logic controls (Tone/Thread) - Styled minimally to sit above input */}
-            <div className="flex items-center gap-3 mb-2 px-1">
-                <select 
-                    value={tone} 
-                    onChange={(e) => setTone(e.target.value)} 
-                    className="text-xs border-none bg-[#F3F6F8] rounded-md px-2 py-1 outline-none text-gray-600 cursor-pointer"
-                >
-                    <option value="Professional">Professional</option>
-                    <option value="Friendly">Friendly</option>
-                    <option value="Urgent">Urgent</option>
-                    <option value="Persuasive">Persuasive</option>
-                </select>
+          {/* Prompt Bar Area - integrated tone/thread controls inside input box */}
+          <div className="mt-auto pt-2 bg-white">
+            <div className="relative w-full">
+              <div className="bg-[#F3F6F8] rounded-xl p-3">
+                <div className="flex items-center justify-between gap-3 mb-2">
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={tone}
+                      onChange={(e) => setTone(e.target.value)}
+                      className="text-xs border-none bg-transparent rounded-md px-2 py-1 outline-none text-gray-600 cursor-pointer"
+                    >
+                      <option value="Professional">Professional</option>
+                      <option value="Friendly">Friendly</option>
+                      <option value="Urgent">Urgent</option>
+                      <option value="Persuasive">Persuasive</option>
+                    </select>
 
-                <div className="flex items-center gap-2">
-                    <input 
-                        id="continueThread" 
-                        type="checkbox" 
-                        checked={continueThread} 
-                        onChange={(e)=>setContinueThread(e.target.checked)} 
-                        className="accent-[var(--primary)] w-3 h-3"
-                    />
-                    <label htmlFor="continueThread" className="text-xs text-gray-500 cursor-pointer">Continue thread</label>
+                    <label className="flex items-center gap-2 text-xs text-gray-600">
+                      <input
+                        id="continueThread"
+                        type="checkbox"
+                        checked={continueThread}
+                        onChange={(e) => setContinueThread(e.target.checked)}
+                        className="accent-[var(--primary)] w-4 h-4"
+                      />
+                      <span>Continue thread</span>
+                    </label>
+                  </div>
                 </div>
-            </div>
 
-            {/* Input that looks like AIPromptBar */}
-            <div className="relative flex items-center w-full">
-                <input
-                  value={context}
-                  onChange={(e) => setContext(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && !loading && sendMessage()}
-                  placeholder="Describe the changes you want..."
-                  className="w-full bg-[#F3F6F8] rounded-xl pl-4 pr-12 py-3 outline-none text-sm text-[#1B223C] placeholder:text-gray-400"
-                />
-                {/* Apply latest generated content into main panel (icon button) */}
-                <button
-                  onClick={handleApplyLatest}
-                  type="button"
-                  title="Apply latest AI message to main panel"
-                  disabled={chat.filter((m) => m.role === 'ai').length === 0}
-                  className={`absolute right-12 p-2 rounded-full transition-all shadow-sm flex items-center justify-center ${
-                    chat.filter((m) => m.role === 'ai').length === 0
-                      ? 'bg-gray-100 text-gray-400 pointer-events-none'
-                      : 'bg-gradient-to-tr from-[#1E3A8A] to-[#233E97] text-white hover:scale-105'
-                  } ${animateApply ? 'animate-pulse' : ''}`}
-                >
-                  <ArrowRight size={16} />
-                </button>
+                <div className="relative">
+                  <textarea
+                    value={context}
+                    onChange={(e) => setContext(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        if (!loading) sendMessage();
+                      }
+                    }}
+                    placeholder="Describe the changes you want..."
+                    className="w-full bg-transparent rounded-md resize-none min-h-[72px] pr-20 pl-3 py-2 outline-none text-sm text-[#1B223C] placeholder:text-gray-400"
+                  />
 
-                <button 
-                  onClick={sendMessage} 
-                  disabled={loading || !context.trim()}
-                  className="absolute right-2 p-1.5 bg-[var(--primary)] rounded-lg hover:opacity-90 disabled:opacity-50 transition-all"
-                >
-                  <SendHorizontal size={16} color="white" />
-                </button>
+                  {/* Apply latest generated content into main panel (icon button) */}
+                  {/* <button
+                    onClick={handleApplyLatest}
+                    type="button"
+                    title="Apply latest AI message to main panel"
+                    disabled={chat.filter((m) => m.role === 'ai').length === 0}
+                    className={`absolute right-12 bottom-3 p-2 rounded-full transition-all shadow-sm flex items-center justify-center ${
+                      chat.filter((m) => m.role === 'ai').length === 0
+                        ? 'bg-gray-100 text-gray-400 pointer-events-none'
+                        : 'bg-gradient-to-tr from-[#1E3A8A] to-[#233E97] text-white hover:scale-105'
+                    } ${animateApply ? 'animate-pulse' : ''}`}
+                  >
+                    <ArrowRight size={16} />
+                  </button> */}
+
+                  <button
+                    onClick={sendMessage}
+                    disabled={loading || !context.trim()}
+                    className="absolute right-2 bottom-2 p-2 bg-[var(--primary)] rounded-lg hover:opacity-90 disabled:opacity-50 transition-all"
+                  >
+                    <SendHorizontal size={16} color="white" />
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </Card>
