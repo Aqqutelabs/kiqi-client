@@ -11,12 +11,14 @@ import { useState, useEffect } from "react";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import axios from "axios";
 import BASE_URL from "@/lib/utils/baseUrl";
+import { formatDate } from "@/lib/utils/dateFormatter";
 
 interface Transactions {
   id: string;
   transactionID: string;
   date: string;
   type: "Debit" | "Credit" | "Referral" | "Conversion" | "Purchase" | "Refund";
+  currencyType: string;
   description: string;
   amount: string;
   balance: string;
@@ -40,12 +42,23 @@ export default function TransactionHistoryPage() {
                 ).token
               : null
             : null;
-        const res = await axios.get(`${BASE_URL}/api/v1/transactions`, {
+        const res = await axios.get(`${BASE_URL}/api/v1/account/transactions`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        setTransactions(res.data.data || res.data);
+        const mapped: Transactions[] = res.data.data.map((tx: any) => ({
+          id: tx._id,
+          transactionID: tx.transactionId || "—",
+          date: formatDate(tx.dateCreated || tx.createdAt),
+          type: tx.type,
+          currencyType: tx.currencyType,
+          description: tx.description || "—",
+          amount: tx.amount?.toString() || "0",
+          balance: tx.balance?.toString() || "0",
+          status: tx.status || "Pending",
+        }));
+        setTransactions(mapped);
       } catch (err) {
         setError("Failed to load transactions");
       } finally {
@@ -55,27 +68,45 @@ export default function TransactionHistoryPage() {
 
     fetchTransactions();
   }, []);
+
   const transaction_cards = [
     {
-      title: "₦187,500 GC",
+      title: `₦${transactions
+        .filter(
+          (tx) =>
+            tx.currencyType === "go_credits" &&
+            tx.description.toLowerCase().includes("added")
+        )
+        .reduce((sum, tx) => sum + Number(tx.amount), 0)
+        .toLocaleString()} GC`,
       description: "Total Credits",
       icon: ArrowDownLeft,
       color: "#00A63E",
     },
     {
-      title: "₦134,500 GC",
+      title: `₦${transactions
+        .filter(
+          (tx) =>
+            tx.currencyType === "go_credits" &&
+            tx.description.toLowerCase().includes("deducted")
+        )
+        .reduce((sum, tx) => sum + Number(tx.amount), 0)
+        .toLocaleString()} GC`,
       description: "Total Debits",
       icon: ArrowUpRight,
       color: "#E7000B",
     },
     {
-      title: "₦5,000 GC",
+      title: `₦${transactions
+        .filter((tx) => tx.type === "Referral")
+        .reduce((sum, tx) => sum + Number(tx.amount), 0)
+        .toLocaleString()} GC`,
       description: "Referral Earnings",
       icon: Gift,
       color: "#155DFC",
     },
     {
-      title: "12",
+      title: `${transactions.length}`,
       description: "Transactions",
       icon: Coins,
       color: "#9810FA",

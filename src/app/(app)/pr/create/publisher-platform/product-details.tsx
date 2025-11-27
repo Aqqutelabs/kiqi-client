@@ -424,7 +424,7 @@ const reviews: Review[] = [
           </div>
 
           <div className="text-white">
-            <div className="text-3xl font-bold mb-1">₦{product.amount}</div>
+            <div className="text-3xl font-bold mb-1">{product.amount}</div>
           </div>
         </div>
 

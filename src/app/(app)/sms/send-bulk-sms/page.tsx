@@ -102,7 +102,7 @@ export default function SendBulkSMS() {
         groupName: group.name,
         dateCreated: group.createdAt,
         totalContactsInList: group.contacts?.length || 0,
-        contacts: group.contacts || [],
+        contacts: group.contacts?.map((contact: any) => contact.phone) || [],
       }));
 
       setRecipientGroups(groupsData);

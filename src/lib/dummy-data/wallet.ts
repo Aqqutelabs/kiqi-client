@@ -5,7 +5,7 @@ import { DollarSign, Zap } from "lucide-react";
 export const stats = [
   {
     title: "GoCredits",
-    amount: "12,450",
+    amount: "0",
     currency: "GC",
     color: "#233E97",
     percent: "12",
@@ -17,10 +17,10 @@ export const stats = [
   },
   {
     title: "GoCoins",
-    amount: "3,280",
+    amount: "0",
     currency: "Coins",
     color: "#FE9A00",
-    percent: "8",
+    percent: "0",
     barText: "Conversion rate",
     barAmount: "1 Coin = 2.5 GC",
     info: "earned this month",
@@ -29,10 +29,10 @@ export const stats = [
   },
   {
     title: "Current Plan",
-    amount: "Professional",
+    amount: "Free",
     color: "#7F22FE",
     barText: "Next renewal",
-    barAmount: "Nov 27, 2025",
+    barAmount: "-",
     icon: DollarSign,
     link: "View plan details →",
   },

@@ -30,6 +30,7 @@ import { Button } from "@/components/ui/Button";
 import ConnectWallet from "@/components/ui/ConnectWalletModal";
 import BASE_URL from "@/lib/utils/baseUrl";
 import axios from "axios";
+import { formatDate } from "@/lib/utils/dateFormatter";
 
 type CustomStatProps = {
   title: string;
@@ -44,6 +45,14 @@ type CustomStatProps = {
   isActive?: boolean;
   link?: string;
   isPositive?: boolean;
+};
+
+type ActivityItem = {
+  activity: string;
+  time: string;
+  amount: number | string;
+  currency: string;
+  type: "Added" | "Deducted" | "Referral" | string;
 };
 
 function CustomStatCard({
@@ -127,6 +136,8 @@ export default function WalletPage() {
   const [openModal, setOpenModal] = useState(false);
   const [connectWallet, setConnectWallet] = useState(false);
   const [stats, setStats] = useState(dummyStats);
+  const [recent_activity, setRecentActivity] = useState<ActivityItem[]>([]);
+  const [value, setValue] = useState("");
   // quick actions
   const quick_actions = [
     {
@@ -151,20 +162,20 @@ export default function WalletPage() {
       href: "/refer",
     },
   ];
+  const token =
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("persist:root") || "{}").auth
+        ? JSON.parse(
+            JSON.parse(localStorage.getItem("persist:root") || "{}").auth
+          ).token
+        : null
+      : null;
 
   useEffect(() => {
-    const token =
-      typeof window !== "undefined"
-        ? JSON.parse(localStorage.getItem("persist:root") || "{}").auth
-          ? JSON.parse(
-              JSON.parse(localStorage.getItem("persist:root") || "{}").auth
-            ).token
-          : null
-        : null;
     axios
       .get(`${BASE_URL}/api/v1/subscriptions/details`, {
         headers: {
-          Authorization: `Bearer ${token}`, 
+          Authorization: `Bearer ${token}`,
         },
       })
       .then((res) => {
@@ -203,6 +214,42 @@ export default function WalletPage() {
       })
       .catch((err) => console.error(err));
   }, []);
+
+  useEffect(() => {
+    const fetchRecentTransactions = async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}/api/v1/account/transactions`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        console.log("Transactions:", res.data);
+
+        const result = res.data.data; // array of transactions
+
+        const formatted = result.map((tx: any) => ({
+          activity: tx.type,
+          time: formatDate(tx.createdAt),
+          amount: tx.amount,
+          currency: tx.currencyType === "go_coins" ? "Coins" : "GC",
+          type:
+            tx.type === "Conversion"
+              ? tx.description.includes("added")
+                ? "Added"
+                : "Deducted"
+              : tx.type,
+        }));
+
+        setRecentActivity(formatted);
+      } catch (err) {
+        console.error("Failed to fetch recent transactions", err);
+      }
+    };
+
+    fetchRecentTransactions();
+  }, []);
+
   return (
     <section>
       {/* heading and action buttons */}
@@ -356,8 +403,14 @@ export default function WalletPage() {
               Amount to Redeem
             </h4>
             <div className="h-14 bg-[#F3F3F5] border border-[#CAD5E2] py-1 px-3 rounded-lg flex items-center justify-between">
-              <p className="text-sm text-[#717182]">100</p>
-              <div className="flex gap-2 items-center">
+              <input
+                type="number"
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                className="bg-transparent outline-none text-sm text-[#717182] w-full"
+              />
+
+              <div className="flex gap-2 items-center ml-3">
                 <div className="rounded-lg text-white py-1 h-[30px] w-[46px] text-xs bg-[var(--primary)] flex justify-center items-center">
                   ALL
                 </div>
