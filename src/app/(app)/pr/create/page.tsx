@@ -72,12 +72,12 @@ export default function CreatePressRelease() {
   }, []);
 
   const handleSubmit = async () => {
-    const hardcodedCampaignId = "671ef7f20b8f4a0d6fcb47a9";
-    //if (!selectedCampaign) return alert("Select a campaign first");
-    if (!prContent) return alert("Press release content is required");
+    //const hardcodedCampaignId = "671ef7f20b8f4a0d6fcb47a9";
+    // if (!selectedCampaign) return alert("Select a campaign first");
+    // if (!prContent) return alert("Press release content is required");
 
     const formData = new FormData();
-    formData.append("campaign_id", hardcodedCampaignId);
+    formData.append("campaign_id", selectedCampaign ?? "");
     formData.append("pr_content", prContent);
 
     // Set default status to "Draft"
