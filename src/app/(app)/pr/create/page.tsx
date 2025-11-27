@@ -15,20 +15,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function CreatePressRelease() {
-  interface Campaign {
-    _id: string;
-    campaignName: string;
-    subjectLine: string;
-    senderId: string;
-    user_id: string;
-    audience: {
-      emailLists: string[];
-    };
-    status: string;
-    createdAt: string;
-  }
-
-  const router = useRouter();
   const suggestions = ["Show Preview", "Clear Content", "Upload Document"];
   const [activeTab, setActiveTab] = useState<number | null>(null);
   const [prContent, setPrContent] = useState("");
@@ -116,7 +102,7 @@ export default function CreatePressRelease() {
 
   return (
     <motion.main
-      className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6"
+      className="flex-1 overflow-y-auto   space-y-6"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}

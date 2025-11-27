@@ -290,7 +290,7 @@ export default function CampaignSettings() {
             size={"lg"}
             className="w-full"
             variant={"secondary"}
-            onClick={() => toast.success("Sent successfully!")}>
+            onClick={() => {toast.success("Sent successfully!"); redirect("/email-campaigns/dashboard")}}>
             Send Now
           </Button>
         </div>

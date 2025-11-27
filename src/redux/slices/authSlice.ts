@@ -157,16 +157,21 @@ const authSlice = createSlice({
         state.registration.message = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
-        // Clear previous user state
-        Object.assign(state, initialState);
-        
-        state.registration.status = 'succeeded';
-        state.registration.data = action.payload.data;
-        state.registration.message = action.payload.message;
-        if (action.payload.token) {
-          state.token = action.payload.token;
-          state.user = action.payload.data; // Set the user on successful registration
-        }
+        // Return a fresh state object instead of mutating a possibly read-only draft.
+        // This avoids "Cannot assign to read only property" errors that can occur
+        // when the persisted/re-hydrated state is frozen by persistence middleware.
+        const payload = action.payload || {} as any;
+        return {
+          ...initialState,
+          registration: {
+            status: 'succeeded',
+            error: null,
+            data: payload.data ?? null,
+            message: payload.message ?? null,
+          },
+          token: payload.token ?? null,
+          user: payload.data ?? null,
+        } as AuthState;
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.registration.status = 'failed';

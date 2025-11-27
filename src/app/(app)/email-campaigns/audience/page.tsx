@@ -36,7 +36,7 @@ const AudiencePage = () => {
     selectedRows.length === subscribers.length && subscribers.length > 0;
 
   return (
-    <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 flex flex-col">
+    <main className="flex-1 overflow-y-auto flex flex-col">
       <PageHeader title="Audience" backLink="/email-campaigns/dashboard" />
 
       <div className="bg-white rounded-lg shadow-md flex-1 flex flex-col">

@@ -2,18 +2,21 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { registerUser } from "@/redux/slices/authSlice";
+import { selectAuth } from '@/redux/selectors/authSelectors';
+import { registerUser, resetAuthState } from "@/redux/slices/authSlice";
 import { Lock, User, Eye, EyeOff, Link2, CircleUserRound, Phone } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { FormField } from "@/components/ui/FormField";
 import { toast } from "react-hot-toast";
 import AuthLayout from "@/components/ui/layout/AuthLayout";
+import ConnectWallet from "@/components/ui/ConnectWalletModal";
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [openConnectWalletModal, setOpenConnectWalletModal] = useState(false);
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -24,7 +27,17 @@ const SignUpPage = () => {
   });
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const registration = useAppSelector((state) => state.auth.registration);
+  const { registration } = useAppSelector(selectAuth);
+
+  // Reset any transient auth/registration state when entering the signup page
+  // This prevents stale 'loading' states from persisted Redux state on page reloads
+  React.useEffect(() => {
+    dispatch(resetAuthState());
+    return () => {
+      // Ensure transient registration state is cleared when leaving
+      dispatch(resetAuthState());
+    };
+  }, [dispatch]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -95,7 +108,7 @@ const SignUpPage = () => {
             Google
           </Button>
           <Button
-            onClick={() => redirect("/signup/connect-wallet")}
+            onClick={() => setOpenConnectWalletModal(true)}
             variant="secondary"
             className="flex items-center gap-2">
             <Link2 />
@@ -214,6 +227,12 @@ const SignUpPage = () => {
           </Link>
         </p>
       </Card>
+
+      <ConnectWallet
+      isOpen={openConnectWalletModal}
+      onClose={() => setOpenConnectWalletModal(false)}
+      mode="signup"
+      />
     </AuthLayout>
   );
 };
