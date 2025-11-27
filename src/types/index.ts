@@ -27,6 +27,7 @@ export interface EmailListDetails extends EmailList {
 }
 
 export interface Campaign {
+  _id: string | null | undefined;
   campaignName: string; // made required
   id: string;
   name: string;

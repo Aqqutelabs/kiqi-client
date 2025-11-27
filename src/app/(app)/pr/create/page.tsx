@@ -10,8 +10,8 @@ import Heading from "@/components/ui/TextHeading";
 import BASE_URL from "@/lib/utils/baseUrl";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { redirect } from "next/navigation";
 import { useState, useEffect } from "react";
+import { Campaign } from "@/types";
 import { useRouter } from "next/navigation";
 
 export default function CreatePressRelease() {
@@ -19,6 +19,7 @@ export default function CreatePressRelease() {
   const [activeTab, setActiveTab] = useState<number | null>(null);
   const [prContent, setPrContent] = useState("");
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const router = useRouter();
 
   const [loading, setLoading] = useState(false);
 
@@ -127,8 +128,8 @@ export default function CreatePressRelease() {
         >
           <option value=""></option>
           {Array.isArray(campaigns) &&
-            campaigns.map((campaign) => (
-              <option key={campaign._id} value={campaign._id}>
+            campaigns.map((campaign, idx) => (
+              <option key={campaign._id ?? idx} value={campaign._id ?? ""}>
                 {campaign.campaignName}
               </option>
             ))}
