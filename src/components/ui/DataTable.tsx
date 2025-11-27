@@ -1,7 +1,7 @@
-import React from 'react';
-import { MoreHorizontal, Eye } from 'lucide-react';
-import { Button } from './Button';
-import Link from 'next/link';
+import React from "react";
+import { MoreHorizontal, Eye } from "lucide-react";
+import { Button } from "./Button";
+import Link from "next/link";
 
 export interface Column<T> {
   header: string;
@@ -46,11 +46,19 @@ export function DataTable<T extends { id: string | number }>({
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200 rounded-b-xl">
-          {data.map((row) => (
-            <tr key={row.id} className="bg-white h-20">
-              {columns.map((col) => (
-                <td key={String(col.accessor)} className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                  {String(row[col.accessor])}
+          {data.map((row, rowIndex) => (
+            <tr key={row.id ?? rowIndex} className="bg-white h-20">
+              {columns.map((col, colIndex) => (
+                <td
+                  key={String(col.accessor) + colIndex}
+                  className="px-6 py-4 whitespace-nowrap text-sm text-gray-700"
+                >
+                  {
+                    row[col.accessor] !== undefined &&
+                    row[col.accessor] !== null
+                      ? String(row[col.accessor])
+                      : "—" 
+                  }
                 </td>
               ))}
               {(onEdit || onDelete || onView || extraActions) && (
@@ -65,12 +73,20 @@ export function DataTable<T extends { id: string | number }>({
                       </Link>
                     )}
                     {onEdit && (
-                      <Button variant="tertiary" size="sm" onClick={() => onEdit(row)}>
+                      <Button
+                        variant="tertiary"
+                        size="sm"
+                        onClick={() => onEdit(row)}
+                      >
                         Edit
                       </Button>
                     )}
                     {onDelete && (
-                      <Button variant="destructive" size="sm" onClick={() => onDelete(row)}>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => onDelete(row)}
+                      >
                         Delete
                       </Button>
                     )}

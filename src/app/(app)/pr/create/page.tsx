@@ -7,24 +7,120 @@ import { Select } from "@/components/ui/Select";
 import SimpleFileInput from "@/components/ui/SimpleFileInput";
 import { Textarea } from "@/components/ui/Textarea";
 import Heading from "@/components/ui/TextHeading";
+import BASE_URL from "@/lib/utils/baseUrl";
+import axios from "axios";
 import { motion } from "framer-motion";
 import { redirect } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function CreatePressRelease() {
-  const suggestions = [
-    "Show Preview",
-    "Clear Content",
-    "Upload Document",
-  ];
+  interface Campaign {
+    _id: string;
+    campaignName: string;
+    subjectLine: string;
+    senderId: string;
+    user_id: string;
+    audience: {
+      emailLists: string[];
+    };
+    status: string;
+    createdAt: string;
+  }
+
+  const router = useRouter();
+  const suggestions = ["Show Preview", "Clear Content", "Upload Document"];
   const [activeTab, setActiveTab] = useState<number | null>(null);
   const [prContent, setPrContent] = useState("");
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+
+  const [loading, setLoading] = useState(false);
+
+  const [selectedCampaign, setSelectedCampaign] = useState<string | null>(null);
+  const [image, setImage] = useState<File | null>(null);
+
+  const token =
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("persist:root") || "{}").auth
+        ? JSON.parse(
+            JSON.parse(localStorage.getItem("persist:root") || "{}").auth
+          ).token
+        : null
+      : null;
+
+  useEffect(() => {
+    const fetchCampaigns = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(`${BASE_URL}/api/v1/campaigns`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        console.log("Campaign response:", res.data);
+
+        setCampaigns(res.data.data);
+      } catch (err) {
+        console.error("Failed to fetch campaigns", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCampaigns();
+  }, []);
+
+  const handleSubmit = async () => {
+    const hardcodedCampaignId = "671ef7f20b8f4a0d6fcb47a9";
+    //if (!selectedCampaign) return alert("Select a campaign first");
+    if (!prContent) return alert("Press release content is required");
+
+    const formData = new FormData();
+    formData.append("campaign_id", hardcodedCampaignId);
+    formData.append("pr_content", prContent);
+
+    // Set default status to "Draft"
+    formData.append("status", "Draft");
+
+    if (image) {
+      formData.append("image", image);
+    }
+
+    try {
+      const res = await axios.post(
+        `${BASE_URL}/api/v1/press-releases/create`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      console.log("PR Created:", res.data);
+
+      router.push("/pr/create/publisher-platform");
+    } catch (error: any) {
+      console.error("Error creating PR:", error);
+      //alert("Error creating PR");
+      if (error.response) {
+        console.error("Backend response data:", error.response.data);
+        alert(`Error from server: ${JSON.stringify(error.response.data)}`);
+      } else {
+        alert(`Network or unknown error: ${error.message}`);
+      }
+    }
+  };
+
   return (
     <motion.main
       className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}>
+      transition={{ duration: 0.5 }}
+    >
       <PageHeader title="Create a Press Release" backLink="/pr/dashboard" />
       <Card>
         <Heading
@@ -33,27 +129,49 @@ export default function CreatePressRelease() {
           className="mb-2"
           sm
         />
+        {/* Select a Campaign */}
         <Select
           name="campaign-selection"
-          placeholder="Campaign A"
-          onChange={(e) => console.log(e.target.value)}>
-          <option value="a">Campaign A</option>
-          <option value="b">Campaign B</option>
+          placeholder="Select a campaign"
+          onChange={(e) => {
+            console.log("Selected campaign:", e.target.value);
+            setSelectedCampaign(e.target.value);
+          }}
+          disabled={loading}
+        >
+          <option value=""></option>
+          {Array.isArray(campaigns) &&
+            campaigns.map((campaign) => (
+              <option key={campaign._id} value={campaign._id}>
+                {campaign.campaignName}
+              </option>
+            ))}
+          {/* <option value="b">Campaign B</option>
           <option value="c">Campaign C</option>
-          <option value="d">Campaign D</option>
+          <option value="d">Campaign D</option> */}
         </Select>
       </Card>
+      {/* File Upload */}
       <Card>
         <Heading heading="Step 2" />
-        <SimpleFileInput id="content-upload" label="Content Upload" />
+        <SimpleFileInput
+          id="content-upload"
+          label="Content Upload"
+          onChange={(fileList) => setImage(fileList?.[0] ?? null)}
+        />
       </Card>
+      {/* Content */}
       <Card>
         <Heading
           heading="Upload Your Press Release Content"
           subtitle="Use the toolbar to format your text with bold, italic, headers, lists, and more."
           className="mb-4"
         />
-        <Textarea showToolbar value={prContent} onChange={(e) => setPrContent(e.target.value)} />
+        <Textarea
+          showToolbar
+          value={prContent}
+          onChange={(e) => setPrContent(e.target.value)}
+        />
         <div className="flex items-center gap-2 mt-4">
           {suggestions.map((suggestion, idx) => {
             const isActive = activeTab === idx;
@@ -65,7 +183,8 @@ export default function CreatePressRelease() {
                   isActive
                     ? "bg-gray-50 border-blue-300"
                     : "bg-transparent border-gray-300"
-                }`}>
+                }`}
+              >
                 {suggestion}
               </div>
             );
@@ -83,9 +202,7 @@ export default function CreatePressRelease() {
         </div>
       </Card>
       <div className="flex justify-end items-center">
-        <Button
-          size={"lg"}
-          onClick={() => redirect("/pr/create/publisher-platform")}>
+        <Button size="lg" onClick={handleSubmit}>
           Next
         </Button>
       </div>

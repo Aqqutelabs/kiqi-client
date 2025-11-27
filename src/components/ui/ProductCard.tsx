@@ -25,17 +25,23 @@ export interface Products {
 
 type ProductProps = {
   product: Products;
+  onAddToCart?: (product: Products) => void;
+  isAdded?: boolean;
 };
 
-export default function ProductCard({ product }: ProductProps) {
-  const { isAdded, handleAddToCart, setIsSidebarOpen, isSidebarOpen } =
-    useProducts();
+export default function ProductCard({
+  product,
+  onAddToCart,
+  isAdded,
+}: ProductProps) {
+  const { setIsSidebarOpen, isSidebarOpen } = useProducts();
 
   return (
     <>
       <div
         onClick={() => setIsSidebarOpen(true)}
-        className="w-full h-[540px] border border-[#E2E8F0] rounded-2xl">
+        className="w-full h-[540px] border border-[#E2E8F0] rounded-2xl"
+      >
         {/* header */}
         <div className="h-[140px] w-full rounded-t-2xl flex justify-center items-center border-b border-gray-200 relative">
           {product.productName}
@@ -95,7 +101,7 @@ export default function ProductCard({ product }: ProductProps) {
             {/* price, payment type */}
             <div className="space-y-1">
               <h1 className="font-bold text-[#233E97] text-3xl">
-                ₦{product.amount}
+                {product.amount}
               </h1>
               <p className="text-xs text-[#62748E] font-normal">
                 {product.paymentType}
@@ -106,14 +112,25 @@ export default function ProductCard({ product }: ProductProps) {
           {/* Action Buttons */}
           <div className="flex gap-3 w-full">
             {!isAdded && (
-             <Button onClick={() => setIsSidebarOpen(true)} size={"lg"} variant={"outline"} className="w-2/5">
+              <Button
+                onClick={() => setIsSidebarOpen(true)}
+                size={"lg"}
+                variant={"outline"}
+                className="w-2/5"
+              >
                 <Eye size={18} className="mr-2" />
                 <span className="font-medium whitespace-nowrap">View</span>
-             </Button>
+              </Button>
             )}
-            <Button onClick={handleAddToCart} size={"lg"} className={isAdded ? "w-full" : "w-3/5"}>
+            <Button
+              onClick={() => onAddToCart && onAddToCart(product)} // call only if provided
+              size="lg"
+              className={isAdded ? "w-full" : "w-3/5"}
+            >
               <ShoppingCart size={18} className="mr-2" />
-              <span className="whitespace-nowrap">{!isAdded ? "Add" : "Added"} to Cart</span>
+              <span className="whitespace-nowrap">
+                {!isAdded ? "Add" : "Added"} to Cart
+              </span>
             </Button>
           </div>
         </div>
