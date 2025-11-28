@@ -2,6 +2,7 @@
 import React, { useEffect } from "react";
 import Head from "next/head";
 import '../../kiki.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 export default function FeatureOne() {

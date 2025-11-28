@@ -4,6 +4,9 @@ import Head from "next/head";
 import Link from "next/link";
 import '../kiki.css';
 import { usePathname } from "next/navigation";
+import NavBar from '@/components/landing/navbar';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import LandingFooterSecond from '@/components/landing/landingfooter';
 
 
 export default function Home() {
@@ -11,7 +14,7 @@ export default function Home() {
     const pathname = usePathname();
 
     const [year, setYear] = useState(new Date().getFullYear())
-    const featureActive = pathname.startsWith("/feature");
+    pathname.startsWith("/feature");
 
     useEffect(() => {
         setYear(new Date().getFullYear());
@@ -23,90 +26,7 @@ export default function Home() {
                 <title>Kiki — Email Marketing Without the Headache</title>
             </Head>
 
-
-            <nav className="topbar navbar navbar-expand-lg navbar-light bg-white py-3">
-                <div className="container">
-                    <a className="navbar-brand d-flex align-items-center" href="#">
-                        <img src="/assets/img/logo.png" alt="" />
-                    </a>
-
-                    <button
-                        className="navbar-toggler"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#navbarNav"
-                    >
-                        <span className="navbar-toggler-icon" />
-                    </button>
-
-                    <div className="collapse navbar-collapse" id="navbarNav">
-                        <ul className="navbar-nav mx-auto">
-                            <li className="nav-item">
-                                <a className="nav-link active" href="#">
-                                    Home
-                                </a>
-                            </li>
-
-                            <li className="nav-item dropdown">
-                                <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                    Feature
-                                </a>
-                                <ul className="dropdown-menu">
-                                    <li>
-                                        <a className="dropdown-item" href="#">
-                                            Feature 1
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a className="dropdown-item" href="#">
-                                            Feature 2
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a className="dropdown-item" href="#">
-                                            Feature 3
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-
-                            <li className="nav-item dropdown">
-                                <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                    Services
-                                </a>
-                                <ul className="dropdown-menu">
-                                    <li>
-                                        <a className="dropdown-item" href="#">
-                                            Service 1
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a className="dropdown-item" href="#">
-                                            Service 2
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a className="dropdown-item" href="#">
-                                            Service 3
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-
-                            <li className="nav-item">
-                                <a className="nav-link" href="#">
-                                    Pricing
-                                </a>
-                            </li>
-                        </ul>
-
-                        <div className="d-flex">
-                            <button className="btn btn-sign-in">Sign In</button>
-                            <button className="btn btn-get-started">Get Started</button>
-                        </div>
-                    </div>
-                </div>
-            </nav>
+            <NavBar/>
 
             <section className="py-4 py-lg-5">
                 <div className="container-xxl">
@@ -788,7 +708,7 @@ export default function Home() {
                                 <div className="step-card">
                                     <span className="step-badge">Step 3</span>
                                     <div className="step-screen shadow-sm">
-                                        <div className="ratio ratio-16x9 rounded overflow-hidden bg-body-tertiary mt-4">
+                                        <div className="bg-body-tertiary mt-4">
                                             <img src="/assets/img/step3.png" alt="" className="img-contain" />
                                         </div>
                                     </div>
@@ -873,76 +793,13 @@ export default function Home() {
                                         </div>
                                     </div>
                                 </div>
-                            </div>{/* /accordion */}
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
             {/* FAQ ends here */}
-
-
-            <footer className="footer-dark pt-5 pb-4">
-                <div className="container-xxl">
-                    <div className="row gy-5 align-items-start">
-                        <div className="col-lg-6">
-                            <div className="d-flex align-items-center mb-3">
-                                <img src="/assets/img/kiki.png" alt="KiKi logo" className="rounded-circle me-2" style={{ width: 44, height: 44, objectFit: 'cover' }} />
-                                <span className="h4 m-0 fw-bold text-white">KiKi</span>
-                            </div>
-
-                            <p className="text-white mb-4" style={{ maxWidth: 640 }}>
-                                KiKi is the email marketing platform built for founders, beginners, and busy owners.
-                                Launch campaigns in minutes, track only what matters, and grow without the overwhelm.
-                                Simple, smart, and secure — the way email should be.
-                            </p>
-
-                            <h6 className="text-white mb-3">Stay Up To Date</h6>
-
-                            <form className="subscribe-wrap" action="#" method="post" noValidate>
-                                <div className="input-group subscribe-group">
-                                    <input type="email" className="form-control subscribe-input" placeholder="Enter Your Email"
-                                        aria-label="Email address" />
-                                    <button className="btn btn-subscribe" type="submit">Subscribe</button>
-                                </div>
-                            </form>
-                        </div>
-
-                        {/* Nav */}
-                        <div className="col-lg-6">
-                            <ul className="nav justify-content-lg-end footer-nav">
-                                <li className="nav-item"><a className="nav-link active" href="#">Home</a></li>
-                                <li className="nav-item"><a className="nav-link" href="#">Feature</a></li>
-                                <li className="nav-item"><a className="nav-link" href="#">Services</a></li>
-                                <li className="nav-item"><a className="nav-link" href="#">Pricing</a></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <hr className="footer-divider my-4" />
-
-                    {/* Bottom bar */}
-                    <div className="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
-                        <div className="text-white small">
-                            <span className="me-2">KiKi</span>
-                            <i className="bi bi-c-circle me-1"></i>
-                            <span id="year">{year}</span> All rights reserved.
-                            <div className="mt-1">
-                                <a href="#" className="link-muted me-3">Privacy Policy</a>
-                                <a href="#" className="link-muted">Terms of Service</a>
-                            </div>
-                        </div>
-
-                        <ul className="list-unstyled d-flex align-items-center gap-2 m-0">
-                            <li><a className="social" href="#" aria-label="Snapchat"><i className="bi bi-snapchat"></i></a></li>
-                            <li><a className="social" href="#" aria-label="Instagram"><i className="bi bi-instagram"></i></a></li>
-                            <li><a className="social" href="#" aria-label="LinkedIn"><i className="bi bi-linkedin"></i></a></li>
-                            <li><a className="social" href="#" aria-label="YouTube"><i className="bi bi-youtube"></i></a></li>
-                            <li><a className="social" href="#" aria-label="Facebook"><i className="bi bi-facebook"></i></a></li>
-                            <li><a className="social" href="#" aria-label="WhatsApp"><i className="bi bi-whatsapp"></i></a></li>
-                        </ul>
-                    </div>
-                </div>
-            </footer>
+            <LandingFooterSecond/>
         </>
     )
 }

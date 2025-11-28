@@ -1,6 +1,3 @@
-@import "bootstrap/dist/css/bootstrap.min.css";
-@import "bootstrap-icons/font/bootstrap-icons.css";
-
 /* ========== Design tokens========== */
 :root {
     --ink: #0f172a;
@@ -31,9 +28,6 @@
     --tst-accent: #0ea5e9;
     --tst-card: #e9f8fc;
     --tst-muted: #58636b;
-}
-.collapse{
-    visibility: initial !important;
 }
 
 @font-face {
@@ -190,7 +184,6 @@ body {
     font-size: 60px;
     font-weight: 900;
     color: #fff;
-    font-family: "Plus Jakarta Sans";
 }
 
 .marketing-main.light {
@@ -215,6 +208,12 @@ body {
 .hero .lead {
     color: rgba(255, 255, 255, 0.85);
 }
+
+
+.dark-hero {
+    background: #012132 !important;
+}
+
 
 .hero-art {
     position: relative;
@@ -275,6 +274,8 @@ body {
     color: var(--ink);
     border-radius: 14px;
     padding: 10px;
+    width: 40%;
+    height: 20%;
     box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.08);
     display: flex;
     flex-direction: column;
@@ -971,11 +972,13 @@ body {
   color:var(--ink, #0f172a);
   background: linear-gradient(100deg, #eef4ff 0%, #eaf1ff 40%, #d7e6ff 70%, #cfe0ff 100%);
 } */
-
+.collapse{
+    visibility:initial !important
+}
 .pr-blend {
     position: relative;
     overflow: hidden;
-    background-image: url("/assets/img/campaign_pr.png");
+    background-image: url(/assets/img/campaign_pr.png);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -1001,6 +1004,10 @@ body {
     display: block;
     width: 100%;
     height: auto;
+}
+
+.accordion-button:not(.collapsed):after{
+    background: none !important;
 }
 
 /* Blue arc layers (subtle rings) */
@@ -1574,19 +1581,16 @@ body {
     color: #1f5ee6;
 }
 
+.faq-plain .accordion-button:not(.collapsed)::after {
+    content: "–";
+    color: #1f5ee6;
+}
+
 .faq-plain .accordion-body {
     padding: 0.5rem 0 1rem 0;
     color: #6b7280;
 }
 
-.accordion-button:not(.collapsed):after{
-    display: none;
-}
-
-.accordion-button{
-    border: none !important;
-    padding: 10px 20px !important;
-}
 /* FAQ ends here */
 
 /* Responsive tweaks */
@@ -2389,6 +2393,7 @@ body {
         inset 0 -4px 12px rgba(0, 0, 0, 0.07);
     text-decoration: none;
     transition: transform 0.12s ease, box-shadow 0.12s ease;
+    border: none;
 }
 
 .prms-cta:hover {
@@ -2793,6 +2798,15 @@ body {
     padding: 10px 0;
 }
 
+.vis-panel.blend {
+    background: #041527;
+}
+
+.vis-panel.seo {
+    background: #d5e595;
+    color: #000 !important;
+}
+
 /* Layout grid */
 .vis-row {
     display: grid;
@@ -2835,6 +2849,10 @@ body {
     margin-bottom: 22px;
     font-size: 1rem;
     line-height: 1.55;
+}
+
+.vis-lead li {
+    list-style: none !important;
 }
 
 /* Buttons */
@@ -3075,7 +3093,6 @@ body {
     display: inline-block;
     transform: translateY(-1px);
 }
-
 
 /* ==== Email Marketing ======= */
 .page-wrap {
@@ -3600,7 +3617,8 @@ h2.section-title {
     display: flex;
     justify-content: flex-end;
 }
-.mc-banner-right img{
+
+.mc-banner-right img {
     height: 300px;
     width: 100%;
     object-fit: contain;
@@ -3647,6 +3665,7 @@ h2.section-title {
     padding: 12px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
 }
+
 /* Responsive tweaks */
 @media (max-width: 991px) {
     .mc-banner {
@@ -3658,4 +3677,333 @@ h2.section-title {
         width: 100%;
         justify-content: flex-start;
     }
+}
+
+/* the solution section CSS */
+.thesoln-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6rem 1rem;
+    background: radial-gradient(1200px 500px at 10% 30%, rgba(226, 240, 255, 0.9), transparent 10%),
+        linear-gradient(180deg, #f6fbff 0%, #eef6ff 100%);
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    overflow: hidden;
+}
+
+.thesoln-card-wrap {
+    width: 980px;
+    max-width: calc(100% - 48px);
+    text-align: center;
+    position: relative;
+}
+
+.thesoln-pill {
+    display: inline-block;
+    padding: 6px 18px;
+    border-radius: 999px;
+    background: #ffffff;
+    color: #323232;
+    font-size: 13px;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.03);
+    margin-bottom: 18px;
+}
+
+.thesoln-title {
+    font-weight: 700;
+    font-size: 40px;
+    color: #0f1724;
+    line-height: 1.05;
+    margin-bottom: 6px;
+}
+
+.thesoln-title .thesoln-highlight {
+    color: #00a8ff;
+}
+
+.thesoln-grid {
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 18px;
+}
+
+.thesoln-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 22px;
+    text-align: left;
+    box-shadow: 0 10px 30px rgba(21, 48, 91, 0.06);
+    border: 1px solid rgba(16, 24, 40, 0.04);
+    gap: 16px;
+    min-height: 140px;
+}
+
+.thesoln-card--large {
+    grid-column: 1 / -1;
+    min-height: 160px;
+    display: flex;
+    align-items: center;
+}
+
+.thesoln-icon {
+    place-items: center;
+    border-radius: 14px;
+}
+
+.thesoln-icon img {
+    height: 100px;
+    margin-bottom: 30px;
+}
+
+.thesoln-card-title {
+    font-weight: 700;
+    font-size: 18px;
+    margin: 0 0 6px 0;
+    color: #0087d9;
+}
+
+.thesoln-card-text {
+    margin: 0;
+    color: #415164;
+    font-size: 14px;
+}
+
+.thesoln-cta {
+    margin-top: 28px;
+    display: flex;
+    justify-content: center;
+}
+
+.thesoln-btn {
+    background: linear-gradient(90deg, #1ea0ff, #0077d9);
+    color: #fff;
+    padding: 14px 42px;
+    border-radius: 10px;
+    box-shadow: 0 18px 40px rgba(4, 89, 173, 0.18);
+    border: none;
+    font-weight: 600;
+    font-size: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.thesoln-envelope {
+    position: absolute;
+    left: -120px;
+    top: 30%;
+    width: 62px;
+    transform: rotate(-12deg);
+    opacity: 0.95;
+}
+
+.thesoln-booking {
+    position: absolute;
+    right: -15%;
+    top: 40%;
+    width: 100px;
+    opacity: 0.95;
+}
+
+@media (max-width: 900px) {
+    .thesoln-title {
+        font-size: 28px;
+    }
+
+    .thesoln-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .thesoln-card--large {
+        grid-column: 1 / -1;
+    }
+
+    .thesoln-icon {
+        width: 60px;
+        height: 60px;
+        flex-basis: 60px;
+    }
+}
+
+/* how it works */
+
+.howit-heading {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    font-weight: 700;
+}
+
+.howit-highlight {
+    color: #255aab;
+}
+
+.step-card {
+    background: linear-gradient(180deg, #eef6ff 0%, #f7fbff 100%);
+    border-radius: 18px;
+    padding: 28px;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    box-shadow: 0 10px 30px rgba(15, 37, 78, 0.06);
+}
+
+.step-badge {
+    background-color: #255aab;
+    color: #ffffff;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 6px 20px rgba(31, 92, 255, 0.12);
+}
+
+.step-image {
+    border-radius: 14px;
+    width: 100%;
+    height: 180px;
+    margin-top: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: visible;
+}
+
+.inner-ui {
+    width: 86%;
+    height: 68%;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    color: #21325b;
+}
+
+.inner-ui img {
+    height: 200px;
+    object-fit: contain;
+}
+
+.stepped-title {
+    font-weight: 700;
+    margin-top: 16px;
+    font-size: 1.02rem;
+}
+
+.stepped-desc {
+    color: #6b7280;
+    margin-top: 6px;
+    text-align: center;
+    font-size: 0.95rem;
+}
+
+.success-percent {
+    font-weight: 700;
+    color: #255aab;
+}
+
+/* responsiveness tweaks */
+@media (max-width: 767px) {
+    .step-card {
+        min-height: 260px;
+        padding: 20px;
+    }
+
+    .howit-heading {
+        font-size: 1.4rem;
+    }
+}
+
+.bg-primary2 {
+    background: #eef5fd;
+}
+
+/* why choose kiki SEO */
+.kiki-hero {
+    background: linear-gradient(180deg, #06223a 0%, #0b5fa1 100%);
+    padding: 60px 20;
+    color: #fff;
+}
+
+.newpanel-bg {
+    background: rgba(45, 83, 107, 0.621);
+    border-radius: 10px;
+}
+
+.kiki-panel2 {
+    border-radius: 12px;
+    padding: 30px;
+}
+
+.kiki-feature {
+    background: #ffffff;
+    color: #0b2740;
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 6px 18px rgba(3, 12, 30, 0.12);
+}
+
+.kiki-icon {
+    height: 40px;
+    width: 40px;
+    background: black;
+    border-radius: 50%;
+    padding: 5px;
+}
+
+.kiki-image-card {
+    border-radius: 12px;
+    position: relative;
+    overflow: visible;
+}
+
+.kiki-person {
+    width: 100%;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.kiki-testimonial {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 22px;
+    color: #06223a;
+    min-height: 150px;
+    box-shadow: 0 12px 34px rgba(3, 12, 30, 0.08);
+    margin: 12px;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.kiki-author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.kiki-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #29a3d9;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
 }
