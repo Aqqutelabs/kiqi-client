@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
-import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { selectAuth } from '@/redux/selectors/authSelectors';
+import { useSelector } from "react-redux";
+import { useAppDispatch } from '@/redux/hooks';
 import { resetAuthState } from '@/redux/slices/authSlice';
 
 import { Eye, EyeOff, LockKeyhole, CircleUserRound, Link2 } from "lucide-react";
@@ -14,8 +13,10 @@ import { Card } from "@/components/ui/Card";
 import { FormField } from "@/components/ui/FormField";
 import AuthLayout from "@/components/ui/layout/AuthLayout";
 import { loginUser } from "@/redux/slices/authSlice";
-import { AppDispatch, RootState } from "@/redux/store";
+import { RootState } from "@/redux/store";
 import ConnectWallet from "@/components/ui/ConnectWalletModal";
+import { toast } from "react-hot-toast";
+import { useAutoLogout } from '@/hooks/useAutoLogout';
 
 // Assuming Google and Metamask have their own logo components or are SVGs
 const GoogleIcon = () => (
@@ -31,8 +32,22 @@ const LoginPage = () => {
   const router = useRouter();
   const { status, error } = useSelector((state: RootState) => state.auth);
   const [openConnectWalletModal, setOpenConnectWalletModal] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  
+  // Use the auto logout hook
+  const { setupAutoLogout, clearAutoLogout } = useAutoLogout();
 
-  // const { status, error } = useAppSelector(selectAuth);
+  // Remove the old conditional logic and replace with useEffect
+  useEffect(() => {
+    if (!rememberMe) {
+      localStorage.setItem("rememberMe", "false");
+      toast.success("You will be logged out automatically after 10 minutes for security reasons. Check the box to prevent this next time.");
+    } else {
+      localStorage.removeItem("rememberMe");
+      // Clear any existing auto-logout timer when rememberMe is checked
+      clearAutoLogout();
+    }
+  }, [rememberMe, clearAutoLogout]);
 
   // Reset auth error/status on mount to avoid showing stale errors
   React.useEffect(() => {
@@ -46,11 +61,22 @@ const LoginPage = () => {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const credentials = { email, password };
+    
     dispatch(loginUser(credentials)).then((result) => {
       if (loginUser.fulfilled.match(result)) {
+        // Setup auto logout after successful login
+        setupAutoLogout(rememberMe);
         router.push("/dashboard");
       }
     });
+  };
+
+  const handleRememberMeChange = (checked: boolean) => {
+    setRememberMe(checked);
+    if (checked) {
+      // Clear auto-logout timer immediately when user checks remember me
+      clearAutoLogout();
+    }
   };
 
   return (
@@ -115,8 +141,10 @@ const LoginPage = () => {
               <input
                 type="checkbox"
                 className="h-4 w-4 rounded border-gray-300 text-[var(--primary)] focus:ring-[#3366FF]"
+                checked={rememberMe}
+                onChange={(e) => handleRememberMeChange(e.target.checked)}
               />
-              <span className="ml-2 text-gray-600">Remember Me</span>
+              <span className="ml-2 text-gray-600">Keep me logged in</span>
             </label>
             <Link
               href="/reset-password"
