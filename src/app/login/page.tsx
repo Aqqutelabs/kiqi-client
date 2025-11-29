@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 import { useAppDispatch } from '@/redux/hooks';
 import { resetAuthState } from '@/redux/slices/authSlice';
 
-import { Eye, EyeOff, LockKeyhole, CircleUserRound, Link2 } from "lucide-react";
+import { Eye, EyeOff, LockKeyhole, CircleUserRound, Link2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { FormField } from "@/components/ui/FormField";
@@ -18,16 +18,14 @@ import ConnectWallet from "@/components/ui/ConnectWalletModal";
 import { toast } from "react-hot-toast";
 import { useAutoLogout } from '@/hooks/useAutoLogout';
 
-// Assuming Google and Metamask have their own logo components or are SVGs
 const GoogleIcon = () => (
   <img src="/devicon_google.svg" alt="Google" className="h-5 w-5" />
-);
-const MetamaskIcon = () => (
-  <img src="/wallet/metamask-fox.svg" alt="Metamask" className="h-5 w-5" />
 );
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { status, error } = useSelector((state: RootState) => state.auth);
@@ -37,66 +35,110 @@ const LoginPage = () => {
   // Use the auto logout hook
   const { setupAutoLogout, clearAutoLogout } = useAutoLogout();
 
-  // Remove the old conditional logic and replace with useEffect
+  // Initialize rememberMe from localStorage on component mount
   useEffect(() => {
+    const savedRememberMe = localStorage.getItem("rememberMe");
+    console.log('Loaded rememberMe from localStorage:', savedRememberMe);
+    setRememberMe(savedRememberMe === "true");
+  }, []);
+
+  // Handle remember me changes
+  useEffect(() => {
+    console.log('Remember me changed to:', rememberMe);
+    localStorage.setItem("rememberMe", rememberMe.toString());
+    
     if (!rememberMe) {
-      localStorage.setItem("rememberMe", "false");
-      toast.success("You will be logged out automatically after 10 minutes for security reasons. Check the box to prevent this next time.");
+      // Only show toast if this is an explicit user action (not initial load)
+      const initialLoad = localStorage.getItem('initialAuthLoad') !== 'true';
+      if (initialLoad) {
+        toast.success("You will be logged out automatically after 10 minutes for security reasons. Check the box to prevent this.");
+        localStorage.setItem('initialAuthLoad', 'true');
+      }
     } else {
-      localStorage.removeItem("rememberMe");
-      // Clear any existing auto-logout timer when rememberMe is checked
+      // Clear auto-logout timer when remember me is checked
       clearAutoLogout();
+      toast.success("You will stay logged in until you manually log out.");
     }
   }, [rememberMe, clearAutoLogout]);
 
-  // Reset auth error/status on mount to avoid showing stale errors
-  React.useEffect(() => {
-    // clear any stale auth UI state on mount
+  // Reset auth error/status on mount
+  useEffect(() => {
     dispatch(resetAuthState());
   }, [dispatch]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget as HTMLFormElement);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
+    
+    if (!email || !password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
     const credentials = { email, password };
     
-    dispatch(loginUser(credentials)).then((result) => {
+    try {
+      const result = await dispatch(loginUser(credentials));
       if (loginUser.fulfilled.match(result)) {
+        console.log('Login successful, setting up auto logout with rememberMe:', rememberMe);
+        
         // Setup auto logout after successful login
         setupAutoLogout(rememberMe);
+        
+        toast.success("Login successful!");
         router.push("/dashboard");
+      } else if (loginUser.rejected.match(result)) {
+        toast.error(result.payload as string || "Login failed");
       }
-    });
-  };
-
-  const handleRememberMeChange = (checked: boolean) => {
-    setRememberMe(checked);
-    if (checked) {
-      // Clear auto-logout timer immediately when user checks remember me
-      clearAutoLogout();
+    } catch (error) {
+      toast.error("An unexpected error occurred");
     }
   };
 
+  const handleGoogleLogin = () => {
+    toast.loading("Google login would redirect to OAuth in production");
+    setTimeout(() => {
+      toast.success("This would redirect to Google OAuth in a real application");
+    }, 1000);
+  };
+
+  const handleRememberMeChange = (checked: boolean) => {
+    console.log('User changed remember me to:', checked);
+    setRememberMe(checked);
+  };
+
+  const isLoading = status === "loading";
+
   return (
     <AuthLayout>
-      <Card className="w-[600px]">
+      <Card className="w-full max-w-[600px] mx-4">
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800">Login to KiKi</h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
           <Button
-            variant="primary"
-            className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50">
-            <GoogleIcon /> <span className="ml-2">Google</span>
+            type="button"
+            onClick={handleGoogleLogin}
+            variant="outline"
+            className="flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <GoogleIcon />
+            )}
+            <span>Google</span>
           </Button>
+          
           <Button
+            type="button"
             onClick={() => setOpenConnectWalletModal(true)}
-            variant="secondary"
-            className="flex items-center gap-2">
-            <Link2 />
+            variant="outline"
+            className="flex items-center justify-center gap-2"
+            disabled={isLoading}
+          >
+            <Link2 className="h-4 w-4" />
             Log in using Wallet
           </Button>
         </div>
@@ -113,9 +155,12 @@ const LoginPage = () => {
             id="email"
             name="email"
             type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter Email Address"
             icon={<CircleUserRound className="text-gray-400" size={18} />}
             required
+            disabled={isLoading}
           />
 
           <div className="relative">
@@ -124,42 +169,63 @@ const LoginPage = () => {
               id="password"
               name="password"
               type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter Password"
               icon={<LockKeyhole className="text-gray-400" size={18} />}
               required
+              disabled={isLoading}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-10 text-gray-400">
+              className="absolute right-3 top-10 text-gray-400 hover:text-gray-600 transition-colors"
+              disabled={isLoading}
+            >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
 
           <div className="flex items-center justify-between text-sm">
-            <label className="flex items-center">
+            <label className="flex items-center cursor-pointer">
               <input
                 type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 text-[var(--primary)] focus:ring-[#3366FF]"
+                className="h-4 w-4 rounded border-gray-300 text-[var(--primary)] focus:ring-[#3366FF] focus:ring-2 transition-colors"
                 checked={rememberMe}
                 onChange={(e) => handleRememberMeChange(e.target.checked)}
+                disabled={isLoading}
               />
               <span className="ml-2 text-gray-600">Keep me logged in</span>
             </label>
             <Link
               href="/reset-password"
-              className="font-medium text-[var(--primary)] hover:underline">
+              className="font-medium text-[var(--primary)] hover:underline transition-colors"
+              onClick={(e) => isLoading && e.preventDefault()}
+            >
               Forgot Password?
             </Link>
           </div>
 
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && (
+            <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md border border-red-200">
+              {error}
+            </div>
+          )}
 
           <Button
             type="submit"
-            className="w-full"
-            disabled={status === "loading"}>
-            {status === "loading" ? "Logging in..." : "Log In"}
+            className="w-full flex items-center justify-center gap-2"
+            disabled={isLoading}
+            variant={isLoading ? "secondary" : "primary"}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Logging in...
+              </>
+            ) : (
+              "Log In"
+            )}
           </Button>
         </form>
 
@@ -167,14 +233,17 @@ const LoginPage = () => {
           Do not have an account?{" "}
           <Link
             href="/signup"
-            className="font-medium text-[var(--primary)] hover:underline">
+            className="font-medium text-[var(--primary)] hover:underline transition-colors"
+            onClick={(e) => isLoading && e.preventDefault()}
+          >
             Sign Up
           </Link>
         </p>
       </Card>
+      
       <ConnectWallet
         isOpen={openConnectWalletModal}
-        onClose={() => setOpenConnectWalletModal(false)}
+        onClose={() => !isLoading && setOpenConnectWalletModal(false)}
         mode="login"
       />
     </AuthLayout>

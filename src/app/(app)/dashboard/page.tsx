@@ -177,7 +177,7 @@ const DashboardOverviewPage = () => {
           {recentActivities.map((activity, idx) => (
             <div key={idx} className="flex flex-col md:flex-row justify-between items-end md:items-center md:h-[72px] border-b border-[#F0F1F7] py-4 px-3 md:px-6">
               <div className="flex items-center gap-3">
-                <input type="radio" checked className="size-6 rounded border border-[#0450B5] accent-[#0450B5] hidden md:block" /> 
+                <input type="radio" checked readOnly className="size-6 rounded border border-[#0450B5] accent-[#0450B5] hidden md:block" /> 
                 <div className="space-y-1.5">
                   <p className="font-medium text-sm text-[#101928]">{activity.title}</p>
                   <span className="block text-xs font-medium text-[#344054]">{activity.description}</span>
