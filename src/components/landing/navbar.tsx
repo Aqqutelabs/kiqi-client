@@ -27,22 +27,22 @@ export default function NavBar() {
                         </li>
 
                         <li className="nav-item dropdown">
-                            <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <a className="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
                                 Feature
                             </a>
                             <ul className="dropdown-menu">
                                 <li>
-                                    <a className="dropdown-item" href="#">
+                                    <a className="dropdown-item" href="/featured/one">
                                         Feature 1
                                     </a>
                                 </li>
                                 <li>
-                                    <a className="dropdown-item" href="#">
+                                    <a className="dropdown-item" href="/featured/two">
                                         Feature 2
                                     </a>
                                 </li>
                                 <li>
-                                    <a className="dropdown-item" href="#">
+                                    <a className="dropdown-item" href="/featured/three">
                                         Feature 3
                                     </a>
                                 </li>

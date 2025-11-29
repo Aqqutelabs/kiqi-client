@@ -1006,6 +1006,10 @@ body {
     height: auto;
 }
 
+.bg-blogs{
+    background: #eef5fd;
+}
+
 .accordion-button:not(.collapsed):after{
     background: none !important;
 }
