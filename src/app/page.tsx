@@ -9,7 +9,7 @@ import FAQ from "@/components/landing/faq";
 import LandingFooter from "@/components/landing/footer";
 import TestimonialCarousel from "@/components/landing/testimonial-carousel";
 import BlogCarousel from "@/components/landing/blog-carousel";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 type ButtonProps = {
@@ -131,6 +131,53 @@ export default function Home() {
     },
   ];
 
+  const [currentYear, setCurrentYear] = useState(2024);
+  const [isYearly, setIsYearly] = useState(false);
+
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear());
+
+    // Handle scroll buttons
+    const scrollers = Array.from(document.querySelectorAll("[data-scroller]"));
+    const listeners: Array<{ btn: Element; handler: EventListener }> = [];
+
+    scrollers.forEach((scroller) => {
+      const buttons = Array.from(scroller.querySelectorAll(".scroll-btn"));
+      const scrollContainer = scroller.querySelector(
+        ".blog-scroller, .t-scroller"
+      );
+
+      buttons.forEach((btn) => {
+        const handler: EventListener = () => {
+          const dir = btn.getAttribute("data-dir");
+          const scrollAmount = 300;
+          if (scrollContainer) {
+            (scrollContainer as Element).scrollBy({
+              left: dir === "next" ? scrollAmount : -scrollAmount,
+              behavior: "smooth",
+            } as ScrollToOptions);
+          }
+        };
+        btn.addEventListener("click", handler);
+        listeners.push({ btn, handler });
+      });
+    });
+
+    // Show yearly savings message
+    const yearlyRadio = document.getElementById(
+      "bill-yearly"
+    ) as HTMLInputElement;
+    const savingsMsg = document.querySelector(".pricing-save");
+
+    if (yearlyRadio) {
+      yearlyRadio.addEventListener("change", () => {
+        if (savingsMsg) {
+          savingsMsg.classList.toggle("d-none", !yearlyRadio.checked);
+        }
+      });
+    }
+  }, []);
+
   return (
     <>
       <section className="px-4 md:px-10 py-5 space-y-6">
@@ -160,9 +207,7 @@ export default function Home() {
             <Link href="/login" className="text-sm text-white cursor-pointer">
               Sign In
             </Link>
-            <Link
-              href="/signup"
-              className="text-sm text-white cursor-pointer">
+            <Link href="/signup" className="text-sm text-white cursor-pointer">
               Sign up
             </Link>
           </div>
@@ -181,12 +226,12 @@ export default function Home() {
 
             <h1 className="font-bold text-[28px] md:text-[52px]">
               Email Marketing <br className="hidden md:block" />
-               Without the Hassle
+              Without the Hassle
             </h1>
             <p className="text-base md:text-xl font-light my-12">
               Launch Campaigns, grow subcribers
               <br className="hidden md:block" />
-             and drive sales - without learning "Email Marketing"
+              and drive sales - without learning "Email Marketing"
             </p>
 
             <div className="flex flex-col md:flex-row gap-4 md:gap-5 items-center w-full md:w-[360px]">
@@ -196,7 +241,7 @@ export default function Home() {
                 link="/waitlist"
                 icon={<GoArrowUp />}
               />
-              
+
               <Button content="Watch Demo" variant="secondary" link="" />
             </div>
 

@@ -31,24 +31,6 @@ export default function RootLayout({
 }: {
     children: React.ReactNode;
 }) {
-<<<<<<< HEAD
-  return (
-    <html lang="en">
-      <body className={inter.className}>
-        <SidebarProvider>
-          <ProductsProvider>
-              <ReduxProvider>
-                <WalletProvider>
-                  <ToasterClient />
-                  {children}
-                </WalletProvider>
-              </ReduxProvider>
-          </ProductsProvider>
-        </SidebarProvider>
-      </body>
-    </html>
-  );
-=======
     return (
         <html lang="en" className={jakarta.variable}>
             <head>
@@ -76,7 +58,7 @@ export default function RootLayout({
                                 <JQueryClient />
                                 <script
                                     src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"
-                                />                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+                                />
                                 {children}
                             </WalletProvider>
                         </ReduxProvider>
@@ -85,5 +67,4 @@ export default function RootLayout({
             </body>
         </html>
     );
->>>>>>> b44164ce52a3feaea574fb103a4ee3e7f69f695d
 }

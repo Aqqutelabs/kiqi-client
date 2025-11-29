@@ -442,7 +442,7 @@ export default function EmailCampaignDashboard() {
               <Filter value="" onChange={() => {}} />
               <Button
                 className="w-full"
-                onClick={() => redirect("/email-campaigns/ai")}
+                onClick={() => redirect("/email-campaigns/ai/generate-email")}
               > 
                 <Plus size={18} className="mr-1" />
                 Create Campaign

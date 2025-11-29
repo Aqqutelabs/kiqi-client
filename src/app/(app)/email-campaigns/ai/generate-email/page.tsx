@@ -234,7 +234,7 @@ export default function AIGeneratedEmail() {
     try {
       localStorage.setItem("kiqi_campaign_draft", JSON.stringify(draft));
       toast.success("Draft saved. Opening Settings...");
-      router.push("/settings");
+      router.push("/email-campaigns/settings");
     } catch (e) {
       toast.error("Failed to save draft");
     }
