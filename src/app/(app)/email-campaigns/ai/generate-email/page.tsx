@@ -5,19 +5,12 @@ import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import Heading from "@/components/ui/TextHeading";
 import {
-  Atom,
-  Copy,
-  FolderInput,
-  Share2,
   Sparkles,
   ArrowRight,
-  ThumbsDown,
-  ThumbsUp,
   X,
   SendHorizontal,
+  Plus,
 } from "lucide-react";
-// Note: We are simulating the look of AIPromptBar using standard inputs 
-// to ensure your logic (context, tone, sendMessage) continues to work.
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-hot-toast";
@@ -27,12 +20,26 @@ import BASE_URL from "@/lib/utils/baseUrl";
 import { RichTextToolbar } from "@/components/ui/RichTextToolbar";
 import { useRouter } from "next/navigation";
 import { FormField } from "@/components/ui/FormField";
-import { Select } from "@/components/ui/Select";
+import Avatar from "@/components/ui/Avatar";
+import { useAppSelector } from "@/redux/hooks";
 
 export default function AIGeneratedEmail() {
   const editorRef = React.useRef<HTMLDivElement>(null);
   const kikiPanelRef = React.useRef<HTMLDivElement>(null);
   const [activeFormats, setActiveFormats] = React.useState<string[]>([]);
+
+  // for user avatar and name
+   const user = useAppSelector((state) => state.auth.user);
+    const displayName = user
+      ? "firstName" in user &&
+        "lastName" in user &&
+        user.firstName &&
+        user.lastName
+        ? `${user.firstName} ${user.lastName}`
+        : "name" in user && user.name
+        ? user.name
+        : "User"
+      : "User";
 
   // Update active formats for toolbar highlighting
   const updateActiveFormats = () => {
@@ -48,17 +55,16 @@ export default function AIGeneratedEmail() {
   // Redux token
   const authToken = useSelector((state: any) => state.auth?.token ?? null);
 
-  // Chat state
+  // Chat state with session tracking
   const [chat, setChat] = React.useState<Array<{ role: "user" | "ai"; message: string; time: string; raw?: any }>>([]);
+  const [chatSessionId, setChatSessionId] = React.useState<string>(() => Date.now().toString());
 
   // Input fields
   const [context, setContext] = React.useState("");
-  const [tone, setTone] = React.useState("Professional");
   const [subjectLine, setSubjectLine] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [applied, setApplied] = React.useState(false);
-  const [continueThread, setContinueThread] = React.useState(false);
 
   // Main panel content (for Apply Changes) - single editable string
   const [mainPanelContent, setMainPanelContent] = React.useState<string>("");
@@ -79,6 +85,15 @@ export default function AIGeneratedEmail() {
     } catch (e) {
       return null;
     }
+  };
+
+  // Start a new chat session
+  const startNewChat = () => {
+    setChat([]);
+    setChatSessionId(Date.now().toString());
+    setMainPanelContent("");
+    setContext("");
+    toast.success("New chat started");
   };
 
   // Send message to AI
@@ -103,8 +118,16 @@ export default function AIGeneratedEmail() {
         ? { headers: { Authorization: `Bearer ${cleanToken}` } }
         : {};
       
-      const payload: any = { context, tone };
-      if (continueThread) payload.continueThread = true;
+      // Only continue thread if we have previous messages in this session
+      const shouldContinueThread = chat.filter(msg => msg.role === "user").length > 0;
+      
+      const payload: any = { 
+        context, 
+        tone: "Professional",
+        continueThread: shouldContinueThread,
+        sessionId: chatSessionId // Send session ID to maintain context properly
+      };
+      
       const resp = await apiClient.post(`${BASE_URL}/api/v1/ai-email/generate-email`, payload, headers);
 
       // Helper: normalize response data into plain text
@@ -113,9 +136,20 @@ export default function AIGeneratedEmail() {
         let content = d.content ?? d;
         if (typeof content === "string") {
           const trimmed = content.trim();
-          if ((trimmed.startsWith("{") && trimmed.endsWith("}")) || (trimmed.startsWith("[") && trimmed.endsWith("]"))) {
+          
+          // Filter out continuation markers and redundant greetings
+          const filteredContent = trimmed
+            .replace(/---\s*Reply\s*continued\s*---/gi, '')
+            .replace(/---\s*Continued\s*---/gi, '')
+            .replace(/_{3,}.*?_{3,}/g, '')
+            .replace(/^(hi there|hello|hey)[\s\S]*?---\s*Reply\s*continued\s*---/gi, '')
+            .replace(/^(hi there|hello|hey)[,.\s]*/gi, '')
+            .replace(/\b(?:previously|earlier|before|as mentioned)\b.*?\./gi, '') // Remove references to previous context
+            .trim();
+
+          if ((filteredContent.startsWith("{") && filteredContent.endsWith("}")) || (filteredContent.startsWith("[") && filteredContent.endsWith("]"))) {
             try {
-              const parsed = JSON.parse(trimmed);
+              const parsed = JSON.parse(filteredContent);
               if (parsed && typeof parsed === "object") {
                 if (parsed.subject || parsed.body) {
                   return `${parsed.subject ? parsed.subject + "\n\n" : ""}${parsed.body ?? ""}`.trim();
@@ -124,7 +158,7 @@ export default function AIGeneratedEmail() {
               }
             } catch (e) { }
           }
-          return content;
+          return filteredContent;
         }
         if (typeof content === "object") {
           if (content.subject || content.body) {
@@ -171,41 +205,21 @@ export default function AIGeneratedEmail() {
     try {
       const el = kikiPanelRef.current;
       if (!el) return;
-      // scroll to bottom smoothly
       el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
     } catch (e) {
       // ignore
     }
   }, [chat, loading]);
 
-  // Pulse/animate apply button when a new AI message arrives
-  const [animateApply, setAnimateApply] = React.useState(false);
-  React.useEffect(() => {
-    if (!chat || chat.length === 0) return;
-    const last = chat[chat.length - 1];
-    if (last.role === 'ai') {
-      setAnimateApply(true);
-      const t = setTimeout(() => setAnimateApply(false), 2000);
-      return () => clearTimeout(t);
+  // Auto-apply the latest AI response to the main email editor
+  useEffect(() => {
+    if (chat.length === 0) return;
+    
+    const lastMessage = chat[chat.length - 1];
+    if (lastMessage.role === 'ai') {
+      setMainPanelContent(lastMessage.message);
     }
-    return;
   }, [chat]);
-
-  // Apply changes to main panel
-  const handleApplyChanges = () => {
-    const aiMsgs = chat.filter((msg) => msg.role === "ai");
-    if (aiMsgs.length === 0) {
-      toast.error("No AI messages to apply");
-      return;
-    }
-    const last = aiMsgs[aiMsgs.length - 1].message;
-    // Update React-controlled content (avoids direct DOM writes)
-    setMainPanelContent(last);
-
-    setApplied(true);
-    toast.success("Message applied to main panel!");
-    setTimeout(() => setApplied(false), 2000);
-  };
 
   // Apply a specific AI message by index
   const handleApplyMessage = (idx: number) => {
@@ -217,21 +231,6 @@ export default function AIGeneratedEmail() {
     setMainPanelContent(msg.message);
     setApplied(true);
     toast.success('AI message applied to main panel');
-    setTimeout(() => setApplied(false), 1500);
-  };
-
-  // Apply latest AI message to main editor (used by button next to Send)
-  const handleApplyLatest = () => {
-    const aiMsgs = chat.filter((msg) => msg.role === 'ai');
-    if (aiMsgs.length === 0) {
-      toast.error('No AI messages to apply');
-      return;
-    }
-    const last = aiMsgs[aiMsgs.length - 1].message;
-    // Update React-controlled content (no direct DOM writes)
-    setMainPanelContent(last);
-    setApplied(true);
-    toast.success('Latest AI message applied to main panel');
     setTimeout(() => setApplied(false), 1500);
   };
 
@@ -250,7 +249,7 @@ export default function AIGeneratedEmail() {
     try {
       localStorage.setItem("kiqi_campaign_draft", JSON.stringify(draft));
       toast.success("Draft saved. Opening Settings...");
-      router.push("/settings");
+      router.push("/email-campaigns/settings");
     } catch (e) {
       toast.error("Failed to save draft");
     }
@@ -264,9 +263,9 @@ export default function AIGeneratedEmail() {
   };
 
   return (
-    <section className="space-y-4">
+    <section className="space-y-4 h-screen flex flex-col">
       {/* heading */}
-      <Card>
+      <Card className="flex-shrink-0">
         <PageHeader title="AI Generated Email" backLink="/email-campaigns/ai" />
 
         {/* subject line */}
@@ -281,10 +280,12 @@ export default function AIGeneratedEmail() {
       </Card>
 
       {/* cards */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 h-screen">
-        {/* generated email */}
-        <Card className="col-span-3">
-          <Heading heading="Generated Email" />
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 flex-1 min-h-0">
+        {/* generated email - Fixed height card */}
+        <Card className="col-span-3 flex flex-col h-full">
+          <div className="flex-shrink-0">
+            <Heading heading="Generated Email" />
+          </div>
 
           {/* Format Toolbar */}
           <RichTextToolbar
@@ -293,58 +294,17 @@ export default function AIGeneratedEmail() {
             onUpdateFormats={updateActiveFormats}
           />
 
-          {/* tools and actions - Visual only from reference, logic wired where applicable */}
-          {/* <div className="flex justify-between items-center my-5">
-            <ul className="flex items-center gap-6 text-sm text-[#606062]">
-              <li className="cursor-pointer hover:text-gray-800">
-                <Share2 size={15} className="mr-2 inline-block" />
-                <span>Share</span>
-              </li>
-              <li className="cursor-pointer hover:text-gray-800">
-                <FolderInput size={15} className="mr-2 inline-block" />
-                <span>Export</span>
-              </li>
-              <li className="cursor-pointer hover:text-gray-800" onClick={handleApplyChanges}>
-                <Atom size={15} className="mr-2 inline-block" />
-                <span>{applied ? "Applied" : "Apply Latest"}</span>
-              </li>
-            </ul>
-            <div className="flex items-center gap-6">
-              <ThumbsUp
-                size={15}
-                color="#606062"
-                className="cursor-pointer hover:text-[var(--primary)]"
-              />
-              <ThumbsDown
-                size={15}
-                color="#606062"
-                className="cursor-pointer hover:text-[var(--primary)]"
-              />
-              <Copy
-                size={15}
-                color="#606062"
-                className="cursor-pointer hover:text-[var(--primary)]"
-                onClick={() => {
-                   const text = editorRef.current?.innerText || "";
-                   if(text) { navigator.clipboard.writeText(text); toast.success("Copied!"); }
-                }}
-              />
-            </div>
-          </div> */}
-
-          {/* email body - Replaced Textarea with ContentEditable to match reference UI */}
+          {/* email body */}
           <div
             ref={editorRef}
             contentEditable
             onInput={handleEditorInput}
             onFocus={updateActiveFormats}
             onClick={updateActiveFormats}
-            className="space-y-5 text-[#1B223C] text-base my-5 focus:outline-none min-h-[300px]"
+            className="space-y-5 text-[#1B223C] text-base my-5 focus:outline-none flex-1 overflow-y-auto min-h-0 max-h-[400px] scrollbar-hide"
             tabIndex={0}
             suppressContentEditableWarning={true}
           >
-            {/* Render the React-controlled content. We avoid setting innerHTML with raw HTML
-                to keep things simple — replace newlines with <br/> for visual line breaks. */}
             {mainPanelContent ? (
               <div className="whitespace-pre-wrap">{mainPanelContent}</div>
             ) : (
@@ -352,42 +312,42 @@ export default function AIGeneratedEmail() {
             )}
           </div>
 
-          <Button
-            size={"lg"}
-            onClick={sendToSettings}
-          >
-            Send Email
-          </Button>
-
-          {/* email footer customization */}
-          <div className="space-y-1 w-full mt-20">
-            <label className="text-[#1B223C] text-sm">
-              Email Footer Customization
-            </label>
-            <Select
-              placeholder="Default branded footer"
-              className="bg-transparent mt-2 h-14"
+          {/* Fixed Send Email button at bottom */}
+          <div className="flex-shrink-0 pt-4">
+            <Button
+              size={"lg"}
+              onClick={sendToSettings}
+              className="w-full"
             >
-              <option>Default branded footer</option>
-            </Select>
+              Send Email
+            </Button>
           </div>
         </Card>
 
-        {/* kiki ai */}
-        <Card className="col-span-2 flex flex-col justify-between">
-          {/* heading and close button */}
-          <div className="flex justify-between items-center">
+        {/* kiki ai - Fixed height card */}
+        <Card className="col-span-2 flex flex-col h-full min-h-0">
+          {/* heading and new chat button */}
+          <div className="flex justify-between items-center flex-shrink-0 mb-5">
             <div className="flex gap-3 items-center">
               <Sparkles color="#1B223C" size={20} />
               <Heading heading="KiKi Ai" />
             </div>
-            <button className="flex justify-center items-center border border-[#E2E8F0] h-10.5 w-[50px] py-2.5 px-3.5 rounded-xl cursor-pointer">
-              <X size={20} color="gray" />
-            </button>
+            <div className="flex gap-2">
+              <button 
+                onClick={startNewChat}
+                className="flex justify-center items-center border border-[#E2E8F0] h-10.5 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors"
+                title="Start new chat"
+              >
+                <Plus size={16} color="gray" />
+              </button>
+              <button className="flex justify-center items-center border border-[#E2E8F0] h-10.5 py-2.5 px-3.5 rounded-xl cursor-pointer">
+                <X size={20} color="gray" />
+              </button>
+            </div>
           </div>
 
           {/* Chat Messages Area */}
-          <div ref={kikiPanelRef} className="space-y-5 overflow-y-auto flex-1 pr-2">
+          <div ref={kikiPanelRef} className="space-y-5 overflow-y-auto scrollbar-hide flex-1 pr-2 min-h-0 max-h-[500px]">
             <AnimatePresence>
                 {chat.length > 0 ? (
                    chat.map((msg, idx) => (
@@ -398,14 +358,10 @@ export default function AIGeneratedEmail() {
                     className="flex gap-3 items-start"
                   >
                     {msg.role === "user" ? (
-                      <img
-                        src="https://res.cloudinary.com/dygn4o3nv/image/upload/v1750431090/diego-hernandez-MSepzbKFz10-unsplash_zmv8um.jpg"
-                        alt="You"
-                        className="w-8 h-8 object-cover rounded-full mt-2"
-                        />
+                     <Avatar name={displayName} />
                     ) : (
-                      <div className="flex justify-center items-center bg-[var(--primary)] p-2 rounded-full min-w-8 h-8 mt-2">
-                        <Sparkles size={15} color="white" />
+                      <div className="flex justify-center items-center bg-white p-2 rounded-full min-w-8 h-8 mt-2">
+                        <img src="/favicon.svg" alt="Icon" className="size-11 object-cover" />
                       </div>
                     )}
 
@@ -424,23 +380,13 @@ export default function AIGeneratedEmail() {
                       )}
 
                       {msg.role === 'ai' && (
-                        <>
-                          {/* Overlay apply icon (top-right) */}
-                          <button
-                            onClick={() => handleApplyMessage(idx)}
-                            title="Apply this AI message"
-                            className="absolute right-2 top-2 p-2 rounded-full shadow-md bg-gradient-to-tr from-[#1E3A8A] to-[#233E97] text-white hover:scale-105"
-                          >
-                            <ArrowRight size={14} />
-                          </button>
-
-                          {/* Bottom apply button (end of response) */}
-                          {/* <div className="flex justify-end mt-2">
-                            <Button size="sm" onClick={() => handleApplyMessage(idx)} className="bg-[#233E97] text-white px-3 py-1.5 rounded-md hover:opacity-95">
-                              Apply
-                            </Button>
-                          </div> */}
-                        </>
+                        <button
+                          onClick={() => handleApplyMessage(idx)}
+                          title="Apply this AI message"
+                          className="absolute right-2 top-2 p-2 rounded-full shadow-md bg-gradient-to-tr from-[#1E3A8A] to-[#233E97] text-white hover:scale-105"
+                        >
+                          <ArrowRight size={14} />
+                        </button>
                       )}
                     </div>
                   </motion.div>
@@ -452,8 +398,8 @@ export default function AIGeneratedEmail() {
             
             {loading && (
                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-2 items-start">
-                    <div className="flex justify-center items-center bg-[var(--primary)] p-2 rounded-full min-w-8 h-8">
-                        <Sparkles size={15} color="white" />
+                    <div className="flex justify-center items-center bg-white p-2 rounded-full min-w-8 h-8">
+                        <img src="/favicon.svg" alt="Icon" className="size-11" />
                     </div>
                     <div className="mt-2 px-2.5 bg-[#F3F6F8] rounded-full p-2">
                         <div className="flex gap-1">
@@ -470,36 +416,10 @@ export default function AIGeneratedEmail() {
             )}
           </div>
 
-          {/* Prompt Bar Area - integrated tone/thread controls inside input box */}
-          <div className="mt-auto pt-2 bg-white">
+          {/* Prompt Bar Area */}
+          <div className="mt-auto pt-2 bg-white flex-shrink-0">
             <div className="relative w-full">
               <div className="bg-[#F3F6F8] rounded-xl p-3">
-                <div className="flex items-center justify-between gap-3 mb-2">
-                  <div className="flex items-center gap-2">
-                    <select
-                      value={tone}
-                      onChange={(e) => setTone(e.target.value)}
-                      className="text-xs border-none bg-transparent rounded-md px-2 py-1 outline-none text-gray-600 cursor-pointer"
-                    >
-                      <option value="Professional">Professional</option>
-                      <option value="Friendly">Friendly</option>
-                      <option value="Urgent">Urgent</option>
-                      <option value="Persuasive">Persuasive</option>
-                    </select>
-
-                    <label className="flex items-center gap-2 text-xs text-gray-600">
-                      <input
-                        id="continueThread"
-                        type="checkbox"
-                        checked={continueThread}
-                        onChange={(e) => setContinueThread(e.target.checked)}
-                        className="accent-[var(--primary)] w-4 h-4"
-                      />
-                      <span>Continue thread</span>
-                    </label>
-                  </div>
-                </div>
-
                 <div className="relative">
                   <textarea
                     value={context}
@@ -511,23 +431,8 @@ export default function AIGeneratedEmail() {
                       }
                     }}
                     placeholder="Describe the changes you want..."
-                    className="w-full bg-transparent rounded-md resize-none min-h-[72px] pr-20 pl-3 py-2 outline-none text-sm text-[#1B223C] placeholder:text-gray-400"
+                    className="w-full bg-transparent rounded-md resize-none min-h-[72px] pr-20 pl-3 py-2 outline-none text-sm text-[#1B223C] placeholder:text-gray-400 scrollbar-hide"
                   />
-
-                  {/* Apply latest generated content into main panel (icon button) */}
-                  {/* <button
-                    onClick={handleApplyLatest}
-                    type="button"
-                    title="Apply latest AI message to main panel"
-                    disabled={chat.filter((m) => m.role === 'ai').length === 0}
-                    className={`absolute right-12 bottom-3 p-2 rounded-full transition-all shadow-sm flex items-center justify-center ${
-                      chat.filter((m) => m.role === 'ai').length === 0
-                        ? 'bg-gray-100 text-gray-400 pointer-events-none'
-                        : 'bg-gradient-to-tr from-[#1E3A8A] to-[#233E97] text-white hover:scale-105'
-                    } ${animateApply ? 'animate-pulse' : ''}`}
-                  >
-                    <ArrowRight size={16} />
-                  </button> */}
 
                   <button
                     onClick={sendMessage}

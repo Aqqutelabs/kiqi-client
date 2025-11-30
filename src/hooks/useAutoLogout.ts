@@ -1,39 +1,60 @@
-// hooks/useAutoLogout.js
-import { useEffect, useRef } from 'react';
+// hooks/useAutoLogout.ts
+import { useEffect, useRef, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { logout } from '@/redux/slices/authSlice';
 import { toast } from 'react-hot-toast';
 
 export const useAutoLogout = () => {
   const dispatch = useDispatch();
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const setupAutoLogout = (rememberMe: boolean) => {
-    // Clear existing timer
+  const clearAutoLogout = useCallback(() => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
+      timerRef.current = null;
     }
+  }, []);
 
-    // Set new timer only if rememberMe is false
+  const setupAutoLogout = useCallback((rememberMe: boolean) => {
+    // Always clear existing timer first
+    clearAutoLogout();
+
+    console.log('Setting up auto logout. Remember me:', rememberMe);
+
+    // Only set timer if rememberMe is false
     if (!rememberMe) {
+      const timeoutDuration = 10 * 60 * 1000; // 10 minutes
+      
       timerRef.current = setTimeout(() => {
-        localStorage.setItem("rememberMe", "false");
+        console.log('Auto logout triggered');
+        
+        // Clear any stored auth data
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('user_email');
+        localStorage.setItem('rememberMe', 'false');
+        
+        // Dispatch logout action
         dispatch(logout());
-        toast("You have been automatically logged out for security reasons. Click the checkbox to prevent this next time.");
-      }, 10 * 60 * 1000); // 10 minutes
+        
+        // Show toast notification
+        toast.success('You have been automatically logged out after 10 minutes for security reasons. Check "Keep me logged in" to prevent this next time.');
+        
+        // Redirect to login page
+        if (typeof window !== 'undefined') {
+          window.location.href = '/login';
+        }
+      }, timeoutDuration);
+    } else {
+      console.log('Auto logout disabled - remember me is checked');
     }
-  };
-
-  const clearAutoLogout = () => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-    }
-  };
+  }, [dispatch, clearAutoLogout]);
 
   // Clean up on unmount
   useEffect(() => {
-    return clearAutoLogout;
-  }, []);
+    return () => {
+      clearAutoLogout();
+    };
+  }, [clearAutoLogout]);
 
   return { setupAutoLogout, clearAutoLogout };
 };
