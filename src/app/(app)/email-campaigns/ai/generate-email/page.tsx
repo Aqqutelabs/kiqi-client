@@ -20,11 +20,26 @@ import BASE_URL from "@/lib/utils/baseUrl";
 import { RichTextToolbar } from "@/components/ui/RichTextToolbar";
 import { useRouter } from "next/navigation";
 import { FormField } from "@/components/ui/FormField";
+import Avatar from "@/components/ui/Avatar";
+import { useAppSelector } from "@/redux/hooks";
 
 export default function AIGeneratedEmail() {
   const editorRef = React.useRef<HTMLDivElement>(null);
   const kikiPanelRef = React.useRef<HTMLDivElement>(null);
   const [activeFormats, setActiveFormats] = React.useState<string[]>([]);
+
+  // for user avatar and name
+   const user = useAppSelector((state) => state.auth.user);
+    const displayName = user
+      ? "firstName" in user &&
+        "lastName" in user &&
+        user.firstName &&
+        user.lastName
+        ? `${user.firstName} ${user.lastName}`
+        : "name" in user && user.name
+        ? user.name
+        : "User"
+      : "User";
 
   // Update active formats for toolbar highlighting
   const updateActiveFormats = () => {
@@ -343,11 +358,7 @@ export default function AIGeneratedEmail() {
                     className="flex gap-3 items-start"
                   >
                     {msg.role === "user" ? (
-                      <img
-                        src="https://res.cloudinary.com/dygn4o3nv/image/upload/v1750431090/diego-hernandez-MSepzbKFz10-unsplash_zmv8um.jpg"
-                        alt="You"
-                        className="w-8 h-8 object-cover rounded-full mt-2"
-                        />
+                     <Avatar name={displayName} />
                     ) : (
                       <div className="flex justify-center items-center bg-white p-2 rounded-full min-w-8 h-8 mt-2">
                         <img src="/favicon.svg" alt="Icon" className="size-11 object-cover" />
