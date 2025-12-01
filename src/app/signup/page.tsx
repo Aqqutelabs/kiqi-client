@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
@@ -29,6 +29,66 @@ const SignUpPage = () => {
   const router = useRouter();
   const { registration } = useAppSelector(selectAuth);
 
+  // Handle Google OAuth callback when page loads
+  useEffect(() => {
+    const handleGoogleCallback = async () => {
+      // Check if we're coming back from Google OAuth
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      const error = urlParams.get('error');
+      const state = urlParams.get('state');
+
+      if (code) {
+        try {
+          toast.loading("Completing Google sign up...");
+          
+          // Get the mode from localStorage
+          const oauthMode = localStorage.getItem('oauthMode') || 'signup';
+          
+          // Send the authorization code to your backend
+          const response = await fetch('/api/v1/auth/google', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+              code, 
+              state,
+              mode: oauthMode // Tell backend if this is for signup
+            }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            toast.success("Google sign up successful!");
+            
+            // Save the token
+            if (data.token) {
+              localStorage.setItem('authToken', data.token);
+            }
+            
+            // Clear OAuth state from localStorage
+            localStorage.removeItem('oauthState');
+            localStorage.removeItem('oauthMode');
+            
+            // Redirect to dashboard
+            router.push("/dashboard");
+          } else {
+            toast.error(data.message || "Google sign up failed");
+          }
+        } catch (err) {
+          console.error('Google callback error:', err);
+          toast.error("Failed to complete Google sign up");
+        }
+      } else if (error) {
+        toast.error(`Google sign up error: ${error}`);
+      }
+    };
+
+    handleGoogleCallback();
+  }, [router]);
+
   // Reset any transient auth/registration state when entering the signup page
   // This prevents stale 'loading' states from persisted Redux state on page reloads
   React.useEffect(() => {
@@ -38,6 +98,38 @@ const SignUpPage = () => {
       dispatch(resetAuthState());
     };
   }, [dispatch]);
+
+  // Function to handle Google OAuth for signup
+  const handleGoogleSignUp = () => {
+    // Your Google OAuth configuration
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "154495277350-l34s69kvqvoimk0kjj8ae1vsvbg74hgg.apps.googleusercontent.com";
+    const redirectUri = process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI || "https://gokiki.app";
+    
+    // Store mode in localStorage to identify this as a signup flow
+    localStorage.setItem('oauthMode', 'signup');
+    
+    // Generate a random state for security
+    const state = Math.random().toString(36).substring(7);
+    localStorage.setItem('oauthState', state);
+    
+    // Construct Google OAuth URL
+    const googleAuthUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+    
+    // Add parameters
+    googleAuthUrl.searchParams.append('client_id', clientId);
+    googleAuthUrl.searchParams.append('redirect_uri', redirectUri);
+    googleAuthUrl.searchParams.append('response_type', 'code');
+    googleAuthUrl.searchParams.append('scope', 'email profile');
+    googleAuthUrl.searchParams.append('state', state);
+    googleAuthUrl.searchParams.append('access_type', 'offline');
+    googleAuthUrl.searchParams.append('prompt', 'consent select_account'); // select_account shows account selection
+    
+    // Redirect to Google
+    window.location.href = googleAuthUrl.toString();
+    
+    // Show loading toast
+    toast.loading("Redirecting to Google...");
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -102,15 +194,20 @@ const SignUpPage = () => {
         
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Button
+            type="button"
+            onClick={handleGoogleSignUp}
             variant="primary"
-            className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+            className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+            disabled={registration.status === "loading"}>
             <img src="/devicon_google.svg" alt="Google" className="h-5 w-5" />
             Google
           </Button>
           <Button
+            type="button"
             onClick={() => setOpenConnectWalletModal(true)}
             variant="secondary"
-            className="flex items-center gap-2">
+            className="flex items-center gap-2"
+            disabled={registration.status === "loading"}>
             <Link2 />
             Connect Wallet
           </Button>
@@ -133,6 +230,7 @@ const SignUpPage = () => {
               value={form.firstName}
               onChange={handleChange}
               required
+              disabled={registration.status === "loading"}
             />
             <FormField
               label="Last Name"
@@ -143,6 +241,7 @@ const SignUpPage = () => {
               value={form.lastName}
               onChange={handleChange}
               required
+              disabled={registration.status === "loading"}
             />
           </div>
           
@@ -156,6 +255,7 @@ const SignUpPage = () => {
             value={form.email}
             onChange={handleChange}
             required
+            disabled={registration.status === "loading"}
           />
           
           <FormField
@@ -168,6 +268,7 @@ const SignUpPage = () => {
             value={form.phoneNumber}
             onChange={handleChange}
             required
+            disabled={registration.status === "loading"}
           />
           
           <FormField
@@ -179,6 +280,7 @@ const SignUpPage = () => {
             value={form.orgName}
             onChange={handleChange}
             required
+            disabled={registration.status === "loading"}
           />
           
           <div className="relative">
@@ -192,11 +294,13 @@ const SignUpPage = () => {
               value={form.password}
               onChange={handleChange}
               required
+              disabled={registration.status === "loading"}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-10 text-gray-400 hover:text-gray-600">
+              className="absolute right-3 top-10 text-gray-400 hover:text-gray-600"
+              disabled={registration.status === "loading"}>
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
             <p className="text-xs text-gray-500 mt-1">

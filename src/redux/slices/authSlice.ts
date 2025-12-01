@@ -180,6 +180,44 @@ const authSlice = createSlice({
   },
 });
 
+// redux/slices/authSlice.ts (add this to your existing slice)
+export const web3Login = createAsyncThunk(
+  'auth/web3Login',
+  async (walletData: {
+    publicKey: string;
+    signature: string;
+    message: string;
+    timestamp: number;
+    nonce: string;
+  }, { rejectWithValue }) => {
+    try {
+      const response = await fetch('/api/auth/wallet-login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(walletData),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Wallet authentication failed');
+      }
+
+      const data = await response.json();
+      
+      // Store token in localStorage
+      if (data.token) {
+        localStorage.setItem('authToken', data.token);
+      }
+      
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Wallet authentication failed');
+    }
+  }
+);
+
 export const { logout, resetAuthState } = authSlice.actions;
 
 export default authSlice.reducer;
