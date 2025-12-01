@@ -401,7 +401,7 @@ export default function EmailCampaignDashboard() {
       <Card>
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <Heading heading="Campaigns" />
+            <Heading heading="Messages" />
             
             {/* Refresh Button and Total Count */}
             <div className="flex items-center gap-4">

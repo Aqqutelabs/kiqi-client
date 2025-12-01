@@ -19,6 +19,50 @@ import toast from "react-hot-toast";
 export default function CampaignSettings() {
   const [successModal, setSuccessModal] = useState(false);
   const [advancedSettings, setAdvancedSettings] = useState(false);
+  const [scheduleLater, setScheduleLater] = useState(false);
+
+  const [data, setData] = useState({
+    campaignName: "",
+    senderEmail: "",
+    audience: "",
+    excludeLists: {
+      unsubscribed: false,
+      bounced: false,
+      inactive: false,
+    },
+    recipientEmail: "",
+    resendSettings: {
+      resendUnopened: false,
+      dontResend: false,
+    },
+    waitTime: "",
+    fallbackSubjectLine: "",
+    useAltText: false,
+    sendOnce: false,
+    dailySendLimit: "",
+    batchSending: "",
+    includeUnsubscribedLink: false,
+    includePermissionReminder: false,
+    permissionReminder: "",
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.currentTarget;
+    const type = (e.currentTarget as HTMLInputElement).type;
+    const checked = (e.currentTarget as HTMLInputElement).checked;
+
+    if (type === "checkbox") {
+      setData((prevData) => ({
+        ...prevData,
+        [name]: checked,
+      }));
+    } else {
+      setData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
+  };
 
   return (
     <Card>
@@ -26,7 +70,7 @@ export default function CampaignSettings() {
         title="Campaign settings"
         backLink="/email-campaigns/ai/generate-email"
       />
-      <div className="border border-[#E2E8F0] rounded-2xl py-8">
+      <div className="border border-[#E2E8F0] rounded-2xl py-8 mb-6">
         {/* header */}
         <div className="border-b border-[#E2E8F0] h-16 py-6 px-8">
           <Heading heading="Campaign Info" />
@@ -35,30 +79,27 @@ export default function CampaignSettings() {
         {/* rest of component */}
         <div className="px-8 py-4 space-y-5">
           {/* campaign name */}
-          <div className="space-y-1 w-full">
-            <label className="text-[#1B223C] text-sm">Campaign Name</label>
-            <Select
-              placeholder="Select campaign name"
-              className="bg-[#00000014]">
-              <option value="">Campaign 1</option>
-            </Select>
-          </div>
+          <FormField
+            id="campaignName"
+            label="Campaign Name"
+            placeholder="Select campaign name"
+            className="bg-[#00000014]"
+            value={data.campaignName}
+            onChange={handleChange}
+          />
           {/* divider */}
           <hr className="text-gray-200" />
-
-          {/* sender name */}
-          <FormField
-            label="From (Sender Name)"
-            id="senderName"
-            placeholder="Enter the name of the Sender or the name of your Business or Organization"
-          />
+          
           {/* sender email dropdown */}
           <div className="flex items-end gap-4">
             <div className="space-y-1 w-full">
               <label className="text-[#1B223C] text-sm">Sender Email</label>
               <Select
                 placeholder="Select sender email"
-                className="bg-[#00000014]">
+                className="bg-[#00000014]"
+                value={data.senderEmail}
+                onChange={handleChange}
+                >
                 <option value="">Email 1</option>
               </Select>
             </div>
@@ -67,17 +108,6 @@ export default function CampaignSettings() {
               onClick={() => redirect("/email-campaigns/create-sender")}>
               Register new sender email
             </Button>
-          </div>
-
-          {/* reply to email */}
-          <div className="space-y-4">
-            <label className="text-[#1B223C] text-sm">Reply-to Email</label>
-            <Checkbox
-              name="no-reply"
-              label="No Reply"
-              isChecked={false}
-              onChange={() => {}}
-            />
           </div>
 
           {/* divider */}
@@ -89,7 +119,10 @@ export default function CampaignSettings() {
               <label className="text-[#1B223C] text-sm">Audience</label>
               <Select
                 placeholder="Select from email list"
-                className="bg-[#00000014]">
+                className="bg-[#00000014]"
+                value={data.audience}
+                onChange={handleChange}
+                >
                 <option>Newsletter Subscribers</option>
               </Select>
             </div>
@@ -126,20 +159,44 @@ export default function CampaignSettings() {
                     <Checkbox
                       name="unsubscribed"
                       label="Unsubscribed"
-                      isChecked={false}
-                      onChange={() => {}}
+                      isChecked={data.excludeLists.unsubscribed}
+                      onChange={(checked) =>
+                        setData((prevData) => ({
+                          ...prevData,
+                          excludeLists: {
+                            ...prevData.excludeLists,
+                            unsubscribed: checked,
+                          },
+                        }))
+                      }
                     />
                     <Checkbox
                       name="bounced"
                       label="Bounced"
-                      isChecked={false}
-                      onChange={() => {}}
+                      isChecked={data.excludeLists.bounced}
+                      onChange={(checked) =>
+                        setData((prevData) => ({
+                          ...prevData,
+                          excludeLists: {
+                            ...prevData.excludeLists,
+                            bounced: checked,
+                          },
+                        }))
+                      }
                     />
                     <Checkbox
                       name="inactive"
                       label="Inactive"
-                      isChecked={false}
-                      onChange={() => {}}
+                      isChecked={data.excludeLists.inactive}
+                      onChange={(checked) =>
+                        setData((prevData) => ({
+                          ...prevData,
+                          excludeLists: {
+                            ...prevData.excludeLists,
+                            inactive: checked,
+                          },
+                        }))
+                      }
                     />
                   </div>
                 </div>
@@ -148,6 +205,8 @@ export default function CampaignSettings() {
                 <FormField
                   label="Recipient Email Address (Optional)"
                   id="recipientEmail"
+                  value={data.recipientEmail}
+                  onChange={handleChange}
                   placeholder="Enter the name of the Sender or the name of your Business or Organization"
                 />
 
@@ -163,14 +222,30 @@ export default function CampaignSettings() {
                     <Checkbox
                       name="resend-unopened"
                       label="Resend to unopened emails"
-                      isChecked={false}
-                      onChange={() => {}}
+                      isChecked={data.resendSettings.resendUnopened}
+                      onChange={(checked) =>
+                        setData((prevData) => ({
+                          ...prevData,
+                          resendSettings: {
+                            ...prevData.resendSettings,
+                            resendUnopened: checked,
+                          },
+                        }))
+                      }
                     />
                     <Checkbox
                       name="dont-resend"
                       label="Don't resend"
-                      isChecked={false}
-                      onChange={() => {}}
+                      isChecked={data.resendSettings.dontResend}
+                      onChange={(checked) =>
+                        setData((prevData) => ({
+                          ...prevData,
+                          resendSettings: {
+                            ...prevData.resendSettings,
+                            dontResend: checked,
+                          },
+                        }))
+                      }
                     />
                   </div>
                 </div>
@@ -180,6 +255,8 @@ export default function CampaignSettings() {
                   label="Wait Time"
                   id="waitTime"
                   placeholder="E.g 2 days"
+                  value={data.waitTime}
+                  onChange={handleChange}
                 />
 
                 {/* divider */}
@@ -192,6 +269,8 @@ export default function CampaignSettings() {
                     label="Alternative Text"
                     id="fallbackSubjectLine"
                     placeholder="Enter a fallback subject line"
+                    value={data.fallbackSubjectLine}
+                    onChange={handleChange}
                   />
                   <div className="flex gap-4 items-center mt-4 w-fit flex-row-reverse">
                     <p className="text-sm">
@@ -216,6 +295,8 @@ export default function CampaignSettings() {
                   label="Daily Send Limit (Max)"
                   id="dailySendLimit"
                   placeholder="5000 emails per day"
+                  value={data.dailySendLimit}
+                  onChange={handleChange}
                 />
 
                 {/* batch sending */}
@@ -223,6 +304,8 @@ export default function CampaignSettings() {
                   label="Batch Sending"
                   id="batchSending"
                   placeholder="500 every 10 minutes"
+                  value={data.batchSending}
+                  onChange={handleChange}
                 />
 
                 {/* divider */}
@@ -250,9 +333,10 @@ export default function CampaignSettings() {
                     label="Permission Reminder"
                     id="permissionReminder"
                     placeholder="You are receiving this email because you signed up for our newsletter at ..."
+                    value={data.permissionReminder}
+                    onChange={handleChange}
                   />
                 </div>
-
               </div>
             )}
           </div>
@@ -266,36 +350,40 @@ export default function CampaignSettings() {
             <Checkbox
               name="later"
               label="Schedule for later"
-              isChecked={false}
-              onChange={() => {}}
+              isChecked={scheduleLater}
+              onChange={() => setScheduleLater(!scheduleLater)}
             />
           </div>
 
           {/* schedule date */}
-          <div className="flex flex-col md:flex-row items-end gap-3 w-[800px]">
+          {scheduleLater && <div className="flex flex-col md:flex-row items-end gap-3 w-[800px]">
             <DateInput label="Schedule Date" />
             <TimeInput label="Schedule Time" />
-          </div>
+          </div>}
         </div>
 
         {/* cta buttons */}
-        <div className="flex items-center gap-4 w-[500px] mt-10 ml-8">
+        <div className="flex items-center gap-4 w-[500px] mt-5 ml-8">
           <Button
             size={"lg"}
             className="w-full"
             onClick={() => setSuccessModal(true)}>
-            Save Settings
+            Save Draft
           </Button>
           <Button
             size={"lg"}
             className="w-full"
             variant={"secondary"}
-            onClick={() => {toast.success("Sent successfully!"); redirect("/email-campaigns/dashboard")}}>
-            Send Now
+            onClick={() => {
+              toast.success("Sent successfully!");
+              redirect("/email-campaigns/dashboard");
+            }}>
+            {scheduleLater ? 'Send Email' : 'Send Now'}
           </Button>
         </div>
       </div>
 
+      {/* success modal */}
       <Modal
         isOpen={successModal}
         onClose={() => setSuccessModal(false)}

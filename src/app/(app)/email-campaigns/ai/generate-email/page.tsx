@@ -266,7 +266,7 @@ export default function AIGeneratedEmail() {
     <section className="space-y-4 h-screen flex flex-col">
       {/* heading */}
       <Card className="flex-shrink-0">
-        <PageHeader title="AI Generated Email" backLink="/email-campaigns/ai" />
+        <PageHeader title="AI Generated Email" backLink="/email-campaigns/dashboard" />
 
         {/* subject line */}
         <FormField
@@ -339,9 +339,6 @@ export default function AIGeneratedEmail() {
                 title="Start new chat"
               >
                 <Plus size={16} color="gray" />
-              </button>
-              <button className="flex justify-center items-center border border-[#E2E8F0] h-10.5 py-2.5 px-3.5 rounded-xl cursor-pointer">
-                <X size={20} color="gray" />
               </button>
             </div>
           </div>
