@@ -13,54 +13,186 @@ import ToggleSwitch from "@/components/ui/SwitchComponent";
 import Heading from "@/components/ui/TextHeading";
 import { CircleCheck, ChevronDown, ChevronUp } from "lucide-react";
 import { redirect } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import apiClient from "@/lib/utils/apiClient";
+import BASE_URL from "@/lib/utils/baseUrl";
+import { useAppSelector } from "@/redux/hooks";
 
 export default function CampaignSettings() {
   const [successModal, setSuccessModal] = useState(false);
   const [advancedSettings, setAdvancedSettings] = useState(false);
   const [scheduleLater, setScheduleLater] = useState(false);
+  const [loading, setLoading] = useState(false);
 
+  // Get user email for senderId
+  const user = useAppSelector((state) => state.auth.user);
+  const token = useAppSelector((state) => state.auth.token);
+  const userEmail = user?.email || "";
+
+  // Simplified data state matching API requirements
   const [data, setData] = useState({
     campaignName: "",
-    senderEmail: "",
-    audience: "",
-    excludeLists: {
-      unsubscribed: false,
-      bounced: false,
-      inactive: false,
+    subjectLine: "", // This will be populated from localStorage
+    senderId: userEmail,
+    autoStart: true,
+    audience: {
+      emailLists: [""],
     },
-    recipientEmail: "",
-    resendSettings: {
-      resendUnopened: false,
-      dontResend: false,
-    },
-    waitTime: "",
-    fallbackSubjectLine: "",
-    useAltText: false,
-    sendOnce: false,
-    dailySendLimit: "",
-    batchSending: "",
-    includeUnsubscribedLink: false,
-    includePermissionReminder: false,
-    permissionReminder: "",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.currentTarget;
-    const type = (e.currentTarget as HTMLInputElement).type;
-    const checked = (e.currentTarget as HTMLInputElement).checked;
+    setData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
 
-    if (type === "checkbox") {
-      setData((prevData) => ({
-        ...prevData,
-        [name]: checked,
-      }));
-    } else {
-      setData((prevData) => ({
-        ...prevData,
-        [name]: value,
-      }));
+  // Get subject line from localStorage (from AI generator page)
+  useEffect(() => {
+    try {
+      const savedDraft = localStorage.getItem("kiqi_campaign_draft");
+
+      if (savedDraft) {
+        const draft = JSON.parse(savedDraft);
+
+        // Extract subject line from AI generated email
+        const extractedSubject = draft.subjectLine || "";
+
+        // Set subject line in form data
+        setData((prevData) => ({
+          ...prevData,
+          subjectLine: extractedSubject,
+        }));
+
+        // Remove from localStorage after extracting
+        localStorage.removeItem("kiqi_campaign_draft");
+      }
+    } catch (error) {
+      console.error("Error parsing draft data:", error);
+    }
+  }, []);
+
+  // Handle audience selection (email list)
+  const handleAudienceChange = (emailListId: string) => {
+    setData((prevData) => ({
+      ...prevData,
+      audience: {
+        emailLists: [emailListId],
+      },
+    }));
+  };
+
+  // Handle sender email selection
+  const handleSenderChange = (email: string) => {
+    setData((prevData) => ({
+      ...prevData,
+      senderId: email,
+    }));
+  };
+
+  // Send Now button handler
+  const handleSendNow = async () => {
+    // Validate required fields
+    if (!data.campaignName.trim()) {
+      toast.error("Please enter a campaign name");
+      return;
+    }
+
+    if (!data.subjectLine.trim()) {
+      toast.error("Subject line is required");
+      return;
+    }
+
+    if (!data.senderId.trim()) {
+      toast.error("Please select a sender email");
+      return;
+    }
+
+    if (!data.audience.emailLists[0]?.trim()) {
+      toast.error("Please select an audience email list");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Prepare the exact 5-field payload
+      const payload = {
+        campaignName: data.campaignName,
+        subjectLine: data.subjectLine,
+        senderId: data.senderId,
+        autoStart: scheduleLater ? false : true, // If scheduling for later, autoStart should be false
+        audience: {
+          emailLists: [data.audience.emailLists[0]],
+        },
+      };
+
+      console.log("Sending payload:", payload);
+
+      // Make API call
+      const response = await apiClient.post(
+        `${BASE_URL}/api/v1/campaigns`,
+        payload,
+        token ? { headers: { Authorization: `Bearer ${token}` } } : {}
+      );
+
+      if (response.success) {
+        toast.success("Campaign created successfully!");
+        setSuccessModal(true);
+      } else {
+        toast.error(response.message || "Failed to create campaign");
+      }
+    } catch (error: any) {
+      console.error("API Error:", error);
+      toast.error(
+        error?.message || "An error occurred while creating campaign"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Save Draft button handler (optional - if you still want this)
+  const handleSaveDraft = async () => {
+    // Similar to handleSendNow but with autoStart: false
+    if (!data.campaignName.trim()) {
+      toast.error("Please enter a campaign name");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const payload = {
+        campaignName: data.campaignName,
+        subjectLine: data.subjectLine || "Draft Campaign",
+        senderId: data.senderId || userEmail,
+        autoStart: false,
+        audience: {
+          emailLists: data.audience.emailLists[0]
+            ? [data.audience.emailLists[0]]
+            : [],
+        },
+      };
+
+      const response = await apiClient.post(
+        `${BASE_URL}/api/v1/campaigns`,
+        payload
+      );
+
+      if (response.success) {
+        toast.success("Draft saved successfully!");
+        setSuccessModal(true);
+      } else {
+        toast.error(response.message || "Failed to save draft");
+      }
+    } catch (error: any) {
+      console.error("API Error:", error);
+      toast.error(error?.message || "An error occurred while saving draft");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -81,26 +213,47 @@ export default function CampaignSettings() {
           {/* campaign name */}
           <FormField
             id="campaignName"
+            name="campaignName"
             label="Campaign Name"
-            placeholder="Select campaign name"
+            placeholder="Enter campaign name"
             className="bg-[#00000014]"
             value={data.campaignName}
             onChange={handleChange}
+            required
           />
+
           {/* divider */}
           <hr className="text-gray-200" />
-          
+
+          {/* subject line (pre-filled from AI generator) */}
+          <FormField
+            id="subjectLine"
+            name="subjectLine"
+            label="Subject Line"
+            placeholder="Subject line from AI generated email"
+            className="bg-[#00000014]"
+            value={data.subjectLine}
+            onChange={handleChange}
+            required
+          />
+
+          {/* divider */}
+          <hr className="text-gray-200" />
+
           {/* sender email dropdown */}
           <div className="flex items-end gap-4">
             <div className="space-y-1 w-full">
-              <label className="text-[#1B223C] text-sm">Sender Email</label>
+              <label className="text-[#1B223C] text-sm">Sender Email *</label>
               <Select
                 placeholder="Select sender email"
                 className="bg-[#00000014]"
-                value={data.senderEmail}
-                onChange={handleChange}
-                >
-                <option value="">Email 1</option>
+                value={data.senderId}
+                onChange={(e) => handleSenderChange(e.target.value)}
+                required>
+                <option value="">Select an email</option>
+                <option value="mrayendi1@gmail.com">mrayendi1@gmail.com</option>
+                <option value={userEmail}>{userEmail} (Your Email)</option>
+                {/* Add more sender emails as needed */}
               </Select>
             </div>
             <Button
@@ -116,14 +269,18 @@ export default function CampaignSettings() {
           {/* audience */}
           <div className="flex items-end gap-4">
             <div className="space-y-1 w-full">
-              <label className="text-[#1B223C] text-sm">Audience</label>
+              <label className="text-[#1B223C] text-sm">Audience *</label>
               <Select
                 placeholder="Select from email list"
                 className="bg-[#00000014]"
-                value={data.audience}
-                onChange={handleChange}
-                >
-                <option>Newsletter Subscribers</option>
+                value={data.audience.emailLists[0] || ""}
+                onChange={(e) => handleAudienceChange(e.target.value)}
+                required>
+                <option value="">Select an email list</option>
+                <option value="6915f7d396931636c516020f">
+                  Newsletter Subscribers
+                </option>
+                {/* Add more email list options here */}
               </Select>
             </div>
             <Button
@@ -155,48 +312,24 @@ export default function CampaignSettings() {
                   <h4 className="font-medium text-sm text-[#1B223C]">
                     Exclude Lists
                   </h4>
-                  <div className="flex flex-col md:flex-row items-center gap-3">
+                  <div className="flex flex-col md:flex-row items-start md:items-center gap-3">
                     <Checkbox
                       name="unsubscribed"
                       label="Unsubscribed"
-                      isChecked={data.excludeLists.unsubscribed}
-                      onChange={(checked) =>
-                        setData((prevData) => ({
-                          ...prevData,
-                          excludeLists: {
-                            ...prevData.excludeLists,
-                            unsubscribed: checked,
-                          },
-                        }))
-                      }
+                      isChecked={false}
+                      onChange={() => {}}
                     />
                     <Checkbox
                       name="bounced"
                       label="Bounced"
-                      isChecked={data.excludeLists.bounced}
-                      onChange={(checked) =>
-                        setData((prevData) => ({
-                          ...prevData,
-                          excludeLists: {
-                            ...prevData.excludeLists,
-                            bounced: checked,
-                          },
-                        }))
-                      }
+                      isChecked={false}
+                      onChange={() => {}}
                     />
                     <Checkbox
                       name="inactive"
                       label="Inactive"
-                      isChecked={data.excludeLists.inactive}
-                      onChange={(checked) =>
-                        setData((prevData) => ({
-                          ...prevData,
-                          excludeLists: {
-                            ...prevData.excludeLists,
-                            inactive: checked,
-                          },
-                        }))
-                      }
+                      isChecked={false}
+                     onChange={() => {}}
                     />
                   </div>
                 </div>
@@ -205,8 +338,8 @@ export default function CampaignSettings() {
                 <FormField
                   label="Recipient Email Address (Optional)"
                   id="recipientEmail"
-                  value={data.recipientEmail}
-                  onChange={handleChange}
+                  value=""
+                  onChange={() => {}}
                   placeholder="Enter the name of the Sender or the name of your Business or Organization"
                 />
 
@@ -218,34 +351,18 @@ export default function CampaignSettings() {
                   <h4 className="font-medium text-sm text-[#1B223C]">
                     Resend Settings
                   </h4>
-                  <div className="flex flex-col md:flex-row items-center gap-3">
+                  <div className="flex flex-col md:flex-row items-start md:items-center gap-3">
                     <Checkbox
                       name="resend-unopened"
                       label="Resend to unopened emails"
-                      isChecked={data.resendSettings.resendUnopened}
-                      onChange={(checked) =>
-                        setData((prevData) => ({
-                          ...prevData,
-                          resendSettings: {
-                            ...prevData.resendSettings,
-                            resendUnopened: checked,
-                          },
-                        }))
-                      }
+                      isChecked={false}
+                      onChange={() => {}}
                     />
                     <Checkbox
                       name="dont-resend"
                       label="Don't resend"
-                      isChecked={data.resendSettings.dontResend}
-                      onChange={(checked) =>
-                        setData((prevData) => ({
-                          ...prevData,
-                          resendSettings: {
-                            ...prevData.resendSettings,
-                            dontResend: checked,
-                          },
-                        }))
-                      }
+                      isChecked={false}
+                      onChange={() => {}}
                     />
                   </div>
                 </div>
@@ -255,8 +372,8 @@ export default function CampaignSettings() {
                   label="Wait Time"
                   id="waitTime"
                   placeholder="E.g 2 days"
-                  value={data.waitTime}
-                  onChange={handleChange}
+                  value=""
+                  onChange={() => {}}
                 />
 
                 {/* divider */}
@@ -269,8 +386,8 @@ export default function CampaignSettings() {
                     label="Alternative Text"
                     id="fallbackSubjectLine"
                     placeholder="Enter a fallback subject line"
-                    value={data.fallbackSubjectLine}
-                    onChange={handleChange}
+                    value=""
+                    onChange={() => {}}
                   />
                   <div className="flex gap-4 items-center mt-4 w-fit flex-row-reverse">
                     <p className="text-sm">
@@ -295,8 +412,8 @@ export default function CampaignSettings() {
                   label="Daily Send Limit (Max)"
                   id="dailySendLimit"
                   placeholder="5000 emails per day"
-                  value={data.dailySendLimit}
-                  onChange={handleChange}
+                  value=""
+                  onChange={() => {}}
                 />
 
                 {/* batch sending */}
@@ -304,8 +421,8 @@ export default function CampaignSettings() {
                   label="Batch Sending"
                   id="batchSending"
                   placeholder="500 every 10 minutes"
-                  value={data.batchSending}
-                  onChange={handleChange}
+                  value=""
+                  onChange={() => {}}
                 />
 
                 {/* divider */}
@@ -333,16 +450,17 @@ export default function CampaignSettings() {
                     label="Permission Reminder"
                     id="permissionReminder"
                     placeholder="You are receiving this email because you signed up for our newsletter at ..."
-                    value={data.permissionReminder}
+                    value=""
                     onChange={handleChange}
                   />
                 </div>
               </div>
             )}
           </div>
+        </div>
 
-          {/* delivery time */}
-          <div className="space-y-3">
+        {/* delivery time */}
+          <div className="space-y-3 mx-8 mt-4">
             <h4 className="font-medium text-sm text-[#1B223C]">
               Delivery Time
             </h4>
@@ -356,29 +474,31 @@ export default function CampaignSettings() {
           </div>
 
           {/* schedule date */}
-          {scheduleLater && <div className="flex flex-col md:flex-row items-end gap-3 w-[800px]">
+          {scheduleLater && <div className="flex flex-col md:flex-row items-end gap-3 w-[800px] mx-8 mt-4">
             <DateInput label="Schedule Date" />
             <TimeInput label="Schedule Time" />
           </div>}
-        </div>
 
         {/* cta buttons */}
         <div className="flex items-center gap-4 w-[500px] mt-5 ml-8">
           <Button
             size={"lg"}
             className="w-full"
-            onClick={() => setSuccessModal(true)}>
-            Save Draft
+            onClick={handleSaveDraft}
+            disabled={loading}
+            variant="outline">
+            {loading ? "Saving..." : "Save Draft"}
           </Button>
           <Button
             size={"lg"}
             className="w-full"
-            variant={"secondary"}
-            onClick={() => {
-              toast.success("Sent successfully!");
-              redirect("/email-campaigns/dashboard");
-            }}>
-            {scheduleLater ? 'Send Email' : 'Send Now'}
+            onClick={handleSendNow}
+            disabled={loading}>
+            {loading
+              ? "Sending..."
+              : scheduleLater
+              ? "Schedule Send"
+              : "Send Now"}
           </Button>
         </div>
       </div>
