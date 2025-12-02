@@ -393,6 +393,9 @@ export default function EmailCampaignDashboard() {
         campaign.status.toLowerCase() === tab.toLowerCase()
       );
 
+      // Search query state
+      const [query, setQuery] = useState("");
+
   return (
     <main className="flex-1 overflow-y-auto space-y-6">
       <PageHeader title="Email Campaigns" backLink="/dashboard" />
@@ -401,7 +404,7 @@ export default function EmailCampaignDashboard() {
       <Card>
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <Heading heading="Campaigns" />
+            <Heading heading="Messages" />
             
             {/* Refresh Button and Total Count */}
             <div className="flex items-center gap-4">
@@ -438,7 +441,7 @@ export default function EmailCampaignDashboard() {
             
             {/* filters */}
             <div className="flex gap-2">
-              <SearchInput value="" onChange={() => {}} name="" />
+              <SearchInput value={query} onChange={(e) => setQuery(e.target.value)} name="query" />
               <Filter value="" onChange={() => {}} />
               <Button
                 className="w-full"

@@ -17,6 +17,7 @@ import { RootState } from "@/redux/store";
 import ConnectWallet from "@/components/ui/ConnectWalletModal";
 import { toast } from "react-hot-toast";
 import { useAutoLogout } from '@/hooks/useAutoLogout';
+import { useWallet } from '@solana/wallet-adapter-react'; // Add this import
 
 const GoogleIcon = () => (
   <img src="/devicon_google.svg" alt="Google" className="h-5 w-5" />
@@ -31,6 +32,10 @@ const LoginPage = () => {
   const { status, error } = useSelector((state: RootState) => state.auth);
   const [openConnectWalletModal, setOpenConnectWalletModal] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [isWalletConnecting, setIsWalletConnecting] = useState(false);
+  
+  // Use Solana wallet
+  const { connected, publicKey, connecting, disconnect, select, wallets } = useWallet();
   
   // Use the auto logout hook
   const { setupAutoLogout, clearAutoLogout } = useAutoLogout();
@@ -66,6 +71,15 @@ const LoginPage = () => {
     dispatch(resetAuthState());
   }, [dispatch]);
 
+  // Handle wallet connection status
+  useEffect(() => {
+    if (connected && publicKey && openConnectWalletModal) {
+      // Wallet is connected, you might want to show some feedback
+      console.log('Wallet connected:', publicKey.toString());
+      setIsWalletConnecting(false);
+    }
+  }, [connected, publicKey, openConnectWalletModal]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -94,11 +108,30 @@ const LoginPage = () => {
     }
   };
 
+  // Function to handle Google login
   const handleGoogleLogin = () => {
-    toast.loading("Google login would redirect to OAuth in production");
-    setTimeout(() => {
-      toast.success("This would redirect to Google OAuth in a real application");
-    }, 1000);
+    // Your Google OAuth configuration
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "154495277350-l34s69kvqvoimk0kjj8ae1vsvbg74hgg.apps.googleusercontent.com";
+    const redirectUri = process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI || "https://gokiki.app";
+    
+    // Generate a random state for security
+    const state = Math.random().toString(36).substring(7);
+    localStorage.setItem('oauthState', state);
+    
+    // Construct Google OAuth URL
+    const googleAuthUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+    
+    // Add parameters
+    googleAuthUrl.searchParams.append('client_id', clientId);
+    googleAuthUrl.searchParams.append('redirect_uri', redirectUri);
+    googleAuthUrl.searchParams.append('response_type', 'code');
+    googleAuthUrl.searchParams.append('scope', 'email profile');
+    googleAuthUrl.searchParams.append('state', state);
+    googleAuthUrl.searchParams.append('access_type', 'offline');
+    googleAuthUrl.searchParams.append('prompt', 'consent');
+    
+    // Redirect to Google
+    window.location.href = googleAuthUrl.toString();
   };
 
   const handleRememberMeChange = (checked: boolean) => {
@@ -121,7 +154,7 @@ const LoginPage = () => {
             onClick={handleGoogleLogin}
             variant="outline"
             className="flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
-            disabled={isLoading}
+            disabled={isLoading || connecting}
           >
             {isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -136,10 +169,14 @@ const LoginPage = () => {
             onClick={() => setOpenConnectWalletModal(true)}
             variant="outline"
             className="flex items-center justify-center gap-2"
-            disabled={isLoading}
+            disabled={isLoading || connecting}
           >
-            <Link2 className="h-4 w-4" />
-            Log in using Wallet
+            {connecting ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Link2 className="h-4 w-4" />
+            )}
+            {connecting ? "Connecting..." : "Log in using Wallet"}
           </Button>
         </div>
 
@@ -160,7 +197,7 @@ const LoginPage = () => {
             placeholder="Enter Email Address"
             icon={<CircleUserRound className="text-gray-400" size={18} />}
             required
-            disabled={isLoading}
+            disabled={isLoading || connecting}
           />
 
           <div className="relative">
@@ -174,13 +211,13 @@ const LoginPage = () => {
               placeholder="Enter Password"
               icon={<LockKeyhole className="text-gray-400" size={18} />}
               required
-              disabled={isLoading}
+              disabled={isLoading || connecting}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3 top-10 text-gray-400 hover:text-gray-600 transition-colors"
-              disabled={isLoading}
+              disabled={isLoading || connecting}
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
@@ -193,14 +230,14 @@ const LoginPage = () => {
                 className="h-4 w-4 rounded border-gray-300 text-[var(--primary)] focus:ring-[#3366FF] focus:ring-2 transition-colors"
                 checked={rememberMe}
                 onChange={(e) => handleRememberMeChange(e.target.checked)}
-                disabled={isLoading}
+                disabled={isLoading || connecting}
               />
               <span className="ml-2 text-gray-600">Keep me logged in</span>
             </label>
             <Link
               href="/reset-password"
               className="font-medium text-[var(--primary)] hover:underline transition-colors"
-              onClick={(e) => isLoading && e.preventDefault()}
+              onClick={(e) => (isLoading || connecting) && e.preventDefault()}
             >
               Forgot Password?
             </Link>
@@ -215,8 +252,8 @@ const LoginPage = () => {
           <Button
             type="submit"
             className="w-full flex items-center justify-center gap-2"
-            disabled={isLoading}
-            variant={isLoading ? "secondary" : "primary"}
+            disabled={isLoading || connecting}
+            variant={(isLoading || connecting) ? "secondary" : "primary"}
           >
             {isLoading ? (
               <>
@@ -234,7 +271,7 @@ const LoginPage = () => {
           <Link
             href="/signup"
             className="font-medium text-[var(--primary)] hover:underline transition-colors"
-            onClick={(e) => isLoading && e.preventDefault()}
+            onClick={(e) => (isLoading || connecting) && e.preventDefault()}
           >
             Sign Up
           </Link>
@@ -243,7 +280,7 @@ const LoginPage = () => {
       
       <ConnectWallet
         isOpen={openConnectWalletModal}
-        onClose={() => !isLoading && setOpenConnectWalletModal(false)}
+        onClose={() => !(isLoading || connecting) && setOpenConnectWalletModal(false)}
         mode="login"
       />
     </AuthLayout>
