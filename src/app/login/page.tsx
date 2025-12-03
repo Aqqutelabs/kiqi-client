@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { FormField } from "@/components/ui/FormField";
 import AuthLayout from "@/components/ui/layout/AuthLayout";
-import { loginUser } from "@/redux/slices/authSlice";
+import { loginUser, loginUserWithGoogle } from "@/redux/slices/authSlice";
 import { RootState } from "@/redux/store";
 import ConnectWallet from "@/components/ui/ConnectWalletModal";
 import { toast } from "react-hot-toast";
@@ -34,11 +34,73 @@ const LoginPage = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [isWalletConnecting, setIsWalletConnecting] = useState(false);
   
-  // Use Solana wallet
+  // Use Sola
+  // na wallet
   const { connected, publicKey, connecting, disconnect, select, wallets } = useWallet();
   
   // Use the auto logout hook
   const { setupAutoLogout, clearAutoLogout } = useAutoLogout();
+
+  // Handle Google OAuth callback
+  useEffect(() => {
+    const handleGoogleCallback = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
+      const error = params.get('error');
+
+      console.log('🔍 Checking for Google OAuth callback...');
+      console.log('Code:', code ? code.substring(0, 20) + '...' : 'NOT FOUND');
+      console.log('Error:', error);
+
+      // If there's an error from Google
+      if (error) {
+        const errorDescription = params.get('error_description') || 'Authentication failed';
+        console.error('❌ Google OAuth error:', error, errorDescription);
+        toast.error(errorDescription);
+        // Clear the URL params on error
+        window.history.replaceState({}, document.title, '/login');
+        return;
+      }
+
+      // If there's a code, dispatch the thunk
+      if (code) {
+        console.log('📤 Dispatching loginUserWithGoogle thunk with code...');
+        try {
+          const result = await dispatch(loginUserWithGoogle(code));
+          
+          if (loginUserWithGoogle.fulfilled.match(result)) {
+            console.log('✨ Google login successful!');
+            
+            // Clear any error state
+            dispatch(resetAuthState());
+            
+            // Clear the URL params
+            window.history.replaceState({}, document.title, '/login');
+            
+            // Redirect to dashboard
+            setTimeout(() => {
+              console.log('🚀 Redirecting to dashboard...');
+              router.push('/dashboard');
+            }, 500);
+          } else if (loginUserWithGoogle.rejected.match(result)) {
+            console.error('❌ Google login failed:', result.payload);
+            // Silently fail if we're still redirecting - the error is likely a duplicate call
+            if (result.payload && !result.payload.toString().includes('exchange')) {
+              toast.error(result.payload as string || 'Google login failed');
+            }
+            
+            // Clear the URL params on error
+            window.history.replaceState({}, document.title, '/login');
+          }
+        } catch (err) {
+          console.error('Error in callback:', err);
+          // Silently ignore callback errors
+        }
+      }
+    };
+
+    handleGoogleCallback();
+  }, [router, dispatch]);
 
   // Initialize rememberMe from localStorage on component mount
   useEffect(() => {
@@ -110,13 +172,24 @@ const LoginPage = () => {
 
   // Function to handle Google login
   const handleGoogleLogin = () => {
-    // Your Google OAuth configuration
-    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "154495277350-l34s69kvqvoimk0kjj8ae1vsvbg74hgg.apps.googleusercontent.com";
-    const redirectUri = process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI || "https://gokiki.app";
+    // Your Google OAuth configuration from .env
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    const redirectUri = process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI;
+    
+    console.log('🔵 Google Login Handler Called');
+    console.log('Client ID:', clientId);
+    console.log('Redirect URI:', redirectUri);
+    
+    if (!clientId || !redirectUri) {
+      console.error('❌ Google configuration missing - Client ID:', !!clientId, 'Redirect URI:', !!redirectUri);
+      toast.error("Google authentication is not properly configured");
+      return;
+    }
     
     // Generate a random state for security
     const state = Math.random().toString(36).substring(7);
     localStorage.setItem('oauthState', state);
+    console.log('Generated OAuth state:', state);
     
     // Construct Google OAuth URL
     const googleAuthUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
@@ -125,13 +198,30 @@ const LoginPage = () => {
     googleAuthUrl.searchParams.append('client_id', clientId);
     googleAuthUrl.searchParams.append('redirect_uri', redirectUri);
     googleAuthUrl.searchParams.append('response_type', 'code');
-    googleAuthUrl.searchParams.append('scope', 'email profile');
+    googleAuthUrl.searchParams.append('scope', 'openid email profile');
     googleAuthUrl.searchParams.append('state', state);
     googleAuthUrl.searchParams.append('access_type', 'offline');
     googleAuthUrl.searchParams.append('prompt', 'consent');
     
+    console.log('🔗 Constructed Google Auth URL:', googleAuthUrl.toString());
+    console.log('URL Parameters:');
+    console.log('  - client_id:', clientId);
+    console.log('  - redirect_uri:', redirectUri);
+    console.log('  - response_type: code');
+    console.log('  - scope: openid email profile');
+    console.log('  - state:', state);
+    console.log('  - access_type: offline');
+    console.log('  - prompt: consent');
+    
     // Redirect to Google
-    window.location.href = googleAuthUrl.toString();
+    console.log('⏳ Redirecting to Google in 500ms...');
+    console.log('Full URL:', googleAuthUrl.toString());
+    
+    // Add a small delay to allow console logs to be captured
+    setTimeout(() => {
+      console.log('→ NOW REDIRECTING TO GOOGLE');
+      window.location.href = googleAuthUrl.toString();
+    }, 500);
   };
 
   const handleRememberMeChange = (checked: boolean) => {

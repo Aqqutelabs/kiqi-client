@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect } from 'react';
-import('bootstrap/dist/js/bootstrap.bundle.min.js');
 
 export default function BootstrapClient() {
   useEffect(() => {
+    // Dynamically import bootstrap on client side only
+    import('bootstrap').catch(err => console.error('Bootstrap import failed:', err));
   }, []);
 
   return null;
