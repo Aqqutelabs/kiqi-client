@@ -1,7 +1,7 @@
 "use client";
 import React, { useRef, useState } from "react";
 import Link from "next/link";
-import { Trash2 } from "lucide-react";
+import { Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { FileUpload } from "@/components/ui/FileUpload";
@@ -16,7 +16,102 @@ import {
   clearCreateEmailListStatus,
 } from "@/redux/slices/campaignSlice";
 import { toast } from "react-hot-toast";
-import { FormField } from "@/components/ui/FormField";
+
+// Chip Input Component
+const ChipInput = ({ 
+  chips, 
+  onChipsChange, 
+  placeholder = "Type email and press comma or Enter",
+  type = "email" // 'email' or 'contact'
+}: { 
+  chips: Array<{ value: string; fullName?: string }>;
+  onChipsChange: (chips: Array<{ value: string; fullName?: string }>) => void;
+  placeholder?: string;
+  type?: 'email' | 'contact';
+}) => {
+  const [inputValue, setInputValue] = useState("");
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    
+    // Check if user typed comma
+    if (value.includes(',')) {
+      const parts = value.split(',');
+      const newChips = parts.slice(0, -1).map(part => {
+        const trimmed = part.trim();
+        if (!trimmed) return null;
+        
+        // Parse "email fullName" format
+        const [val, ...rest] = trimmed.split(/\s+/);
+        const fullName = rest.join(" ").trim();
+        
+        return fullName ? { value: val, fullName } : { value: val };
+      }).filter(Boolean) as Array<{ value: string; fullName?: string }>;
+      
+      if (newChips.length > 0) {
+        onChipsChange([...chips, ...newChips]);
+      }
+      setInputValue(parts[parts.length - 1]);
+    } else {
+      setInputValue(value);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const trimmed = inputValue.trim();
+      
+      if (trimmed) {
+        // Parse "email fullName" format
+        const [val, ...rest] = trimmed.split(/\s+/);
+        const fullName = rest.join(" ").trim();
+        
+        const newChip = fullName ? { value: val, fullName } : { value: val };
+        onChipsChange([...chips, newChip]);
+        setInputValue("");
+      }
+    } else if (e.key === 'Backspace' && !inputValue && chips.length > 0) {
+      // Remove last chip on backspace if input is empty
+      onChipsChange(chips.slice(0, -1));
+    }
+  };
+
+  const removeChip = (index: number) => {
+    onChipsChange(chips.filter((_, i) => i !== index));
+  };
+
+  return (
+    <div className="min-h-[80px] border border-gray-300 rounded-md p-2 flex flex-wrap gap-2 items-start focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
+      {chips.map((chip, index) => (
+        <div
+          key={index}
+          className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"
+        >
+          <span>
+            {chip.value}
+            {chip.fullName && <span className="ml-1 text-xs opacity-75">({chip.fullName})</span>}
+          </span>
+          <button
+            type="button"
+            onClick={() => removeChip(index)}
+            className="hover:bg-blue-200 rounded-full p-0.5 transition-colors"
+          >
+            <X size={14} />
+          </button>
+        </div>
+      ))}
+      <input
+        type="text"
+        value={inputValue}
+        onChange={handleInputChange}
+        onKeyDown={handleKeyDown}
+        placeholder={chips.length === 0 ? placeholder : ""}
+        className="flex-1 min-w-[200px] outline-none bg-transparent text-sm"
+      />
+    </div>
+  );
+};
 
 const ManageEmailListPage = () => {
   const dispatch = useAppDispatch();
@@ -28,11 +123,11 @@ const ManageEmailListPage = () => {
     status,
     error,
   } = useAppSelector(selectCampaign);
+  
   const [form, setForm] = React.useState({
     email_listName: "",
-    emails: "",
-    emailFiles: "",
   });
+  const [emailChips, setEmailChips] = useState<Array<{ value: string; fullName?: string }>>([]);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const fileUploadRef = useRef<any>(null);
@@ -41,15 +136,11 @@ const ManageEmailListPage = () => {
   const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
 
   useEffect(() => {
-    // Cast to any to avoid TS dispatch overload issues with async thunks
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     dispatch(fetchUserEmailLists() as any);
   }, [dispatch]);
 
-  // Refetch email lists after successful creation
   useEffect(() => {
     if (createEmailListStatus === "succeeded") {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       dispatch(fetchUserEmailLists() as any);
     }
   }, [createEmailListStatus, dispatch]);
@@ -60,38 +151,29 @@ const ManageEmailListPage = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setIsSubmitting(true);
     dispatch(clearCreateEmailListStatus());
+    
     try {
-      // Parse emails as array of objects: [{ email, fullName? }]
-      // Accepts: "email fullName" or just "email"
-      const emailsArr = form.emails
-        .split(",")
-        .map((e) => {
-          const [email, ...rest] = e.trim().split(/\s+/);
-          const fullName = rest.join(" ").trim();
-          return fullName
-            ? { email: email.trim(), fullName }
-            : { email: email.trim() };
-        })
-        .filter((e) => e.email);
-      const filesArr = form.emailFiles
-        .split(",")
-        .map((f) => f.trim())
-        .filter(Boolean);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // Convert chips to API format
+      const emailsArr = emailChips.map(chip => ({
+        email: chip.value,
+        ...(chip.fullName && { fullName: chip.fullName })
+      }));
+
       const result = await dispatch(
         createEmailListWithFiles({
           email_listName: form.email_listName,
           emails: emailsArr,
-          emailFiles: filesArr,
+          emailFiles: [],
         }) as any
       );
+      
       if (createEmailListWithFiles.fulfilled.match(result)) {
         toast.success("Email list created successfully!");
-        setForm({ email_listName: "", emails: "", emailFiles: "" });
+        setForm({ email_listName: "" });
+        setEmailChips([]);
       } else {
         toast.error(
           result.payload ||
@@ -106,23 +188,24 @@ const ManageEmailListPage = () => {
     }
   };
 
-  // CSV upload handler (just send file, let backend process)
   const handleCsvUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
     setUploadError(null);
     setUploadSuccess(null);
+    
     try {
       const formData = new FormData();
       formData.append("csv", file);
       formData.append("email_listName", form.email_listName || "Untitled List");
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      
       const result = await dispatch(createEmailListWithFiles(formData) as any);
+      
       if (createEmailListWithFiles.fulfilled.match(result)) {
         setUploadSuccess("CSV uploaded and email list created!");
-        setForm({ email_listName: "", emails: "", emailFiles: "" });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        setForm({ email_listName: "" });
+        setEmailChips([]);
         dispatch(fetchUserEmailLists() as any);
       } else {
         setUploadError(
@@ -139,7 +222,6 @@ const ManageEmailListPage = () => {
     }
   };
 
-  // Sort userCampaigns by createdAt descending
   const sortedCampaigns = Array.isArray(userCampaigns)
     ? [...userCampaigns].sort(
         (a, b) =>
@@ -147,13 +229,11 @@ const ManageEmailListPage = () => {
       )
     : [];
 
-  // Add delete handler
   const handleDelete = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this email list?"))
       return;
     try {
       await dispatch({ type: "campaign/deleteEmailList", payload: id });
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       dispatch(fetchUserEmailLists() as any);
       toast.success("Email list deleted successfully!");
     } catch (err) {
@@ -162,14 +242,14 @@ const ManageEmailListPage = () => {
   };
 
   return (
-    <main className="flex-1 overflow-y-auto  ">
+    <main className="flex-1 overflow-y-auto">
       <PageHeader title="Email List" backLink="/email-campaigns/dashboard" />
 
       <Card className="mb-8 p-6">
         <h3 className="text-lg font-semibold mb-4 text-gray-800">
           Create Email List
         </h3>
-        <form className="space-y-6" onSubmit={handleSubmit}>
+        <div className="space-y-6">
           <div>
             <label className="block text-sm font-medium mb-1">List Name</label>
             <Input
@@ -180,19 +260,23 @@ const ManageEmailListPage = () => {
               required
             />
           </div>
+
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Add Email Address (Option 1)
+            <label className="block text-sm font-medium mb-2">
+              Add Email Addresses (Option 1)
             </label>
-            <FormField
-              name="emails"
-              id="emails"
-              value={form.emails}
-              onChange={handleFormChange}
-              placeholder="Enter email addresses here."
+            <ChipInput
+              chips={emailChips}
+              onChipsChange={setEmailChips}
+              placeholder="Type email address and press comma or Enter"
+              type="email"
             />
-            <p className="text-[10px] mt-1 text-gray-500">Enter email addresses here. Each line: 'email fullName', e.g. john@example.com John Doe, jane@example.com Jane Doe.</p>
+            <p className="text-xs mt-2 text-gray-500">
+              Type an email address (optionally followed by full name) and press comma or Enter. 
+              Example: john@example.com John Doe, jane@example.com Jane Doe
+            </p>
           </div>
+
           <div>
             <label className="block text-sm font-medium mb-1">
               Upload Email Address CSV (Option 2)
@@ -206,7 +290,11 @@ const ManageEmailListPage = () => {
                 } as React.ChangeEvent<HTMLInputElement>)
               }
             />
+            <p className="text-xs mt-2 text-gray-500">
+              Upload a CSV file with email addresses and names
+            </p>
           </div>
+
           {createEmailListStatus === "loading" || isSubmitting ? (
             <div className="text-blue-600">Creating list...</div>
           ) : null}
@@ -221,12 +309,13 @@ const ManageEmailListPage = () => {
           {uploadSuccess && (
             <div className="text-green-600">{uploadSuccess}</div>
           )}
+
           <Button
-            type="submit"
-            disabled={isSubmitting || createEmailListStatus === "loading"}>
+            onClick={handleSubmit}
+            disabled={isSubmitting || createEmailListStatus === "loading" || emailChips.length === 0}>
             Create Email List
           </Button>
-        </form>
+        </div>
       </Card>
 
       <Card className="p-6">
@@ -315,4 +404,5 @@ const ManageEmailListPage = () => {
     </main>
   );
 };
+
 export default ManageEmailListPage;
