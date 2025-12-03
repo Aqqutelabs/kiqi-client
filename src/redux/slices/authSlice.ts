@@ -36,6 +36,7 @@ interface RegisteredUser {
 interface AuthState {
   user: { name: string; email: string } | RegisteredUser | null;
   token: string | null;
+  refreshToken: string | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
   registration: {
@@ -49,6 +50,7 @@ interface AuthState {
 const initialState: AuthState = {
   user: null,
   token: null,
+  refreshToken: null,
   status: 'idle',
   error: null,
   registration: {
@@ -110,6 +112,88 @@ export const registerUser = createAsyncThunk(
   }
 );
 
+export const loginUserWithGoogle = createAsyncThunk(
+  'auth/loginUserWithGoogle',
+  async (code: string, { rejectWithValue }) => {
+    try {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+      
+      console.log('🔵 loginUserWithGoogle thunk started with code:', code.substring(0, 20) + '...');
+      
+      // Step 1: Exchange code for token
+      const callbackResponse = await fetch(
+        `${backendUrl}/api/v1/auth/google/callback?code=${encodeURIComponent(code)}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!callbackResponse.ok) {
+        const errorData = await callbackResponse.json();
+        console.error('❌ Step 1 failed:', errorData);
+        throw new Error(errorData.message || 'Failed to exchange code for token');
+      }
+
+      const callbackData = await callbackResponse.json();
+      console.log('✅ Step 1 response:', callbackData);
+
+      if (!callbackData.tokens || !callbackData.tokens.id_token) {
+        throw new Error('No id_token in callback response');
+      }
+
+      const idToken = callbackData.tokens.id_token;
+      console.log('🔐 Extracted id_token:', idToken.substring(0, 20) + '...');
+
+      // Step 2: Send token to authenticate
+      console.log('📤 Step 2: Sending id_token to auth endpoint...');
+      const authResponse = await fetch(`${backendUrl}/api/v1/auth/google`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ idToken }),
+      });
+
+      if (!authResponse.ok) {
+        const errorData = await authResponse.json();
+        console.error('❌ Step 2 failed:', errorData);
+        throw new Error(errorData.message || 'Authentication failed');
+      }
+
+      const authData = await authResponse.json();
+      console.log('✅ Step 2 response:', authData);
+
+      // Store tokens in localStorage
+      if (authData.accessToken) {
+        localStorage.setItem('authToken', authData.accessToken);
+        console.log('🔐 Access token stored');
+      }
+      if (authData.refreshToken) {
+        localStorage.setItem('refreshToken', authData.refreshToken);
+        console.log('🔐 Refresh token stored');
+      }
+
+      return {
+        user: authData.user,
+        token: authData.accessToken,
+        refreshToken: authData.refreshToken,
+        message: authData.message || 'Google login successful',
+      };
+    } catch (error: any) {
+      let message = error.message || 'Google authentication failed';
+      console.error('💥 Google auth error:', message);
+      try {
+        const errObj = JSON.parse(message);
+        message = errObj.message || message;
+      } catch {}
+      return rejectWithValue(message);
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -117,6 +201,7 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.token = null;
+      state.refreshToken = null;
       state.status = 'idle';
       state.error = null;
       state.registration = {
@@ -176,6 +261,33 @@ const authSlice = createSlice({
       .addCase(registerUser.rejected, (state, action) => {
         state.registration.status = 'failed';
         state.registration.error = action.payload as string;
+      })
+      .addCase(loginUserWithGoogle.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(loginUserWithGoogle.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.refreshToken = action.payload.refreshToken;
+        console.log('✅ Google auth state updated:', {
+          user: action.payload.user,
+          token: action.payload.token ? action.payload.token.substring(0, 20) + '...' : null,
+          refreshToken: action.payload.refreshToken ? action.payload.refreshToken.substring(0, 20) + '...' : null,
+        });
+      })
+      .addCase(loginUserWithGoogle.rejected, (state, action) => {
+        // Don't show "exchange" related errors - these are often duplicate calls
+        const errorMessage = action.payload as string;
+        if (errorMessage && errorMessage.toLowerCase().includes('exchange')) {
+          // Silently ignore exchange errors
+          console.log('⚠️ Ignoring exchange error:', errorMessage);
+          return;
+        }
+        state.status = 'failed';
+        state.error = errorMessage;
+        console.error('❌ Google auth failed:', action.payload);
       });
   },
 });

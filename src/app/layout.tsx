@@ -7,8 +7,6 @@ import ToasterClient from "./ToasterClient";
 import { ProductsProvider } from "@/context/ProductContext";
 import { SidebarProvider } from "@/context/SidebarContext";
 import { WalletProvider } from "@/context/WalletContext";
-import BootstrapClient from "@/components/landing/bootstrapclient";
-import JQueryClient from "@/components/landing/jquery";
 import { SolanaProvider } from "@/context/Web3Context";
 
 const inter = Inter({
@@ -52,6 +50,7 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css"
         />
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
       </head>
       <body className={inter.className}>
         <SolanaProvider>
@@ -60,8 +59,6 @@ export default function RootLayout({
               <ReduxProvider>
                 <WalletProvider>
                   <ToasterClient />
-                  <BootstrapClient />
-                  <JQueryClient />
                   <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js" />
                   {children}
                 </WalletProvider>
