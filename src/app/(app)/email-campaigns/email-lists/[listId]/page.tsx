@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 // import { PageHeader } from '@/components/molecules/PageHeader';
 // import { Button } from '@/components/atoms/Button';
 // import { Input } from '@/components/atoms/Input';
-import { Trash2, Search, Filter, ChevronDown, Plus } from "lucide-react";
+import { Trash2, Search, Filter, ChevronDown, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
@@ -184,7 +184,11 @@ const EmailListDetailPage = () => {
                 {list.emails.map((sub: any, i: number) => (
                   <tr key={sub._id || i}>
                     <td className="p-3">
-                      {sub.email || Object.values(sub).join("")}
+                      <div className="border border-gray-400 rounded-full w-fit py-1 px-3 text-sm bg-gray-50 flex gap-1.5 items-center">
+                        <div className="size-8 rounded-full bg-gray-300 flex justify-center items-center">{sub.email.substring(0, 1)}</div>
+                        <span>{sub.email || Object.values(sub).join("")}</span>
+                        <X size={16} color="gray" cursor={"pointer"}/>
+                      </div>
                     </td>
                     <td className="p-3">{sub.fullName || "-"}</td>
                     <td className="p-3">

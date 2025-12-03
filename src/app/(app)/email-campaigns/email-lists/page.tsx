@@ -7,7 +7,6 @@ import { Card } from "@/components/ui/Card";
 import { FileUpload } from "@/components/ui/FileUpload";
 import { Input } from "@/components/ui/Input";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
-import { Textarea } from "@/components/ui/Textarea";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { selectCampaign } from '@/redux/selectors/campaignSelectors';
 import { fetchUserEmailLists } from "@/redux/slices/campaignSlice";
@@ -190,8 +189,9 @@ const ManageEmailListPage = () => {
               id="emails"
               value={form.emails}
               onChange={handleFormChange}
-              placeholder="Enter email addresses here. Each line: 'email fullName', e.g. john@example.com John Doe, jane@example.com Jane Doe."
+              placeholder="Enter email addresses here."
             />
+            <p className="text-[10px] mt-1 text-gray-500">Enter email addresses here. Each line: 'email fullName', e.g. john@example.com John Doe, jane@example.com Jane Doe.</p>
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">
