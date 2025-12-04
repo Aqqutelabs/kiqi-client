@@ -291,6 +291,34 @@ export const startEmailCampaign = createAsyncThunk<
   }
 );
 
+export const deleteEmailList = createAsyncThunk<
+  any,
+  string, // id of the email list to delete
+  { rejectValue: string, state: { auth: { token: string | null } } }
+>(
+  'campaigns/deleteEmailList',
+  async (id, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.token;
+      const response = await apiClient.delete(
+        `${BASE_URL}/api/v1/email-lists/${id}`,
+        token ? { headers: { Authorization: `Bearer ${token}` } } : {}
+      );
+      if (response.error) {
+        return thunkAPI.rejectWithValue(response.message || 'Failed to delete email list');
+      }
+      return response.data;
+    } catch (error: any) {
+      let message = error.message || 'Failed to delete email list';
+      try {
+        const errObj = JSON.parse(message);
+        message = errObj.message || message;
+      } catch {}
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 // New reducer to fetch all campaigns from /api/v1/campaigns
 export const fetchAllCampaigns = createAsyncThunk<
   any[],
