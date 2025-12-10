@@ -72,14 +72,16 @@ export default function NavBar() {
           <span className="navbar-toggler-icon" />
         </button>
 
-        <div 
-          className={`collapse navbar-collapse ${isMobileMenuOpen ? 'show' : ''}`} 
+        <div
+          className={`collapse navbar-collapse ${
+            isMobileMenuOpen ? "show" : ""
+          }`}
           id="navbarNav">
           <ul className="navbar-nav mx-auto">
             {links.map((link, index) => (
-              <li 
-                key={index} 
-                className={`nav-item ${link.dropdown ? 'dropdown' : ''}`}
+              <li
+                key={index}
+                className={`nav-item ${link.dropdown ? "dropdown" : ""}`}
                 onMouseLeave={closeDropdown}>
                 {link.dropdown ? (
                   <>
@@ -94,15 +96,18 @@ export default function NavBar() {
                       aria-expanded={activeDropdown === link.label}>
                       {link.label}
                     </a>
-                    <ul 
-                      className={`dropdown-menu ${activeDropdown === link.label ? 'show' : ''}`}
+                    <ul
+                      className={`dropdown-menu ${
+                        activeDropdown === link.label ? "show" : ""
+                      }`}
                       style={{
-                        display: activeDropdown === link.label ? 'block' : 'none'
+                        display:
+                          activeDropdown === link.label ? "block" : "none",
                       }}>
                       {link.dropdown.map((item, dropIndex) => (
                         <li key={dropIndex}>
-                          <a 
-                            className="dropdown-item" 
+                          <a
+                            className="dropdown-item"
                             href={item.href}
                             onClick={() => {
                               closeDropdown();
@@ -115,8 +120,8 @@ export default function NavBar() {
                     </ul>
                   </>
                 ) : (
-                  <a 
-                    className={`nav-link ${link.href === '/' ? 'active' : ''}`} 
+                  <a
+                    className={`nav-link ${link.href === "/" ? "active" : ""}`}
                     href={link.href}
                     onClick={() => setIsMobileMenuOpen(false)}>
                     {link.label}
@@ -127,14 +132,14 @@ export default function NavBar() {
           </ul>
 
           <div className="d-flex">
-            <a 
-              href="/login" 
+            <a
+              href="/login"
               className="btn btn-sign-in"
               onClick={() => setIsMobileMenuOpen(false)}>
               Sign In
             </a>
-            <a 
-              href="/signup" 
+            <a
+              href="/signup"
               className="btn btn-get-started"
               onClick={() => setIsMobileMenuOpen(false)}>
               Get Started

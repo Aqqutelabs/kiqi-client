@@ -1,40 +1,30 @@
+// store/slices/authSlice.ts - Updated version
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import apiClient from '@/lib/utils/apiClient';
 import BASE_URL from '@/lib/utils/baseUrl';
 
-// This is a mock API call function. Replace with your actual API logic.
-const apiLogin = async (credentials: any) => {
-  console.log('Logging in with:', credentials);
-  await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
-  if (credentials.email === 'test@example.com') {
-    return { user: { name: 'Obinna Festus', email: 'test@example.com' }, token: 'fake-jwt-token' };
-  } else {
-    throw new Error('Invalid credentials');
-  }
-};
-
-interface RegisterPayload {
-  fullName: string;
-  phoneNumber: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  organizationName: string;
-}
-
-interface RegisteredUser {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  organizationName: string;
-  createdAt: string;
-  updatedAt: string;
+interface WalletAuthResponse {
+  user: {
+    id: string;
+    walletAddress: string;
+    email?: string;
+    username?: string;
+    createdAt: string;
+  };
+  accessToken: string;
+  refreshToken?: string;
+  message: string;
 }
 
 interface AuthState {
-  user: { name: string; email: string } | RegisteredUser | null;
+  user: { 
+    id: string;
+    walletAddress: string;
+    email?: string;
+    username?: string;
+    createdAt: string;
+    name?: string;
+  } | null;
   token: string | null;
   refreshToken: string | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
@@ -42,15 +32,15 @@ interface AuthState {
   registration: {
     status: 'idle' | 'loading' | 'succeeded' | 'failed';
     error: string | null;
-    data: RegisteredUser | null;
+    data: any | null;
     message: string | null;
   };
 }
 
 const initialState: AuthState = {
   user: null,
-  token: null,
-  refreshToken: null,
+  token: typeof window !== 'undefined' ? localStorage.getItem('authToken') : null,
+  refreshToken: typeof window !== 'undefined' ? localStorage.getItem('refreshToken') : null,
   status: 'idle',
   error: null,
   registration: {
@@ -61,18 +51,92 @@ const initialState: AuthState = {
   },
 };
 
+// Wallet authentication thunk
+export const loginUserWithWallet = createAsyncThunk(
+  'auth/loginUserWithWallet',
+  async (
+    walletData: {
+      publicKey: string;
+      signature: string;
+      message: string;
+      timestamp: number;
+      nonce: string;
+      mode?: 'signup' | 'login';
+    },
+    { rejectWithValue }
+  ) => {
+    try {
+      const endpoint = walletData.mode === 'signup'
+        ? `${BASE_URL}/api/v1/auth/wallet/signup`
+        : `${BASE_URL}/api/v1/auth/wallet/login`;
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          walletAddress: walletData.publicKey,
+          signature: walletData.signature,
+          message: walletData.message,
+          timestamp: walletData.timestamp,
+          nonce: walletData.nonce,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || errorData.message || 'Wallet authentication failed');
+      }
+
+      const data = await response.json();
+      
+      // Store tokens in localStorage
+      if (data.accessToken) {
+        localStorage.setItem('authToken', data.accessToken);
+      }
+      if (data.refreshToken) {
+        localStorage.setItem('refreshToken', data.refreshToken);
+      }
+      
+      return {
+        user: data.user,
+        token: data.accessToken,
+        refreshToken: data.refreshToken,
+        message: data.message || 'Wallet authentication successful',
+      };
+    } catch (error: any) {
+      let message = error.message || 'Wallet authentication failed';
+      try {
+        const errObj = JSON.parse(message);
+        message = errObj.message || message;
+      } catch {}
+      return rejectWithValue(message);
+    }
+  }
+);
+
+// Your existing thunks remain the same...
 export const loginUser = createAsyncThunk('auth/loginUser', async (credentials: { email: string; password: string }, { rejectWithValue }) => {
   try {
     const response = await apiClient.post(`${BASE_URL}/api/v1/auth/login`, credentials);
     if (response.error) {
-
       return rejectWithValue(response.message || 'Login failed');
     }
     if (!response.accessToken || !response.user) {
       return rejectWithValue(response.message || 'Login failed');
     }
+    
+    // Store tokens
+    if (response.accessToken) {
+      localStorage.setItem('authToken', response.accessToken);
+    }
+    if (response.refreshToken) {
+      localStorage.setItem('refreshToken', response.refreshToken);
+    }
+    
     return {
-      user: response.user, // Use full user object from backend
+      user: response.user,
       token: response.accessToken,
       refreshToken: response.refreshToken,
       message: response.message,
@@ -89,13 +153,26 @@ export const loginUser = createAsyncThunk('auth/loginUser', async (credentials: 
 
 export const registerUser = createAsyncThunk(
   'auth/registerUser',
-  async (payload: RegisterPayload, { rejectWithValue }) => {
+  async (payload: {
+    fullName: string;
+    phoneNumber: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    organizationName: string;
+  }, { rejectWithValue }) => {
     try {
       const response = await apiClient.post(`${BASE_URL}/api/v1/auth/register`, payload);
       if (response.error) {
         return rejectWithValue(response.message || 'Registration failed');
       }
+      
       // Store token if present
+      if (response.accessToken) {
+        localStorage.setItem('authToken', response.accessToken);
+      }
+      
       return {
         data: response.data,
         message: response.message,
@@ -193,7 +270,6 @@ export const loginUserWithGoogle = createAsyncThunk(
     }
   }
 );
-
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -210,6 +286,12 @@ const authSlice = createSlice({
         data: null,
         message: null,
       };
+      
+      // Clear localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('refreshToken');
+      }
     },
     resetAuthState: (state) => {
       state.status = 'idle';
@@ -221,15 +303,33 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Wallet login cases
+      .addCase(loginUserWithWallet.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(loginUserWithWallet.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.refreshToken = action.payload.refreshToken || null;
+        state.error = null;
+      })
+      .addCase(loginUserWithWallet.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload as string;
+      })
+      
+      // Your existing cases...
       .addCase(loginUser.pending, (state) => {
         state.status = 'loading';
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.user = action.payload.user; // Store full user object
+        state.user = action.payload.user;
         state.token = action.payload.token;
-        // Optionally store refreshToken if needed: state.refreshToken = action.payload.refreshToken;
+        state.refreshToken = action.payload.refreshToken || null;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.status = 'failed';
@@ -242,94 +342,20 @@ const authSlice = createSlice({
         state.registration.message = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
-        // Return a fresh state object instead of mutating a possibly read-only draft.
-        // This avoids "Cannot assign to read only property" errors that can occur
-        // when the persisted/re-hydrated state is frozen by persistence middleware.
-        const payload = action.payload || {} as any;
-        return {
-          ...initialState,
-          registration: {
-            status: 'succeeded',
-            error: null,
-            data: payload.data ?? null,
-            message: payload.message ?? null,
-          },
-          token: payload.token ?? null,
-          user: payload.data ?? null,
-        } as AuthState;
+        state.registration.status = 'succeeded';
+        state.registration.data = action.payload.data || null;
+        state.registration.message = action.payload.message || null;
+        state.token = action.payload.token || null;
+        if (action.payload.data) {
+          state.user = action.payload.data;
+        }
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.registration.status = 'failed';
         state.registration.error = action.payload as string;
-      })
-      .addCase(loginUserWithGoogle.pending, (state) => {
-        state.status = 'loading';
-        state.error = null;
-      })
-      .addCase(loginUserWithGoogle.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-        state.refreshToken = action.payload.refreshToken;
-        console.log('✅ Google auth state updated:', {
-          user: action.payload.user,
-          token: action.payload.token ? action.payload.token.substring(0, 20) + '...' : null,
-          refreshToken: action.payload.refreshToken ? action.payload.refreshToken.substring(0, 20) + '...' : null,
-        });
-      })
-      .addCase(loginUserWithGoogle.rejected, (state, action) => {
-        // Don't show "exchange" related errors - these are often duplicate calls
-        const errorMessage = action.payload as string;
-        if (errorMessage && errorMessage.toLowerCase().includes('exchange')) {
-          // Silently ignore exchange errors
-          console.log('⚠️ Ignoring exchange error:', errorMessage);
-          return;
-        }
-        state.status = 'failed';
-        state.error = errorMessage;
-        console.error('❌ Google auth failed:', action.payload);
       });
   },
 });
 
-// redux/slices/authSlice.ts (add this to your existing slice)
-export const web3Login = createAsyncThunk(
-  'auth/web3Login',
-  async (walletData: {
-    publicKey: string;
-    signature: string;
-    message: string;
-    timestamp: number;
-    nonce: string;
-  }, { rejectWithValue }) => {
-    try {
-      const response = await fetch('/api/auth/wallet-login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(walletData),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Wallet authentication failed');
-      }
-
-      const data = await response.json();
-      
-      // Store token in localStorage
-      if (data.token) {
-        localStorage.setItem('authToken', data.token);
-      }
-      
-      return data;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Wallet authentication failed');
-    }
-  }
-);
-
 export const { logout, resetAuthState } = authSlice.actions;
-
 export default authSlice.reducer;

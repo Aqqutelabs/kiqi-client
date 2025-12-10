@@ -9,10 +9,10 @@ import { useState, useEffect } from "react";
 import SearchInput from "@/components/ui/Search";
 import Filter from "@/components/ui/Filter";
 import { Button } from "@/components/ui/Button";
-import { Plus, Sparkles, Loader, Edit3, Trash2 } from "lucide-react";
+import { Plus, Loader, } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
 import { redirect } from "next/navigation";
-import axios from "axios";
+import api from '@/lib/api';
 import { FormField } from "@/components/ui/FormField";
 
 // Define type for campaign data
@@ -276,51 +276,47 @@ export default function EmailCampaignDashboard() {
   ];
 
   // Fetch campaigns data
-  const fetchCampaigns = async (showRefreshLoader = false) => {
-    if (showRefreshLoader) {
-      setRefreshing(true);
-    } else {
-      setLoading(true);
+const fetchCampaigns = async (showRefreshLoader = false) => {
+  if (showRefreshLoader) {
+    setRefreshing(true);
+  } else {
+    setLoading(true);
+  }
+  
+  try {
+    // Now just use the api instance - token is automatically included
+    const response = await api.get<ApiResponse<Campaign[]>>('/campaigns');
+
+    const campaignsData = response.data.data || [];
+
+    if (!Array.isArray(campaignsData)) {
+      throw new Error("Unexpected data format from server");
     }
+
+    const transformedData: Campaign[] = campaignsData.map((campaign: any, index: number) => ({
+      id: campaign.id || index + 1,
+      name: campaign.name || `Campaign ${index + 1}`,
+      status: campaign.status || 'Active',
+      audience: campaign.audience || 'All Subscribers',
+      deliveries: campaign.deliveries || 0,
+      opens: campaign.opens || 0,
+      clicks: campaign.clicks || 0,
+      date: campaign.date || new Date().toISOString().split('T')[0],
+    }));
+
+    setCampaigns(transformedData);
+    toast.success(showRefreshLoader ? 'Campaigns refreshed!' : 'Campaigns loaded!');
     
-    try {
-      const response = await axios.get<ApiResponse<Campaign[]>>(
-        'https://kiqi-server-pqqr.onrender.com/api/v1/campaigns'
-      );
-
-      const campaignsData = response.data.data || [];
-
-      if (!Array.isArray(campaignsData)) {
-        throw new Error("Unexpected data format from server");
-      }
-
-      // Transform API data to match our Campaign interface
-      const transformedData: Campaign[] = campaignsData.map((campaign: any, index: number) => ({
-        id: campaign.id || index + 1,
-        name: campaign.name || `Campaign ${index + 1}`,
-        status: campaign.status || 'Active',
-        audience: campaign.audience || 'All Subscribers',
-        deliveries: campaign.deliveries || 0,
-        opens: campaign.opens || 0,
-        clicks: campaign.clicks || 0,
-        date: campaign.date || new Date().toISOString().split('T')[0],
-      }));
-
-      setCampaigns(transformedData);
-      toast.success(showRefreshLoader ? 'Campaigns refreshed!' : 'Campaigns loaded!');
-      
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch campaigns';
-      toast.error(errorMessage);
-      console.error('Error fetching campaigns:', err);
-      
-      // Set empty array instead of dummy data
-      setCampaigns([]);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'Failed to fetch campaigns';
+    toast.error(errorMessage);
+    console.error('Error fetching campaigns:', err);
+    setCampaigns([]);
+  } finally {
+    setLoading(false);
+    setRefreshing(false);
+  }
+};
 
   // Initial data fetch
   useEffect(() => {
