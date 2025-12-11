@@ -1,4 +1,5 @@
 "use client";
+import NavBar from "@/components/landing/navbar";
 import { Button } from "@/components/ui/Button";
 import { Rocket } from "lucide-react";
 import { redirect } from "next/navigation";
@@ -41,16 +42,11 @@ export default function ComingSoonLanding() {
     }
   };
 
-  const socialLinks = [
-    { icon: "group", href: "#", label: "Community" },
-    { icon: "photo_camera", href: "#", label: "Instagram" },
-    { icon: "campaign", href: "#", label: "Updates" },
-  ];
-
   return (
     <section 
       className="bg-background-light dark:bg-background-dark font-display text-text-light dark:text-text-dark"
       style={{ minHeight: "max(884px, 100dvh)" }}>
+        <NavBar/>
       <div className="relative flex h-auto min-h-screen w-full flex-col items-center justify-center bg-background-light dark:bg-background-dark group/design-root overflow-x-hidden p-4">
         <div className="flex max-w-md flex-col items-center text-center">
           
@@ -73,7 +69,7 @@ export default function ComingSoonLanding() {
           </p>
           
         </div>
-        <Button variant={"tertiary"} onClick={() => redirect("/")}>Bsck to Home</Button>
+        <Button variant={"tertiary"} onClick={() => redirect("/")}>Back to Home</Button>
       </div>
     </section>
   );
