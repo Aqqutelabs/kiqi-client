@@ -316,7 +316,7 @@ const fetchCampaigns = async (showRefreshLoader = false) => {
     }));
 
     setCampaigns(transformedData);
-    toast.success(showRefreshLoader ? 'Campaigns refreshed!' : 'Campaigns loaded!');
+    // toast.success(showRefreshLoader ? 'Campaigns refreshed!' : 'Campaigns loaded!');
     
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : 'Failed to fetch campaigns';
