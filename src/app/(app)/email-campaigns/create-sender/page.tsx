@@ -154,7 +154,7 @@ const CreateSenderEmailPage = () => {
     <>
       {/* toasts are handled by the global ToasterClient component */}
       <main className="flex-1 overflow-y-auto">
-        <PageHeader title="Create a sender email" backLink="/email-campaigns/dashboard" />
+        <PageHeader title="Create a sender email" backLink="/email-campaigns/settings" />
 
         <Card className="mb-6 p-6">
           <h3 className="text-lg font-semibold mb-2">Create & Verify SendGrid Sender</h3>
