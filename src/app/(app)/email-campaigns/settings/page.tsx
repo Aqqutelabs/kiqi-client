@@ -50,13 +50,13 @@ export default function CampaignSettings() {
 
   const user = useAppSelector((state) => state.auth.user);
   const token = useAppSelector((state) => state.auth.token);
-  const userEmail = user?.email || "";
+  // const userEmail = user?.email || "";
   const router = useRouter();
 
   const [data, setData] = useState({
     campaignName: "",
     subjectLine: "",
-    senderId: userEmail,
+    senderId: "",
     autoStart: true,
     audience: {
       emailLists: [] as string[], // For existing list IDs
@@ -64,11 +64,11 @@ export default function CampaignSettings() {
   });
 
   // Update data.senderId when userEmail changes
-  useEffect(() => {
-    if (userEmail) {
-      setData((prev) => ({ ...prev, senderId: userEmail }));
-    }
-  }, [userEmail]);
+  // useEffect(() => {
+  //   if (userEmail) {
+  //     setData((prev) => ({ ...prev, senderId: userEmail }));
+  //   }
+  // }, [userEmail]);
 
   // Fetch existing email lists
   useEffect(() => {
@@ -430,6 +430,14 @@ export default function CampaignSettings() {
               id="sender-email"
               placeholder="Enter your sender ID"
             />
+            {/* <div className="space-y-1 w-full">
+              <label className="text-[#1B223C] text-sm">Sender Email</label>
+              <Select
+                placeholder="Select sender email"
+                className="bg-[#00000014]">
+                <option value="">Email 1</option>
+              </Select>
+            </div> */}
             <Button
               className="w-[30%]"
               onClick={() => redirect("/email-campaigns/create-sender")}>
