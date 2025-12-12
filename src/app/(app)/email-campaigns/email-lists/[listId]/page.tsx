@@ -316,7 +316,7 @@ const EmailListDetailPage = () => {
               
               {/* Dropdown Menu */}
               {showListDropdown && (
-                <div className="absolute top-full left-0 mt-1 w-64 bg-white border rounded-lg shadow-lg z-10 max-h-80 overflow-y-auto">
+                <div className="absolute top-full left-0 mt-1 w-64 bg-white border rounded-lg shadow-lg z-10 max-h-64 overflow-y-auto scrollbar-hide">
                   {allLists.map((list) => (
                     <button
                       key={list._id}

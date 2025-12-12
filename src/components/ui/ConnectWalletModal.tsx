@@ -20,7 +20,9 @@ export default function ConnectWallet({
   onClose: () => void;
   mode?: "signup" | "login";
 }) {
-  const { signInWithWallet, isSigning, publicKey, error, disconnect } = useWalletAuth();
+  const { 
+    // signInWithWallet, 
+    isSigning, publicKey, error, disconnect } = useWalletAuth();
   const { connected, connecting } = useWallet();
   const [localError, setLocalError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -43,7 +45,7 @@ export default function ConnectWallet({
   const handleSignIn = async () => {
     try {
       setLocalError(null);
-      await signInWithWallet();
+      // await signInWithWallet();
       setSuccess(true);
       
       toast.success(`${mode === "signup" ? 'Signed up' : 'Signed in'} successfully with wallet!`);
