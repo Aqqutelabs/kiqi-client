@@ -115,11 +115,11 @@ export default function PRDashboard() {
         console.log(result);
 
         const formatted = result.map((item: any) => ({
-          id: item.id,
+          id: item._id,
           title: item.title,
           status: item.status,
           distribution: item.distribution || "—",
-          campaign: item.campaign?.name || "—",
+          campaign: item.campaign || "—",
           performance: item.performance || "—",
           date_created: formatDate(item.date_created),
         }));
@@ -184,7 +184,7 @@ export default function PRDashboard() {
             <DataTable
               columns={columns}
               data={data}
-              onView={(id) => `/pr/pr-details/${id}`}
+            onView={(id) => `/pr/pr-details/${id}`}
             />
           </Card>
         )}

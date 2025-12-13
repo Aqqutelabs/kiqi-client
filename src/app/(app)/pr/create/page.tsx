@@ -11,8 +11,10 @@ import BASE_URL from "@/lib/utils/baseUrl";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { redirect } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/Input";
+import toast from "react-hot-toast";
 
 export default function CreatePressRelease() {
   interface Campaign {
@@ -32,12 +34,20 @@ export default function CreatePressRelease() {
   const suggestions = ["Show Preview", "Clear Content", "Upload Document"];
   const [activeTab, setActiveTab] = useState<number | null>(null);
   const [prContent, setPrContent] = useState("");
+  const title = useRef<HTMLInputElement>(null);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
 
   const [loading, setLoading] = useState(false);
 
-  const [selectedCampaign, setSelectedCampaign] = useState<string | null>(null);
+  //const [selectedCampaign, setSelectedCampaign] = useState<string | null>(null);
   const [image, setImage] = useState<File | null>(null);
+
+  useEffect(() => {
+    localStorage.removeItem("pr_step_one");
+    localStorage.removeItem("pr_step_one_image");
+    localStorage.removeItem("cart");
+    localStorage.removeItem("pr_id");
+  }, []);
 
   const token =
     typeof window !== "undefined"
@@ -71,47 +81,97 @@ export default function CreatePressRelease() {
     fetchCampaigns();
   }, []);
 
+  const fileToBase64 = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
   const handleSubmit = async () => {
+    //const hardcodedCampaignId = "671ef7f20b8f4a0d6fcb47a9";
+    try {
+      // Validate required fields
+      // if (!selectedCampaign) {
+      //   alert("Please select a campaign.");
+      //   return;
+      // }
+      // if (!prContent || prContent.trim() === "") {
+      //   alert("Press release content is required.");
+      //   return;
+      // }
+
+      // Prepare draft object (text only)
+      const draft = {
+        title: title.current?.value || "",
+        // campaign_id: hardcodedCampaignId,
+        pr_content: prContent,
+        status: "Draft",
+      };
+
+      // Save draft to localStorage
+      localStorage.setItem("pr_step_one", JSON.stringify(draft));
+
+      // Convert image to Base64 (if exists) and save separately
+      if (image) {
+        const imageBase64 = await fileToBase64(image);
+        localStorage.setItem("pr_step_one_image", imageBase64);
+      }
+
+      // Debug: verify localStorage
+      console.log("Step 1 draft stored:", {
+        draft,
+        imageBase64:
+          localStorage.getItem("pr_step_one_image")?.slice(0, 50) + "...",
+      });
+
+      // Navigate to Step 2 (publisher selection)
+      router.push("/pr/create/publisher-platform");
+    } catch (error) {
+      console.error("Failed to save Step 1 data:", error);
+      toast.error("An error occurred while saving the PR draft. Please try again.");
+    }
     //const hardcodedCampaignId = "671ef7f20b8f4a0d6fcb47a9";
     // if (!selectedCampaign) return alert("Select a campaign first");
     // if (!prContent) return alert("Press release content is required");
 
-    const formData = new FormData();
-    formData.append("campaign_id", selectedCampaign ?? "");
-    formData.append("pr_content", prContent);
+    // const formData = new FormData();
+    // formData.append("campaign_id", hardcodedCampaignId ?? "");
+    // formData.append("pr_content", prContent);
 
-    // Set default status to "Draft"
-    formData.append("status", "Draft");
+    // // Set default status to "Draft"
+    // formData.append("status", "Draft");
 
-    if (image) {
-      formData.append("image", image);
-    }
+    // if (image) {
+    //   formData.append("image", image);
+    // }
 
-    try {
-      const res = await axios.post(
-        `${BASE_URL}/api/v1/press-releases/create`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+    // try {
+    //   const res = await axios.post(
+    //     `${BASE_URL}/api/v1/press-releases/create`,
+    //     formData,
+    //     {
+    //       headers: {
+    //         Authorization: `Bearer ${token}`,
+    //         "Content-Type": "multipart/form-data",
+    //       },
+    //     }
+    //   );
 
-      console.log("PR Created:", res.data);
+    //   console.log("PR Created:", res.data);
 
-      router.push("/pr/create/publisher-platform");
-    } catch (error: any) {
-      console.error("Error creating PR:", error);
-      //alert("Error creating PR");
-      if (error.response) {
-        console.error("Backend response data:", error.response.data);
-        alert(`Error from server: ${JSON.stringify(error.response.data)}`);
-      } else {
-        alert(`Network or unknown error: ${error.message}`);
-      }
-    }
+    //   router.push("/pr/create/publisher-platform");
+    // } catch (error: any) {
+    //   console.error("Error creating PR:", error);
+    //   //alert("Error creating PR");
+    //   if (error.response) {
+    //     console.error("Backend response data:", error.response.data);
+    //     alert(`Error from server: ${JSON.stringify(error.response.data)}`);
+    //   } else {
+    //     alert(`Network or unknown error: ${error.message}`);
+    //   }
+    // }
   };
 
   return (
@@ -125,31 +185,48 @@ export default function CreatePressRelease() {
       <Card>
         <Heading
           heading="Step 1"
-          subtitle="Campaign Selection"
-          className="mb-2"
+          subtitle="Title"
+          className="mb-6"
           sm
         />
-        {/* Select a Campaign */}
-        <Select
-          name="campaign-selection"
-          placeholder="Select a campaign"
-          onChange={(e) => {
-            console.log("Selected campaign:", e.target.value);
-            setSelectedCampaign(e.target.value);
-          }}
-          disabled={loading}
-        >
-          <option value=""></option>
-          {Array.isArray(campaigns) &&
-            campaigns.map((campaign) => (
-              <option key={campaign._id} value={campaign._id}>
-                {campaign.campaignName}
-              </option>
-            ))}
-          {/* <option value="b">Campaign B</option>
-          <option value="c">Campaign C</option>
-          <option value="d">Campaign D</option> */}
-        </Select>
+        {/* <div className="mb-4">
+          <Heading
+            heading="Choose or Create Campaign"
+            subtitle="Press releases are grouped under campaigns. Select an existing campaign or start a new one."
+            className="mb-2"
+            sm
+          />
+          {/* Select a Campaign */}
+          {/* <Select
+            name="campaign-selection"
+            placeholder="Select a campaign"
+            onChange={(e) => {
+              console.log("Selected campaign:", e.target.value);
+              setSelectedCampaign(e.target.value);
+            }}
+            disabled={loading}
+          >
+            <option value=""></option>
+            {Array.isArray(campaigns) &&
+              campaigns.map((campaign) => (
+                <option key={campaign._id} value={campaign._id}>
+                  {campaign.campaignName}
+                </option>
+              ))}
+            
+          </Select> */}
+        {/* </div> */} 
+
+        {/* Press Release Title */}
+        <div>
+          <Heading
+            heading="Press Release Title"
+            subtitle="Give this release a name"
+            className="mb-2"
+            sm
+          />
+          <Input name="title" ref={title} placeholder="Enter a title" />
+        </div>
       </Card>
       {/* File Upload */}
       <Card>

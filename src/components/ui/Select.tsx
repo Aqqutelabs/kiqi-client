@@ -43,8 +43,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
               {placeholder}
             </option>
           )}
-          {children || <option value="" disabled>No options available</option>}
-          {children}
+          {children && children}
         </select>
 
         <ChevronDown

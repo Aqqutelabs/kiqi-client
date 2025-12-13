@@ -27,6 +27,7 @@ interface Transactions {
 
 export default function TransactionHistoryPage() {
   const [transactions, setTransactions] = useState<Transactions[]>([]);
+  const [filtered, setFiltered] = useState<Transactions[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -59,6 +60,7 @@ export default function TransactionHistoryPage() {
           status: tx.status || "Pending",
         }));
         setTransactions(mapped);
+        setFiltered(mapped);
       } catch (err) {
         setError("Failed to load transactions");
       } finally {
@@ -113,6 +115,9 @@ export default function TransactionHistoryPage() {
     },
   ];
   const [query, setQuery] = useState("");
+  const [typeFilter, setTypeFilter] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
 
   const headers: Column<Transactions>[] = [
     { header: "Transaction ID", accessor: "transactionID" },
@@ -123,6 +128,32 @@ export default function TransactionHistoryPage() {
     { header: "Balance", accessor: "balance" },
     { header: "Status", accessor: "status" },
   ];
+
+  useEffect(() => {
+    let list = [...transactions];
+
+    // Search filter
+    if (query) {
+      list = list.filter((t) =>
+        t.description.toLowerCase().includes(query.toLowerCase())
+      );
+    }
+
+    // Type filter
+    if (typeFilter) {
+      list = list.filter((t) => t.type === typeFilter);
+    }
+
+    // Date range
+    if (fromDate) {
+      list = list.filter((t) => new Date(t.date) >= new Date(fromDate));
+    }
+    if (toDate) {
+      list = list.filter((t) => new Date(t.date) <= new Date(toDate));
+    }
+
+    setFiltered(list);
+  }, [query, typeFilter, fromDate, toDate, transactions]);
 
   // const data: Transactions[] = [
   //   {
@@ -182,11 +213,28 @@ export default function TransactionHistoryPage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        <Select placeholder="Enter Types">
+        <Select
+          placeholder="All Types"
+          value={typeFilter}
+          onChange={(e) => setTypeFilter(e.target.value)}
+        >
           <option value="">All Types</option>
+          <option value="Credit">Credit</option>
+          <option value="Debit">Debit</option>
+          <option value="Purchase">Purchase</option>
+          <option value="Conversion">Conversion</option>
+          <option value="Referral">Referral</option>
         </Select>
-        <DateInput placeholder="From date" />
-        <DateInput placeholder="To date" />
+        
+
+        <DateInput
+          placeholder="From date"
+          onChange={(value) => setFromDate(value)}
+        />
+        <DateInput
+          placeholder="To date"
+          onChange={(value) => setToDate(value)}
+        />
       </div>
 
       {/* table */}
@@ -195,7 +243,7 @@ export default function TransactionHistoryPage() {
       {error && <p className="text-red-500">{error}</p>}
 
       {!loading && !error && (
-        <DataTable columns={headers} data={transactions} />
+        <DataTable columns={headers} data={filtered} />
       )}
     </section>
   );

@@ -27,32 +27,29 @@ export default function PaymentSuccess() {
     }
 
     axios
-      .post(
-        `${BASE_URL}/api/v1/subscriptions/verify-payment`,
-        { reference },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
+      .get(`${BASE_URL}/api/v1/press-releases/orders/verify-payment`, {
+        params: { reference },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then(() => {
         setVerifyStatus("success");
 
         // Redirect after 3 seconds
         setTimeout(() => {
-          router.push("/wallet");
+          router.push("/pr/dashboard");
         }, 3000);
       })
       .catch(() => {
         setVerifyStatus("failed");
+
+        setTimeout(() => {
+          router.push("/pr/checkout");
+        }, 1500);
+
+        toast.error("Payment failed");
       });
-
-    toast.error("Payment failed");
-
-    setTimeout(() => {
-      router.push("/subscriptions");
-    }, 1500);
   }, []);
 
   if (verifyStatus === "verifying") return <p>Verifying payment…</p>;

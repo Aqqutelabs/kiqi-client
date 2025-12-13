@@ -138,6 +138,18 @@ export default function WalletPage() {
   const [stats, setStats] = useState(dummyStats);
   const [recent_activity, setRecentActivity] = useState<ActivityItem[]>([]);
   const [value, setValue] = useState("");
+
+  const conversionRate = 2.5;
+  const feeRate = 0.1;
+
+  const coinsToRedeem = Number(value) || 0;
+
+  const grossCredits = coinsToRedeem * conversionRate;
+  const processingFee = grossCredits * feeRate;
+  const finalCredits = grossCredits - processingFee;
+
+  const [coins, setCoins] = useState<number>(0);
+
   // quick actions
   const quick_actions = [
     {
@@ -180,7 +192,8 @@ export default function WalletPage() {
       })
       .then((res) => {
         const { usage, subscription } = res.data.data;
-        const coins = usage.monthly_credits / 2.5;
+        const calculatedCoins = usage.monthly_credits / 2.5;
+        setCoins(calculatedCoins);
 
         setStats([
           {
@@ -200,7 +213,7 @@ export default function WalletPage() {
           {
             // Go Coins
             ...dummyStats[1],
-            amount: coins.toLocaleString(),
+            amount: calculatedCoins.toLocaleString(),
           },
           {
             ...dummyStats[2], // Current Plan card
@@ -387,7 +400,7 @@ export default function WalletPage() {
             <div className="space-y-1">
               <p className="text-sm text-[#62748E]">Available Balance</p>
               <p>
-                <span className="text-[#0F172B] text-2xl">3,280</span>
+                <span className="text-[#0F172B] text-2xl">{coins.toLocaleString()}</span>
                 <span className="text-[#62748E] text-sm ml-1">GoCoins</span>
               </p>
             </div>
@@ -427,19 +440,19 @@ export default function WalletPage() {
             </p>
             <p className="flex items-center justify-between">
               <span className="text-sm text-[#62748E]">Gross Credits</span>
-              <span className="text-sm text-[#0F172B]">250 GC</span>
+              <span className="text-sm text-[#0F172B]">{grossCredits.toLocaleString()} GC</span>
             </p>
             <p className="flex items-center justify-between">
               <span className="text-sm text-[#62748E]">
                 Processing Fee (10%)
               </span>
-              <span className="text-sm text-[#E7000B]">-25 GC</span>
+              <span className="text-sm text-[#E7000B]">-{processingFee.toLocaleString()} GC</span>
             </p>
             <hr className="text-gray-200" />
             <div className="flex items-center justify-between">
               <p className="text-[#0F172B]">You'll Receive</p>
               <p>
-                <span className="text-xl text-[#27AE60]">225</span>
+                <span className="text-xl text-[#27AE60]">{finalCredits.toLocaleString()}</span>
                 <span className="text-sm text-[#62748E] ml-1">GC</span>
               </p>
             </div>
@@ -479,6 +492,7 @@ export default function WalletPage() {
       <ConnectWallet
         isOpen={connectWallet}
         onClose={() => setConnectWallet(false)}
+        redeemAmount={value}
       />
     </section>
   );

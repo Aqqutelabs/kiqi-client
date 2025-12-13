@@ -10,36 +10,110 @@ import {
 } from "lucide-react";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { Button } from "@/components/ui/Button";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import BASE_URL from "@/lib/utils/baseUrl";
 import axios from "axios";
 import { Publications } from "../create/publisher-platform/page";
+import { parseAmount } from "@/lib/utils/parseAmount";
 
 export default function PRCheckoutPage() {
-
   const [selectedPayment, setSelectedPayment] = useState("paystack");
   const [publications, setPublications] = useState<Publications[]>([]);
+  const router = useRouter();
+
+  interface CartItem {
+    _id: string; // for React key
+    publisherId: string;
+    name: string;
+    price: string;
+    region_reach: string[];
+    audience_reach: string;
+    selected: boolean;
+  }
 
   const [cartData, setCartData] = useState<{
-    items: Publications[];
-    subtotal: number;
-    vat: number;
-    total: number;
+    items: CartItem[];
+    _id: string;
+    user_id: string;
+    created_at: string;
+    updated_at: string;
   } | null>(null);
 
-  useEffect(() => {
-    const savedCart = localStorage.getItem("cart");
-    if (savedCart) {
-      setCartData(JSON.parse(savedCart));
+  // useEffect(() => {
+  //   const savedCart = localStorage.getItem("cart");
+  //   if (savedCart) {
+  //     setCartData(JSON.parse(savedCart));
+  //   }
+  // }, []);
+
+  const token =
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("persist:root") || "{}").auth
+        ? JSON.parse(
+            JSON.parse(localStorage.getItem("persist:root") || "{}").auth
+          ).token
+        : null
+      : null;
+
+  const fetchCart = async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/api/v1/press-releases/cart`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setCartData(res.data.data);
+    } catch (error) {
+      console.error("Error fetching cart:", error);
     }
+  };
+
+  useEffect(() => {
+    fetchCart();
   }, []);
+
+  const subtotal =
+    cartData?.items?.reduce((sum, item) => {
+      return sum + parseAmount(item.price);
+    }, 0) || 0;
+
+  const vat = subtotal * 0.075;
+  const total = subtotal + vat;
 
   const formatPrice = (amount: number) => `₦${amount.toLocaleString()}`;
 
-  const completePayment = () => {
-    toast.success("Payment Completed!");
-    redirect("/pr/dashboard");
+  const completePayment = async () => {
+    try {
+      const token =
+        typeof window !== "undefined"
+          ? JSON.parse(localStorage.getItem("persist:root") || "{}").auth
+            ? JSON.parse(
+                JSON.parse(localStorage.getItem("persist:root") || "{}").auth
+              ).token
+            : null
+          : null;
+
+      const res = await axios.post(
+        `${BASE_URL}/api/v1/press-releases/orders/checkout`,
+        null,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      console.log(res);
+      const paymentLink = res.data.data.payment.authorization_url;
+      console.log(paymentLink);
+      if (paymentLink) {
+        window.location.href = paymentLink;
+        return;
+      }
+
+      // toast.success("Payment Completed!");
+      // router.push("/pr/dashboard");
+    } catch (error: any) {
+      toast.error("Unable to complete payment");
+    }
   };
 
   const [showBalance, setShowBalance] = useState(false);
@@ -72,7 +146,8 @@ export default function PRCheckoutPage() {
                     Your Publications
                   </h2>
                   <span className="bg-blue-50 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full">
-                    3 Items
+                    {cartData ? cartData.items.length : 0}{" "}
+                    {cartData?.items.length === 1 ? "Item" : "Items"}
                   </span>
                 </div>
 
@@ -89,29 +164,43 @@ export default function PRCheckoutPage() {
 
                   <div className="space-y-4">
                     {cartData?.items?.length ? (
-                      cartData.items.map((pub) => (
-                        <div
-                          key={pub.id}
-                          className="flex items-start justify-between p-4 rounded-xl border border-gray-100 bg-gradient-to-r from-[#F8FAFC] to-[#FFFFFF]"
-                        >
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-gray-900 mb-2">
-                              {pub.productName}
-                            </h4>
-                            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
-                              <span className="bg-white border border-[#E2E8F0] h-6 px-3 flex justify-center items-center rounded-md">
-                                {pub.reach}
-                              </span>
-                              <span className="bg-white border border-[#E2E8F0] h-6 px-3 flex justify-center items-center rounded-md">
-                                {pub.region}
-                              </span>
+                      cartData.items.map((pub, pubIndex) => {
+                        return (
+                          <div
+                            key={`${pub._id}-${pubIndex}`}
+                            className="flex items-start justify-between p-4 rounded-xl border border-gray-100 bg-gradient-to-r from-[#F8FAFC] to-[#FFFFFF]"
+                          >
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-gray-900 mb-2">
+                                {pub.name}
+                              </h4>
+
+                              <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+                                <span className="bg-white border border-[#E2E8F0] h-6 px-3 flex justify-center items-center rounded-md">
+                                  {pub.audience_reach}
+                                </span>
+
+                                {pub.region_reach?.map(
+                                  (region, regionIndex) => {
+                                    return (
+                                      <span
+                                        key={`${pub._id}-${pubIndex}-region-${regionIndex}`}
+                                        className="bg-white border border-[#E2E8F0] h-6 px-3 flex justify-center items-center rounded-md"
+                                      >
+                                        {region}
+                                      </span>
+                                    );
+                                  }
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="text-right ml-4 font-bold text-gray-900">
+                              {pub.price}
                             </div>
                           </div>
-                          <div className="text-right ml-4 font-bold text-gray-900">
-                            {pub.amount}
-                          </div>
-                        </div>
-                      ))
+                        );
+                      })
                     ) : (
                       <p className="text-gray-500">No items in your cart</p>
                     )}
@@ -242,29 +331,39 @@ export default function PRCheckoutPage() {
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Subtotal</span>
                     <span className="font-semibold text-gray-900">
-                      {formatPrice(cartData?.subtotal || 0)}
+                      ₦{subtotal.toLocaleString()}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">VAT (7.5%)</span>
                     <span className="font-semibold text-gray-900">
-                      {formatPrice(cartData?.vat || 0)}
+                      ₦{vat.toLocaleString()}
                     </span>
                   </div>
                   <div className="border-t border-gray-200 pt-4">
                     <div className="flex justify-between">
                       <span className="font-semibold text-gray-900">Total</span>
                       <span className="text-2xl font-bold text-blue-600">
-                        {formatPrice(cartData?.total || 0)}
+                        ₦{total.toLocaleString()}
                       </span>
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <Button size={"lg"} onClick={completePayment}>
+                  <Button
+                    size="lg"
+                    onClick={completePayment}
+                    disabled={selectedPayment !== "paystack"}
+                    className={`w-full transition-all ${
+                      selectedPayment !== "paystack"
+                        ? "opacity-50 cursor-not-allowed"
+                        : ""
+                    }`}
+                  >
                     Complete Payment
                   </Button>
+
                   <Button
                     variant={"tertiary"}
                     onClick={() => redirect("/pr/create/publisher-platform")}
