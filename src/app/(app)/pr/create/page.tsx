@@ -21,7 +21,7 @@ export default function CreatePressRelease() {
   const [activeTab, setActiveTab] = useState<number | null>(null);
   const [prContent, setPrContent] = useState("");
   const title = useRef<HTMLInputElement>(null);
-  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  //const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
@@ -45,28 +45,28 @@ export default function CreatePressRelease() {
         : null
       : null;
 
-  useEffect(() => {
-    const fetchCampaigns = async () => {
-      try {
-        setLoading(true);
-        const res = await axios.get(`${BASE_URL}/api/v1/campaigns`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+  // useEffect(() => {
+  //   const fetchCampaigns = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const res = await axios.get(`${BASE_URL}/api/v1/campaigns`, {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       });
 
-        console.log("Campaign response:", res.data);
+  //       console.log("Campaign response:", res.data);
 
-        setCampaigns(res.data.data);
-      } catch (err) {
-        console.error("Failed to fetch campaigns", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  //       setCampaigns(res.data.data);
+  //     } catch (err) {
+  //       console.error("Failed to fetch campaigns", err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchCampaigns();
-  }, []);
+  //   fetchCampaigns();
+  // }, []);
 
   const fileToBase64 = (file: File) =>
     new Promise<string>((resolve, reject) => {
