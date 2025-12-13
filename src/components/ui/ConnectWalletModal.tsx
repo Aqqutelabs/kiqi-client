@@ -8,6 +8,7 @@ import Heading from "./TextHeading";
 import { Button } from "./Button";
 import BASE_URL from "@/lib/utils/baseUrl";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 interface ConnectWalletProps {
   isOpen: boolean;
@@ -36,7 +37,7 @@ export default function ConnectWallet({
 
       const provider = window.phantom?.solana;
       if (!provider?.isPhantom) {
-        alert("Phantom not installed");
+        toast.error("Phantom not installed");
         return;
       }
 
