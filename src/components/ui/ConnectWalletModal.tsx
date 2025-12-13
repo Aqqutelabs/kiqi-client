@@ -1,10 +1,9 @@
 "use client";
 
-import { Card } from "@/components/ui/Card";
 import { Modal } from "@/components/ui/Modal";
-import { X } from "lucide-react";
-import { redirect } from "next/navigation";
-import { useState } from "react";
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { useWalletAuth } from '@/hooks/useWalletAuth';
+import { useState } from 'react';
 import Heading from "./TextHeading";
 import { Button } from "./Button";
 import BASE_URL from "@/lib/utils/baseUrl";

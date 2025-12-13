@@ -1,55 +1,48 @@
 import * as React from "react";
-import { clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
 import { ChevronDown } from "lucide-react";
+import { twMerge } from "tailwind-merge";
+import clsx from "clsx";
 
-export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+export interface SelectProps
+  extends React.SelectHTMLAttributes<HTMLSelectElement> {
   placeholder?: string;
 }
 
 const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className, children, placeholder, value, defaultValue, ...props }, ref) => {
-    const [hasValue, setHasValue] = React.useState(!!defaultValue || !!value);
-
-    const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      setHasValue(!!e.target.value);
-      if (props.onChange) {
-        props.onChange(e);
-      }
-    };
+  (
+    { className, placeholder, children, value, defaultValue, ...props },
+    ref
+  ) => {
+    const hasValue =
+      (value !== undefined && value !== "") ||
+      (defaultValue !== undefined && defaultValue !== "");
 
     return (
-      <div className="relative w-full">
+      <div className="relative">
         <select
           ref={ref}
           value={value}
           defaultValue={defaultValue}
-          onChange={handleChange}
-          {...props}
           className={twMerge(
             clsx(
-              "flex h-10 w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-[#3366FF] appearance-none bg-white",
-              "focus:outline-none focus:border-[#3366FF]",
-              "hover:border-[#3366FF]/60 transition-all duration-200 ease-in-out",
-              "disabled:bg-gray-100 disabled:cursor-not-allowed",
-              // Apply gray color when placeholder is showing
-              !hasValue && placeholder && "text-gray-400",
+              "w-full border border-gray-300 rounded-md px-3 py-[10px] appearance-none",
+              "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm",
+              !hasValue && "text-gray-400",
               className
             )
           )}
-        >
+          {...props}>
+          {/* Placeholder (hidden from options but shown when no value) */}
           {placeholder && (
-            <option value="" disabled hidden>
+            <option value="" disabled hidden className="text-sm cursor-not-allowed">
               {placeholder}
             </option>
           )}
           {children && children}
         </select>
 
-        <ChevronDown
-          className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 pointer-events-none"
-          aria-hidden="true"
-        />
+        {/* Icon */}
+        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 h-4 w-4" />
       </div>
     );
   }

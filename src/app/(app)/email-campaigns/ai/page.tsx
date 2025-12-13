@@ -29,13 +29,15 @@ export default function EmailCampaignAIPage() {
 
   return (
     <Card>
-      <div className="flex justify-between items-center">
-        <PageHeader title="KiKi Ai" backLink="/email-campaigns/dashboard" />
-        <Button size={"lg"}>
-          <Sparkles size={16} className="mr-1.5" />
-          Upgrade
-        </Button>
-      </div>
+          <div className="flex justify-between items-center">
+            <PageHeader title="KiKi Ai" backLink="/email-campaigns/dashboard" />
+            <Link href="/subscriptions">
+              <Button size={"lg"}>
+                <Sparkles size={16} className="mr-1.5" />
+                Upgrade
+              </Button>
+            </Link>
+          </div>
       <h1 className="text-center text-4xl space-x-2 leading-14">
         <span className="text-[#1B223C]">
           Supercharge your campaigns <br /> with

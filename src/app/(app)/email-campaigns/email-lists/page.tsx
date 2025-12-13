@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/Input";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { Textarea } from "@/components/ui/Textarea";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { selectCampaign } from '@/redux/selectors/campaignSelectors';
 import { fetchUserEmailLists } from "@/redux/slices/campaignSlice";
 import { useEffect } from "react";
 import {
@@ -27,7 +28,7 @@ const ManageEmailListPage = () => {
     userCampaigns,
     status,
     error,
-  } = useAppSelector((state) => state.campaign);
+  } = useAppSelector(selectCampaign);
   const [form, setForm] = React.useState({
     email_listName: "",
     emails: "",
@@ -41,13 +42,16 @@ const ManageEmailListPage = () => {
   const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
 
   useEffect(() => {
-    dispatch(fetchUserEmailLists());
+    // Cast to any to avoid TS dispatch overload issues with async thunks
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    dispatch(fetchUserEmailLists() as any);
   }, [dispatch]);
 
   // Refetch email lists after successful creation
   useEffect(() => {
     if (createEmailListStatus === "succeeded") {
-      dispatch(fetchUserEmailLists());
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      dispatch(fetchUserEmailLists() as any);
     }
   }, [createEmailListStatus, dispatch]);
 
@@ -78,12 +82,13 @@ const ManageEmailListPage = () => {
         .split(",")
         .map((f) => f.trim())
         .filter(Boolean);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = await dispatch(
         createEmailListWithFiles({
           email_listName: form.email_listName,
           emails: emailsArr,
           emailFiles: filesArr,
-        })
+        }) as any
       );
       if (createEmailListWithFiles.fulfilled.match(result)) {
         toast.success("Email list created successfully!");
@@ -113,11 +118,13 @@ const ManageEmailListPage = () => {
       const formData = new FormData();
       formData.append("csv", file);
       formData.append("email_listName", form.email_listName || "Untitled List");
-      const result = await dispatch(createEmailListWithFiles(formData));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result = await dispatch(createEmailListWithFiles(formData) as any);
       if (createEmailListWithFiles.fulfilled.match(result)) {
         setUploadSuccess("CSV uploaded and email list created!");
         setForm({ email_listName: "", emails: "", emailFiles: "" });
-        dispatch(fetchUserEmailLists());
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        dispatch(fetchUserEmailLists() as any);
       } else {
         setUploadError(
           result.payload ||
@@ -147,7 +154,8 @@ const ManageEmailListPage = () => {
       return;
     try {
       await dispatch({ type: "campaign/deleteEmailList", payload: id });
-      dispatch(fetchUserEmailLists());
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      dispatch(fetchUserEmailLists() as any);
       toast.success("Email list deleted successfully!");
     } catch (err) {
       toast.error("Failed to delete email list.");
@@ -155,7 +163,7 @@ const ManageEmailListPage = () => {
   };
 
   return (
-    <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+    <main className="flex-1 overflow-y-auto  ">
       <PageHeader title="Email List" backLink="/email-campaigns/dashboard" />
 
       <Card className="mb-8 p-6">

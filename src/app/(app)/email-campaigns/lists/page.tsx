@@ -15,6 +15,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
+import BASE_URL from '@/lib/utils/baseUrl';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
@@ -24,6 +25,7 @@ import { Modal } from "@/components/ui/Modal";
 import { Pagination } from "@/components/ui/Pagination";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { selectCampaign } from '@/redux/selectors/campaignSelectors';
 import {
   createEmailListWithFiles,
   clearCreateEmailListStatus,
@@ -64,10 +66,12 @@ const EmailCampaignsListPage = () => {
     userCampaigns,
     status,
     error,
-  } = useAppSelector((state) => state.campaign);
+  } = useAppSelector(selectCampaign);
 
   React.useEffect(() => {
-    dispatch(fetchAllCampaigns());
+    // Cast to any to avoid TS dispatch overload issues with async thunks
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    dispatch(fetchAllCampaigns() as any);
   }, [dispatch]);
 
   React.useEffect(() => {
@@ -107,6 +111,7 @@ const EmailCampaignsListPage = () => {
           : { email: email.trim() };
       })
       .filter((e) => e.email);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     dispatch(
       createEmailListWithFiles({
         email_listName: form.email_listName,
@@ -115,7 +120,7 @@ const EmailCampaignsListPage = () => {
           .split(",")
           .map((f) => f.trim())
           .filter(Boolean),
-      })
+      }) as any
     );
   };
 
@@ -140,13 +145,14 @@ const EmailCampaignsListPage = () => {
   const handleStartCampaign = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedListId) return;
-    const result = await dispatch(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result = await dispatch(
       startEmailCampaign({
         campaignName: campaignForm.campaignName,
         emailListId: selectedListId,
         subject: campaignForm.subject,
         body: campaignForm.body,
-      })
+      }) as any
     );
     if (startEmailCampaign.fulfilled.match(result)) {
       toast.success("Campaign started and emails sent!");
@@ -168,9 +174,7 @@ const EmailCampaignsListPage = () => {
             : null
           : null;
       const res = await fetch(
-        `${
-          process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
-        }/api/v1/campaigns/${campaignId}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || BASE_URL}/api/v1/campaigns/${campaignId}`,
         {
           method: "DELETE",
           headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -178,7 +182,8 @@ const EmailCampaignsListPage = () => {
       );
       if (res.ok) {
         toast.success("Campaign deleted!");
-        dispatch(fetchAllCampaigns());
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        dispatch(fetchAllCampaigns() as any);
       } else {
         const data = await res.json();
         toast.error(data.error || "Failed to delete campaign");
@@ -232,7 +237,7 @@ const EmailCampaignsListPage = () => {
 
   return (
     <>
-      <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+      <main className="flex-1 overflow-y-auto  ">
         <div className="flex justify-between items-center mb-6">
           <PageHeader
             title="Email Campaigns"

@@ -138,7 +138,7 @@ export default function PRDashboard() {
 
   return (
     <div className="flex-1 flex flex-col">
-      <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
+      <main className="flex-1 overflow-y-auto space-y-6">
         <PageHeader title="Dashboard" />
         {/* Stat Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
