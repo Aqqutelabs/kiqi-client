@@ -1,497 +1,1148 @@
 "use client";
-
-import Image from "next/image";
-import { GoArrowUp } from "react-icons/go";
-import { FaCircleCheck } from "react-icons/fa6";
-import LandingCarousel from "@/components/landing/carousel";
-import KiQiFeatures from "@/components/landing/kiqi-features";
-import FAQ from "@/components/landing/faq";
-import LandingFooter from "@/components/landing/footer";
-import TestimonialCarousel from "@/components/landing/testimonial-carousel";
-import BlogCarousel from "@/components/landing/blog-carousel";
-import { useState } from "react";
-import Link from "next/link";
-
-type ButtonProps = {
-  variant: "primary" | "secondary" | "plain";
-  icon?: React.ReactNode;
-  content: string;
-  className?: string;
-  link: string;
-};
-
-function Button({ variant, icon, content, className, link }: ButtonProps) {
-  const classes = `${
-    variant === "primary"
-      ? "bg-[#0C31A1] text-white"
-      : variant === "secondary"
-      ? "bg-transparent border border-white text-white"
-      : "bg-white text-[#111111]"
-  } h-[58px] w-full rounded-[10px] flex justify-center items-center relative text-sm block ${className}`;
-  return (
-    <Link href={link} className={classes}>
-      {content}
-      {icon && (
-        <div className="bg-[#020617] size-[30px] rounded-full border border-white flex justify-center items-center text-white absolute -right-3.5 rotate-45">
-          {icon}
-        </div>
-      )}
-    </Link>
-  );
-}
+import { useEffect, useState } from "react";
+import "./kiki.css";
+import { usePathname } from "next/navigation";
+import NavBar from "@/components/landing/navbar";
+import "bootstrap/dist/css/bootstrap.min.css";
+import LandingFooterSecond from "@/components/landing/landingfooter";
 
 export default function Home() {
-  const navLinks = ["Product", "Pricing", "Blog", "Download"];
+  const pathname = usePathname();
 
-  const gridBoxes = [
-    {
-      title: "Tailor KiKi to your business",
-      subtitle:
-        "KiKi is not just your regular AI chatbot, it understands your business and it can help your business grow faster.",
-      lists: [
-        "Upload your business data with the help of our interactive bot",
-        "Ask KiKi anything about your business",
-        "Generate text & media for Ads",
-      ],
-    },
-    {
-      title: "Toggle KiKi on/off",
-      subtitle: "Switch off AI mode and respond yourself when you want to.",
-      lists: [
-        "Respond to your customers instantly",
-        "Professional & Polite",
-        "Flexible",
-      ],
-    },
-  ];
+  const [year, setYear] = useState(new Date().getFullYear());
+  pathname.startsWith("/feature");
 
-  const [activePlanTab, setActivePlanTab] = useState(1);
-  const tabs = [
-    { id: 1, name: "Monthly" },
-    { id: 2, name: "Yearly" },
-  ];
-  const plans = [
-    {
-      id: 1,
-      icon: "/bullseye-arrow.svg",
-      name: "Free",
-      description: "Start for free - basic tools to automate conversations.",
-      price: "0",
-      perks: [
-        "Enhanced Analytics",
-        "Custom Domain",
-        "E-commerce Integration",
-        "Priority Support",
-        "Advanced Security",
-      ],
-    },
-    {
-      id: 2,
-      icon: "/gem.svg",
-      name: "Soloprenuer",
-      description:
-        "Perfect for individuals - get business analytics and higher limits than the free tier.",
-      price: "5",
-      perks: [
-        "Advanced Marketing Tools",
-        "Customizable Templates",
-        "Multi-user Access",
-        "Third-party Integrations",
-        "24/7 Priority Support",
-      ],
-    },
-    {
-      id: 3,
-      icon: "/bullseye-arrow.svg",
-      name: "Small Business",
-      description:
-        "Take your small business to the next level with limitless features.",
-      price: "34",
-      perks: [
-        "Enhanced Analytics",
-        "Custom Domain",
-        "E-commerce Integration",
-        "Priority Support",
-        "Advanced Security",
-      ],
-    },
-    {
-      id: 4,
-      icon: "/gem.svg",
-      name: "Enterprise",
-      description: "When collaboration and security  matter.",
-      price: "56",
-      perks: [
-        "Advanced Marketing Tools",
-        "Customizable Templates",
-        "Multi-user Access",
-        "Third-party Integrations",
-        "24/7 Priority Support",
-      ],
-    },
-  ];
+  useEffect(() => {
+    setYear(new Date().getFullYear());
+  }, []);
 
   return (
     <>
-      <section className="px-4 md:px-10 py-5 space-y-6">
-        {/* navigation */}
-        <nav className="flex justify-between items-center">
-          {/* logo */}
-          <Image
-            src={"/kiki-logo.svg"}
-            alt="KiKi 2025"
-            height={66}
-            width={140}
-          />
+      <NavBar />
 
-          {/* links */}
-          <ul className="hidden md:flex items-center gap-4">
-            {navLinks.map((link, index) => (
-              <li
-                key={index}
-                className="text-base text-[#111111] font-normal hover:text-[#0C31A1] cursor-pointer">
-                {link}
-              </li>
-            ))}
-          </ul>
+      <section className="py-4 py-lg-5">
+        <div className="container-xxl">
+          <div className="hero rounded-xxl px-4 px-lg-5 py-5">
+            <div className="row align-items-center gy-5">
+              <div className="col-lg-6">
+                <h1 className="marketing-main">
+                  Email Marketing
+                  <br />
+                  Without the Headache
+                </h1>
+                <p className="lead mb-4">
+                  Launch campaigns, grow subscribers, and drive sales — without
+                  learning “Email Marketing”.
+                </p>
 
-          {/* cta */}
-          <div className="bg-[#111111] h-[58px] w-[260px] rounded-[10px] py-5 gap-10 hidden md:flex items-center justify-center">
-            <Link href="/login" className="text-sm text-white cursor-pointer">
-              Sign In
-            </Link>
-            <Link
-              href="/signup"
-              className="text-sm text-white cursor-pointer">
-              Sign up
-            </Link>
-          </div>
-        </nav>
+                <div className="d-flex flex-wrap align-items-center gap-3 mb-4">
+                  <a href="#" className="btn btn-white btn-pill">
+                    Start For Free <i className="bi bi-arrow-right ms-1"></i>
+                  </a>
+                  <a href="#" className="btn btn-outline-ice btn-pill">
+                    <i className="bi bi-play-fill me-1"></i> Watch Demo
+                  </a>
+                  <img
+                    className="avatar"
+                    src="https://i.pravatar.cc/80?img=32"
+                    alt="Customer avatar"
+                    loading="lazy"
+                  />
+                </div>
 
-        {/* hero */}
-        <div className="flex flex-col md:flex-row items-start md:h-[600px] gap-5">
-          <div className="w-full md:w-3/4 bg-[#0C31A1] text-white rounded-[30px] h-full relative p-7 md:p-14">
-            <Image
-              src={"/kiqi-hero.svg"}
-              alt="Hero Image"
-              width={410}
-              height={530}
-              className="absolute -right-11 bottom-0 z-10 hidden md:block"
-            />
-
-            <h1 className="font-bold text-[28px] md:text-[52px]">
-              Email Marketing <br className="hidden md:block" />
-               Without the Hassle
-            </h1>
-            <p className="text-base md:text-xl font-light my-12">
-              Launch Campaigns, grow subcribers
-              <br className="hidden md:block" />
-             and drive sales - without learning "Email Marketing"
-            </p>
-
-            <div className="flex flex-col md:flex-row gap-4 md:gap-5 items-center w-full md:w-[360px]">
-              <Button
-                content="Join Waitlist"
-                variant="plain"
-                link="/waitlist"
-                icon={<GoArrowUp />}
-              />
-              
-              <Button content="Watch Demo" variant="secondary" link="" />
-            </div>
-
-            <div className="flex flex-col gap-6 items-start my-8">
-              <div className="flex gap-2 items-center">
-                <FaCircleCheck color="#4CAF50" size={20} />
-                <p className="text-sm">No technical experience required</p>
+                <div className="d-flex flex-wrap gap-4">
+                  <div className="d-flex align-items-center gap-2 text-white">
+                    <i className="bi bi-check-circle-fill mini-check"></i>
+                    <span>No technical experience required</span>
+                  </div>
+                  <div className="d-flex align-items-center gap-2 text-white">
+                    <i className="bi bi-check-circle-fill mini-check"></i>
+                    <span>No credit card required</span>
+                  </div>
+                </div>
               </div>
-              <div className="flex gap-2 items-center">
-                <FaCircleCheck color="#4CAF50" size={20} />
-                <p className="text-sm">No credit card required</p>
+
+              {/* Right: image + floating UI */}
+              <div className="col-lg-6">
+                <div className="hero-art ms-lg-5">
+                  <div className="photo-card shadow-lift">
+                    <img
+                      src="/assets/img/main.png"
+                      alt="Model wearing a blue sweater"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="photo-outline" aria-hidden="true"></div>
+
+                  {/* Floating bits */}
+                  <div className="float pos-tl">
+                    <img
+                      className="avatar"
+                      src="https://i.pravatar.cc/100?img=4"
+                      alt="Avatar"
+                      loading="lazy"
+                    />
+                  </div>
+
+                  <a href="#" className="float btn-campaign bg-info text-white">
+                    <span>
+                      <i className="bi bi-plus-lg me-1"></i>
+                      Create Campaign
+                    </span>
+                  </a>
+
+                  <div className="float pos-mid-r stat-card">
+                    <div className="d-flex align-items-center justify-content-between">
+                      <span className="percent-text">88.60%</span>
+                      <span className="text-success small">
+                        <i className="bi bi-arrow-up-right"></i> 1.3%
+                      </span>
+                    </div>
+                    <div className="text-secondary small">Avg. open rate</div>
+                  </div>
+
+                  <div className="float pos-mid-l chat-bubble">
+                    Hi, do you have a blue dress in UK size 12?
+                  </div>
+                  <div className="float" style={{ top: "48%", left: "-.9rem" }}>
+                    <img
+                      className="avatar"
+                      src="https://i.pravatar.cc/100?img=11"
+                      alt="Avatar"
+                      loading="lazy"
+                    />
+                  </div>
+
+                  <div className="product-card shadow">
+                    <img
+                      src="/assets/img/ladyslide.jpg"
+                      alt="Blue dress"
+                      loading="lazy"
+                    />
+                    <div style={{ paddingLeft: 10 }}>
+                      <div className="product-title">Amiri Dress</div>
+                      <div className="product-subtitle">
+                        Soft weight light chiffon dress
+                      </div>
+                      <div className="product-subtitle mt-2">Fabric: 100%</div>
+                      <div className="product-subtitle">Polyester: 100%</div>
+                      <div className="d-flex flex-wrap gap-2 small text-secondary">
+                        <span>
+                          Color: <b>Blue</b>
+                        </span>
+                      </div>
+                      <div className="d-flex flex-wrap gap-2 small text-secondary">
+                        <span>Size: 12</span>
+                      </div>
+                      <button className="add-to-cart">
+                        <i className="bi bi-bag-plus me-1"></i>Add to Cart
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-          <div className="w-full md:w-1/4 relative rounded-[30px] h-full">
-            <Image
-              src={"/kiki Ai-hero.png"}
-              alt="Hero Image"
-              fill
-              className="object-cover rounded-[30px]"
-            />
-          </div>
+          {/* /hero */}
         </div>
+      </section>
 
-        <LandingCarousel />
-
-        {/* easy integration */}
-        <div className="flex flex-col justify-center items-center gap-6 my-20">
-          <div className="bg-[#0C31A133] h-[34px] w-[220px] rounded-full flex justify-center items-center">
-            <p className="text-[#0C31A1] text-xs md:text-sm">
-              Easy Integration
-            </p>
-          </div>
-          <h2 className="text-[#111111] text-[32px] md:text-[52px] text-center font-bold md:w-[677px]">
-            One Click Is All It Takes To Connect KiKi With Your Top Sales
-            Platforms
-          </h2>
-          <p className="text-[#797878] text-lg md:text-[27px] text-center font-normal">
-            All your messages in one place - Automate your Lead Conversion.
-          </p>
-          <div className="border border-[#E7EBFF] shadow-sm rounded-[30px] h-[155px] w-[95%] md:w-[420px] flex items-center justify-between p-5">
-            <div className="border border-[#E7EBFF] size-20 md:size-[115px] rounded-[10px] py-2.5 px-5 space-y-2.5">
-              <Image
-                src={"/instagram.svg"}
-                alt="Instagram"
-                height={70}
-                width={70}
-              />
-              <p className="text-[8px] md:text-xs text-center text-[#111111]">
-                Instagram
-              </p>
-            </div>
-            <div className="border border-[#E7EBFF] size-20 md:size-[115px] rounded-[10px] py-2.5 px-5 space-y-2.5">
-              <Image
-                src={"/facebook.svg"}
-                alt="Facebook"
-                height={70}
-                width={70}
-              />
-              <p className="text-[8px] md:text-xs text-center text-[#111111]">
-                Facebook
-              </p>
-            </div>
-            <div className="border border-[#E7EBFF] size-20 md:size-[115px] rounded-[10px] py-2.5 px-5 space-y-2.5">
-              <Image
-                src={"/whatsapp.svg"}
-                alt="WhatsApp"
-                height={70}
-                width={70}
-              />
-              <p className="text-[8px] md:text-xs text-center text-[#111111]">
-                Whatsapp
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <KiQiFeatures />
-
-        {/* grid section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 bg-[#E6E6E6] rounded-[30px] p-4 md:p-10">
-          <div className="md:h-[560px] rounded-[30px] relative">
-            <Image
-              src={"/grid-image-1.svg"}
-              alt="Image"
-              fill
-              className="object-cover rounded-[30px]"
-            />
-          </div>
-          {gridBoxes.map((box, index) => (
-            <div
-              key={index}
-              className="md:h-[560px] rounded-[30px] bg-white p-8 space-y-4 md:space-y-10">
-              <h2 className="text-[#111111] font-bold text-2xl md:text-[38px]">
-                {box.title}
-              </h2>
-              <p className="font-light text-base md:text-[27px] leading-9">
-                {box.subtitle}
-              </p>
-              <ul className="space-y-4">
-                {box.lists.map((list, idx) => (
-                  <li key={idx} className="flex gap-2 items-center">
-                    <FaCircleCheck color="#4CAF50" size={20} />
-                    <p className="text-xs md:text-lg">{list}</p>
-                  </li>
-                ))}
+      <section className="ticker">
+        <div className="container-xxl">
+          <div className="ticker-viewport">
+            <div className="ticker-track">
+              <ul className="ticker-group">
+                <li>
+                  <i className="bi bi-check2-circle me-2"></i>Quick campaigns
+                </li>
+                <li>
+                  <i className="bi bi-people me-2"></i>Subscribers on autopilot
+                </li>
+                <li>
+                  <i className="bi bi-graph-up-arrow me-2"></i>Magic metrics
+                  dashboard
+                </li>
+                <li>
+                  <i className="bi bi-emoji-smile me-2"></i>Sales, not stress
+                </li>
+                <li>
+                  <i className="bi bi-shield-check me-2"></i>100% deliverability
+                  focus
+                </li>
+                <li>
+                  <i className="bi bi-phone me-2"></i>Mobile friendly templates
+                </li>
               </ul>
-              <div className="w-full md:w-[280px]">
-                <Button
-                  content="Start For Free"
-                  link="/waitlist"
-                  variant="primary"
-                  icon={<GoArrowUp />}
+              <ul className="ticker-group" aria-hidden="true">
+                <li>
+                  <i className="bi bi-check2-circle me-2"></i>Quick campaigns
+                </li>
+                <li>
+                  <i className="bi bi-people me-2"></i>Subscribers on autopilot
+                </li>
+                <li>
+                  <i className="bi bi-graph-up-arrow me-2"></i>Magic metrics
+                  dashboard
+                </li>
+                <li>
+                  <i className="bi bi-emoji-smile me-2"></i>Sales, not stress
+                </li>
+                <li>
+                  <i className="bi bi-shield-check me-2"></i>100% deliverability
+                  focus
+                </li>
+                <li>
+                  <i className="bi bi-phone me-2"></i>Mobile friendly templates
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-5 text-center">
+        <div className="container-xxl">
+          <span className="badge rounded-pill bg-warning-subtle text-warning-emphasis fw-semibold px-3 py-2 mb-3">
+            Inbox Magic
+          </span>
+
+          <h2 className="display-6 fw-bold mb-2">
+            We send the <span className="text-primary">Emails.</span> You get
+            the <span className="text-success">Sales.</span>
+          </h2>
+          <p className="text-secondary mb-5">
+            Upload a sheet, paste contacts, or connect your inbox. Our concierge
+            does the rest.
+          </p>
+
+          {/* halo + icons */}
+          <div className="inbox-art mx-auto">
+            <div className="inbox-halo"></div>
+
+            <div className="inbox-core shadow-sm">
+              <img src="/assets/img/kiki.png" alt="App logo" />
+            </div>
+
+            {/* orbiting icons */}
+            <div className="orbit icon ig">
+              <i className="bi bi-instagram"></i>
+            </div>
+            <div className="orbit icon fb">
+              <i className="bi bi-facebook"></i>
+            </div>
+            <div className="orbit icon wa">
+              <i className="bi bi-whatsapp"></i>
+            </div>
+            <div className="orbit icon sheets">
+              <i className="bi bi-file-earmark-spreadsheet"></i>
+            </div>
+            <div className="orbit icon csv">
+              <i className="bi bi-filetype-csv"></i>
+            </div>
+
+            {/* tiny avatar */}
+            <img
+              className="orbit avatar"
+              src="https://i.pravatar.cc/72?img=12"
+              alt="Customer avatar"
+            />
+          </div>
+
+          <div className="mt-4">
+            <a href="#" className="btn-kiki btn-primary btn btn-pill px-4">
+              Launch My First Campaign <i className="bi bi-send ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section className="features-section py-5 py-lg-6">
+        <div className="container-xxl">
+          <div className="features-wrap rounded-xxl p-5 text-center">
+            <h2 className="fw-bold display-6 mb-3">Kiki Features</h2>
+
+            <div className="d-flex justify-content-center">
+              <ul
+                className="nav nav-pills feature-tabs justify-content-center gap-1 mb-5"
+                role="tablist">
+                <li className="nav-item" role="presentation">
+                  <button className="nav-link active" type="button" role="tab">
+                    Manage Campaigns
+                  </button>
+                </li>
+                <li className="nav-item" role="presentation">
+                  <button className="nav-link" type="button" role="tab">
+                    Email Lists
+                  </button>
+                </li>
+                <li className="nav-item" role="presentation">
+                  <button className="nav-link" type="button" role="tab">
+                    Automation
+                  </button>
+                </li>
+                <li className="nav-item" role="presentation">
+                  <button className="nav-link" type="button" role="tab">
+                    Analytics
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            {/* Feature stage */}
+            <div className="feature-stage mx-auto">
+              <div className="feature-screen shadow-lift">
+                <img
+                  src="/assets/img/campaign.png"
+                  alt="Kiki dashboard preview"
+                  loading="lazy"
                 />
               </div>
             </div>
-          ))}
-          <div className="md:h-[560px] rounded-[30px] relative">
-            <Image
-              src={"/grid-image-2.svg"}
-              alt="Image"
-              fill
-              className="object-cover rounded-[30px]"
-            />
           </div>
         </div>
+      </section>
 
-        <BlogCarousel />
-
-        {/* plans */}
-        <div className="space-y-4 flex flex-col items-center my-20 px-4 md:px-10">
-          <h2 className="font-bold text-center text-2xl md:text-[52px] capitalize">
-            Find your perfect plan
-          </h2>
-          <p className="text-center text-[#797878] font-normal text-sm md:text-2xl max-w-2xl">
-            Discover the ideal plan to fuel your business growth.
-            <br className="hidden md:block" />
-            Over 500% return on investment guaranteed for your business.
-          </p>
-
-          <div className="bg-[#FBFBFB] rounded-2xl h-[60px] md:h-[73px] w-full max-w-[320px] md:max-w-[290px] p-2.5 border border-[#E7EBFF] flex items-center justify-between">
-            {tabs.map((tab) => (
-              <div
-                key={tab.id}
-                onClick={() => setActivePlanTab(tab.id)}
-                className={`rounded-xl flex-1 h-full transition-all duration-300 ease-in-out flex justify-center items-center cursor-pointer ${
-                  activePlanTab === tab.id
-                    ? "bg-white text-[#1B223C] shadow-sm"
-                    : "bg-transparent text-[#797878]"
-                }`}>
-                <p className="text-sm md:text-lg font-normal">{tab.name}</p>
-              </div>
-            ))}
+      <div className="container d-flex flex-column align-items-center">
+        <div className="heading demo-box">
+          <div className="play-icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="black"
+              className="bi bi-play-fill"
+              viewBox="0 0 16 16">
+              <path d="M11.596 8.697l-6.363 3.692A.5.5 0 0 1 4.5 11.92V4.08a.5.5 0 0 1 .733-.442l6.363 3.692a.5.5 0 0 1 0 .866z" />
+            </svg>
           </div>
+          <span>
+            Watch full <span className="demo-video">Demo Video</span> Below
+          </span>
+          <img src="/assets/img/arrow.png" alt="" className="arrow" />
+        </div>
 
-          <div className="w-full overflow-x-auto scrollbar-hide">
-            <div className="flex items-stretch gap-4 py-6 md:py-12 min-w-max">
-              {plans.map((plan) => {
-                const isEven = plan.id % 2;
-                return (
-                  <div
-                    key={plan.id}
-                    className={`flex-shrink-0 h-auto md:h-[600px] w-[280px] sm:w-[320px] md:w-[360px] rounded-[20px] border border-[#E7EBFF] space-y-2 shadow-sm p-[20px] md:p-[30px] flex flex-col justify-between ${
-                      isEven ? "bg-white" : "bg-[#BCCAFF21]"
-                    }`}>
-                    <div
-                      className={`size-10 rounded-[10px] flex justify-center items-center ${
-                        isEven ? "bg-[#6A8AFF]" : "bg-white"
-                      }`}>
-                      <Image
-                        src={plan.icon}
-                        alt="Icon"
-                        height={23}
-                        width={23}
+        {/* Video Player Container */}
+        <div className="video-wrapper mt-4 position-relative">
+          <img
+            src="/assets/img/video-modal.png"
+            alt="Demo Video Screenshot"
+            draggable="false"
+          />
+          <div
+            className="play-button-overlay"
+            role="button"
+            aria-label="Play Video"
+            tabIndex={0}>
+            <svg
+              className="play-icon-svg"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 16 16">
+              <path d="M11.596 8.697l-6.363 3.692A.5.5 0 0 1 4.5 11.92V4.08a.5.5 0 0 1 .733-.442l6.363 3.692a.5.5 0 0 1 0 .866z" />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <section className="analytics-section py-5">
+        <div className="container-xxl">
+          <div className="analytics-wrap rounded-xxl px-lg-15  py-5 text-center text-white">
+            <h2 className="fw-bold mb-2">
+              Smarter <span className="text-warning">Emails</span>. Safer Data.
+            </h2>
+            <p className="text-white mb-5">
+              Kiki gives you analytics that make sense and security that keeps
+              your emails safe — without extra setup.
+            </p>
+
+            <div className="d-grid gap-4 gap-lg-5 text-start">
+              {/* Card 1 */}
+              <div className="feature-box p-3 p-lg-4 shadow-sm">
+                <div className="row align-items-center g-3 g-lg-4">
+                  <div className="col-md-5">
+                    <div className="screen">
+                      <img
+                        src="/assets/img/feature1.png"
+                        alt="Engagement score dashboard"
+                        loading="lazy"
                       />
                     </div>
+                  </div>
+                  <div className="col-md-7">
+                    <h5 className="fw-semibold mb-2 text-black">
+                      Engagement score simplified
+                    </h5>
+                    <p className="text-secondary mb-0">
+                      Auto-generate meaningful alternative text for thousands of
+                      images with a single click - saving your team hours of
+                      manual tagging. Perfect for ecommerce, media-heavy sites,
+                      and content-rich platforms.
+                    </p>
+                  </div>
+                </div>
+              </div>
 
-                    <div
-                      className={`space-y-5 ${
-                        !isEven ? "text-[#0C31A1]" : "text-[#1B223C]"
-                      }`}>
-                      <div className="space-y-4">
-                        <h3 className="text-2xl md:text-3xl font-bold">
-                          {plan.name}
-                        </h3>
-                        <p className="text-sm md:text-base text-[#3C3C3C] font-light">
-                          {plan.description}
-                        </p>
-                        <p className="flex items-center gap-2 flex-wrap">
-                          <span className="font-bold text-3xl md:text-[44px]">
-                            ${plan.price}
-                          </span>
-                          <span className="text-sm md:text-base text-[#797878] font-light">
-                            per month
-                          </span>
-                        </p>
+              {/* Card 2 (image on the right) */}
+              <div className="feature-box p-3 p-lg-4 shadow-sm">
+                <div className="row align-items-center g-3 g-lg-4 flex-md-row-reverse">
+                  <div className="col-md-5">
+                    <div className="screen">
+                      <img
+                        src="/assets/img/feature2.png"
+                        alt="Subscriber growth trends"
+                        loading="lazy"
+                      />
+                    </div>
+                  </div>
+                  <div className="col-md-7">
+                    <h5 className="fw-semibold mb-2 text-black">
+                      Subscriber growth trends
+                    </h5>
+                    <p className="text-secondary mb-0">
+                      Auto-generate meaningful alternative text for thousands of
+                      images with a single click - saving your team hours of
+                      manual tagging. Perfect for ecommerce, media-heavy sites,
+                      and content-rich platforms.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 3 */}
+              <div className="feature-box p-3 p-lg-4 shadow-sm">
+                <div className="row align-items-center g-3 g-lg-4">
+                  <div className="col-md-5">
+                    <div className="screen">
+                      <img
+                        src="/assets/img/feature3.png"
+                        alt="Encrypted data protection"
+                        loading="lazy"
+                      />
+                    </div>
+                  </div>
+                  <div className="col-md-7">
+                    <h5 className="fw-semibold mb-2 text-black">
+                      Encrypted data protection
+                    </h5>
+                    <p className="text-secondary mb-0">
+                      Auto-generate meaningful alternative text for thousands of
+                      images with a single click - saving your team hours of
+                      manual tagging. Perfect for ecommerce, media-heavy sites,
+                      and content-rich platforms.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-blogs py-5 ">
+        <div className="container-xxl" data-scroller>
+          <div className="d-flex align-items-end justify-content-between mb-3">
+            <h2 className="fw-bold mb-0">Recent Blogs</h2>
+            <div className="d-none d-md-flex align-items-center gap-2">
+              <button
+                className="scroll-btn btn btn-light border"
+                type="button"
+                data-dir="prev"
+                aria-label="Scroll left">
+                <i className="bi bi-chevron-left"></i>
+              </button>
+              <button
+                className="scroll-btn btn btn-light border"
+                type="button"
+                data-dir="next"
+                aria-label="Scroll right">
+                <i className="bi bi-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <div className="blog-scroller">
+            {/* Card 1 */}
+            <article className="blog-card blog-blue">
+              <div className="blog-content">
+                <h3 className="blog-title">
+                  5 Mistakes Beginners Make in Email Marketing
+                </h3>
+                <span className="vline"></span>
+                <div className="brand-badge">
+                  <img src="/assets/img/logo.png" alt="KiKi" />
+                </div>
+              </div>
+              <div className="blog-media">
+                <img src="/assets/img/blog1.png" alt="Email marketing screen" />
+              </div>
+            </article>
+
+            {/* Card 2 (yellow with title bubble) */}
+            <article className="blog-card blog-yellow">
+              <div className="blog-content">
+                <h3 className="blog-title bubble-chip">
+                  Why Engagement Open Rate in 2025
+                </h3>
+                <span className="vline dark"></span>
+                <div className="brand-badge">
+                  <img src="/assets/img/logo.png" alt="KiKi" />
+                </div>
+              </div>
+              <div className="blog-media">
+                <img src="/assets/img/blog2.png" alt="Analytics on laptop" />
+              </div>
+            </article>
+
+            {/* Card 3 */}
+            <article className="blog-card blog-indigo">
+              <div className="blog-content">
+                <h3 className="blog-title">
+                  How AI Writes Emails That Convert
+                </h3>
+                <span className="vline"></span>
+                <div className="brand-badge">
+                  <img src="/assets/img/logo.png" alt="KiKi" />
+                </div>
+              </div>
+              <div className="blog-media">
+                <img src="/assets/img/blog3.png" alt="AI illustration" />
+              </div>
+            </article>
+            {/* Card 4 */}
+            <article className="blog-card blog-indigo">
+              <div className="blog-content">
+                <h3 className="blog-title">
+                  How AI Writes Emails That Convert
+                </h3>
+                <span className="vline"></span>
+                <div className="brand-badge">
+                  <img src="/assets/img/logo.png" alt="KiKi" />
+                </div>
+              </div>
+              <div className="blog-media">
+                <img src="/assets/img/blog4.png" alt="AI illustration" />
+              </div>
+            </article>
+          </div>
+
+          {/* Mobile arrows */}
+          <div className="d-flex d-md-none justify-content-center gap-2 mt-3">
+            <button
+              className="scroll-btn btn btn-light border"
+              type="button"
+              data-dir="prev"
+              aria-label="Scroll left">
+              <i className="bi bi-chevron-left"></i>
+            </button>
+            <button
+              className="scroll-btn btn btn-light border"
+              type="button"
+              data-dir="next"
+              aria-label="Scroll right">
+              <i className="bi bi-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-5">
+        <div className="container-xxl">
+          <div className="pr-blend rounded-xxl p-4 p-lg-5">
+            <div className="row align-items-center gy-4">
+              <div className="col-lg-6">
+                <h2 className="fw-bold display-6 mb-3">
+                  Blend Your Campaign With PR
+                </h2>
+                <p className="text-secondary mb-3">
+                  Why stop at inboxes? Amplify your email marketing with
+                  guaranteed PR placements on top media outlets. Turn every
+                  campaign into a headline, boost credibility, and reach
+                  audiences beyond your list.
+                </p>
+                <p className="text-secondary mb-4">
+                  With Kiki, your story travels further, faster, and with more
+                  authority.
+                </p>
+                <a href="#" className="btn btn-dark btn-pill">
+                  Get Started
+                </a>
+              </div>
+
+              <div className="col-lg-6">
+                <div className="pr-art ms-lg-3">
+                  {/* soft arcs */}
+                  <span className="pr-blob blob-a" aria-hidden="true"></span>
+                  <span className="pr-blob blob-b" aria-hidden="true"></span>
+                  <span className="pr-blob blob-c" aria-hidden="true"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* /pr-blend */}
+        </div>
+      </section>
+
+      <section className="py-5" id="pricing">
+        <div className="container-xxl">
+          <div className="text-center mb-4">
+            <span className="badge rounded-pill bg-body-secondary text-body fw-semibold px-3 py-2">
+              Pricing Plans
+            </span>
+            <h2 className="fw-bold display-6 mt-3 mb-2">
+              Find Your Perfect Plan
+            </h2>
+            <p className="text-secondary mb-3">
+              Choose the plan that grows with you. Start free, scale when you’re
+              ready, cancel anytime.
+            </p>
+
+            <div
+              className="btn-group pricing-toggle"
+              role="group"
+              aria-label="Billing period">
+              <input
+                type="radio"
+                className="btn-check"
+                name="billing"
+                id="bill-monthly"
+                defaultChecked
+              />
+              <label
+                className="btn btn-light border me-1"
+                htmlFor="bill-monthly">
+                Monthly
+              </label>
+
+              <input
+                type="radio"
+                className="btn-check"
+                name="billing"
+                id="bill-yearly"
+              />
+              <label className="btn btn-light border" htmlFor="bill-yearly">
+                Yearly
+              </label>
+            </div>
+            <div className="small text-secondary mt-2 pricing-save d-none">
+              Save 15% when billed yearly
+            </div>
+          </div>
+
+          <div className="row g-4 align-items-stretch">
+            <div className="col-md-6 col-lg-3">
+              <article className="plan-card h-100">
+                <div className="plan-top">
+                  <span className="plan-chip">
+                    <i className="bi bi-shield-check"></i>
+                  </span>
+                  <h5 className="plan-name">Free</h5>
+                  <p className="plan-desc">
+                    Perfect for beginners testing email.
+                  </p>
+
+                  <div className="price-line">
+                    <span className="currency">$</span>
+                    <span
+                      className="price-amount"
+                      data-monthly="0"
+                      data-yearly="0">
+                      0
+                    </span>
+                    <span className="period">per month</span>
+                  </div>
+                </div>
+
+                <hr className="my-3" />
+                <ul className="plan-list">
+                  <li>
+                    <i className="bi bi-check2-circle"></i> 500 emails
+                  </li>
+                  <li>
+                    <i className="bi bi-check2-circle"></i> Extended Quota @
+                    $0.005/email
+                  </li>
+                  <li>
+                    <i className="bi bi-check2-circle"></i> 1 Campaign
+                  </li>
+                  <li>
+                    <i className="bi bi-check2-circle"></i> Basic analytics
+                  </li>
+                </ul>
+
+                <a
+                  href="#"
+                  className="btn btn-outline-dark btn-pill w-100 mt-auto">
+                  Get Started
+                </a>
+              </article>
+            </div>
+
+            <div className="col-md-6 col-lg-3">
+              <article className="plan-card plan-featured h-100 text-white">
+                <div className="plan-top">
+                  <span className="plan-chip soft">
+                    <i className="bi bi-rocket-takeoff"></i>
+                  </span>
+                  <h5 className="plan-name">Solo</h5>
+                  <p className="plan-desc">
+                    Built for freelancers and side hustles.
+                  </p>
+
+                  <div className="price-line">
+                    <span className="currency">$</span>
+                    <span
+                      className="price-amount"
+                      data-monthly="0.99"
+                      data-yearly="0.85">
+                      0.99
+                    </span>
+                    <span className="period">per month</span>
+                  </div>
+                </div>
+
+                <hr className="my-3 border-light opacity-25" />
+                <ul className="plan-list">
+                  <li>
+                    <i className="bi bi-check2-circle"></i> Everything in Free +
+                  </li>
+                  <li>
+                    <i className="bi bi-check2-circle"></i> 2,000 emails
+                  </li>
+                  <li>
+                    <i className="bi bi-check2-circle"></i> Extended Quota @
+                    $0.002/email
+                  </li>
+                  <li>
+                    <i className="bi bi-check2-circle"></i> 5 Campaigns
+                  </li>
+                  <li>
+                    <i className="bi bi-check2-circle"></i> Engagement score
+                  </li>
+                  <li>
+                    <i className="bi bi-check2-circle"></i> Smart templates
+                  </li>
+                  <li>
+                    <i className="bi bi-check2-circle"></i> Basic automation
+                  </li>
+                  <li>
+                    <i className="bi bi-check2-circle"></i> Support
+                  </li>
+                </ul>
+
+                <a href="#" className="btn btn-light btn-pill w-100 mt-auto">
+                  Get Started
+                </a>
+              </article>
+            </div>
+
+            {/* MSME */}
+            <div className="col-md-6 col-lg-3">
+              <article className="plan-card h-100">
+                <div className="plan-top">
+                  <span className="plan-chip">
+                    <i className="bi bi-building"></i>
+                  </span>
+                  <h5 className="plan-name">MSME</h5>
+                  <p className="plan-desc">For growing small businesses.</p>
+
+                  <div className="price-line">
+                    <span className="currency">$</span>
+                    <span
+                      className="price-amount"
+                      data-monthly="9.85"
+                      data-yearly="8.35">
+                      9.85
+                    </span>
+                    <span className="period">per month</span>
+                  </div>
+                </div>
+
+                <hr className="my-3" />
+                <ul className="plan-list">
+                  <li>
+                    <i className="bi bi-check2-circle"></i> 20,000 emails
+                  </li>
+                  <li>
+                    <i className="bi bi-check2-circle"></i> Extended Quota @
+                    $0.001/email
+                  </li>
+                  <li>
+                    <i className="bi bi-check2-circle"></i> Unlimited Campaigns
+                  </li>
+                  <li>
+                    <i className="bi bi-check2-circle"></i> Concierge access (4
+                    emails per month)
+                  </li>
+                  <li>
+                    <i className="bi bi-check2-circle"></i> Advanced analytics
+                  </li>
+                  <li>
+                    <i className="bi bi-check2-circle"></i> Campaign A/B testing
+                  </li>
+                </ul>
+
+                <a
+                  href="#"
+                  className="btn btn-outline-dark btn-pill w-100 mt-auto">
+                  Get Started
+                </a>
+              </article>
+            </div>
+
+            {/* Business (dark) */}
+            <div className="col-md-6 col-lg-3">
+              <article className="plan-card plan-business h-100 text-white">
+                <div className="plan-top">
+                  <span className="plan-chip soft">
+                    <i className="bi bi-shield-lock"></i>
+                  </span>
+                  <h5 className="plan-name">Business</h5>
+                  <p className="plan-desc">Serious power for scale.</p>
+
+                  <div className="price-line">
+                    <span className="currency">$</span>
+                    <span
+                      className="price-amount"
+                      data-monthly="56"
+                      data-yearly="48">
+                      56
+                    </span>
+                    <span className="period">per month</span>
+                  </div>
+                </div>
+
+                <hr className="my-3 border-light opacity-25" />
+                <ul className="plan-list">
+                  <li>
+                    <i className="bi bi-check2-circle"></i> 100,000 emails
+                  </li>
+                  <li>
+                    <i className="bi bi-check2-circle"></i> Extended Quota @
+                    $0.001/email
+                  </li>
+                  <li>
+                    <i className="bi bi-check2-circle"></i> Team accounts
+                  </li>
+                  <li>
+                    <i className="bi bi-check2-circle"></i> Security compliance
+                  </li>
+                  <li>
+                    <i className="bi bi-check2-circle"></i> Custom integrations
+                  </li>
+                  <li>
+                    <i className="bi bi-check2-circle"></i> Concierge+
+                    automation
+                  </li>
+                </ul>
+
+                <a href="#" className="btn btn-light btn-pill w-100 mt-auto">
+                  Get Started
+                </a>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-5">
+        <div className="container-xxl">
+          <h2 className="fw-bold text-center mb-4">
+            See what others are saying about{" "}
+            <span className="text-primary">Kiki.</span>
+          </h2>
+
+          <div className="t-wrap position-relative" data-scroller>
+            {/* arrows */}
+            <button
+              className="t-arrow btn btn-light border"
+              type="button"
+              data-dir="prev"
+              aria-label="Scroll left">
+              <i className="bi bi-chevron-left"></i>
+            </button>
+
+            <div className="t-scroller">
+              {/* Card 1 */}
+              <article className="t-card">
+                <p className="t-quote">
+                  ‘As a fashion designer I always struggled with juggling
+                  sewing, content creation, and responding to clients. Kiki
+                  solved that for me!’
+                </p>
+                <div className="t-author">
+                  <img src="https://i.pravatar.cc/80?img=5" alt="" />
+                  <div>
+                    <div className="t-name">Kelly</div>
+                    <div className="t-role">Fashion Designer</div>
+                  </div>
+                </div>
+              </article>
+
+              {/* Card 2 */}
+              <article className="t-card">
+                <p className="t-quote">
+                  I tried Kiki once and I was sold. It’s so easy to use and even
+                  better at responding to customers than I am 😂
+                </p>
+                <div className="t-author">
+                  <img src="https://i.pravatar.cc/80?img=15" alt="" />
+                  <div>
+                    <div className="t-name">David</div>
+                    <div className="t-role">Freelance Social media manager</div>
+                  </div>
+                </div>
+              </article>
+
+              {/* Card 3 */}
+              <article className="t-card">
+                <p className="t-quote">
+                  Our newsletter finally ships on time. Templates are clean,
+                  analytics make sense, and support is fast.
+                </p>
+                <div className="t-author">
+                  <img src="https://i.pravatar.cc/80?img=23" alt="" />
+                  <div>
+                    <div className="t-name">Alex</div>
+                    <div className="t-role">E‑commerce Owner</div>
+                  </div>
+                </div>
+              </article>
+
+              {/* Card 4 */}
+              <article className="t-card">
+                <p className="t-quote">
+                  The automations are simple but powerful. We recovered
+                  abandoned cart sales in the first week.
+                </p>
+                <div className="t-author">
+                  <img src="https://i.pravatar.cc/80?img=41" alt="" />
+                  <div>
+                    <div className="t-name">Maya</div>
+                    <div className="t-role">Store Manager</div>
+                  </div>
+                </div>
+              </article>
+            </div>
+
+            <button
+              className="t-arrow t-arrow-right btn btn-light border"
+              type="button"
+              data-dir="next"
+              aria-label="Scroll right">
+              <i className="bi bi-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-5">
+        <div className="container-xxl">
+          <div className="steps-wrap rounded-xxl  p-lg-5 text-center">
+            <h2 className="fw-bold mb-1">From zero to email marketing in</h2>
+            <h2 className="fw-bold mb-4">
+              <span className="text-primary">3 simple steps</span>
+            </h2>
+
+            <div className="row g-4 mt-3 justify-content-center">
+              {/* Step 1 */}
+              <div className="col-md-6 col-lg-4">
+                <div className="step-card">
+                  <span className="step-badge">Step 1</span>
+                  <div className="step-screen shadow-sm">
+                    <div className="dz">
+                      <div className="dz-box">
+                        <img
+                          src="/assets/img/file-rep.png"
+                          className="file-rep"
+                          alt=""
+                        />
+                        <img
+                          src="/assets/img/user-add.png"
+                          className="user-add"
+                          alt=""
+                        />
+                        <div className="centralize mb-3 mt-3">
+                          <img
+                            src="/assets/img/link-upload.png"
+                            className="upd"
+                            alt="file upload"
+                          />
+                        </div>
+                        <h6>Drag and drop here or choose a file</h6>
+                        <small>
+                          All doc, word, pdf, csv, xls file types are supported
+                        </small>
                       </div>
-
-                      <div
-                        className={`${
-                          isEven ? "bg-[#E7EBFF]" : "bg-white"
-                        } h-0.5 w-full`}></div>
-
-                      <div className="space-y-2">
-                        {plan.perks.map((p, idx) => (
-                          <div
-                            key={idx}
-                            className="flex gap-[11px] items-center text-sm md:text-base">
-                            <Image
-                              src={isEven ? "/check-2.svg" : "/Check.svg"}
-                              alt="Icon"
-                              height={20}
-                              width={20}
-                            />
-                            <p className="font-normal">{p}</p>
-                          </div>
-                        ))}
+                      <div className="w-100 px-3">
+                        <button className="btn btn-primary w-100 btn-sm mt-3">
+                          Create Email List
+                        </button>
                       </div>
                     </div>
-
-                    <Link
-                      href={"/waitlist"}
-                      className={`h-[50px] md:h-[58px] w-full rounded-[10px] flex justify-center items-center text-sm md:text-base ${
-                        isEven
-                          ? "bg-[#0C31A1] text-white"
-                          : "border border-[#0C31A1] text-[#0C31A1]"
-                      }`}>
-                      Get Started
-                    </Link>
                   </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
+                  <div className="step-caption">Upload contacts</div>
+                </div>
+              </div>
 
-        {/* testimony */}
-        <TestimonialCarousel />
-        {/* getting started */}
-        <div className="space-y-4 flex flex-col items-center my-20">
-          <h2 className="font-bold text-center text-2xl md:text-[52px]">
-            Get started with <span className="text-[#0C31A1]">KiKi</span>
-          </h2>
-          <p className="text-center text-[#797878] font-normal text-sm md:text-2xl">
-            Convert more conversations to sales.{" "}
-            <br className="hidden md:block" />
-            Stay ahead of your competition - sign up today!
-          </p>
-          <div className="flex flex-col md:flex-row justify-center items-center gap-5 md:gap-20 md:mt-10">
-            <div className="w-full">
-              <div className="relative size-[300px] md:size-[250px]">
-                <Image src={"/get-started-1.svg"} alt="Step 1" fill />
+              {/* Step 2 */}
+              <div className="col-md-6 col-lg-4">
+                <div className="step-card">
+                  <span className="step-badge">Step 2</span>
+                  <div className="step-screen shadow-sm">
+                    <div className="ok text-center mt-4">
+                      <div className="display-6 mb-2 text-success">
+                        <i className="bi bi-check-circle-fill"></i>
+                      </div>
+                      <div className="fw-semibold">Successful</div>
+                      <p className="small text-secondary mb-2">
+                        Your campaign has been created. Copy the link to share.
+                      </p>
+
+                      <div className="w-100 px-3">
+                        <button className="btn btn-primary w-100 btn-sm mt-3">
+                          Copy Link
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="step-caption">Approve campaign</div>
+                </div>
               </div>
-              <div className="space-y-2">
-                <p className="text-xl text-center font-light">01</p>
-                <p className="text-xl text-center font-bold whitespace-nowrap">
-                  Create your account
-                </p>
-              </div>
-            </div>
-            <div className="w-full">
-              <div className="relative size-[300px] md:size-[250px]">
-                <Image src={"/get-started-2.svg"} alt="Step 2" fill />
-              </div>
-              <div className="space-y-2">
-                <p className="text-xl text-center font-light">02</p>
-                <p className="text-xl text-center font-bold whitespace-nowrap">
-                  Connect your sales channel
-                </p>
-              </div>
-            </div>
-            <div className="w-full">
-              <div className="relative size-[300px] md:size-[250px]">
-                <Image src={"/get-started-3.svg"} alt="Step 3" fill />
-              </div>
-              <div className="space-y-2">
-                <p className="text-xl text-center font-light">03</p>
-                <p className="text-xl text-center font-bold whitespace-nowrap">
-                  Verify your account
-                </p>
+
+              {/* Step 3 */}
+              <div className="col-md-6 col-lg-4">
+                <div className="step-card">
+                  <span className="step-badge">Step 3</span>
+                  <div className="step-screen shadow-sm">
+                    <div className="bg-body-tertiary mt-4">
+                      <img
+                        src="/assets/img/step3.png"
+                        alt=""
+                        className="img-contain"
+                      />
+                    </div>
+                  </div>
+                  <div className="step-caption">Track result</div>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="w-full md:w-[280px] mt-10">
-            <Button
-              content="Start For Free"
-              link="/waitlist"
-              variant="primary"
-              icon={<GoArrowUp />}
-            />
           </div>
         </div>
-        <FAQ />
       </section>
-      <LandingFooter />
+      {/* Three steps ends here */}
+
+      {/* FAQ */}
+      <section className="py-5 d-flex ">
+        <div className="container-xxl ">
+          <div className="row  d-flex justify-content-center align-items-center">
+            <div className="col-lg-7 col-xl-6">
+              <h3 className="fw-bold text-primary mb-4">FAQ</h3>
+
+              <div className="accordion faq-plain" id="faq">
+                {/* Q1 */}
+                <div className="accordion-item">
+                  <h2 className="accordion-header" id="q1">
+                    <button
+                      className="accordion-button collapsed"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#a1"
+                      aria-expanded="false"
+                      aria-controls="a1">
+                      Do I need marketing experience?
+                    </button>
+                  </h2>
+                  <div
+                    id="a1"
+                    className="accordion-collapse collapse"
+                    aria-labelledby="q1"
+                    data-bs-parent="#faq">
+                    <div className="accordion-body">
+                      Nope. Use our templates and guided flows—just add your
+                      brand and products.
+                    </div>
+                  </div>
+                </div>
+
+                {/* Q2 */}
+                <div className="accordion-item">
+                  <h2 className="accordion-header" id="q2">
+                    <button
+                      className="accordion-button collapsed"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#a2"
+                      aria-expanded="false"
+                      aria-controls="a2">
+                      How fast can I start?
+                    </button>
+                  </h2>
+                  <div
+                    id="a2"
+                    className="accordion-collapse collapse"
+                    aria-labelledby="q2"
+                    data-bs-parent="#faq">
+                    <div className="accordion-body">
+                      Import contacts, pick a template, hit send—most folks
+                      launch in under 15 minutes.
+                    </div>
+                  </div>
+                </div>
+
+                {/* Q3 */}
+                <div className="accordion-item">
+                  <h2 className="accordion-header" id="q3">
+                    <button
+                      className="accordion-button collapsed"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#a3"
+                      aria-expanded="false"
+                      aria-controls="a3">
+                      What makes Kiki different?
+                    </button>
+                  </h2>
+                  <div
+                    id="a3"
+                    className="accordion-collapse collapse"
+                    aria-labelledby="q3"
+                    data-bs-parent="#faq">
+                    <div className="accordion-body">
+                      Clear analytics, deliverability focus, and automation
+                      that’s simple enough for beginners.
+                    </div>
+                  </div>
+                </div>
+
+                {/* Q4 (open by default) */}
+                <div className="accordion-item">
+                  <h2 className="accordion-header" id="q4">
+                    <button
+                      className="accordion-button"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#a4"
+                      aria-expanded="true"
+                      aria-controls="a4">
+                      Can I cancel anytime?
+                    </button>
+                  </h2>
+                  <div
+                    id="a4"
+                    className="accordion-collapse collapse show"
+                    aria-labelledby="q4"
+                    data-bs-parent="#faq">
+                    <div className="accordion-body">
+                      Yes. No lock‑ins, no hidden fees.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      {/* FAQ ends here */}
+      <LandingFooterSecond />
     </>
   );
 }

@@ -6,12 +6,13 @@ import { usePathname } from "next/navigation";
 import { User } from "lucide-react";
 import Image from "next/image";
 import { useSidebar } from "@/context/SidebarContext";
+import Avatar from "../Avatar";
 
 const Header = () => {
   const dispatch = useAppDispatch();
   // const router = useRouter();
-  const user = useAppSelector((state) => state.auth.user);
   // console.log("i am the user", user);
+  const user = useAppSelector((state) => state.auth.user);
   const displayName = user
     ? "firstName" in user &&
       "lastName" in user &&
@@ -48,7 +49,8 @@ const Header = () => {
           <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gray-200">
             <ChevronDown className="hidden" />{" "}
             {/* Hidden, just to keep import if needed */}
-            <User className="h-6 w-6 text-gray-500" aria-label="User avatar" />
+            {/* <User className="h-6 w-6 text-gray-500" aria-label="User avatar" /> */}
+          <Avatar name={displayName}/>
           </span>
         </div>
         <div className="hidden sm:block">
