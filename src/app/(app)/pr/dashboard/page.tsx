@@ -103,37 +103,37 @@ export default function PRDashboard() {
             ).token
           : null
         : null;
-    const fetchPRs = async () => {
-      try {
-        const res = await axios.get(`${BASE_URL}/api/v1/press-releases/list`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const result = res.data.data;
-        
-        console.log(result);
 
-        const formatted = result.map((item: any) => ({
-          id: item.id,
-          title: item.title,
-          status: item.status,
-          distribution: item.distribution || "—",
-          campaign: item.campaign?.name || "—",
-          performance: item.performance || "—",
-          date_created: formatDate(item.date_created),
-        }));
+    if (token) {
+      const fetchPRs = async () => {
+        try {
+          const res = await axios.get(`${BASE_URL}/api/v1/press-releases/list`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const result = res.data.data;
+          
+          console.log(result);
 
-        setData(formatted);
-      } catch (error) {
-        console.error("Failed to load PR list:", error);
-      }
-      //  finally {
-      //   setLoading(false);
-      // }
-    };
+          const formatted = result.map((item: any) => ({
+            id: item.id,
+            title: item.title,
+            status: item.status,
+            distribution: item.distribution || "—",
+            campaign: item.campaign?.name || "—",
+            performance: item.performance || "—",
+            date_created: formatDate(item.date_created),
+          }));
 
-    fetchPRs();
+          setData(formatted);
+        } catch (error) {
+          console.error("Failed to load PR list:", error);
+        }
+      };
+
+      fetchPRs();
+    }
   }, []);
 
   return (

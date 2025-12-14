@@ -122,8 +122,15 @@ const DashboardOverviewPage = () => {
   const router = useRouter();
 
   useEffect(() => {
+    // Wait for authentication state to resolve before redirecting
+    if (user === undefined || token === undefined) {
+      console.log('🔄 Waiting for authentication state to resolve...');
+      return;
+    }
+
     if (!user || !token) {
-      router.replace("/login");
+      console.log('🔒 User not authenticated. Redirecting to login...');
+      router.replace('/login');
     }
   }, [user, token, router]);
 

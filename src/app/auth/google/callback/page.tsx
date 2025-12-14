@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { loginUserWithGoogle } from "@/redux/slices/authSlice";
@@ -14,6 +14,7 @@ const GoogleCallbackPage = () => {
   const dispatch = useAppDispatch();
   const { status, error } = useAppSelector((state: RootState) => state.auth);
   const [localError, setLocalError] = useState<string | null>(null);
+  const dispatchedRef = useRef(false); // Prevent multiple dispatches
 
   useEffect(() => {
     const handleGoogleCallback = async () => {
@@ -21,7 +22,7 @@ const GoogleCallbackPage = () => {
         console.log('🟢 CALLBACK PAGE LOADED');
         console.log('Full URL:', window.location.href);
         console.log('Search Params:', Object.fromEntries(searchParams.entries()));
-        
+
         // Get the authorization code from URL
         const code = searchParams.get("code");
         const state = searchParams.get("state");
@@ -37,7 +38,7 @@ const GoogleCallbackPage = () => {
           console.error('❌ ERROR FROM GOOGLE:', errorParam, errorDescription);
           setLocalError(errorDescription);
           toast.error(errorDescription);
-          
+
           // Redirect back to login after 2 seconds
           setTimeout(() => {
             router.push("/login");
@@ -50,7 +51,7 @@ const GoogleCallbackPage = () => {
           console.error('❌ NO CODE:', err);
           setLocalError(err);
           toast.error(err);
-          
+
           setTimeout(() => {
             router.push("/login");
           }, 2000);
@@ -63,13 +64,13 @@ const GoogleCallbackPage = () => {
         console.log('  - Received state:', state);
         console.log('  - Saved state:', savedState);
         console.log('  - Match:', state === savedState);
-        
+
         if (state !== savedState) {
           const err = "State mismatch - possible CSRF attack";
           console.error('❌ STATE MISMATCH:', err);
           setLocalError(err);
           toast.error(err);
-          
+
           setTimeout(() => {
             router.push("/login");
           }, 2000);
@@ -79,22 +80,29 @@ const GoogleCallbackPage = () => {
 
         console.log('✅ All validations passed, sending code to backend...');
         // Dispatch the Google login thunk
-        const result = await dispatch(loginUserWithGoogle(code));
-        console.log('📦 Backend response:', result);
-        
-        if (loginUserWithGoogle.fulfilled.match(result)) {
-          console.log('✨ LOGIN SUCCESS! Redirecting to dashboard...');
-          toast.success("Google login successful!");
-          // Redirect to dashboard
-          router.push("/dashboard");
-        } else if (loginUserWithGoogle.rejected.match(result)) {
-          const errorMsg = result.payload as string;
-          console.error('❌ LOGIN FAILED:', errorMsg);
-          toast.error(errorMsg);
-          
-          setTimeout(() => {
-            router.push("/login");
-          }, 2000);
+        if (code && !dispatchedRef.current) {
+          console.log('Dispatching loginUserWithGoogle thunk with code...', code);
+          const result = await dispatch(loginUserWithGoogle(code));
+          dispatchedRef.current = true; // Mark as dispatched
+          console.log('📦 Backend response:', result);
+
+          if (loginUserWithGoogle.fulfilled.match(result)) {
+            console.log('✨ LOGIN SUCCESS! Redirecting to dashboard...');
+            toast.success("Google login successful!");
+
+            // Clear query parameters after successful login
+            console.log('🔄 Attempting to redirect to /dashboard');
+            router.replace("/dashboard"); // Removed shallow: true to ensure full reload
+            console.log('✅ Redirected to /dashboard');
+          } else if (loginUserWithGoogle.rejected.match(result)) {
+            const errorMsg = result.payload as string;
+            console.error('❌ LOGIN FAILED:', errorMsg);
+            toast.error(errorMsg);
+
+            setTimeout(() => {
+              router.push("/login");
+            }, 2000);
+          }
         }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "Authentication failed";
@@ -111,7 +119,7 @@ const GoogleCallbackPage = () => {
     };
 
     handleGoogleCallback();
-  }, [searchParams, router, dispatch]);
+  }, [router, dispatch]); // Removed searchParams from dependencies
 
   const displayError = localError || error;
 

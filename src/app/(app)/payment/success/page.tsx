@@ -7,38 +7,38 @@ export default function PaymentSuccess() {
   const [verifyStatus, setVerifyStatus] = useState("verifying");
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const reference = urlParams.get("reference");
-    const token =
-        typeof window !== "undefined"
-          ? JSON.parse(localStorage.getItem("persist:root") || "{}").auth
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      const reference = urlParams.get("reference");
+      const token =
+          JSON.parse(localStorage.getItem("persist:root") || "{}").auth
             ? JSON.parse(
                 JSON.parse(localStorage.getItem("persist:root") || "{}").auth
               ).token
-            : null
-          : null;
+            : null;
 
-    if (!reference) {
-      setVerifyStatus("invalid");
-      return;
+      if (!reference) {
+        setVerifyStatus("invalid");
+        return;
+      }
+
+      axios
+        .post(
+          `${BASE_URL}/api/v1/subscriptions/verify-payment`,
+          { reference },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then(() => {
+          setVerifyStatus("success");
+        })
+        .catch(() => {
+          setVerifyStatus("failed");
+        });
     }
-
-    axios
-      .post(
-        `${BASE_URL}/api/v1/subscriptions/verify-payment`,
-        { reference },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
-      .then(() => {
-        setVerifyStatus("success");
-      })
-      .catch(() => {
-        setVerifyStatus("failed");
-      });
   }, []);
 
   if (verifyStatus === "verifying") return <p>Verifying payment…</p>;

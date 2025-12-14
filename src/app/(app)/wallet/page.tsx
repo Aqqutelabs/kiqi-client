@@ -172,48 +172,52 @@ export default function WalletPage() {
       : null;
 
   useEffect(() => {
-    axios
-      .get(`${BASE_URL}/api/v1/subscriptions/details`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
-        const { usage, subscription } = res.data.data;
-        const coins = usage.monthly_credits / 2.5;
+    if (token) {
+      axios
+        .get(`${BASE_URL}/api/v1/subscriptions/details`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((res) => {
+          const { usage, subscription } = res.data.data;
+          const coins = usage.monthly_credits / 2.5;
 
-        setStats([
-          {
-            title: "GoCredits",
-            amount: usage.remaining_credits.toLocaleString(),
-            currency: "GC",
-            color: "#233E97",
-            percent: Math.round(
-              (usage.remaining_credits / usage.monthly_credits) * 100
-            ).toString(),
-            barText: "Monthly limit",
-            barAmount: `${usage.monthly_credits.toLocaleString()} GC`,
-            info: "vs last month",
-            icon: Zap, // fallback to dummy icon
-            isPositive: true,
-          },
-          {
-            // Go Coins
-            ...dummyStats[1],
-            amount: coins.toLocaleString(),
-          },
-          {
-            ...dummyStats[2], // Current Plan card
-            amount: subscription.planName,
-            barAmount: new Date(subscription.endDate).toLocaleDateString(
-              "en-US",
-              { month: "short", day: "numeric", year: "numeric" }
-            ),
-          },
-        ]);
-      })
-      .catch((err) => console.error(err));
-  }, []);
+          setStats([
+            {
+              title: "GoCredits",
+              amount: usage.remaining_credits.toLocaleString(),
+              currency: "GC",
+              color: "#233E97",
+              percent: Math.round(
+                (usage.remaining_credits / usage.monthly_credits) * 100
+              ).toString(),
+              barText: "Monthly limit",
+              barAmount: `${usage.monthly_credits.toLocaleString()} GC`,
+              info: "vs last month",
+              icon: Zap, // fallback to dummy icon
+              isPositive: true,
+            },
+            {
+              // Go Coins
+              ...dummyStats[1],
+              amount: coins.toLocaleString(),
+            },
+            {
+              ...dummyStats[2], // Current Plan card
+              amount: subscription.planName,
+              barAmount: new Date(subscription.endDate).toLocaleDateString(
+                "en-US",
+                { month: "short", day: "numeric", year: "numeric" }
+              ),
+            },
+          ]);
+        })
+        .catch((error) => {
+          console.error('Error fetching subscription details:', error);
+        });
+    }
+  }, [token]);
 
   useEffect(() => {
     const fetchRecentTransactions = async () => {

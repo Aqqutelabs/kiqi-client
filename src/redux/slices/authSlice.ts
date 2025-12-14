@@ -47,6 +47,7 @@ interface AuthState {
   };
 }
 
+// Define initialState with default values
 const initialState: AuthState = {
   user: null,
   token: null,
@@ -61,142 +62,38 @@ const initialState: AuthState = {
   },
 };
 
-export const loginUser = createAsyncThunk('auth/loginUser', async (credentials: { email: string; password: string }, { rejectWithValue }) => {
-  try {
-    const response = await apiClient.post(`${BASE_URL}/api/v1/auth/login`, credentials);
-    if (response.error) {
+// Update rehydrateState to use initialState as fallback
+const rehydrateState = (): AuthState => {
+  if (typeof window === 'undefined') {
+    return initialState;
+  }
 
-      return rejectWithValue(response.message || 'Login failed');
-    }
-    if (!response.accessToken || !response.user) {
-      return rejectWithValue(response.message || 'Login failed');
-    }
+  const storedToken = localStorage.getItem('authToken');
+  const storedRefreshToken = localStorage.getItem('refreshToken');
+  const storedUser = JSON.parse(localStorage.getItem('user') || 'null');
+
+  if (storedToken && storedUser) {
     return {
-      user: response.user, // Use full user object from backend
-      token: response.accessToken,
-      refreshToken: response.refreshToken,
-      message: response.message,
+      user: storedUser,
+      token: storedToken,
+      refreshToken: storedRefreshToken,
+      status: 'idle',
+      error: null,
+      registration: {
+        status: 'idle',
+        error: null,
+        data: null,
+        message: null,
+      },
     };
-  } catch (error: any) {
-    let message = error.message || 'Login failed';
-    try {
-      const errObj = JSON.parse(message);
-      message = errObj.message || message;
-    } catch {}
-    return rejectWithValue(message);
   }
-});
 
-export const registerUser = createAsyncThunk(
-  'auth/registerUser',
-  async (payload: RegisterPayload, { rejectWithValue }) => {
-    try {
-      const response = await apiClient.post(`${BASE_URL}/api/v1/auth/register`, payload);
-      if (response.error) {
-        return rejectWithValue(response.message || 'Registration failed');
-      }
-      // Store token if present
-      return {
-        data: response.data,
-        message: response.message,
-        token: response.accessToken,
-      };
-    } catch (error: any) {
-      let message = error.message || 'Registration failed';
-      try {
-        const errObj = JSON.parse(message);
-        message = errObj.message || message;
-      } catch {}
-      return rejectWithValue(message);
-    }
-  }
-);
-
-export const loginUserWithGoogle = createAsyncThunk(
-  'auth/loginUserWithGoogle',
-  async (code: string, { rejectWithValue }) => {
-    try {
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
-      
-      console.log('🔵 loginUserWithGoogle thunk started with code:', code.substring(0, 20) + '...');
-      
-      // Step 1: Exchange code for token
-      const callbackResponse = await fetch(
-        `${backendUrl}/api/v1/auth/google/callback?code=${encodeURIComponent(code)}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      if (!callbackResponse.ok) {
-        const errorData = await callbackResponse.json();
-        console.error('❌ Step 1 failed:', errorData);
-        throw new Error(errorData.message || 'Failed to exchange code for token');
-      }
-
-      const callbackData = await callbackResponse.json();
-      console.log('✅ Step 1 response:', callbackData);
-
-      if (!callbackData.tokens || !callbackData.tokens.id_token) {
-        throw new Error('No id_token in callback response');
-      }
-
-      const idToken = callbackData.tokens.id_token;
-      console.log('🔐 Extracted id_token:', idToken.substring(0, 20) + '...');
-
-      // Step 2: Send token to authenticate
-      console.log('📤 Step 2: Sending id_token to auth endpoint...');
-      const authResponse = await fetch(`${backendUrl}/api/v1/auth/google`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ idToken }),
-      });
-
-      if (!authResponse.ok) {
-        const errorData = await authResponse.json();
-        console.error('❌ Step 2 failed:', errorData);
-        throw new Error(errorData.message || 'Authentication failed');
-      }
-
-      const authData = await authResponse.json();
-      console.log('✅ Step 2 response:', authData);
-
-      // Store tokens in localStorage
-      if (authData.accessToken) {
-        localStorage.setItem('authToken', authData.accessToken);
-        console.log('🔐 Access token stored');
-      }
-      if (authData.refreshToken) {
-        localStorage.setItem('refreshToken', authData.refreshToken);
-        console.log('🔐 Refresh token stored');
-      }
-
-      return {
-        user: authData.user,
-        token: authData.accessToken,
-        refreshToken: authData.refreshToken,
-        message: authData.message || 'Google login successful',
-      };
-    } catch (error: any) {
-      let message = error.message || 'Google authentication failed';
-      console.error('💥 Google auth error:', message);
-      try {
-        const errObj = JSON.parse(message);
-        message = errObj.message || message;
-      } catch {}
-      return rejectWithValue(message);
-    }
-  }
-);
+  return initialState;
+};
 
 const authSlice = createSlice({
   name: 'auth',
-  initialState,
+  initialState: rehydrateState(),
   reducers: {
     logout: (state) => {
       state.user = null;
@@ -210,6 +107,11 @@ const authSlice = createSlice({
         data: null,
         message: null,
       };
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+      }
     },
     resetAuthState: (state) => {
       state.status = 'idle';
@@ -278,19 +180,172 @@ const authSlice = createSlice({
         });
       })
       .addCase(loginUserWithGoogle.rejected, (state, action) => {
-        // Don't show "exchange" related errors - these are often duplicate calls
         const errorMessage = action.payload as string;
-        if (errorMessage && errorMessage.toLowerCase().includes('exchange')) {
-          // Silently ignore exchange errors
-          console.log('⚠️ Ignoring exchange error:', errorMessage);
-          return;
-        }
         state.status = 'failed';
         state.error = errorMessage;
-        console.error('❌ Google auth failed:', action.payload);
+        console.error('❌ Google auth failed:', errorMessage);
+        alert(`Authentication failed: ${errorMessage}`); // Display error to the user
       });
   },
 });
+
+export const loginUser = createAsyncThunk(
+  'auth/loginUser',
+  async (credentials: { email: string; password: string }, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        try {
+          const error = JSON.parse(errorText);
+          throw new Error(error.message || 'Login failed');
+        } catch {
+          throw new Error('Unexpected server response');
+        }
+      }
+
+      const data = await response.json();
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('authToken', data.token);
+      }
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Login failed');
+    }
+  }
+);
+
+export const registerUser = createAsyncThunk(
+  'auth/registerUser',
+  async (userData: RegisterPayload, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${BASE_URL}/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        try {
+          const error = JSON.parse(errorText);
+          throw new Error(error.message || 'Registration failed');
+        } catch {
+          throw new Error('Unexpected server response');
+        }
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Registration failed');
+    }
+  }
+);
+
+const validateToken = (token: string | null): boolean => {
+  if (!token) {
+    console.error('❌ Token validation failed: Token is missing');
+    return false;
+  }
+
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const currentTime = Math.floor(Date.now() / 1000);
+    if (payload.exp && payload.exp < currentTime) {
+      console.error('❌ Token validation failed: Token is expired');
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error('❌ Token validation failed: Invalid token format');
+    return false;
+  }
+};
+
+export const loginUserWithGoogle = createAsyncThunk(
+  'auth/loginUserWithGoogle',
+  async (code: string, { rejectWithValue }) => {
+    try {
+      console.log('🔄 Starting Google OAuth flow with code:', code);
+
+      // Step 1: Exchange code for tokens
+      const tokenResponse = await fetch(`${BASE_URL}/api/v1/auth/google/callback?code=${encodeURIComponent(code)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!tokenResponse.ok) {
+        const errorText = await tokenResponse.text();
+        console.error('❌ Failed to fetch tokens. Response:', errorText);
+        try {
+          const error = JSON.parse(errorText);
+          if (error.message === 'invalid_grant') {
+            console.error('❌ invalid_grant: Authorization code is expired or already used.');
+            throw new Error('Authorization code expired or already used. Please try logging in again.');
+          }
+          throw new Error(error.message || 'Failed to fetch tokens');
+        } catch {
+          throw new Error('Unexpected server response while fetching tokens');
+        }
+      }
+
+      const tokenData = await tokenResponse.json();
+      console.log('✅ Tokens received:', tokenData);
+
+      if (!tokenData.tokens || !tokenData.tokens.id_token) {
+        throw new Error('Invalid token structure received from server');
+      }
+
+      // Step 2: Use idToken to authenticate user
+      const authResponse = await fetch(`${BASE_URL}/api/v1/auth/google`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ idToken: tokenData.tokens.id_token }),
+      });
+
+      if (!authResponse.ok) {
+        const errorText = await authResponse.text();
+        console.error('❌ Failed to authenticate user with idToken. Response:', errorText);
+        try {
+          const error = JSON.parse(errorText);
+          throw new Error(error.message || 'Google login failed');
+        } catch {
+          throw new Error('Unexpected server response while authenticating user');
+        }
+      }
+
+      const userData = await authResponse.json();
+      console.log('✅ User authenticated successfully:', userData);
+
+      // if (!userData.token || !validateToken(userData.token)) {
+      //   throw new Error('Authentication failed: Invalid or expired token');
+      // }
+
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('authToken', userData.token);
+        localStorage.setItem('refreshToken', userData.refreshToken);
+      }
+      return userData;
+    } catch (error: any) {
+      console.error('❌ Google OAuth flow failed:', error.message);
+      return rejectWithValue(error.message || 'Google login failed');
+    }
+  }
+);
 
 // redux/slices/authSlice.ts (add this to your existing slice)
 export const web3Login = createAsyncThunk(
@@ -319,7 +374,7 @@ export const web3Login = createAsyncThunk(
       const data = await response.json();
       
       // Store token in localStorage
-      if (data.token) {
+      if (typeof window !== 'undefined' && data.token) {
         localStorage.setItem('authToken', data.token);
       }
       
