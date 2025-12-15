@@ -6,6 +6,11 @@ import Filter from "@/components/ui/Filter";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import SearchInput from "@/components/ui/Search";
 import { StatCard, StatCardProps } from "@/components/ui/StatCard";
+import BASE_URL from "@/lib/utils/baseUrl";
+import { formatDate, formatDateWoutTime } from "@/lib/utils/dateFormatter";
+import axios from "axios";
+import { format } from "node:util";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 interface DistributionReport {
@@ -18,30 +23,88 @@ interface DistributionReport {
   date: string;
 }
 
-export default function PRDetails() {
-  // dashboard statistics
-  const dashboard_stats: StatCardProps[] = [
-    {
-      title: "Total Views",
-      value: "7",
-      info: "Unique readers reached across outlets",
-    },
-    {
-      title: "Total Clicks",
-      value: "7",
-      info: "Direct clicks on links inside your release.",
-    },
-    {
-      title: "Engagement Rate",
-      value: "70%",
-      info: "% of readers who interacted with your release",
-    },
-    {
-      title: "Average Time on Page",
-      value: "00h:45m",
-      info: "Average Time on Page",
-    },
-  ];
+interface PRMetrics {
+  total_views: number;
+  total_clicks: number;
+  engagement_rate: string;
+  avg_time_on_page: string;
+}
+
+interface PRData {
+  _id: string;
+  metrics: PRMetrics;
+  status: string;
+  date_created: string;
+  content: string;
+  campaign_id: string;
+  image?: string;
+  distribution_report: any[];
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
+interface PageProps {
+  params: { id: string };
+}
+
+export default function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = React.use(params);
+
+  const token =
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("persist:root") || "{}").auth
+        ? JSON.parse(
+            JSON.parse(localStorage.getItem("persist:root") || "{}").auth
+          ).token
+        : null
+      : null;
+
+  const [pr, setPr] = useState<PRData | null>(null);
+  const [dashboard_stats, setDashboardStats] = useState<StatCardProps[]>([]);
+
+  useEffect(() => {
+    if (!id) return;
+    const fetchPr = async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}/api/v1/press-releases/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setPr(res.data.data);
+        const metrics = res.data.data.metrics;
+
+        setDashboardStats([
+          {
+            title: "Total Views",
+            value: metrics.total_views,
+            info: "Unique readers reached across outlets",
+          },
+          {
+            title: "Total Clicks",
+            value: metrics.total_clicks,
+            info: "Direct clicks on links inside your release.",
+          },
+          {
+            title: "Engagement Rate",
+            value: metrics.engagement_rate,
+            info: "% of readers who interacted with your release",
+          },
+          {
+            title: "Average Time on Page",
+            value: metrics.avg_time_on_page,
+            info: "Average time readers spent on your PR page",
+          },
+        ]);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchPr();
+  }, [id]);
+
+  if (!pr) return <p>Loading...</p>;
 
   //   table data
   const data: DistributionReport[] = [
@@ -100,21 +163,27 @@ export default function PRDetails() {
             <div className="flex justify-between items-start">
               <p className="text-gray-600">Title</p>
               <strong className="text-right max-w-[60%]">
-                The best marketing tool
+                {/* {pr.title ?? "N/A"} */}
               </strong>
             </div>
             <div className="flex justify-between items-center">
               <p className="text-gray-600">Date Created</p>
-              <strong>10-04-2025</strong>
+              <strong>{formatDateWoutTime(pr.date_created)}</strong>
             </div>
             <div className="flex justify-between items-center">
               <p className="text-gray-600">Date Published</p>
-              <strong>10-04-2025</strong>
+              <strong>N/A</strong>
             </div>
             <div className="flex justify-between items-center">
               <p className="text-gray-600">Status</p>
-              <span className="bg-[#27AE60] text-white py-1 px-4 rounded-full text-sm font-medium">
-                Published
+              <span
+                className={`py-1 px-4 rounded-full text-sm font-medium ${
+                  pr.status === "Published"
+                    ? "bg-[#27AE60] text-white"
+                    : "bg-yellow-200 text-[#B45309]"
+                }`}
+              >
+                {pr.status}
               </span>
             </div>
           </div>
@@ -126,17 +195,10 @@ export default function PRDetails() {
             Content Preview
           </h2>
           <p className="text-gray-700 text-sm leading-relaxed">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Recusandae
-            odio qui animi! Ipsam, vel beatae, accusamus velit soluta. Lorem
-            ipsum dolor sit amet consectetur adipisicing elit. Sequi, itaque
-            esse maiores, reprehenderit corrupti ab temporibus expedita debitis
-            possimus magnam quis dolores! Exercitationem, accusantium
-            repellendus eius quae libero distinctio quo possimus error ab
-            delectus eos voluptatem architecto nostrum! Voluptatum ipsa ipsum
-            natus non.
-            <span className="text-sm text-[#233E97] cursor-pointer ml-4">
+            {pr.content}
+            {/* <span className="text-sm text-[#233E97] cursor-pointer ml-4">
               View less
-            </span>
+            </span> */}
           </p>
         </Card>
       </div>
