@@ -75,6 +75,12 @@ const rehydrateState = (): AuthState => {
         data: null,
         message: null,
       },
+    };
+  }
+
+  return initialState;
+};
+
 // Wallet authentication thunk
 export const loginUserWithWallet = createAsyncThunk(
   'auth/loginUserWithWallet',
@@ -140,7 +146,6 @@ export const loginUserWithWallet = createAsyncThunk(
   }
 );
 
-// Your existing thunks remain the same...
 export const loginUser = createAsyncThunk('auth/loginUser', async (credentials: { email: string; password: string }, { rejectWithValue }) => {
   try {
     const response = await apiClient.post(`${BASE_URL}/api/v1/auth/login`, credentials);
@@ -165,11 +170,14 @@ export const loginUser = createAsyncThunk('auth/loginUser', async (credentials: 
       refreshToken: response.refreshToken,
       message: response.message,
     };
+  } catch (error: any) {
+    let message = error.message || 'Login failed';
+    try {
+      const errObj = JSON.parse(message);
+      message = errObj.message || message;
+    } catch {}
+    return rejectWithValue(message);
   }
-
-  return initialState;
-};
-
 });
 
 export const registerUser = createAsyncThunk(
@@ -291,6 +299,7 @@ export const loginUserWithGoogle = createAsyncThunk(
     }
   }
 );
+
 const authSlice = createSlice({
   name: 'auth',
   initialState: rehydrateState(),
@@ -312,6 +321,7 @@ const authSlice = createSlice({
       if (typeof window !== 'undefined') {
         localStorage.removeItem('authToken');
         localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
       }
     },
     resetAuthState: (state) => {
@@ -335,13 +345,18 @@ const authSlice = createSlice({
         state.token = action.payload.token;
         state.refreshToken = action.payload.refreshToken || null;
         state.error = null;
+        
+        // Store user in localStorage
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('user', JSON.stringify(action.payload.user));
+        }
       })
       .addCase(loginUserWithWallet.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload as string;
       })
       
-      // Your existing cases...
+      // Regular login cases
       .addCase(loginUser.pending, (state) => {
         state.status = 'loading';
         state.error = null;
@@ -351,11 +366,18 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         state.token = action.payload.token;
         state.refreshToken = action.payload.refreshToken || null;
+        
+        // Store user in localStorage
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('user', JSON.stringify(action.payload.user));
+        }
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload as string;
       })
+      
+      // Registration cases
       .addCase(registerUser.pending, (state) => {
         state.registration.status = 'loading';
         state.registration.error = null;
@@ -369,11 +391,38 @@ const authSlice = createSlice({
         state.token = action.payload.token || null;
         if (action.payload.data) {
           state.user = action.payload.data;
+          
+          // Store user in localStorage
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('user', JSON.stringify(action.payload.data));
+          }
         }
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.registration.status = 'failed';
         state.registration.error = action.payload as string;
+      })
+      
+      // Google login cases
+      .addCase(loginUserWithGoogle.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(loginUserWithGoogle.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.refreshToken = action.payload.refreshToken || null;
+        state.error = null;
+        
+        // Store user in localStorage
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('user', JSON.stringify(action.payload.user));
+        }
+      })
+      .addCase(loginUserWithGoogle.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload as string;
       });
   },
 });

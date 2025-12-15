@@ -1,14 +1,19 @@
 "use client";
 
 import { PageHeader } from "@/components/ui/layout/PageHeader";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Star, StarOff } from "lucide-react";
 import Checkbox from "@/components/ui/CheckBox";
+import axios from "axios";
+import BASE_URL from "@/lib/utils/baseUrl";
+import { useAppSelector } from "@/redux/hooks";
+import toast from "react-hot-toast";
 
 export default function Mailbox() {
   const tabs = ["Inbox", "Sent", "Drafts", "Starred", "Trash"];
   const [activeTab, setActiveTab] = useState("Inbox");
+  const [threads, setThreads] = useState<any>([]);
   const [emails, setEmails] = useState([
     {
       id: 1,
@@ -101,6 +106,21 @@ export default function Mailbox() {
       type: "inbox",
     },
   ]);
+  const token = useAppSelector((state) => state.auth.token);
+  useEffect(() => {
+    const fetchThreads = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/api/v1/inbox/threads`, 
+        token ? { headers: { Authorization: `Bearer ${token}` } } : {});
+        console.log(response.data.data);
+        toast.success(response.data.message)
+      } catch (error) {
+        console.error(`Error found: ${error}`)
+      }
+    }
+
+    fetchThreads();
+  }, [])
 
   // Toggle star status
   const toggleStar = (id: number) => {

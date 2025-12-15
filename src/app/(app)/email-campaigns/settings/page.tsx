@@ -48,7 +48,7 @@ export default function CampaignSettings() {
   const [newListName, setNewListName] = useState("");
   const [savingList, setSavingList] = useState(false);
 
-  const user = useAppSelector((state) => state.auth.user);
+  // const user = useAppSelector((state) => state.auth.user);
   const token = useAppSelector((state) => state.auth.token);
   // const userEmail = user?.email || "";
   const router = useRouter();
@@ -428,7 +428,7 @@ export default function CampaignSettings() {
                 setData((prev) => ({ ...prev, senderId: e.target.value }))
               }
               id="sender-email"
-              placeholder="Enter your sender ID"
+              placeholder="Enter your sender ID that has been verified with SendGrid"
             />
             {/* <div className="space-y-1 w-full">
               <label className="text-[#1B223C] text-sm">Sender Email</label>
