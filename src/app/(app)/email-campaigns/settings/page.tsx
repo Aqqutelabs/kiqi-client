@@ -11,87 +11,285 @@ import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { Modal } from "@/components/ui/Modal";
 import ToggleSwitch from "@/components/ui/SwitchComponent";
 import Heading from "@/components/ui/TextHeading";
-import { CircleCheck, ChevronDown, ChevronUp } from "lucide-react";
-import { redirect } from "next/navigation";
+import {
+  CircleCheck,
+  ChevronDown,
+  ChevronUp,
+  Users,
+  Upload,
+  FileText,
+  X,
+} from "lucide-react";
+import { redirect, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import apiClient from "@/lib/utils/apiClient";
-import BASE_URL from "@/lib/utils/baseUrl";
 import { useAppSelector } from "@/redux/hooks";
+import BASE_URL from "@/lib/utils/baseUrl";
+import apiClient from "@/lib/utils/apiClient";
+
+interface ContactChip {
+  id: string;
+  email: string;
+}
 
 export default function CampaignSettings() {
   const [successModal, setSuccessModal] = useState(false);
   const [advancedSettings, setAdvancedSettings] = useState(false);
   const [scheduleLater, setScheduleLater] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [emailLists, setEmailLists] = useState<any>([]);
+  const [audienceOption, setAudienceOption] = useState("existing");
+  const [loadingLists, setLoadingLists] = useState(false);
+  const [manualContacts, setManualContacts] = useState<string>("");
+  const [contactChips, setContactChips] = useState<ContactChip[]>([]);
+  const [csvFile, setCsvFile] = useState<File | null>(null);
+  const [csvPreview, setCsvPreview] = useState<string[]>([]);
+  const [saveListModal, setSaveListModal] = useState(false);
+  const [newListName, setNewListName] = useState("");
+  const [savingList, setSavingList] = useState(false);
 
-  // Get user email for senderId
   const user = useAppSelector((state) => state.auth.user);
   const token = useAppSelector((state) => state.auth.token);
-  const userEmail = user?.email || "";
+  // const userEmail = user?.email || "";
+  const router = useRouter();
 
-  // Simplified data state matching API requirements
   const [data, setData] = useState({
     campaignName: "",
-    subjectLine: "", // This will be populated from localStorage
-    senderId: userEmail,
+    subjectLine: "",
+    senderId: "",
     autoStart: true,
     audience: {
-      emailLists: [""],
+      emailLists: [] as string[], // For existing list IDs
     },
   });
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.currentTarget;
-    setData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+  // Update data.senderId when userEmail changes
+  // useEffect(() => {
+  //   if (userEmail) {
+  //     setData((prev) => ({ ...prev, senderId: userEmail }));
+  //   }
+  // }, [userEmail]);
 
-  // Get subject line from localStorage (from AI generator page)
+  // Fetch existing email lists
   useEffect(() => {
-    try {
-      const savedDraft = localStorage.getItem("kiqi_campaign_draft");
+    const fetchEmailLists = async () => {
+      if (!token) return;
 
-      if (savedDraft) {
-        const draft = JSON.parse(savedDraft);
+      setLoadingLists(true);
+      try {
+        const response = await apiClient.get(
+          `${BASE_URL}/api/v1/email-lists/user/me`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
 
-        // Extract subject line from AI generated email
-        const extractedSubject = draft.subjectLine || "";
-
-        // Set subject line in form data
-        setData((prevData) => ({
-          ...prevData,
-          subjectLine: extractedSubject,
-        }));
-
-        // Remove from localStorage after extracting
-        localStorage.removeItem("kiqi_campaign_draft");
+        setEmailLists(response.data);
+      } catch (error) {
+        console.error("Error fetching email lists:", error);
+        toast.error("Failed to load email lists");
+      } finally {
+        setLoadingLists(false);
       }
-    } catch (error) {
-      console.error("Error parsing draft data:", error);
-    }
-  }, []);
+    };
 
-  // Handle audience selection (email list)
-  const handleAudienceChange = (emailListId: string) => {
-    setData((prevData) => ({
-      ...prevData,
-      audience: {
-        emailLists: [emailListId],
-      },
-    }));
+    fetchEmailLists();
+  }, [token]);
+
+  // Handle manual contacts input
+  const handleManualContactsChange = (value: string) => {
+    setManualContacts(value);
+
+    // Process on comma to create chips
+    if (value.endsWith(",")) {
+      const email = value.slice(0, -1).trim();
+      if (email && isValidEmail(email)) {
+        addContactChip(email);
+        setManualContacts("");
+      }
+    }
   };
 
-  // Handle sender email selection
-  const handleSenderChange = (email: string) => {
-    setData((prevData) => ({
-      ...prevData,
-      senderId: email,
-    }));
+  const addContactChip = (email: string) => {
+    if (!isValidEmail(email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    if (contactChips.some((chip) => chip.email === email)) {
+      toast.error("Email already added");
+      return;
+    }
+
+    setContactChips((prev) => [
+      ...prev,
+      {
+        id: Date.now().toString() + Math.random(),
+        email: email.trim(),
+      },
+    ]);
+  };
+
+  const removeContactChip = (id: string) => {
+    setContactChips((prev) => prev.filter((chip) => chip.id !== id));
+  };
+
+  // Handle CSV file upload
+  const handleCsvUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.name.endsWith(".csv")) {
+      toast.error("Please upload a CSV file");
+      return;
+    }
+
+    setCsvFile(file);
+
+    // Read and preview CSV
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target?.result as string;
+      const emails = parseCsvEmails(text);
+      setCsvPreview(emails.slice(0, 10)); // Show first 10 emails as preview
+
+      // Convert to chips for editing
+      const chips: ContactChip[] = emails.map((email, index) => ({
+        id: `csv-${index}`,
+        email,
+      }));
+      setContactChips(chips);
+    };
+    reader.readAsText(file);
+  };
+
+  const parseCsvEmails = (csvText: string): string[] => {
+    const emails: string[] = [];
+    const lines = csvText.split("\n");
+
+    lines.forEach((line) => {
+      // Extract emails from CSV line (simple parsing)
+      const emailMatches = line.match(
+        /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g
+      );
+      if (emailMatches) {
+        emails.push(...emailMatches.map((email) => email.trim()));
+      }
+    });
+
+    return Array.from(new Set(emails)).filter((email) => isValidEmail(email));
+  };
+
+  const isValidEmail = (email: string): boolean => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email.trim());
+  };
+
+  // Save new email list
+  const handleSaveEmailList = async () => {
+    if (!newListName.trim()) {
+      toast.error("Please enter a list name");
+      return;
+    }
+
+    if (contactChips.length === 0) {
+      toast.error("No contacts to save");
+      return;
+    }
+
+    setSavingList(true);
+    try {
+      const emails = contactChips.map((chip) => chip.email);
+
+      const payload = {
+        name: newListName,
+        emails: emails,
+      };
+
+      const response = await apiClient.post(
+        `${BASE_URL}/api/v1/email-lists`,
+        payload,
+        token ? { headers: { Authorization: `Bearer ${token}` } } : {}
+      );
+
+      if (response.success) {
+        toast.success("Email list saved successfully!");
+        setSaveListModal(false);
+        setNewListName("");
+
+        // Refresh email lists
+        const refreshResponse = await apiClient.get(
+          `${BASE_URL}/api/v1/email-lists/user/me`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        if (refreshResponse.success && refreshResponse.data) {
+          setEmailLists(
+            Array.isArray(refreshResponse.data)
+              ? refreshResponse.data
+              : [refreshResponse.data]
+          );
+        }
+
+        // Switch back to existing lists
+        setAudienceOption("existing");
+      } else {
+        toast.error(response.message || "Failed to save email list");
+      }
+    } catch (error: any) {
+      console.error("Error saving email list:", error);
+      toast.error(
+        error?.message || "An error occurred while saving the email list"
+      );
+    } finally {
+      setSavingList(false);
+    }
+  };
+
+  // const prepareAudienceData = () => {
+  //   if (audienceOption === "existing" && data.audience.emailLists[0]) {
+  //     // EXACT format that works: ONLY emailLists, NO emails array
+  //     return {
+  //       emailLists: [data.audience.emailLists[0]], // Single ID in array
+  //       // NO emails: [] field
+  //     };
+  //   } else {
+  //     // For manual/CSV: send emails directly
+  //     const emails = contactChips.map((chip) => chip.email);
+  //     return {
+  //       emails: emails.filter((email) => isValidEmail(email)),
+  //     };
+  //   }
+  // };
+
+  // Main API call for creating campaign - UPDATED WITH BETTER ERROR LOGGING
+  const createCampaign = async (payload: any) => {
+    setLoading(true);
+    try {
+      // Make API call to create campaign
+      const response = await apiClient.post(
+        `${BASE_URL}/api/v1/campaigns`,
+        payload,
+        token ? { headers: { Authorization: `Bearer ${token}` } } : {}
+      );
+
+      if (response.success) {
+        toast.success("Campaign created successfully!");
+        setSuccessModal(true);
+        router.push("/email-campaigns/dashboard")
+        return response;
+      } else {
+        toast.error(response.message || "Failed to create campaign");
+        return null;
+      }
+    } catch (error: any) {
+      toast.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "An error occurred while creating campaign"
+      );
+      return null;
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Send Now button handler
@@ -112,88 +310,74 @@ export default function CampaignSettings() {
       return;
     }
 
-    if (!data.audience.emailLists[0]?.trim()) {
+    // Validate audience based on selected option
+    if (
+      audienceOption === "existing" &&
+      data.audience.emailLists.length === 0
+    ) {
       toast.error("Please select an audience email list");
       return;
     }
 
-    setLoading(true);
-    try {
-      // Prepare the exact 5-field payload
-      const payload = {
-        campaignName: data.campaignName,
-        subjectLine: data.subjectLine,
-        senderId: data.senderId,
-        autoStart: scheduleLater ? false : true, // If scheduling for later, autoStart should be false
-        audience: {
-          emailLists: [data.audience.emailLists[0]],
-        },
-      };
-
-      console.log("Sending payload:", payload);
-
-      // Make API call
-      const response = await apiClient.post(
-        `${BASE_URL}/api/v1/campaigns`,
-        payload,
-        token ? { headers: { Authorization: `Bearer ${token}` } } : {}
-      );
-
-      if (response.success) {
-        toast.success("Campaign created successfully!");
-        setSuccessModal(true);
-      } else {
-        toast.error(response.message || "Failed to create campaign");
-      }
-    } catch (error: any) {
-      console.error("API Error:", error);
-      toast.error(
-        error?.message || "An error occurred while creating campaign"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Save Draft button handler (optional - if you still want this)
-  const handleSaveDraft = async () => {
-    // Similar to handleSendNow but with autoStart: false
-    if (!data.campaignName.trim()) {
-      toast.error("Please enter a campaign name");
+    if (
+      (audienceOption === "manual" || audienceOption === "csv") &&
+      contactChips.length === 0
+    ) {
+      toast.error("Please add at least one contact");
       return;
     }
 
-    setLoading(true);
-    try {
-      const payload = {
-        campaignName: data.campaignName,
-        subjectLine: data.subjectLine || "Draft Campaign",
-        senderId: data.senderId || userEmail,
-        autoStart: false,
+    let payload;
+
+    if (audienceOption === "existing" && data.audience.emailLists[0]) {
+      payload = {
+        campaignName: data.campaignName.trim(),
+        subjectLine: data.subjectLine.trim(),
+        senderId: data.senderId.trim(),
+        autoStart: scheduleLater ? false : true,
         audience: {
-          emailLists: data.audience.emailLists[0]
-            ? [data.audience.emailLists[0]]
-            : [],
+          emailLists: [data.audience.emailLists[0]], // SINGLE ID in array
+          // NO emails field
         },
       };
+    } else {
+      // For manual/CSV
+      const emails = contactChips.map((chip) => chip.email);
 
-      const response = await apiClient.post(
-        `${BASE_URL}/api/v1/campaigns`,
-        payload
-      );
-
-      if (response.success) {
-        toast.success("Draft saved successfully!");
-        setSuccessModal(true);
-      } else {
-        toast.error(response.message || "Failed to save draft");
-      }
-    } catch (error: any) {
-      console.error("API Error:", error);
-      toast.error(error?.message || "An error occurred while saving draft");
-    } finally {
-      setLoading(false);
+      payload = {
+        campaignName: data.campaignName.trim(),
+        subjectLine: data.subjectLine.trim(),
+        senderId: data.senderId.trim(),
+        autoStart: scheduleLater ? false : true,
+        audience: {
+          emails: emails.filter((email) => isValidEmail(email)),
+        },
+      };
     }
+    await createCampaign(payload);
+  };
+
+  // Continue without saving list
+  const handleContinueWithoutSaving = async () => {
+    setSaveListModal(false);
+
+    // Prepare payload with emails directly
+    const emails = contactChips.map((chip) => chip.email);
+    const payload = {
+      campaignName: data.campaignName,
+      subjectLine: data.subjectLine,
+      senderId: data.senderId,
+      autoStart: scheduleLater ? false : true,
+      audience: {
+        emailLists: [],
+        emails: emails,
+      },
+    };
+
+    console.log("Continuing with payload:", payload);
+
+    // Proceed with API call
+    await createCampaign(payload);
   };
 
   return (
@@ -202,7 +386,7 @@ export default function CampaignSettings() {
         title="Campaign settings"
         backLink="/email-campaigns/ai/generate-email"
       />
-      <div className="border border-[#E2E8F0] rounded-2xl py-8 mb-6">
+      <div className="border border-[#E2E8F0] rounded-2xl py-8">
         {/* header */}
         <div className="border-b border-[#E2E8F0] h-16 py-6 px-8">
           <Heading heading="Campaign Info" />
@@ -212,50 +396,48 @@ export default function CampaignSettings() {
         <div className="px-8 py-4 space-y-5">
           {/* campaign name */}
           <FormField
-            id="campaignName"
-            name="campaignName"
             label="Campaign Name"
-            placeholder="Enter campaign name"
-            className="bg-[#00000014]"
+            name="campaign-name"
             value={data.campaignName}
-            onChange={handleChange}
-            required
+            onChange={(e) =>
+              setData((prev) => ({ ...prev, campaignName: e.target.value }))
+            }
+            id="campaign-name"
+            placeholder="Enter campaign name"
           />
 
-          {/* divider */}
-          <hr className="text-gray-200" />
-
-          {/* subject line (pre-filled from AI generator) */}
+          {/* subject line */}
           <FormField
-            id="subjectLine"
-            name="subjectLine"
             label="Subject Line"
-            placeholder="Subject line from AI generated email"
-            className="bg-[#00000014]"
+            name="subject-line"
             value={data.subjectLine}
-            onChange={handleChange}
-            required
+            onChange={(e) =>
+              setData((prev) => ({ ...prev, subjectLine: e.target.value }))
+            }
+            id="subject-line"
+            placeholder="Enter subject line"
           />
-
-          {/* divider */}
-          <hr className="text-gray-200" />
 
           {/* sender email dropdown */}
           <div className="flex items-end gap-4">
-            <div className="space-y-1 w-full">
-              <label className="text-[#1B223C] text-sm">Sender Email *</label>
+            <FormField
+              name="sender-email"
+              label="Sender Email"
+              value={data.senderId}
+              onChange={(e) =>
+                setData((prev) => ({ ...prev, senderId: e.target.value }))
+              }
+              id="sender-email"
+              placeholder="Enter your sender ID"
+            />
+            {/* <div className="space-y-1 w-full">
+              <label className="text-[#1B223C] text-sm">Sender Email</label>
               <Select
                 placeholder="Select sender email"
-                className="bg-[#00000014]"
-                value={data.senderId}
-                onChange={(e) => handleSenderChange(e.target.value)}
-                required>
-                <option value="">Select an email</option>
-                <option value="mrayendi1@gmail.com">mrayendi1@gmail.com</option>
-                <option value={userEmail}>{userEmail} (Your Email)</option>
-                {/* Add more sender emails as needed */}
+                className="bg-[#00000014]">
+                <option value="">Email 1</option>
               </Select>
-            </div>
+            </div> */}
             <Button
               className="w-[30%]"
               onClick={() => redirect("/email-campaigns/create-sender")}>
@@ -266,28 +448,223 @@ export default function CampaignSettings() {
           {/* divider */}
           <hr className="text-gray-200" />
 
-          {/* audience */}
-          <div className="flex items-end gap-4">
-            <div className="space-y-1 w-full">
-              <label className="text-[#1B223C] text-sm">Audience *</label>
-              <Select
-                placeholder="Select from email list"
-                className="bg-[#00000014]"
-                value={data.audience.emailLists[0] || ""}
-                onChange={(e) => handleAudienceChange(e.target.value)}
-                required>
-                <option value="">Select an email list</option>
-                <option value="6915f7d396931636c516020f">
-                  Newsletter Subscribers
-                </option>
-                {/* Add more email list options here */}
-              </Select>
+          {/* AUDIENCE SECTION - MODIFIED */}
+          <div className="space-y-4">
+            <label className="text-[#1B223C] text-sm font-medium">
+              Audience *
+            </label>
+
+            {/* Audience Option Tabs */}
+            <div className="flex gap-2 pb-2">
+              <button
+                onClick={() => setAudienceOption("existing")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  audienceOption === "existing"
+                    ? "bg-blue-50 text-blue-600 border border-blue-200"
+                    : "text-gray-600 hover:bg-gray-50"
+                }`}>
+                <Users size={16} className="inline mr-2" />
+                Existing Lists
+              </button>
+              <button
+                onClick={() => setAudienceOption("manual")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  audienceOption === "manual"
+                    ? "bg-blue-50 text-blue-600 border border-blue-200"
+                    : "text-gray-600 hover:bg-gray-50"
+                }`}>
+                <FileText size={16} className="inline mr-2" />
+                Manual Input
+              </button>
+              <button
+                onClick={() => setAudienceOption("csv")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  audienceOption === "csv"
+                    ? "bg-blue-50 text-blue-600 border border-blue-200"
+                    : "text-gray-600 hover:bg-gray-50"
+                }`}>
+                <Upload size={16} className="inline mr-2" />
+                Upload CSV
+              </button>
+              <Button onClick={() => redirect("/email-campaigns/email-lists")}>
+                Create a new Email list
+              </Button>
             </div>
-            <Button
-              className="w-[30%]"
-              onClick={() => redirect("/email-campaigns/email-lists")}>
-              Create a new Email list
-            </Button>
+
+            {/* Existing Lists Option */}
+            {audienceOption === "existing" && (
+              <div className="space-y-3">
+                <Select
+                  placeholder={
+                    loadingLists ? "Loading lists..." : "Select from email list"
+                  }
+                  className="bg-[#00000014]"
+                  value={data.audience.emailLists[0] || ""}
+                  onChange={(e) => {
+                    const listId = e.target.value;
+                    console.log("Selected list ID:", listId);
+                    setData((prev) => ({
+                      ...prev,
+                      audience: {
+                        emailLists: listId ? [listId] : [], // Store as single-item array
+                        emails: [], // Clear emails when using list
+                      },
+                    }));
+                  }}
+                  disabled={loadingLists}
+                  required>
+                  <option value="">Select an email list</option>
+                  {Array.isArray(emailLists) &&
+                    emailLists.map((list: any) => (
+                      <option key={list._id} value={list._id}>
+                        {list.name || list.email_listName || list._id} - (
+                        {list.emails?.length || 0} contacts)
+                      </option>
+                    ))}
+                </Select>
+              </div>
+            )}
+
+            {/* Manual Input Option */}
+            {audienceOption === "manual" && (
+              <div className="space-y-3">
+                <div className="relative">
+                  <textarea
+                    value={manualContacts}
+                    onChange={(e) => handleManualContactsChange(e.target.value)}
+                    placeholder="Enter email addresses separated by commas. Press comma or enter after each email."
+                    className="w-full bg-[#00000014] rounded-md p-3 min-h-[100px] resize-none border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-sm"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        if (manualContacts.trim()) {
+                          addContactChip(manualContacts);
+                          setManualContacts("");
+                        }
+                      }
+                    }}
+                  />
+                  <div className="text-xs text-gray-500 mt-1">
+                    Type email and press comma or enter to add
+                  </div>
+                </div>
+
+                {/* Contact Chips */}
+                <div className="flex flex-wrap gap-2 min-h-[60px] p-2 border rounded-lg">
+                  {contactChips.map((chip) => (
+                    <div
+                      key={chip.id}
+                      className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-sm">
+                      <span>{chip.email}</span>
+                      <button
+                        onClick={() => removeContactChip(chip.id)}
+                        className="ml-1 hover:bg-blue-200 rounded-full p-0.5">
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ))}
+                  {contactChips.length === 0 && (
+                    <div className="text-gray-400 text-sm italic p-2">
+                      No contacts added yet
+                    </div>
+                  )}
+                </div>
+
+                <div className="text-sm text-gray-600">
+                  Total contacts: {contactChips.length}
+                </div>
+              </div>
+            )}
+
+            {/* CSV Upload Option */}
+            {audienceOption === "csv" && (
+              <div className="space-y-4">
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+                  <input
+                    type="file"
+                    id="csv-upload"
+                    accept=".csv"
+                    onChange={handleCsvUpload}
+                    className="hidden"
+                  />
+                  <label htmlFor="csv-upload" className="cursor-pointer">
+                    <Upload size={40} className="mx-auto text-gray-400 mb-3" />
+                    <p className="text-gray-600 font-medium">
+                      Click to upload CSV file
+                    </p>
+                    <p className="text-gray-500 text-sm mt-1">
+                      Upload a CSV file containing email addresses
+                    </p>
+                  </label>
+                </div>
+
+                {csvFile && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-700">
+                        {csvFile.name}
+                      </span>
+                      <button
+                        onClick={() => {
+                          setCsvFile(null);
+                          setCsvPreview([]);
+                          setContactChips([]);
+                        }}
+                        className="text-red-500 hover:text-red-700 text-sm">
+                        Remove
+                      </button>
+                    </div>
+
+                    {csvPreview.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium text-gray-700">
+                          Preview ({csvPreview.length} emails):
+                        </p>
+                        <div className="max-h-[120px] overflow-y-auto border rounded p-2">
+                          {csvPreview.map((email, index) => (
+                            <div
+                              key={index}
+                              className="text-sm text-gray-600 py-1 border-b last:border-b-0">
+                              {email}
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Contact Chips for editing */}
+                        <div className="space-y-2">
+                          <p className="text-sm font-medium text-gray-700">
+                            Edit contacts (click × to remove):
+                          </p>
+                          <div className="flex flex-wrap gap-2 min-h-[60px] p-2 border rounded-lg">
+                            {contactChips.slice(0, 20).map((chip) => (
+                              <div
+                                key={chip.id}
+                                className="inline-flex items-center gap-1 bg-green-100 text-green-800 px-3 py-1.5 rounded-full text-sm">
+                                <span>{chip.email}</span>
+                                <button
+                                  onClick={() => removeContactChip(chip.id)}
+                                  className="ml-1 hover:bg-green-200 rounded-full p-0.5">
+                                  <X size={14} />
+                                </button>
+                              </div>
+                            ))}
+                            {contactChips.length > 20 && (
+                              <div className="text-sm text-gray-500">
+                                +{contactChips.length - 20} more...
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="text-sm text-gray-600">
+                          Total contacts loaded: {contactChips.length}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Advanced Settings Accordion */}
@@ -312,7 +689,7 @@ export default function CampaignSettings() {
                   <h4 className="font-medium text-sm text-[#1B223C]">
                     Exclude Lists
                   </h4>
-                  <div className="flex flex-col md:flex-row items-start md:items-center gap-3">
+                  <div className="flex flex-col md:flex-row items-center gap-3">
                     <Checkbox
                       name="unsubscribed"
                       label="Unsubscribed"
@@ -329,7 +706,7 @@ export default function CampaignSettings() {
                       name="inactive"
                       label="Inactive"
                       isChecked={false}
-                     onChange={() => {}}
+                      onChange={() => {}}
                     />
                   </div>
                 </div>
@@ -338,8 +715,6 @@ export default function CampaignSettings() {
                 <FormField
                   label="Recipient Email Address (Optional)"
                   id="recipientEmail"
-                  value=""
-                  onChange={() => {}}
                   placeholder="Enter the name of the Sender or the name of your Business or Organization"
                 />
 
@@ -351,7 +726,7 @@ export default function CampaignSettings() {
                   <h4 className="font-medium text-sm text-[#1B223C]">
                     Resend Settings
                   </h4>
-                  <div className="flex flex-col md:flex-row items-start md:items-center gap-3">
+                  <div className="flex flex-col md:flex-row items-center gap-3">
                     <Checkbox
                       name="resend-unopened"
                       label="Resend to unopened emails"
@@ -372,8 +747,6 @@ export default function CampaignSettings() {
                   label="Wait Time"
                   id="waitTime"
                   placeholder="E.g 2 days"
-                  value=""
-                  onChange={() => {}}
                 />
 
                 {/* divider */}
@@ -386,8 +759,6 @@ export default function CampaignSettings() {
                     label="Alternative Text"
                     id="fallbackSubjectLine"
                     placeholder="Enter a fallback subject line"
-                    value=""
-                    onChange={() => {}}
                   />
                   <div className="flex gap-4 items-center mt-4 w-fit flex-row-reverse">
                     <p className="text-sm">
@@ -412,8 +783,6 @@ export default function CampaignSettings() {
                   label="Daily Send Limit (Max)"
                   id="dailySendLimit"
                   placeholder="5000 emails per day"
-                  value=""
-                  onChange={() => {}}
                 />
 
                 {/* batch sending */}
@@ -421,8 +790,6 @@ export default function CampaignSettings() {
                   label="Batch Sending"
                   id="batchSending"
                   placeholder="500 every 10 minutes"
-                  value=""
-                  onChange={() => {}}
                 />
 
                 {/* divider */}
@@ -450,17 +817,14 @@ export default function CampaignSettings() {
                     label="Permission Reminder"
                     id="permissionReminder"
                     placeholder="You are receiving this email because you signed up for our newsletter at ..."
-                    value=""
-                    onChange={handleChange}
                   />
                 </div>
               </div>
             )}
           </div>
-        </div>
 
-        {/* delivery time */}
-          <div className="space-y-3 mx-8 mt-4">
+          {/* delivery time */}
+          <div className="space-y-3">
             <h4 className="font-medium text-sm text-[#1B223C]">
               Delivery Time
             </h4>
@@ -474,36 +838,37 @@ export default function CampaignSettings() {
           </div>
 
           {/* schedule date */}
-          {scheduleLater && <div className="flex flex-col md:flex-row items-end gap-3 w-[800px] mx-8 mt-4">
-            <DateInput label="Schedule Date" />
-            <TimeInput label="Schedule Time" />
-          </div>}
+          {scheduleLater && (
+            <div className="flex flex-col md:flex-row items-end gap-3 w-[800px]">
+              <DateInput label="Schedule Date" />
+              <TimeInput label="Schedule Time" />
+            </div>
+          )}
+        </div>
 
         {/* cta buttons */}
         <div className="flex items-center gap-4 w-[500px] mt-5 ml-8">
           <Button
             size={"lg"}
             className="w-full"
-            onClick={handleSaveDraft}
-            disabled={loading}
-            variant="outline">
-            {loading ? "Saving..." : "Save Draft"}
+            onClick={() => setSuccessModal(true)}>
+            Save Draft
           </Button>
           <Button
             size={"lg"}
             className="w-full"
+            variant={"secondary"}
             onClick={handleSendNow}
             disabled={loading}>
             {loading
               ? "Sending..."
               : scheduleLater
-              ? "Schedule Send"
+              ? "Schedule Email"
               : "Send Now"}
           </Button>
         </div>
       </div>
 
-      {/* success modal */}
       <Modal
         isOpen={successModal}
         onClose={() => setSuccessModal(false)}
@@ -518,6 +883,42 @@ export default function CampaignSettings() {
           <Button onClick={() => redirect("/email-campaigns/dashboard")}>
             Back to Dashboard
           </Button>
+        </div>
+      </Modal>
+
+      {/* Save List Modal */}
+      <Modal
+        isOpen={saveListModal}
+        onClose={() => setSaveListModal(false)}
+        width="450px">
+        <div className="flex flex-col justify-center items-center gap-6">
+          <Heading
+            heading="Save Email List"
+            subtitle="Would you like to save these contacts as a new email list?"
+            className="text-center"
+          />
+          <FormField
+            label="List Name"
+            id="list-name"
+            value={newListName}
+            onChange={(e) => setNewListName(e.target.value)}
+            placeholder="Enter list name"
+            className="w-full"
+          />
+          <div className="flex gap-4 w-full">
+            <Button
+              variant="secondary"
+              onClick={handleContinueWithoutSaving}
+              className="w-full">
+              Continue Without Saving
+            </Button>
+            <Button
+              onClick={handleSaveEmailList}
+              disabled={savingList}
+              className="w-full">
+              {savingList ? "Saving..." : "Save List"}
+            </Button>
+          </div>
         </div>
       </Modal>
     </Card>

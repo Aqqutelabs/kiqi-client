@@ -235,11 +235,7 @@ const LoginPage = () => {
             className="flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
             disabled={isLoading || connecting}
           >
-            {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <GoogleIcon />
-            )}
+            <GoogleIcon />
             <span>Google</span>
           </Button>
           

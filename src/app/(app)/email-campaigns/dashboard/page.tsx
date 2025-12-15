@@ -7,13 +7,14 @@ import Heading from "@/components/ui/TextHeading";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { useState, useEffect } from "react";
 import SearchInput from "@/components/ui/Search";
-import Filter from "@/components/ui/Filter";
 import { Button } from "@/components/ui/Button";
-import { Plus, Sparkles, Loader, Edit3, Trash2 } from "lucide-react";
+import { Plus, Loader, } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
 import { redirect } from "next/navigation";
-import axios from "axios";
+import api from '@/lib/api';
 import { FormField } from "@/components/ui/FormField";
+import axios from "axios";
+import BASE_URL from "@/lib/utils/baseUrl";
 
 // Define type for campaign data
 interface Campaign {
@@ -24,6 +25,7 @@ interface Campaign {
   deliveries: number;
   opens: number;
   clicks: number;
+  subjectLine: string;
   date: string;
 }
 
@@ -47,6 +49,7 @@ function EditCampaignModal({ isOpen, onClose, campaign, onSave, isLoading }: Edi
     status: "",
     audience: "",
     deliveries: "",
+    subjectLine: "",
     opens: "",
     clicks: "",
     date: ""
@@ -59,6 +62,7 @@ function EditCampaignModal({ isOpen, onClose, campaign, onSave, isLoading }: Edi
         status: campaign.status,
         audience: campaign.audience,
         deliveries: campaign.deliveries.toString(),
+        subjectLine: campaign.subjectLine,
         opens: campaign.opens.toString(),
         clicks: campaign.clicks.toString(),
         date: campaign.date
@@ -102,6 +106,16 @@ function EditCampaignModal({ isOpen, onClose, campaign, onSave, isLoading }: Edi
           placeholder="Enter campaign name"
           value={formData.name}
           onChange={(e) => handleChange("name", e.target.value)}
+          required
+        />
+         <FormField
+          label="Subject Line"
+          id="edit-subject-line"
+          name="subjectLine"
+          type="text"
+          placeholder="Enter Subject Line"
+          value={formData.subjectLine}
+          onChange={(e) => handleChange("subjectLine", e.target.value)}
           required
         />
         
@@ -269,58 +283,51 @@ export default function EmailCampaignDashboard() {
     { header: "Name", accessor: "name" },
     { header: "Status", accessor: "status" },
     { header: "Audience", accessor: "audience" },
-    { header: "Deliveries", accessor: "deliveries" },
-    { header: "Opens", accessor: "opens" },
-    { header: "Clicks", accessor: "clicks" },
     { header: "Date", accessor: "date" },
   ];
 
   // Fetch campaigns data
-  const fetchCampaigns = async (showRefreshLoader = false) => {
-    if (showRefreshLoader) {
-      setRefreshing(true);
-    } else {
-      setLoading(true);
+const fetchCampaigns = async (showRefreshLoader = false) => {
+  if (showRefreshLoader) {
+    setRefreshing(true);
+  } else {
+    setLoading(true);
+  }
+  
+  try {
+    const response = await api.get<ApiResponse<Campaign[]>>('/campaigns');
+
+    const campaignsData = response.data.data || [];
+
+    if (!Array.isArray(campaignsData)) {
+      throw new Error("Unexpected data format from server");
     }
+
+    const transformedData: Campaign[] = campaignsData.map((campaign: any, index: number) => ({
+      id: campaign.id || index + 1,
+      name: campaign.campaignName || `Campaign ${index + 1}`,
+      status: campaign.status || 'Active',
+      audience: campaign.audience.emailLists || 'All Subscribers',
+      deliveries: campaign.deliveries || 0,
+      opens: campaign.opens || 0,
+      clicks: campaign.clicks || 0,
+      subjectLine: campaign.subjectLine || "---",
+      date: campaign.createdat || new Date().toISOString().split('T')[0],
+    }));
+
+    setCampaigns(transformedData);
+    // toast.success(showRefreshLoader ? 'Campaigns refreshed!' : 'Campaigns loaded!');
     
-    try {
-      const response = await axios.get<ApiResponse<Campaign[]>>(
-        'https://kiqi-server-pqqr.onrender.com/api/v1/campaigns'
-      );
-
-      const campaignsData = response.data.data || [];
-
-      if (!Array.isArray(campaignsData)) {
-        throw new Error("Unexpected data format from server");
-      }
-
-      // Transform API data to match our Campaign interface
-      const transformedData: Campaign[] = campaignsData.map((campaign: any, index: number) => ({
-        id: campaign.id || index + 1,
-        name: campaign.name || `Campaign ${index + 1}`,
-        status: campaign.status || 'Active',
-        audience: campaign.audience || 'All Subscribers',
-        deliveries: campaign.deliveries || 0,
-        opens: campaign.opens || 0,
-        clicks: campaign.clicks || 0,
-        date: campaign.date || new Date().toISOString().split('T')[0],
-      }));
-
-      setCampaigns(transformedData);
-      toast.success(showRefreshLoader ? 'Campaigns refreshed!' : 'Campaigns loaded!');
-      
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch campaigns';
-      toast.error(errorMessage);
-      console.error('Error fetching campaigns:', err);
-      
-      // Set empty array instead of dummy data
-      setCampaigns([]);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'Failed to fetch campaigns';
+    toast.error(errorMessage);
+    console.error('Error fetching campaigns:', err);
+    setCampaigns([]);
+  } finally {
+    setLoading(false);
+    setRefreshing(false);
+  }
+};
 
   // Initial data fetch
   useEffect(() => {
@@ -366,25 +373,28 @@ export default function EmailCampaignDashboard() {
     setShowDeleteModal(true);
   };
 
-  // Handle delete confirm
+  // handle delete
   const handleDeleteConfirm = async () => {
-    if (!deletingCampaign) return;
+  if (!deletingCampaign) return;
 
-    setIsDeleting(true);
-    try {
-      // Remove from local state
-      setCampaigns(prev => prev.filter(item => item.id !== deletingCampaign.id));
-      
-      toast.success("Campaign deleted successfully!");
-      setShowDeleteModal(false);
-      setDeletingCampaign(null);
-    } catch (error) {
-      toast.error("Failed to delete campaign");
-      console.error('Error deleting campaign:', error);
-    } finally {
-      setIsDeleting(false);
-    }
-  };
+  setIsDeleting(true);
+  try {
+    // Use the actual campaign ID from the deletingCampaign state
+    const res = await axios.delete(`${BASE_URL}/api/v1/campaigns/${deletingCampaign.id}`);
+    
+    // Remove the campaign from local state
+    setCampaigns(prev => prev.filter(campaign => campaign.id !== deletingCampaign.id));
+    
+    toast.success("Campaign deleted successfully!");
+    setShowDeleteModal(false);
+    setDeletingCampaign(null);
+  } catch (error) {
+    toast.error("Failed to delete campaign");
+    console.error('Error deleting campaign:', error);
+  } finally {
+    setIsDeleting(false);
+  }
+};
 
   // Filter data based on selected tab
   const filteredData = tab === "All" 
@@ -442,7 +452,6 @@ export default function EmailCampaignDashboard() {
             {/* filters */}
             <div className="flex gap-2">
               <SearchInput value={query} onChange={(e) => setQuery(e.target.value)} name="query" />
-              <Filter value="" onChange={() => {}} />
               <Button
                 className="w-full"
                 onClick={() => redirect("/email-campaigns/ai/generate-email")}

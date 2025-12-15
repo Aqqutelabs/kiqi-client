@@ -1,40 +1,30 @@
+// store/slices/authSlice.ts - Updated version
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import apiClient from '@/lib/utils/apiClient';
 import BASE_URL from '@/lib/utils/baseUrl';
 
-// This is a mock API call function. Replace with your actual API logic.
-const apiLogin = async (credentials: any) => {
-  console.log('Logging in with:', credentials);
-  await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
-  if (credentials.email === 'test@example.com') {
-    return { user: { name: 'Obinna Festus', email: 'test@example.com' }, token: 'fake-jwt-token' };
-  } else {
-    throw new Error('Invalid credentials');
-  }
-};
-
-interface RegisterPayload {
-  fullName: string;
-  phoneNumber: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  organizationName: string;
-}
-
-interface RegisteredUser {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  organizationName: string;
-  createdAt: string;
-  updatedAt: string;
+interface WalletAuthResponse {
+  user: {
+    id: string;
+    walletAddress: string;
+    email?: string;
+    username?: string;
+    createdAt: string;
+  };
+  accessToken: string;
+  refreshToken?: string;
+  message: string;
 }
 
 interface AuthState {
-  user: { name: string; email: string } | RegisteredUser | null;
+  user: { 
+    id: string;
+    walletAddress: string;
+    email?: string;
+    username?: string;
+    createdAt: string;
+    name?: string;
+  } | null;
   token: string | null;
   refreshToken: string | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
@@ -42,7 +32,7 @@ interface AuthState {
   registration: {
     status: 'idle' | 'loading' | 'succeeded' | 'failed';
     error: string | null;
-    data: RegisteredUser | null;
+    data: any | null;
     message: string | null;
   };
 }
@@ -50,8 +40,8 @@ interface AuthState {
 // Define initialState with default values
 const initialState: AuthState = {
   user: null,
-  token: null,
-  refreshToken: null,
+  token: typeof window !== 'undefined' ? localStorage.getItem('authToken') : null,
+  refreshToken: typeof window !== 'undefined' ? localStorage.getItem('refreshToken') : null,
   status: 'idle',
   error: null,
   registration: {
@@ -85,12 +75,222 @@ const rehydrateState = (): AuthState => {
         data: null,
         message: null,
       },
+// Wallet authentication thunk
+export const loginUserWithWallet = createAsyncThunk(
+  'auth/loginUserWithWallet',
+  async (
+    walletData: {
+      publicKey: string;
+      signature: string;
+      message: string;
+      timestamp: number;
+      nonce: string;
+      mode?: 'signup' | 'login';
+    },
+    { rejectWithValue }
+  ) => {
+    try {
+      const endpoint = walletData.mode === 'signup'
+        ? `${BASE_URL}/api/v1/auth/wallet/signup`
+        : `${BASE_URL}/api/v1/auth/wallet/login`;
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          walletAddress: walletData.publicKey,
+          signature: walletData.signature,
+          message: walletData.message,
+          timestamp: walletData.timestamp,
+          nonce: walletData.nonce,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || errorData.message || 'Wallet authentication failed');
+      }
+
+      const data = await response.json();
+      
+      // Store tokens in localStorage
+      if (data.accessToken) {
+        localStorage.setItem('authToken', data.accessToken);
+      }
+      if (data.refreshToken) {
+        localStorage.setItem('refreshToken', data.refreshToken);
+      }
+      
+      return {
+        user: data.user,
+        token: data.accessToken,
+        refreshToken: data.refreshToken,
+        message: data.message || 'Wallet authentication successful',
+      };
+    } catch (error: any) {
+      let message = error.message || 'Wallet authentication failed';
+      try {
+        const errObj = JSON.parse(message);
+        message = errObj.message || message;
+      } catch {}
+      return rejectWithValue(message);
+    }
+  }
+);
+
+// Your existing thunks remain the same...
+export const loginUser = createAsyncThunk('auth/loginUser', async (credentials: { email: string; password: string }, { rejectWithValue }) => {
+  try {
+    const response = await apiClient.post(`${BASE_URL}/api/v1/auth/login`, credentials);
+    if (response.error) {
+      return rejectWithValue(response.message || 'Login failed');
+    }
+    if (!response.accessToken || !response.user) {
+      return rejectWithValue(response.message || 'Login failed');
+    }
+    
+    // Store tokens
+    if (response.accessToken) {
+      localStorage.setItem('authToken', response.accessToken);
+    }
+    if (response.refreshToken) {
+      localStorage.setItem('refreshToken', response.refreshToken);
+    }
+    
+    return {
+      user: response.user,
+      token: response.accessToken,
+      refreshToken: response.refreshToken,
+      message: response.message,
     };
   }
 
   return initialState;
 };
 
+});
+
+export const registerUser = createAsyncThunk(
+  'auth/registerUser',
+  async (payload: {
+    fullName: string;
+    phoneNumber: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    organizationName: string;
+  }, { rejectWithValue }) => {
+    try {
+      const response = await apiClient.post(`${BASE_URL}/api/v1/auth/register`, payload);
+      if (response.error) {
+        return rejectWithValue(response.message || 'Registration failed');
+      }
+      
+      // Store token if present
+      if (response.accessToken) {
+        localStorage.setItem('authToken', response.accessToken);
+      }
+      
+      return {
+        data: response.data,
+        message: response.message,
+        token: response.accessToken,
+      };
+    } catch (error: any) {
+      let message = error.message || 'Registration failed';
+      try {
+        const errObj = JSON.parse(message);
+        message = errObj.message || message;
+      } catch {}
+      return rejectWithValue(message);
+    }
+  }
+);
+
+export const loginUserWithGoogle = createAsyncThunk(
+  'auth/loginUserWithGoogle',
+  async (code: string, { rejectWithValue }) => {
+    try {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+      
+      console.log('🔵 loginUserWithGoogle thunk started with code:', code.substring(0, 20) + '...');
+      
+      // Step 1: Exchange code for token
+      const callbackResponse = await fetch(
+        `${backendUrl}/api/v1/auth/google/callback?code=${encodeURIComponent(code)}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!callbackResponse.ok) {
+        const errorData = await callbackResponse.json();
+        console.error('❌ Step 1 failed:', errorData);
+        throw new Error(errorData.message || 'Failed to exchange code for token');
+      }
+
+      const callbackData = await callbackResponse.json();
+      console.log('✅ Step 1 response:', callbackData);
+
+      if (!callbackData.tokens || !callbackData.tokens.id_token) {
+        throw new Error('No id_token in callback response');
+      }
+
+      const idToken = callbackData.tokens.id_token;
+      console.log('🔐 Extracted id_token:', idToken.substring(0, 20) + '...');
+
+      // Step 2: Send token to authenticate
+      console.log('📤 Step 2: Sending id_token to auth endpoint...');
+      const authResponse = await fetch(`${backendUrl}/api/v1/auth/google`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ idToken }),
+      });
+
+      if (!authResponse.ok) {
+        const errorData = await authResponse.json();
+        console.error('❌ Step 2 failed:', errorData);
+        throw new Error(errorData.message || 'Authentication failed');
+      }
+
+      const authData = await authResponse.json();
+      console.log('✅ Step 2 response:', authData);
+
+      // Store tokens in localStorage
+      if (authData.accessToken) {
+        localStorage.setItem('authToken', authData.accessToken);
+        console.log('🔐 Access token stored');
+      }
+      if (authData.refreshToken) {
+        localStorage.setItem('refreshToken', authData.refreshToken);
+        console.log('🔐 Refresh token stored');
+      }
+
+      return {
+        user: authData.user,
+        token: authData.accessToken,
+        refreshToken: authData.refreshToken,
+        message: authData.message || 'Google login successful',
+      };
+    } catch (error: any) {
+      let message = error.message || 'Google authentication failed';
+      console.error('💥 Google auth error:', message);
+      try {
+        const errObj = JSON.parse(message);
+        message = errObj.message || message;
+      } catch {}
+      return rejectWithValue(message);
+    }
+  }
+);
 const authSlice = createSlice({
   name: 'auth',
   initialState: rehydrateState(),
@@ -107,10 +307,11 @@ const authSlice = createSlice({
         data: null,
         message: null,
       };
+      
+      // Clear localStorage
       if (typeof window !== 'undefined') {
         localStorage.removeItem('authToken');
         localStorage.removeItem('refreshToken');
-        localStorage.removeItem('user');
       }
     },
     resetAuthState: (state) => {
@@ -123,15 +324,33 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Wallet login cases
+      .addCase(loginUserWithWallet.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
+      .addCase(loginUserWithWallet.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.refreshToken = action.payload.refreshToken || null;
+        state.error = null;
+      })
+      .addCase(loginUserWithWallet.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload as string;
+      })
+      
+      // Your existing cases...
       .addCase(loginUser.pending, (state) => {
         state.status = 'loading';
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.user = action.payload.user; // Store full user object
+        state.user = action.payload.user;
         state.token = action.payload.token;
-        // Optionally store refreshToken if needed: state.refreshToken = action.payload.refreshToken;
+        state.refreshToken = action.payload.refreshToken || null;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.status = 'failed';
@@ -144,247 +363,20 @@ const authSlice = createSlice({
         state.registration.message = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
-        // Return a fresh state object instead of mutating a possibly read-only draft.
-        // This avoids "Cannot assign to read only property" errors that can occur
-        // when the persisted/re-hydrated state is frozen by persistence middleware.
-        const payload = action.payload || {} as any;
-        return {
-          ...initialState,
-          registration: {
-            status: 'succeeded',
-            error: null,
-            data: payload.data ?? null,
-            message: payload.message ?? null,
-          },
-          token: payload.token ?? null,
-          user: payload.data ?? null,
-        } as AuthState;
+        state.registration.status = 'succeeded';
+        state.registration.data = action.payload.data || null;
+        state.registration.message = action.payload.message || null;
+        state.token = action.payload.token || null;
+        if (action.payload.data) {
+          state.user = action.payload.data;
+        }
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.registration.status = 'failed';
         state.registration.error = action.payload as string;
-      })
-      .addCase(loginUserWithGoogle.pending, (state) => {
-        state.status = 'loading';
-        state.error = null;
-      })
-      .addCase(loginUserWithGoogle.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.user = action.payload.user;
-        state.token = action.payload.token;
-        state.refreshToken = action.payload.refreshToken;
-        console.log('✅ Google auth state updated:', {
-          user: action.payload.user,
-          token: action.payload.token ? action.payload.token.substring(0, 20) + '...' : null,
-          refreshToken: action.payload.refreshToken ? action.payload.refreshToken.substring(0, 20) + '...' : null,
-        });
-      })
-      .addCase(loginUserWithGoogle.rejected, (state, action) => {
-        const errorMessage = action.payload as string;
-        state.status = 'failed';
-        state.error = errorMessage;
-        console.error('❌ Google auth failed:', errorMessage);
-        alert(`Authentication failed: ${errorMessage}`); // Display error to the user
       });
   },
 });
 
-export const loginUser = createAsyncThunk(
-  'auth/loginUser',
-  async (credentials: { email: string; password: string }, { rejectWithValue }) => {
-    try {
-      const response = await fetch(`${BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        try {
-          const error = JSON.parse(errorText);
-          throw new Error(error.message || 'Login failed');
-        } catch {
-          throw new Error('Unexpected server response');
-        }
-      }
-
-      const data = await response.json();
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('authToken', data.token);
-      }
-      return data;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Login failed');
-    }
-  }
-);
-
-export const registerUser = createAsyncThunk(
-  'auth/registerUser',
-  async (userData: RegisterPayload, { rejectWithValue }) => {
-    try {
-      const response = await fetch(`${BASE_URL}/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        try {
-          const error = JSON.parse(errorText);
-          throw new Error(error.message || 'Registration failed');
-        } catch {
-          throw new Error('Unexpected server response');
-        }
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Registration failed');
-    }
-  }
-);
-
-const validateToken = (token: string | null): boolean => {
-  if (!token) {
-    console.error('❌ Token validation failed: Token is missing');
-    return false;
-  }
-
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    const currentTime = Math.floor(Date.now() / 1000);
-    if (payload.exp && payload.exp < currentTime) {
-      console.error('❌ Token validation failed: Token is expired');
-      return false;
-    }
-    return true;
-  } catch (error) {
-    console.error('❌ Token validation failed: Invalid token format');
-    return false;
-  }
-};
-
-export const loginUserWithGoogle = createAsyncThunk(
-  'auth/loginUserWithGoogle',
-  async (code: string, { rejectWithValue }) => {
-    try {
-      console.log('🔄 Starting Google OAuth flow with code:', code);
-
-      // Step 1: Exchange code for tokens
-      const tokenResponse = await fetch(`${BASE_URL}/api/v1/auth/google/callback?code=${encodeURIComponent(code)}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!tokenResponse.ok) {
-        const errorText = await tokenResponse.text();
-        console.error('❌ Failed to fetch tokens. Response:', errorText);
-        try {
-          const error = JSON.parse(errorText);
-          if (error.message === 'invalid_grant') {
-            console.error('❌ invalid_grant: Authorization code is expired or already used.');
-            throw new Error('Authorization code expired or already used. Please try logging in again.');
-          }
-          throw new Error(error.message || 'Failed to fetch tokens');
-        } catch {
-          throw new Error('Unexpected server response while fetching tokens');
-        }
-      }
-
-      const tokenData = await tokenResponse.json();
-      console.log('✅ Tokens received:', tokenData);
-
-      if (!tokenData.tokens || !tokenData.tokens.id_token) {
-        throw new Error('Invalid token structure received from server');
-      }
-
-      // Step 2: Use idToken to authenticate user
-      const authResponse = await fetch(`${BASE_URL}/api/v1/auth/google`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ idToken: tokenData.tokens.id_token }),
-      });
-
-      if (!authResponse.ok) {
-        const errorText = await authResponse.text();
-        console.error('❌ Failed to authenticate user with idToken. Response:', errorText);
-        try {
-          const error = JSON.parse(errorText);
-          throw new Error(error.message || 'Google login failed');
-        } catch {
-          throw new Error('Unexpected server response while authenticating user');
-        }
-      }
-
-      const userData = await authResponse.json();
-      console.log('✅ User authenticated successfully:', userData);
-
-      // if (!userData.token || !validateToken(userData.token)) {
-      //   throw new Error('Authentication failed: Invalid or expired token');
-      // }
-
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('authToken', userData.token);
-        localStorage.setItem('refreshToken', userData.refreshToken);
-      }
-      return userData;
-    } catch (error: any) {
-      console.error('❌ Google OAuth flow failed:', error.message);
-      return rejectWithValue(error.message || 'Google login failed');
-    }
-  }
-);
-
-// redux/slices/authSlice.ts (add this to your existing slice)
-export const web3Login = createAsyncThunk(
-  'auth/web3Login',
-  async (walletData: {
-    publicKey: string;
-    signature: string;
-    message: string;
-    timestamp: number;
-    nonce: string;
-  }, { rejectWithValue }) => {
-    try {
-      const response = await fetch('/api/auth/wallet-login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(walletData),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Wallet authentication failed');
-      }
-
-      const data = await response.json();
-      
-      // Store token in localStorage
-      if (typeof window !== 'undefined' && data.token) {
-        localStorage.setItem('authToken', data.token);
-      }
-      
-      return data;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Wallet authentication failed');
-    }
-  }
-);
-
 export const { logout, resetAuthState } = authSlice.actions;
-
 export default authSlice.reducer;
