@@ -57,39 +57,6 @@ const navigationConfig: NavSection[] = [
         label: "PR",
         icon: "/sidebar-icons/pr.svg",
       },
-      // {
-      //   type: "dropdown",
-      //   label: "Social Media",
-      //   icon: "/sidebar-icons/social-media.svg",
-      //   items: [
-      //     {
-      //       type: "link",
-      //       href: "/campaigns/social/whatsapp",
-      //       label: "Whatsapp",
-      //     },
-      //     {
-      //       type: "link",
-      //       href: "/campaigns/social/facebook",
-      //       label: "Facebook",
-      //     },
-      //     {
-      //       type: "link",
-      //       href: "/campaigns/social/instagram",
-      //       label: "Instagram",
-      //     },
-      //     {
-      //       type: "link",
-      //       href: "/campaigns/social/kollective-marketer",
-      //       label: "Kollective Marketer",
-      //     },
-      //   ],
-      // },
-      // {
-      //   type: "link",
-      //   href: "/analytics",
-      //   label: "Analytics",
-      //   icon: "/sidebar-icons/analytics.svg",
-      // },
       {
         type: "dropdown",
         label: "Email",
@@ -216,7 +183,7 @@ export const Sidebar: React.FC = () => {
   const handleLogout = async () => {
     dispatch(logout());
     await persistor.purge();
-    router.push("/");
+    router.push("/login");
   };
 
   const isLinkActive = (href: string): boolean => {

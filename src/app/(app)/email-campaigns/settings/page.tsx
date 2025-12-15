@@ -26,6 +26,7 @@ import toast from "react-hot-toast";
 import { useAppSelector } from "@/redux/hooks";
 import BASE_URL from "@/lib/utils/baseUrl";
 import apiClient from "@/lib/utils/apiClient";
+import { isValidEmail, parseCsvEmails } from "@/utility/date-utility";
 
 interface ContactChip {
   id: string;
@@ -159,28 +160,6 @@ export default function CampaignSettings() {
       setContactChips(chips);
     };
     reader.readAsText(file);
-  };
-
-  const parseCsvEmails = (csvText: string): string[] => {
-    const emails: string[] = [];
-    const lines = csvText.split("\n");
-
-    lines.forEach((line) => {
-      // Extract emails from CSV line (simple parsing)
-      const emailMatches = line.match(
-        /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g
-      );
-      if (emailMatches) {
-        emails.push(...emailMatches.map((email) => email.trim()));
-      }
-    });
-
-    return Array.from(new Set(emails)).filter((email) => isValidEmail(email));
-  };
-
-  const isValidEmail = (email: string): boolean => {
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return emailRegex.test(email.trim());
   };
 
   // Save new email list

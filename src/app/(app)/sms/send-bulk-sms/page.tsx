@@ -5,8 +5,7 @@ import { Card } from "@/components/ui/Card";
 import { FormField } from "@/components/ui/FormField";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { motion } from "framer-motion";
-import { Calendar, Clock } from "lucide-react";
-import SimpleFileInput from "@/components/ui/SimpleFileInput";
+import { Calendar, Clock, X, Users, Upload, Edit } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Textarea } from "@/components/ui/Textarea";
@@ -18,6 +17,7 @@ import BASE_URL from "@/lib/utils/baseUrl";
 import { useAppSelector } from "@/redux/hooks";
 import { selectToken } from "@/redux/selectors/authSelectors";
 import { RecipientGroup, Sender, SendSMSRequest } from "@/types/sms";
+import { parseCsvPhones } from "@/utility/date-utility";
 
 interface CreateDraftRequest {
   message: string;
@@ -27,26 +27,87 @@ interface CreateDraftRequest {
   scheduledAt?: string;
 }
 
+interface ContactChip {
+  id: string;
+  phone: string;
+}
+
 export default function SendBulkSMS() {
   const router = useRouter();
   const token = useAppSelector(selectToken);
+  
   const [isLoading, setIsLoading] = useState(false);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [isScheduling, setIsScheduling] = useState(false);
+  
   const [senders, setSenders] = useState<Sender[]>([]);
   const [recipientGroups, setRecipientGroups] = useState<RecipientGroup[]>([]);
+  
   const [isFetchingSenders, setIsFetchingSenders] = useState(false);
   const [isFetchingGroups, setIsFetchingGroups] = useState(false);
+  
+  const [selectedRecipientOption, setSelectedRecipientOption] = useState<
+    "existing" | "manual" | "upload"
+  >("existing");
+  
+  const [contactChips, setContactChips] = useState<ContactChip[]>([]);
+  const [csvFile, setCsvFile] = useState<File | null>(null);
 
   const [formData, setFormData] = useState({
     sender_id: "",
-    recipient_phone_number: "",
     recipient_group: "",
     compose_message: "",
     schedule_for_later: false,
     date: "",
     time: "",
   });
+
+  // Calculate total phone numbers based on current selection method
+  const getTotalPhoneNumbers = () => {
+    switch (selectedRecipientOption) {
+      case "existing":
+        if (formData.recipient_group) {
+          const selectedGroup = recipientGroups.find(
+            (group) => group.id === formData.recipient_group
+          );
+          return selectedGroup?.contacts.length || 0;
+        }
+        return 0;
+      
+      case "manual":
+        const manualPhones = contactChips.map(chip => chip.phone);
+        return manualPhones.length;
+      
+      case "upload":
+        return contactChips.length;
+      
+      default:
+        return 0;
+    }
+  };
+
+  // Get phone preview based on selected option
+  const getPhonePreview = (limit: number = 10) => {
+    let phones: string[] = [];
+    
+    switch (selectedRecipientOption) {
+      case "existing":
+        if (formData.recipient_group) {
+          const selectedGroup = recipientGroups.find(
+            (group) => group.id === formData.recipient_group
+          );
+          phones = selectedGroup?.contacts || [];
+        }
+        break;
+      
+      case "manual":
+      case "upload":
+        phones = contactChips.map(chip => chip.phone);
+        break;
+    }
+    
+    return phones.slice(0, limit);
+  };
 
   useEffect(() => {
     if (token) {
@@ -56,7 +117,10 @@ export default function SendBulkSMS() {
   }, [token]);
 
   const fetchSenders = async () => {
-    if (!token) return;
+    if (!token) {
+      toast.error("Authentication required");
+      return;
+    }
 
     setIsFetchingSenders(true);
     try {
@@ -78,14 +142,21 @@ export default function SendBulkSMS() {
       setSenders(senderData);
     } catch (error: any) {
       console.error("Error fetching senders:", error);
-      toast.error("Failed to fetch sender IDs");
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please log in again.");
+      } else {
+        toast.error("Failed to fetch sender IDs");
+      }
     } finally {
       setIsFetchingSenders(false);
     }
   };
 
   const fetchRecipientGroups = async () => {
-    if (!token) return;
+    if (!token) {
+      toast.error("Authentication required");
+      return;
+    }
 
     setIsFetchingGroups(true);
     try {
@@ -108,15 +179,89 @@ export default function SendBulkSMS() {
       setRecipientGroups(groupsData);
     } catch (error: any) {
       console.error("Error fetching recipient groups:", error);
-      toast.error("Failed to fetch recipient groups");
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please log in again.");
+      } else {
+        toast.error("Failed to fetch recipient groups");
+      }
     } finally {
       setIsFetchingGroups(false);
     }
   };
 
+  // Handle CSV file upload
+  // Handle CSV file upload
+const handleCsvUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  if (!file.name.toLowerCase().endsWith(".csv")) {
+    toast.error("Please upload a CSV file");
+    return;
+  }
+  
+  // Clear previous file input to allow re-upload of same file
+  event.target.value = '';
+  
+  setCsvFile(file);
+  setSelectedRecipientOption("upload");
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const text = e.target?.result as string;
+      console.log("CSV content preview:", text.substring(0, 200));
+      
+      const phones = parseCsvPhones(text);
+      console.log("Parsed phones:", phones);
+      
+      if (phones.length === 0) {
+        toast.error("No valid phone numbers found in CSV file");
+        setCsvFile(null);
+        return;
+      }
+      
+      const chips: ContactChip[] = phones.map((phone, index) => ({
+        id: `csv-${Date.now()}-${index}`,
+        phone,
+      }));
+      
+      setContactChips(chips);
+      toast.success(`Loaded ${phones.length} phone numbers from CSV`);
+      
+    } catch (error) {
+      console.error("Error parsing CSV:", error);
+      toast.error("Failed to parse CSV file");
+      setCsvFile(null);
+    }
+  };
+  
+  reader.onerror = () => {
+    toast.error("Failed to read CSV file");
+    setCsvFile(null);
+  };
+  
+  reader.readAsText(file);
+};
+
+  // Handle manual phone input
+  const handleManualPhoneInput = (value: string) => {
+    // Parse comma-separated phone numbers
+    const phoneStrings = value.split(",").map(phone => phone.trim()).filter(Boolean);
+    
+    const chips: ContactChip[] = phoneStrings.map((phone, index) => ({
+      id: `manual-${Date.now()}-${index}`,
+      phone,
+    }));
+    
+    setContactChips(chips);
+  };
+
   const validateForm = () => {
-    if (!formData.recipient_phone_number.trim() && !formData.recipient_group) {
-      toast.error("Please enter recipient phone numbers or select a group");
+    const totalNumbers = getTotalPhoneNumbers();
+    
+    if (totalNumbers === 0) {
+      toast.error("Please add at least one phone number");
       return false;
     }
 
@@ -130,32 +275,11 @@ export default function SendBulkSMS() {
       return false;
     }
 
-    if (!token) {
-      toast.error("Authentication required");
-      return false;
-    }
-
     return true;
   };
 
   const getPhoneNumbers = () => {
-    let phoneNumbers: string[] = [];
-
-    if (formData.recipient_phone_number.trim()) {
-      phoneNumbers = formData.recipient_phone_number
-        .split(",")
-        .map((number) => number.trim())
-        .filter((number) => number.length > 0);
-    } else if (formData.recipient_group) {
-      const selectedGroup = recipientGroups.find(
-        (group) => group.id === formData.recipient_group
-      );
-      if (selectedGroup) {
-        phoneNumbers = selectedGroup.contacts;
-      }
-    }
-
-    return phoneNumbers;
+    return contactChips.map((chip) => chip.phone);
   };
 
   const handleSendSMS = async () => {
@@ -166,25 +290,15 @@ export default function SendBulkSMS() {
     try {
       const phoneNumbers = getPhoneNumbers();
 
-      if (phoneNumbers.length === 0) {
-        toast.error("No valid phone numbers found");
-        setIsLoading(false);
-        return;
-      }
-
       const selectedSender = senders.find(
         (sender) => sender.id === formData.sender_id
       );
-      
+
       if (!selectedSender) {
         toast.error("Selected sender not found");
         setIsLoading(false);
         return;
       }
-
-      console.log("Sending SMS to:", phoneNumbers);
-      console.log("Using sender:", selectedSender.name);
-      console.log("Message:", formData.compose_message);
 
       const sendPromises = phoneNumbers.map((phoneNumber) => {
         const requestData: SendSMSRequest = {
@@ -192,8 +306,6 @@ export default function SendBulkSMS() {
           body: formData.compose_message.trim(),
           from: selectedSender.name,
         };
-
-        console.log("SMS Request:", requestData);
 
         return axios.post(`${BASE_URL}/api/v1/sms/send`, requestData, {
           headers: {
@@ -204,35 +316,35 @@ export default function SendBulkSMS() {
       });
 
       const results = await Promise.allSettled(sendPromises);
-      
+
       const successful = results.filter((r) => r.status === "fulfilled").length;
       const failed = results.filter((r) => r.status === "rejected").length;
 
       if (successful > 0) {
         toast.success(
-          `SMS sent successfully to ${successful} recipient${successful > 1 ? "s" : ""}!${
-            failed > 0 ? ` ${failed} failed.` : ""
-          }`
+          `SMS sent successfully to ${successful} recipient${
+            successful > 1 ? "s" : ""
+          }!${failed > 0 ? ` ${failed} failed.` : ""}`
         );
 
-        setFormData((prev) => ({
+        // Reset form
+        setFormData(prev => ({
           ...prev,
-          recipient_phone_number: "",
           recipient_group: "",
           compose_message: "",
         }));
+        setContactChips([]);
+        setCsvFile(null);
       } else {
         toast.error("Failed to send SMS to all recipients");
       }
-
-      results.forEach((result, index) => {
-        if (result.status === "rejected") {
-          console.error(`Failed to send to ${phoneNumbers[index]}:`, result.reason);
-        }
-      });
     } catch (error: any) {
       console.error("Error sending SMS:", error);
-      handleApiError(error, "send SMS");
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please log in again.");
+      } else {
+        toast.error("Failed to send SMS. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -257,25 +369,10 @@ export default function SendBulkSMS() {
     setIsSavingDraft(true);
 
     try {
-      let recipientIdentifiers: string[] = [];
-
-      if (formData.recipient_phone_number.trim()) {
-        recipientIdentifiers = ["Manual Input"];
-      } else if (formData.recipient_group) {
-        const selectedGroup = recipientGroups.find(
-          (group) => group.id === formData.recipient_group
-        );
-        if (selectedGroup) {
-          recipientIdentifiers = [selectedGroup.groupName];
-        }
-      } else {
-        recipientIdentifiers = ["Not specified"];
-      }
-
       const selectedSender = senders.find(
         (sender) => sender.id === formData.sender_id
       );
-      
+
       if (!selectedSender) {
         toast.error("Selected sender not found");
         setIsSavingDraft(false);
@@ -284,7 +381,7 @@ export default function SendBulkSMS() {
 
       const draftData: CreateDraftRequest = {
         message: formData.compose_message.trim(),
-        recipients: recipientIdentifiers,
+        recipients: getPhoneNumbers(),
         status: "draft",
         senderId: selectedSender.id,
       };
@@ -294,8 +391,6 @@ export default function SendBulkSMS() {
           `${formData.date} ${formData.time}`
         ).toISOString();
       }
-
-      console.log("Draft data:", draftData);
 
       const response = await axios.post(
         `${BASE_URL}/api/v1/drafts`,
@@ -308,15 +403,21 @@ export default function SendBulkSMS() {
         }
       );
 
-      console.log("Draft saved:", response.data);
-      toast.success("Draft saved successfully!");
-
-      setTimeout(() => {
-        router.push("/sms/sms-drafts");
-      }, 1000);
+      if (response.data.success) {
+        toast.success("Draft saved successfully!");
+        setTimeout(() => {
+          router.push("/sms/sms-drafts");
+        }, 1000);
+      } else {
+        toast.error(response.data.message || "Failed to save draft");
+      }
     } catch (error: any) {
       console.error("Error saving draft:", error);
-      handleApiError(error, "save draft");
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please log in again.");
+      } else {
+        toast.error("Failed to save draft. Please try again.");
+      }
     } finally {
       setIsSavingDraft(false);
     }
@@ -334,24 +435,19 @@ export default function SendBulkSMS() {
 
     try {
       const phoneNumbers = getPhoneNumbers();
-
-      if (phoneNumbers.length === 0) {
-        toast.error("No valid phone numbers found");
-        setIsScheduling(false);
-        return;
-      }
-
       const selectedSender = senders.find(
         (sender) => sender.id === formData.sender_id
       );
-      
+
       if (!selectedSender) {
         toast.error("Selected sender not found");
         setIsScheduling(false);
         return;
       }
 
-      const scheduledAt = new Date(`${formData.date} ${formData.time}`).toISOString();
+      const scheduledAt = new Date(
+        `${formData.date} ${formData.time}`
+      ).toISOString();
 
       const scheduleData = {
         message: formData.compose_message.trim(),
@@ -360,8 +456,6 @@ export default function SendBulkSMS() {
         scheduledAt: scheduledAt,
         status: "scheduled",
       };
-
-      console.log("Schedule data:", scheduleData);
 
       const response = await axios.post(
         `${BASE_URL}/api/v1/sms/schedule`,
@@ -374,48 +468,31 @@ export default function SendBulkSMS() {
         }
       );
 
-      console.log("Scheduled:", response.data);
-      toast.success("SMS scheduled successfully!");
-
-      setFormData((prev) => ({
-        ...prev,
-        recipient_phone_number: "",
-        recipient_group: "",
-        compose_message: "",
-        schedule_for_later: false,
-        date: "",
-        time: "",
-      }));
+      if (response.data.success) {
+        toast.success("SMS scheduled successfully!");
+        // Reset form
+        setFormData(prev => ({
+          ...prev,
+          recipient_group: "",
+          compose_message: "",
+          schedule_for_later: false,
+          date: "",
+          time: "",
+        }));
+        setContactChips([]);
+        setCsvFile(null);
+      } else {
+        toast.error(response.data.message || "Failed to schedule SMS");
+      }
     } catch (error: any) {
       console.error("Error scheduling SMS:", error);
-      handleApiError(error, "schedule SMS");
+      if (error.response?.status === 401) {
+        toast.error("Session expired. Please log in again.");
+      } else {
+        toast.error("Failed to schedule SMS. Please try again.");
+      }
     } finally {
       setIsScheduling(false);
-    }
-  };
-
-  const handleApiError = (error: any, action: string) => {
-    if (error.response) {
-      const status = error.response.status;
-      const message = error.response.data?.message || error.response.data?.error;
-
-      console.error(`API Error (${status}):`, error.response.data);
-
-      if (status === 401) {
-        toast.error("Session expired. Please log in again.");
-      } else if (status === 400) {
-        toast.error(message || "Invalid request. Please check your input.");
-      } else if (status === 500) {
-        toast.error("Server error. Please try again later.");
-      } else {
-        toast.error(message || `Failed to ${action}: ${status}`);
-      }
-    } else if (error.request) {
-      console.error("No response received:", error.request);
-      toast.error("No response from server. Please check your connection.");
-    } else {
-      console.error("Error:", error.message);
-      toast.error(`Failed to ${action}. Please try again.`);
     }
   };
 
@@ -424,28 +501,50 @@ export default function SendBulkSMS() {
   };
 
   const handleRecipientGroupChange = (groupId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      recipient_group: groupId,
+    }));
+    setSelectedRecipientOption("existing");
+    
     if (groupId) {
       const selectedGroup = recipientGroups.find(
         (group) => group.id === groupId
       );
       if (selectedGroup) {
-        const contactsString = selectedGroup.contacts.join(", ");
-        handleFormChange("recipient_phone_number", contactsString);
+        const chips: ContactChip[] = selectedGroup.contacts.map((phone, index) => ({
+          id: `group-${groupId}-${index}`,
+          phone,
+        }));
+        setContactChips(chips);
       }
     } else {
-      handleFormChange("recipient_phone_number", "");
+      setContactChips([]);
     }
-    handleFormChange("recipient_group", groupId);
   };
 
   const handleManualPhoneNumberChange = (value: string) => {
-    handleFormChange("recipient_phone_number", value);
-    if (value) {
-      handleFormChange("recipient_group", "");
-    }
+    handleManualPhoneInput(value);
+    setSelectedRecipientOption("manual");
+    setCsvFile(null);
   };
 
-  const isPhoneNumberInputDisabled = !!formData.recipient_group;
+  const removeContactChip = (id: string) => {
+    setContactChips((prev) => prev.filter((chip) => chip.id !== id));
+  };
+
+  const clearRecipients = () => {
+    setFormData(prev => ({
+      ...prev,
+      recipient_group: "",
+    }));
+    setContactChips([]);
+    setCsvFile(null);
+    setSelectedRecipientOption("existing");
+  };
+
+  const totalNumbers = getTotalPhoneNumbers();
+  const phonePreview = getPhonePreview(10);
 
   return (
     <motion.main
@@ -491,57 +590,208 @@ export default function SendBulkSMS() {
             </div>
           </div>
 
-          <div className="border-y border-[#E2E8F0] py-4 space-y-4">
-            <FormField
-              label="Enter Recipients Phone Number (Optional)"
-              id="recipient_phone_number"
-              name="recipient_phone_number"
-              type="text"
-              placeholder={
-                isPhoneNumberInputDisabled
-                  ? "Numbers loaded from selected group"
-                  : "Enter Recipient's Number here. Separate each number with a comma, e.g, 23480123455678,2348022223333."
-              }
-              value={formData.recipient_phone_number}
-              onChange={(e) => handleManualPhoneNumberChange(e.target.value)}
-              disabled={isPhoneNumberInputDisabled}
-            />
+          <div className="border-y border-[#E2E8F0] py-4 space-y-6">
+            {/* Recipient Selection Options */}
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-[#1B223C]">
+                Audience <span className="text-sm text-red-500">*</span>
+              </label>
 
-            <div className="flex flex-col md:flex-row items-end gap-4 my-5">
-              <div className="space-y-2 w-full">
-                <p className="text-sm">Choose from groups</p>
-                <Select
-                  id="recipient_group"
-                  name="recipient_group"
-                  placeholder={
-                    isFetchingGroups
-                      ? "Loading groups..."
-                      : "Select recipient group"
-                  }
-                  value={formData.recipient_group}
-                  onChange={(e) => handleRecipientGroupChange(e.target.value)}
-                  disabled={isFetchingGroups}>
-                  <option value="">Select Recipient Group</option>
-                  {recipientGroups.map((group) => (
-                    <option key={group.id} value={group.id}>
-                      {group.groupName} ({group.totalContactsInList} contacts)
-                    </option>
-                  ))}
-                </Select>
-              </div>
-              <div className="w-full md:w-[300px]">
-                <Button
-                  size={"lg"}
-                  onClick={() => router.push("/sms/manage-recipient-groups")}>
-                  Create a recipient group
-                </Button>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedRecipientOption("existing")}
+                  className={`px-4 flex gap-2 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    selectedRecipientOption === "existing"
+                      ? "bg-blue-50 text-blue-600 border border-blue-200"
+                      : "text-gray-600 hover:bg-gray-50"
+                  }`}>
+                  <Users size={18} />
+                  <span>Existing Lists</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedRecipientOption("manual")}
+                  className={`px-4 flex gap-2 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    selectedRecipientOption === "manual"
+                      ? "bg-blue-50 text-blue-600 border border-blue-200"
+                      : "text-gray-600 hover:bg-gray-50"
+                  }`}>
+                  <Edit size={18} />
+                  <span>Manual input</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedRecipientOption("upload")}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex gap-2 ${
+                    selectedRecipientOption === "upload"
+                      ? "bg-blue-50 text-blue-600 border border-blue-200"
+                      : "text-gray-600 hover:bg-gray-50"
+                  }`}>
+                  <Upload size={18} />
+                  <span>Upload csv</span>
+                </button>
               </div>
             </div>
 
-            <SimpleFileInput
-              label="Upload Phone Number Files (Optional)"
-              id="file-upload"
-            />
+            {/* Phone Numbers Summary */}
+            {totalNumbers > 0 && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Users size={18} className="text-blue-600" />
+                    <span className="font-medium text-blue-800">
+                      {totalNumbers} phone number{totalNumbers !== 1 ? 's' : ''} selected
+                    </span>
+                  </div>
+                  <button
+                    onClick={clearRecipients}
+                    className="text-sm text-blue-600 hover:text-blue-800">
+                    Clear all
+                  </button>
+                </div>
+                
+                {/* Phone Preview */}
+                <div className="space-y-2 max-h-40 overflow-y-auto">
+                  {phonePreview.slice(0,2).map((phone, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between py-2 px-3 bg-white rounded border border-blue-100">
+                      <span className="text-sm text-gray-700 font-mono">
+                        {phone}
+                      </span>
+                      {selectedRecipientOption !== 'existing' && (
+                        <button
+                          onClick={() => {
+                            const chipId = contactChips[index]?.id;
+                            if (chipId) removeContactChip(chipId);
+                          }}
+                          className="p-1 hover:bg-gray-100 rounded">
+                          <X size={14} className="text-gray-500" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  {totalNumbers > 2 && (
+                    <p className="text-xs text-gray-500 text-center pt-2">
+                      ... and {totalNumbers - 2} more contacts
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Existing Lists Section */}
+            {selectedRecipientOption === "existing" && (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <p className="text-sm">Select from existing lists</p>
+                  <div className="flex flex-col md:flex-row items-end gap-4">
+                    <div className="space-y-2 w-full">
+                      <Select
+                        id="recipient_group"
+                        name="recipient_group"
+                        placeholder={
+                          isFetchingGroups
+                            ? "Loading groups..."
+                            : "Select recipient group"
+                        }
+                        value={formData.recipient_group}
+                        onChange={(e) =>
+                          handleRecipientGroupChange(e.target.value)
+                        }
+                        disabled={isFetchingGroups}>
+                        <option value="">Select Recipient Group</option>
+                        {recipientGroups.map((group) => (
+                          <option key={group.id} value={group.id}>
+                            {group.groupName} ({group.totalContactsInList}{" "}
+                            contacts)
+                          </option>
+                        ))}
+                      </Select>
+                    </div>
+                    <div className="w-full md:w-[300px]">
+                      <Button
+                        size={"lg"}
+                        onClick={() =>
+                          router.push("/sms/manage-recipient-groups")
+                        }>
+                        Create a recipient group
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Manual Input Section */}
+            {selectedRecipientOption === "manual" && (
+              <div className="space-y-4">
+                <FormField
+                  label="Enter Recipients Phone Number"
+                  id="recipient_phone_number"
+                  name="recipient_phone_number"
+                  type="text"
+                  placeholder="Enter phone numbers separated by commas, e.g., 23480123455678, 2348022223333"
+                  onChange={(e) =>
+                    handleManualPhoneNumberChange(e.target.value)
+                  }
+                />
+                <div className="flex justify-end">
+                  <Button
+                    size={"lg"}
+                    onClick={() => router.push("/sms/manage-recipient-groups")}>
+                    Create a recipient group
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Upload CSV Section */}
+            {selectedRecipientOption === "upload" && (
+              <div className="space-y-4">
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+                  <input
+                    type="file"
+                    id="csv-upload"
+                    accept=".csv"
+                    onChange={handleCsvUpload}
+                    className="hidden"
+                  />
+                  <label htmlFor="csv-upload" className="cursor-pointer block">
+                    <Upload size={40} className="mx-auto text-gray-400 mb-3" />
+                    <p className="text-gray-600 font-medium">
+                      {csvFile ? csvFile.name : "Click to upload CSV file"}
+                    </p>
+                    <p className="text-gray-500 text-sm mt-1">
+                      Upload a CSV file containing phone numbers
+                    </p>
+                  </label>
+                  {csvFile && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="mt-3"
+                      onClick={() => {
+                        setCsvFile(null);
+                        setContactChips([]);
+                      }}>
+                      Remove File
+                    </Button>
+                  )}
+                </div>
+                
+                <div className="flex justify-end">
+                  <Button
+                    size={"lg"}
+                    onClick={() => router.push("/sms/manage-recipient-groups")}>
+                    Create a recipient group
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="space-y-4">
@@ -580,21 +830,21 @@ export default function SendBulkSMS() {
           </div>
 
           <div className="flex flex-col md:flex-row md:items-center gap-5">
-            <Button size={"lg"} onClick={handleSendSMS} disabled={isLoading}>
-              {isLoading ? "Sending..." : "Send Now"}
+            <Button size={"lg"} onClick={handleSendSMS} disabled={isLoading || totalNumbers === 0}>
+              {isLoading ? "Sending..." : `Send Now (${totalNumbers})`}
             </Button>
             <Button
               size={"lg"}
               variant={"secondary"}
               onClick={handleSaveAsDraft}
-              disabled={isSavingDraft}>
+              disabled={isSavingDraft || totalNumbers === 0}>
               {isSavingDraft ? "Saving..." : "Save as Draft"}
             </Button>
             <Button
               size={"lg"}
               variant={"tertiary"}
               onClick={handleScheduleForLater}
-              disabled={isScheduling || !formData.schedule_for_later}>
+              disabled={isScheduling || !formData.schedule_for_later || totalNumbers === 0}>
               {isScheduling ? "Scheduling..." : "Schedule for Later"}
             </Button>
           </div>
