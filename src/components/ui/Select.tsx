@@ -38,9 +38,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
               {placeholder}
             </option>
           )}
-
-          {/* Real options */}
-          {children}
+          {children && children}
         </select>
 
         {/* Icon */}

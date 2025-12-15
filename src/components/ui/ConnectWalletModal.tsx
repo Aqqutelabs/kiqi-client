@@ -7,25 +7,41 @@ import { useWalletAuth } from '@/hooks/useWalletAuth';
 import { useState, useEffect } from 'react';
 import Heading from "./TextHeading";
 import { Button } from "./Button";
+import BASE_URL from "@/lib/utils/baseUrl";
+import axios from "axios";
 import { useWallet } from '@solana/wallet-adapter-react';
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { Loader2, CheckCircle, AlertCircle } from "lucide-react";
 
-export default function ConnectWallet({ 
-  isOpen, 
-  onClose,
-  mode = "signup"
-}: {
-  isOpen: boolean; 
+interface ConnectWalletModalProps {
+  isOpen: boolean;
   onClose: () => void;
   mode?: "signup" | "login";
-}) {
+  redeemAmount?: string; // optional value from first modal
+}
+
+export default function ConnectWalletModal({
+  isOpen,
+  onClose,
+  mode = "login",
+  redeemAmount,
+}: ConnectWalletModalProps) {
+  const [loading, setLoading] = useState(false);
   const { 
     // signInWithWallet, 
     isSigning, publicKey, error, disconnect } = useWalletAuth();
   const { connected, connecting } = useWallet();
   const [localError, setLocalError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [activeTab, setActiveTab] = useState<number | null>(null);
+
+  const wallets = [
+    { id: 1, name: "Metamask", img: "/wallet/metamask-fox.svg" },
+    { id: 2, name: "Trust Wallet", img: "/wallet/trust_wallet.svg" },
+    { id: 3, name: "WalletConnect", img: "/wallet/walletconnect.svg" },
+    { id: 4, name: "Coinbase Wallet", img: "/wallet/coinbase.svg" },
+    { id: 5, name: "Phantom Wallet", img: "/wallet/phantom-logo.svg" },
+  ];
 
   // Reset states when modal opens/closes
   useEffect(() => {
@@ -42,6 +58,57 @@ export default function ConnectWallet({
     }
   }, [error]);
 
+  const handleProceed = async () => {
+    if (redeemAmount) {
+      // Handle redemption flow
+      const token =
+        typeof window !== "undefined"
+          ? JSON.parse(localStorage.getItem("persist:root") || "{}").auth
+            ? JSON.parse(
+                JSON.parse(localStorage.getItem("persist:root") || "{}").auth
+              ).token
+            : null
+          : null;
+      try {
+        setLoading(true);
+
+        const provider = window.phantom?.solana;
+        if (!provider?.isPhantom) {
+          toast.error("Phantom not installed");
+          return;
+        }
+
+        const resp = await provider.connect();
+        const walletId = resp.publicKey.toString();
+        console.log(walletId);
+
+        const res = await axios.post(
+          `${BASE_URL}/api/v1/conversions`,
+          {
+            amount: Number(redeemAmount),
+            solanaWallet: walletId,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        console.log("Conversion response:", res.data);
+        onClose();
+      } catch (err) {
+        console.error("Conversion failed:", err);
+        toast.error("Failed to process conversion");
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      // Handle wallet authentication flow
+      await handleSignIn();
+    }
+  };
+
   const handleSignIn = async () => {
     try {
       setLocalError(null);
@@ -57,6 +124,7 @@ export default function ConnectWallet({
       }, 1500);
     } catch (error) {
       console.error('Authentication failed:', error);
+      toast.error('Authentication failed. Please try again.');
       // Error is already handled in the hook and set via useEffect
     }
   };
@@ -78,13 +146,40 @@ export default function ConnectWallet({
   return (
     <Modal width="600px" isOpen={isOpen} onClose={handleModalClose}>
       <Heading 
-        heading={mode === "signup" ? "Sign Up with Wallet" : "Sign In with Wallet"} 
-        subtitle={mode === "signup" 
+        heading={redeemAmount ? "Connect Solana Wallet" : (mode === "signup" ? "Sign Up with Wallet" : "Sign In with Wallet")} 
+        subtitle={redeemAmount 
+          ? "Connect your Solana wallet to proceed with redemption" 
+          : (mode === "signup" 
             ? "Connect your Solana wallet to create your account" 
-            : "Connect your Solana wallet to sign in"}
+            : "Connect your Solana wallet to sign in")}
         className="text-center"
       />
       
+      {/* Wallet selection grid - only show if redeemAmount is provided */}
+      {redeemAmount && (
+        <div className="space-y-4 my-4">
+          {wallets.map((wallet) => {
+            const isActive = activeTab === wallet.id;
+            return (
+              <div
+                onClick={() => setActiveTab(wallet.id)}
+                key={wallet.id}
+                className={`border ${
+                  isActive
+                    ? "border-[var(--primary)] shadow bg-blue-50"
+                    : "border-[#E2E8F0]"
+                } py-3 px-4 rounded-xl flex items-center gap-2 h-16 w-full cursor-pointer`}
+              >
+                <img src={wallet.img} alt={wallet.name} className="size-8" />
+                <h4 className="font-medium text-base text-[#1B223C]">
+                  {wallet.name}
+                </h4>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
       <div className="space-y-6 my-6">
         
         {/* Error message */}
@@ -119,17 +214,19 @@ export default function ConnectWallet({
         </div>
 
         {/* Loading state */}
-        {connecting && (
+        {(connecting || loading) && (
           <div className="text-center p-4">
             <div className="flex items-center justify-center gap-2">
               <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
-              <p className="text-sm text-gray-600">Connecting to wallet...</p>
+              <p className="text-sm text-gray-600">
+                {loading ? "Processing..." : "Connecting to wallet..."}
+              </p>
             </div>
           </div>
         )}
 
         {/* Show connected state */}
-        {connected && publicKey && !success && !connecting && (
+        {connected && publicKey && !success && !connecting && !loading && (
           <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200 space-y-4">
             <div className="flex items-center justify-center gap-2">
               <div className="h-2 w-2 bg-green-500 rounded-full"></div>
@@ -143,31 +240,33 @@ export default function ConnectWallet({
               </p>
             </div>
             
-            <div className="space-y-2">
-              <Button 
-                onClick={handleSignIn}
-                className="w-full"
-                disabled={isSigning}
-              >
-                {isSigning ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Signing message...
-                  </span>
-                ) : (
-                  `Complete ${mode === "signup" ? 'Sign Up' : 'Sign In'}`
-                )}
-              </Button>
-              
-              <Button 
-                variant="outline"
-                onClick={disconnect}
-                className="w-full text-sm"
-                disabled={isSigning}
-              >
-                Disconnect Wallet
-              </Button>
-            </div>
+            {!redeemAmount && (
+              <div className="space-y-2">
+                <Button 
+                  onClick={handleSignIn}
+                  className="w-full"
+                  disabled={isSigning}
+                >
+                  {isSigning ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Signing message...
+                    </span>
+                  ) : (
+                    `Complete ${mode === "signup" ? 'Sign Up' : 'Sign In'}`
+                  )}
+                </Button>
+                
+                <Button 
+                  variant="outline"
+                  onClick={disconnect}
+                  className="w-full text-sm"
+                  disabled={isSigning}
+                >
+                  Disconnect Wallet
+                </Button>
+              </div>
+            )}
           </div>
         )}
 
@@ -203,9 +302,15 @@ export default function ConnectWallet({
         <Button 
           variant="outline" 
           onClick={handleModalClose} 
-          disabled={isSigning || connecting}
+          disabled={isSigning || connecting || loading}
         >
           Cancel
+        </Button>
+        <Button 
+          onClick={handleProceed}
+          disabled={(!connected && !redeemAmount) || loading || isSigning}
+        >
+          {redeemAmount ? "Proceed" : (mode === "signup" ? "Sign Up" : "Sign In")}
         </Button>
       </div>
     </Modal>

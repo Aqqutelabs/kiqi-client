@@ -39,7 +39,7 @@ export default function ProductCard({
   return (
     <>
       <div
-        onClick={() => setIsSidebarOpen(true)}
+        // onClick={() => setIsSidebarOpen(true)}
         className="w-full h-[540px] border border-[#E2E8F0] rounded-2xl"
       >
         {/* header */}

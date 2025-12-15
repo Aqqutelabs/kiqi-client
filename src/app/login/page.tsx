@@ -1,27 +1,35 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+// Using useRouter from 'next/navigation' is correct for App Router
+import { useRouter } from "next/navigation"; 
 import { useSelector } from "react-redux";
-import { useAppDispatch } from '@/redux/hooks';
-import { resetAuthState } from '@/redux/slices/authSlice';
+
+import { useAppDispatch } from '@/redux/hooks'; 
+import { RootState } from "@/redux/store"; 
+import {
+  loginUser,
+  loginUserWithGoogle,
+  resetAuthState
+} from '@/redux/slices/authSlice';
 
 import { Eye, EyeOff, LockKeyhole, CircleUserRound, Link2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { FormField } from "@/components/ui/FormField";
 import AuthLayout from "@/components/ui/layout/AuthLayout";
-import { loginUser, loginUserWithGoogle } from "@/redux/slices/authSlice";
-import { RootState } from "@/redux/store";
 import ConnectWallet from "@/components/ui/ConnectWalletModal";
 import { toast } from "react-hot-toast";
 import { useAutoLogout } from '@/hooks/useAutoLogout';
-import { useWallet } from '@solana/wallet-adapter-react'; // Add this import
+import { useWallet } from '@solana/wallet-adapter-react'; 
 
+// --- Icon Component ---
 const GoogleIcon = () => (
   <img src="/devicon_google.svg" alt="Google" className="h-5 w-5" />
 );
+
+// --- Main Component ---
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -34,97 +42,98 @@ const LoginPage = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [isWalletConnecting, setIsWalletConnecting] = useState(false);
   
-  // Use Sola
-  // na wallet
-  const { connected, publicKey, connecting, disconnect, select, wallets } = useWallet();
+  // 🔑 CRITICAL FIX: Ref to prevent duplicate thunk dispatches on re-render/HMR
+  const dispatchedRef = useRef(false);
+  
+  // Use Solana wallet context
+  const { connected, publicKey, connecting } = useWallet();
   
   // Use the auto logout hook
   const { setupAutoLogout, clearAutoLogout } = useAutoLogout();
 
-  // Handle Google OAuth callback
+  // Handle Google OAuth callback (The Fix)
   useEffect(() => {
-    const handleGoogleCallback = async () => {
-      const params = new URLSearchParams(window.location.search);
-      const code = params.get('code');
-      const error = params.get('error');
+    // 1. Get Params
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    const errorParam = params.get('error');
 
-      console.log('🔍 Checking for Google OAuth callback...');
-      console.log('Code:', code ? code.substring(0, 20) + '...' : 'NOT FOUND');
-      console.log('Error:', error);
+    // 2. Check for OAuth Error from Google
+    if (errorParam) {
+      console.error('❌ Google OAuth error:', errorParam);
+      toast.error('Authentication failed. Please try again.');
+      // Use router.replace to clean the URL without creating history entry
+      router.replace('/login'); 
+      return;
+    }
 
-      // If there's an error from Google
-      if (error) {
-        const errorDescription = params.get('error_description') || 'Authentication failed';
-        console.error('❌ Google OAuth error:', error, errorDescription);
-        toast.error(errorDescription);
-        // Clear the URL params on error
-        window.history.replaceState({}, document.title, '/login');
-        return;
-      }
-
-      // If there's a code, dispatch the thunk
-      if (code) {
+    // 3. 🔑 CRITICAL GUARD: Only dispatch if code exists AND it hasn't been dispatched yet
+    if (code && !dispatchedRef.current) {
+      
+      dispatchedRef.current = true; // <-- IMMEDIATELY set the flag
+      
+      // **IMMEDIATE URL CLEANUP**
+      // Clean the URL right away to prevent re-runs from HMR seeing the code
+      // We use router.replace to handle Next.js App Router navigation correctly
+      console.log('🧹 Cleaning URL parameters before dispatch...');
+      router.replace('/login');
+      
+      const handleGoogleCallback = async () => {
         console.log('📤 Dispatching loginUserWithGoogle thunk with code...');
         try {
+          // Perform the token exchange
           const result = await dispatch(loginUserWithGoogle(code));
-          
+
           if (loginUserWithGoogle.fulfilled.match(result)) {
-            console.log('✨ Google login successful!');
-            
-            // Clear any error state
+            console.log('✨ Google login successful! Redirecting to /dashboard...');
             dispatch(resetAuthState());
-            
-            // Clear the URL params
-            window.history.replaceState({}, document.title, '/login');
-            
-            // Redirect to dashboard
-            setTimeout(() => {
-              console.log('🚀 Redirecting to dashboard...');
-              router.push('/dashboard');
-            }, 500);
-          } else if (loginUserWithGoogle.rejected.match(result)) {
+            // Use replace for post-auth redirection
+            router.replace('/dashboard'); 
+            toast.success("Google login successful!");
+          } else {
             console.error('❌ Google login failed:', result.payload);
-            // Silently fail if we're still redirecting - the error is likely a duplicate call
-            if (result.payload && !result.payload.toString().includes('exchange')) {
-              toast.error(result.payload as string || 'Google login failed');
-            }
-            
-            // Clear the URL params on error
-            window.history.replaceState({}, document.title, '/login');
+            const errorMessage = typeof result.payload === 'string' 
+              ? result.payload 
+              : 'Unknown login error';
+            toast.error(errorMessage);
           }
         } catch (err) {
-          console.error('Error in callback:', err);
-          // Silently ignore callback errors
+          console.error('❌ Error during Google login:', err);
+          toast.error('An unexpected error occurred during login');
         }
-      }
-    };
+        // Note: The final cleanup is now handled by the immediate router.replace('/login') above.
+      };
 
-    handleGoogleCallback();
-  }, [router, dispatch]);
+      handleGoogleCallback();
+    }
+  }, [dispatch, router]); // Dependency list remains clean
 
   // Initialize rememberMe from localStorage on component mount
   useEffect(() => {
-    const savedRememberMe = localStorage.getItem("rememberMe");
-    console.log('Loaded rememberMe from localStorage:', savedRememberMe);
-    setRememberMe(savedRememberMe === "true");
+    if (typeof window !== "undefined") {
+      const savedRememberMe = localStorage.getItem("rememberMe");
+      console.log('Loaded rememberMe from localStorage:', savedRememberMe);
+      setRememberMe(savedRememberMe === "true");
+    }
   }, []);
 
   // Handle remember me changes
   useEffect(() => {
-    console.log('Remember me changed to:', rememberMe);
-    localStorage.setItem("rememberMe", rememberMe.toString());
-    
-    if (!rememberMe) {
-      // Only show toast if this is an explicit user action (not initial load)
-      const initialLoad = localStorage.getItem('initialAuthLoad') !== 'true';
-      if (initialLoad) {
-        toast.success("You will be logged out automatically after 10 minutes for security reasons. Check the box to prevent this.");
-        localStorage.setItem('initialAuthLoad', 'true');
+    if (typeof window !== "undefined") {
+      console.log('Remember me changed to:', rememberMe);
+      localStorage.setItem("rememberMe", rememberMe.toString());
+      
+      // Logic for auto-logout messages
+      if (!rememberMe) {
+        const initialLoad = localStorage.getItem('initialAuthLoad') !== 'true';
+        if (initialLoad) {
+          toast.success("You will be logged out automatically after 10 minutes for security reasons. Check the box to prevent this.");
+          localStorage.setItem('initialAuthLoad', 'true');
+        }
+      } else {
+        clearAutoLogout();
+        toast.success("You will stay logged in until you manually log out.");
       }
-    } else {
-      // Clear auto-logout timer when remember me is checked
-      clearAutoLogout();
-      toast.success("You will stay logged in until you manually log out.");
     }
   }, [rememberMe, clearAutoLogout]);
 
@@ -136,7 +145,6 @@ const LoginPage = () => {
   // Handle wallet connection status
   useEffect(() => {
     if (connected && publicKey && openConnectWalletModal) {
-      // Wallet is connected, you might want to show some feedback
       console.log('Wallet connected:', publicKey.toString());
       setIsWalletConnecting(false);
     }
@@ -170,62 +178,42 @@ const LoginPage = () => {
     }
   };
 
-  // Function to handle Google login
+  // Function to handle Google login (redirect to Google)
   const handleGoogleLogin = () => {
-    // Your Google OAuth configuration from .env
-    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-    const redirectUri = process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI;
-    
-    console.log('🔵 Google Login Handler Called');
-    console.log('Client ID:', clientId);
-    console.log('Redirect URI:', redirectUri);
-    
-    if (!clientId || !redirectUri) {
-      console.error('❌ Google configuration missing - Client ID:', !!clientId, 'Redirect URI:', !!redirectUri);
-      toast.error("Google authentication is not properly configured");
-      return;
+    if (typeof window !== "undefined") {
+      const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+      const redirectUri = process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI;
+      
+      if (!clientId || !redirectUri) {
+        console.error('❌ Google configuration missing - Client ID:', !!clientId, 'Redirect URI:', !!redirectUri);
+        toast.error("Google authentication is not properly configured");
+        return;
+      }
+      
+      // Generate a random state for security
+      const state = Math.random().toString(36).substring(7);
+      localStorage.setItem('oauthState', state);
+      
+      // Construct Google OAuth URL
+      const googleAuthUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+      
+      // Add parameters
+      googleAuthUrl.searchParams.append('client_id', clientId);
+      googleAuthUrl.searchParams.append('redirect_uri', redirectUri);
+      googleAuthUrl.searchParams.append('response_type', 'code');
+      googleAuthUrl.searchParams.append('scope', 'openid email profile');
+      googleAuthUrl.searchParams.append('state', state);
+      googleAuthUrl.searchParams.append('access_type', 'offline');
+      googleAuthUrl.searchParams.append('prompt', 'consent');
+      
+      // Redirect to Google
+      setTimeout(() => {
+        window.location.href = googleAuthUrl.toString();
+      }, 500);
     }
-    
-    // Generate a random state for security
-    const state = Math.random().toString(36).substring(7);
-    localStorage.setItem('oauthState', state);
-    console.log('Generated OAuth state:', state);
-    
-    // Construct Google OAuth URL
-    const googleAuthUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
-    
-    // Add parameters
-    googleAuthUrl.searchParams.append('client_id', clientId);
-    googleAuthUrl.searchParams.append('redirect_uri', redirectUri);
-    googleAuthUrl.searchParams.append('response_type', 'code');
-    googleAuthUrl.searchParams.append('scope', 'openid email profile');
-    googleAuthUrl.searchParams.append('state', state);
-    googleAuthUrl.searchParams.append('access_type', 'offline');
-    googleAuthUrl.searchParams.append('prompt', 'consent');
-    
-    console.log('🔗 Constructed Google Auth URL:', googleAuthUrl.toString());
-    console.log('URL Parameters:');
-    console.log('  - client_id:', clientId);
-    console.log('  - redirect_uri:', redirectUri);
-    console.log('  - response_type: code');
-    console.log('  - scope: openid email profile');
-    console.log('  - state:', state);
-    console.log('  - access_type: offline');
-    console.log('  - prompt: consent');
-    
-    // Redirect to Google
-    console.log('⏳ Redirecting to Google in 500ms...');
-    console.log('Full URL:', googleAuthUrl.toString());
-    
-    // Add a small delay to allow console logs to be captured
-    setTimeout(() => {
-      console.log('→ NOW REDIRECTING TO GOOGLE');
-      window.location.href = googleAuthUrl.toString();
-    }, 500);
   };
 
   const handleRememberMeChange = (checked: boolean) => {
-    console.log('User changed remember me to:', checked);
     setRememberMe(checked);
   };
 
@@ -234,6 +222,7 @@ const LoginPage = () => {
   return (
     <AuthLayout>
       <Card className="w-full max-w-[600px] mx-4">
+        {/* ... (rest of the component remains the same) */}
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800">Login to KiKi</h2>
         </div>

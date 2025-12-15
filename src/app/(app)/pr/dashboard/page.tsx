@@ -103,37 +103,37 @@ export default function PRDashboard() {
             ).token
           : null
         : null;
-    const fetchPRs = async () => {
-      try {
-        const res = await axios.get(`${BASE_URL}/api/v1/press-releases/list`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const result = res.data.data;
-        
-        console.log(result);
+
+    if (token) {
+      const fetchPRs = async () => {
+        try {
+          const res = await axios.get(`${BASE_URL}/api/v1/press-releases/list`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const result = res.data.data;
+          
+          console.log(result);
 
         const formatted = result.map((item: any) => ({
-          id: item.id,
+          id: item._id,
           title: item.title,
           status: item.status,
           distribution: item.distribution || "—",
-          campaign: item.campaign?.name || "—",
+          campaign: item.campaign || "—",
           performance: item.performance || "—",
           date_created: formatDate(item.date_created),
         }));
 
-        setData(formatted);
-      } catch (error) {
-        console.error("Failed to load PR list:", error);
-      }
-      //  finally {
-      //   setLoading(false);
-      // }
-    };
+          setData(formatted);
+        } catch (error) {
+          console.error("Failed to load PR list:", error);
+        }
+      };
 
-    fetchPRs();
+      fetchPRs();
+    }
   }, []);
 
   return (
@@ -184,7 +184,7 @@ export default function PRDashboard() {
             <DataTable
               columns={columns}
               data={data}
-              onView={(id) => `/pr/pr-details/${id}`}
+            onView={(id) => `/pr/pr-details/${id}`}
             />
           </Card>
         )}
