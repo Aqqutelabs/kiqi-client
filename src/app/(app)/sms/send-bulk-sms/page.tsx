@@ -6,7 +6,7 @@ import { FormField } from "@/components/ui/FormField";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { motion } from "framer-motion";
 import { Calendar, Clock, X, Users, Upload, Edit } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { Textarea } from "@/components/ui/Textarea";
 import Checkbox from "@/components/ui/CheckBox";
@@ -16,16 +16,8 @@ import axios from "axios";
 import BASE_URL from "@/lib/utils/baseUrl";
 import { useAppSelector } from "@/redux/hooks";
 import { selectToken } from "@/redux/selectors/authSelectors";
-import { RecipientGroup, Sender, SendSMSRequest } from "@/types/sms";
+import { RecipientGroup, Sender } from "@/types/sms";
 import { parseCsvPhones } from "@/utility/date-utility";
-
-interface CreateDraftRequest {
-  message: string;
-  recipients: string[];
-  status: "draft";
-  senderId?: string;
-  scheduledAt?: string;
-}
 
 interface ContactChip {
   id: string;
@@ -35,21 +27,22 @@ interface ContactChip {
 export default function SendBulkSMS() {
   const router = useRouter();
   const token = useAppSelector(selectToken);
-  
+  const searchParams = useSearchParams();
+
   const [isLoading, setIsLoading] = useState(false);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
   const [isScheduling, setIsScheduling] = useState(false);
-  
+
   const [senders, setSenders] = useState<Sender[]>([]);
   const [recipientGroups, setRecipientGroups] = useState<RecipientGroup[]>([]);
-  
+
   const [isFetchingSenders, setIsFetchingSenders] = useState(false);
   const [isFetchingGroups, setIsFetchingGroups] = useState(false);
-  
+
   const [selectedRecipientOption, setSelectedRecipientOption] = useState<
     "existing" | "manual" | "upload"
   >("existing");
-  
+
   const [contactChips, setContactChips] = useState<ContactChip[]>([]);
   const [csvFile, setCsvFile] = useState<File | null>(null);
 
@@ -62,6 +55,18 @@ export default function SendBulkSMS() {
     time: "",
   });
 
+  // Get template message from URL if available
+  useEffect(() => {
+    const message = searchParams.get("message");
+    if (message) {
+      const decodedMessage = decodeURIComponent(message);
+      setFormData((prev) => ({
+        ...prev,
+        compose_message: decodedMessage,
+      }));
+    }
+  }, [searchParams]);
+
   // Calculate total phone numbers based on current selection method
   const getTotalPhoneNumbers = () => {
     switch (selectedRecipientOption) {
@@ -73,14 +78,11 @@ export default function SendBulkSMS() {
           return selectedGroup?.contacts.length || 0;
         }
         return 0;
-      
+
       case "manual":
-        const manualPhones = contactChips.map(chip => chip.phone);
-        return manualPhones.length;
-      
       case "upload":
         return contactChips.length;
-      
+
       default:
         return 0;
     }
@@ -89,7 +91,7 @@ export default function SendBulkSMS() {
   // Get phone preview based on selected option
   const getPhonePreview = (limit: number = 10) => {
     let phones: string[] = [];
-    
+
     switch (selectedRecipientOption) {
       case "existing":
         if (formData.recipient_group) {
@@ -99,13 +101,13 @@ export default function SendBulkSMS() {
           phones = selectedGroup?.contacts || [];
         }
         break;
-      
+
       case "manual":
       case "upload":
-        phones = contactChips.map(chip => chip.phone);
+        phones = contactChips.map((chip) => chip.phone);
         break;
     }
-    
+
     return phones.slice(0, limit);
   };
 
@@ -190,76 +192,85 @@ export default function SendBulkSMS() {
   };
 
   // Handle CSV file upload
-  // Handle CSV file upload
-const handleCsvUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-  const file = event.target.files?.[0];
-  if (!file) return;
+  const handleCsvUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-  if (!file.name.toLowerCase().endsWith(".csv")) {
-    toast.error("Please upload a CSV file");
-    return;
-  }
-  
-  // Clear previous file input to allow re-upload of same file
-  event.target.value = '';
-  
-  setCsvFile(file);
-  setSelectedRecipientOption("upload");
-
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const text = e.target?.result as string;
-      console.log("CSV content preview:", text.substring(0, 200));
-      
-      const phones = parseCsvPhones(text);
-      console.log("Parsed phones:", phones);
-      
-      if (phones.length === 0) {
-        toast.error("No valid phone numbers found in CSV file");
-        setCsvFile(null);
-        return;
-      }
-      
-      const chips: ContactChip[] = phones.map((phone, index) => ({
-        id: `csv-${Date.now()}-${index}`,
-        phone,
-      }));
-      
-      setContactChips(chips);
-      toast.success(`Loaded ${phones.length} phone numbers from CSV`);
-      
-    } catch (error) {
-      console.error("Error parsing CSV:", error);
-      toast.error("Failed to parse CSV file");
-      setCsvFile(null);
+    if (!file.name.toLowerCase().endsWith(".csv")) {
+      toast.error("Please upload a CSV file");
+      return;
     }
+
+    event.target.value = "";
+
+    setCsvFile(file);
+    setSelectedRecipientOption("upload");
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const text = e.target?.result as string;
+        console.log("RAW CSV TEXT (first 500 chars):", text.substring(0, 500));
+
+        const phones = parseCsvPhones(text);
+        console.log("PARSED PHONES RAW:", phones);
+
+        if (phones.length === 0) {
+          toast.error("No valid phone numbers found in CSV file");
+          setCsvFile(null);
+          return;
+        }
+
+        // Check each phone number
+        phones.forEach((phone, index) => {
+          console.log(`Phone ${index}: "${phone}"`, phone.length, "characters");
+          if (phone.includes("X") || phone.includes("x")) {
+            console.log(`WARNING: Phone ${index} contains X: "${phone}"`);
+          }
+        });
+
+        const chips: ContactChip[] = phones.map((phone, index) => ({
+          id: `csv-${Date.now()}-${index}`,
+          phone: phone.trim(), // Ensure trimming
+        }));
+
+        console.log("FINAL CHIPS:", chips);
+        setContactChips(chips);
+        toast.success(`Loaded ${phones.length} phone numbers from CSV`);
+      } catch (error) {
+        console.error("Error parsing CSV:", error);
+        toast.error("Failed to parse CSV file");
+        setCsvFile(null);
+      }
+    };
+
+    reader.onerror = () => {
+      toast.error("Failed to read CSV file");
+      setCsvFile(null);
+    };
+
+    reader.readAsText(file);
   };
-  
-  reader.onerror = () => {
-    toast.error("Failed to read CSV file");
-    setCsvFile(null);
-  };
-  
-  reader.readAsText(file);
-};
 
   // Handle manual phone input
   const handleManualPhoneInput = (value: string) => {
     // Parse comma-separated phone numbers
-    const phoneStrings = value.split(",").map(phone => phone.trim()).filter(Boolean);
-    
+    const phoneStrings = value
+      .split(",")
+      .map((phone) => phone.trim())
+      .filter(Boolean);
+
     const chips: ContactChip[] = phoneStrings.map((phone, index) => ({
       id: `manual-${Date.now()}-${index}`,
       phone,
     }));
-    
+
     setContactChips(chips);
   };
 
   const validateForm = () => {
     const totalNumbers = getTotalPhoneNumbers();
-    
+
     if (totalNumbers === 0) {
       toast.error("Please add at least one phone number");
       return false;
@@ -275,73 +286,106 @@ const handleCsvUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
       return false;
     }
 
+    // Validate phone numbers based on selection method
+    const phoneNumbers = getPhoneNumbers();
+    if (phoneNumbers.length === 0) {
+      toast.error("No valid phone numbers found");
+      return false;
+    }
+
     return true;
   };
 
-  const getPhoneNumbers = () => {
-    return contactChips.map((chip) => chip.phone);
+  const getPhoneNumbers = (): string[] => {
+    switch (selectedRecipientOption) {
+      case "existing":
+        if (formData.recipient_group) {
+          const selectedGroup = recipientGroups.find(
+            (group) => group.id === formData.recipient_group
+          );
+          return selectedGroup?.contacts || [];
+        }
+        return [];
+
+      case "manual":
+      case "upload":
+        return contactChips.map((chip) => chip.phone);
+
+      default:
+        return [];
+    }
   };
 
   const handleSendSMS = async () => {
     if (!validateForm()) return;
+    if (!token) {
+      toast.error("Authentication required");
+      return;
+    }
 
     setIsLoading(true);
 
+    const phoneNumbers = getPhoneNumbers();
+    const selectedSender = senders.find(
+      (sender) => sender.id === formData.sender_id
+    );
+
+    if (!selectedSender) {
+      toast.error("Selected sender not found");
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const phoneNumbers = getPhoneNumbers();
+      // Prepare payload based on your API requirements
+      const payload = {
+        to: phoneNumbers.join(", "), // Changed from recipient_group to actual phone numbers joined with a comma
+        body: formData.compose_message.trim(),
+        from: selectedSender.name,
+      };
 
-      const selectedSender = senders.find(
-        (sender) => sender.id === formData.sender_id
-      );
+      console.log("Sending payload:", payload); // For debugging
 
-      if (!selectedSender) {
-        toast.error("Selected sender not found");
-        setIsLoading(false);
-        return;
-      }
-
-      const sendPromises = phoneNumbers.map((phoneNumber) => {
-        const requestData: SendSMSRequest = {
-          to: phoneNumber,
-          body: formData.compose_message.trim(),
-          from: selectedSender.name,
-        };
-
-        return axios.post(`${BASE_URL}/api/v1/sms/send`, requestData, {
+      const response = await axios.post(
+        `${BASE_URL}/api/v1/sms/send`,
+        payload,
+        {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-        });
-      });
+        }
+      );
 
-      const results = await Promise.allSettled(sendPromises);
-
-      const successful = results.filter((r) => r.status === "fulfilled").length;
-      const failed = results.filter((r) => r.status === "rejected").length;
-
-      if (successful > 0) {
+      if (response.data.success) {
         toast.success(
-          `SMS sent successfully to ${successful} recipient${
-            successful > 1 ? "s" : ""
-          }!${failed > 0 ? ` ${failed} failed.` : ""}`
+          `SMS sent successfully to ${phoneNumbers.length} recipient(s)!`
         );
 
         // Reset form
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
           recipient_group: "",
           compose_message: "",
+          schedule_for_later: false,
+          date: "",
+          time: "",
         }));
         setContactChips([]);
         setCsvFile(null);
+        setSelectedRecipientOption("existing");
       } else {
-        toast.error("Failed to send SMS to all recipients");
+        toast.error(response.data.message || "Failed to send SMS");
       }
     } catch (error: any) {
       console.error("Error sending SMS:", error);
       if (error.response?.status === 401) {
         toast.error("Session expired. Please log in again.");
+      } else if (error.response?.status === 400) {
+        toast.error(
+          error.response.data?.message ||
+            "Invalid request. Please check your inputs."
+        );
       } else {
         toast.error("Failed to send SMS. Please try again.");
       }
@@ -379,18 +423,19 @@ const handleCsvUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         return;
       }
 
-      const draftData: CreateDraftRequest = {
+      const draftData = {
         message: formData.compose_message.trim(),
         recipients: getPhoneNumbers(),
         status: "draft",
         senderId: selectedSender.id,
+        senderName: selectedSender.name,
       };
 
-      if (formData.schedule_for_later && formData.date && formData.time) {
-        draftData.scheduledAt = new Date(
-          `${formData.date} ${formData.time}`
-        ).toISOString();
-      }
+      // if (formData.schedule_for_later && formData.date && formData.time) {
+      //   draftData.scheduledAt = new Date(
+      //     `${formData.date} ${formData.time}`
+      //   ).toISOString();
+      // }
 
       const response = await axios.post(
         `${BASE_URL}/api/v1/drafts`,
@@ -425,6 +470,10 @@ const handleCsvUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
 
   const handleScheduleForLater = async () => {
     if (!validateForm()) return;
+    if (!token) {
+      toast.error("Authentication required");
+      return;
+    }
 
     if (!formData.date || !formData.time) {
       toast.error("Please select date and time for scheduling");
@@ -453,6 +502,7 @@ const handleCsvUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         message: formData.compose_message.trim(),
         recipients: phoneNumbers,
         senderId: selectedSender.id,
+        senderName: selectedSender.name,
         scheduledAt: scheduledAt,
         status: "scheduled",
       };
@@ -471,7 +521,7 @@ const handleCsvUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
       if (response.data.success) {
         toast.success("SMS scheduled successfully!");
         // Reset form
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
           recipient_group: "",
           compose_message: "",
@@ -481,6 +531,7 @@ const handleCsvUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         }));
         setContactChips([]);
         setCsvFile(null);
+        setSelectedRecipientOption("existing");
       } else {
         toast.error(response.data.message || "Failed to schedule SMS");
       }
@@ -501,21 +552,23 @@ const handleCsvUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
   };
 
   const handleRecipientGroupChange = (groupId: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       recipient_group: groupId,
     }));
     setSelectedRecipientOption("existing");
-    
+
     if (groupId) {
       const selectedGroup = recipientGroups.find(
         (group) => group.id === groupId
       );
       if (selectedGroup) {
-        const chips: ContactChip[] = selectedGroup.contacts.map((phone, index) => ({
-          id: `group-${groupId}-${index}`,
-          phone,
-        }));
+        const chips: ContactChip[] = selectedGroup.contacts.map(
+          (phone, index) => ({
+            id: `group-${groupId}-${index}`,
+            phone,
+          })
+        );
         setContactChips(chips);
       }
     } else {
@@ -534,7 +587,7 @@ const handleCsvUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
   };
 
   const clearRecipients = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       recipient_group: "",
     }));
@@ -643,7 +696,8 @@ const handleCsvUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
                   <div className="flex items-center gap-2">
                     <Users size={18} className="text-blue-600" />
                     <span className="font-medium text-blue-800">
-                      {totalNumbers} phone number{totalNumbers !== 1 ? 's' : ''} selected
+                      {totalNumbers} phone number{totalNumbers !== 1 ? "s" : ""}{" "}
+                      selected
                     </span>
                   </div>
                   <button
@@ -652,17 +706,17 @@ const handleCsvUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
                     Clear all
                   </button>
                 </div>
-                
+
                 {/* Phone Preview */}
                 <div className="space-y-2 max-h-40 overflow-y-auto">
-                  {phonePreview.slice(0,2).map((phone, index) => (
+                  {phonePreview.slice(0, 2).map((phone, index) => (
                     <div
                       key={index}
                       className="flex items-center justify-between py-2 px-3 bg-white rounded border border-blue-100">
                       <span className="text-sm text-gray-700 font-mono">
                         {phone}
                       </span>
-                      {selectedRecipientOption !== 'existing' && (
+                      {selectedRecipientOption !== "existing" && (
                         <button
                           onClick={() => {
                             const chipId = contactChips[index]?.id;
@@ -782,7 +836,7 @@ const handleCsvUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
                     </Button>
                   )}
                 </div>
-                
+
                 <div className="flex justify-end">
                   <Button
                     size={"lg"}
@@ -830,7 +884,10 @@ const handleCsvUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
           </div>
 
           <div className="flex flex-col md:flex-row md:items-center gap-5">
-            <Button size={"lg"} onClick={handleSendSMS} disabled={isLoading || totalNumbers === 0}>
+            <Button
+              size={"lg"}
+              onClick={handleSendSMS}
+              disabled={isLoading || totalNumbers === 0}>
               {isLoading ? "Sending..." : `Send Now (${totalNumbers})`}
             </Button>
             <Button
@@ -844,7 +901,11 @@ const handleCsvUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
               size={"lg"}
               variant={"tertiary"}
               onClick={handleScheduleForLater}
-              disabled={isScheduling || !formData.schedule_for_later || totalNumbers === 0}>
+              disabled={
+                isScheduling ||
+                !formData.schedule_for_later ||
+                totalNumbers === 0
+              }>
               {isScheduling ? "Scheduling..." : "Schedule for Later"}
             </Button>
           </div>
