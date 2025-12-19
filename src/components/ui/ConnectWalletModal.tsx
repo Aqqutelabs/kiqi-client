@@ -1,9 +1,10 @@
+// components/ui/ConnectWalletModal.tsx
 "use client";
 
 import { Modal } from "@/components/ui/Modal";
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { useWalletAuth } from '@/hooks/useWalletAuth';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Heading from "./TextHeading";
 import { Button } from "./Button";
 import BASE_URL from "@/lib/utils/baseUrl";

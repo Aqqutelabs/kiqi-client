@@ -540,14 +540,6 @@ export default function ManageRecipientGroups() {
           onDelete={handleDeleteClick}
           isLoading={isFetching}
         />
-
-        {/* Empty state */}
-        {!isFetching && data.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-gray-500 mb-2">No recipient groups found</p>
-            <p className="text-sm text-gray-400">Create your first group above to get started</p>
-          </div>
-        )}
       </Card>
 
       {/* Edit Modal */}

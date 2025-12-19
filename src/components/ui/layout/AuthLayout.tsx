@@ -26,11 +26,11 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
     <div className="min-h-screen w-full flex flex-col lg:flex-row">
       {/* Left Side - Info Panel */}
       <div className="w-full lg:w-[40%] bg-white p-8 lg:py-10 lg:px-14 hidden lg:flex flex-col justify-between">
-        <div>
+        <div className="w-full">
           {/* Logo */}
           <img src="/kiki-logo.svg" alt="Logo" className="w-[100px]" />
           {/* Heading */}
-          <h1 className="text-4xl lg:text-3xl font-medium text-[#1B223C] my-4 whitespace-nowrap">
+          <h1 className="text-4xl lg:text-3xl font-medium text-[#1B223C] my-4">
             Streamline your business with KiKi.
           </h1>
           <p className="text-[#606062] flex items-start gap-2 mt-2 text-sm">
@@ -39,7 +39,7 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
           </p>
 
           {/* Features */}
-          <div className="space-y-7 my-6 w-[500px]">
+          <div className="space-y-7 my-6">
             {features.map((feat, index) => (
               <div key={index} className="space-y-3">
                 <img src={feat.icon} alt="Icon" className="size-7" />
@@ -57,7 +57,7 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
         </div>
 
         {/* Footer Links */}
-        <div className="flex items-center gap-6 text-sm text-gray-600">
+        <div className="flex items-center gap-4 text-sm text-gray-600 flex-wrap">
           <a href="#" className="hover:text-gray-900">
             Terms
           </a>
