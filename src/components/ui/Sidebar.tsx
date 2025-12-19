@@ -90,119 +90,119 @@ const navigationConfig: NavSection[] = [
       //   label: "Analytics",
       //   icon: "/sidebar-icons/analytics.svg",
       // },
-      {
-        type: "dropdown",
-        label: "Email",
-        icon: "/sidebar-icons/analytics.svg",
-        items: [
-          {
-            type: "link",
-            href: "/email-campaigns/dashboard",
-            label: "Dashboard",
-            icon: "/sidebar-icons/analytics.svg",
-          },
-          {
-            type: "link",
-            href: "/email-campaigns/templates",
-            label: "Templates",
-            icon: "/sidebar-icons/analytics.svg",
-          },
-          {
-            type: "link",
-            href: "/email-campaigns/mailbox",
-            label: "Mailbox",
-            icon: "/sidebar-icons/analytics.svg",
-          },
-          {
-            type: "link",
-            href: "/email-campaigns/email-lists",
-            label: "Email Lists",
-            icon: "/sidebar-icons/analytics.svg",
-          },
-        ],
-      },
-      {
-        type: "dropdown",
-        label: "SMS",
-        icon: "/sidebar-icons/sms.svg",
-        items: [
-          {
-            type: "link",
-            href: "/sms/send-bulk-sms",
-            label: "Send Bulk SMS",
-          },
-          {
-            type: "link",
-            href: "/sms/create-sender-id",
-            label: "Create a Sender ID",
-          },
-          {
-            type: "link",
-            href: "/sms/manage-recipient-groups",
-            label: "Manage Recipient Groups",
-          },
-          {
-            type: "link",
-            href: "/sms/sms-drafts",
-            label: "SMS Drafts",
-          },
-          {
-            type: "link",
-            href: "/sms/sms-templates",
-            label: "SMS Templates",
-          },
-        ],
-      },
+      // {
+      //   type: "dropdown",
+      //   label: "Email",
+      //   icon: "/sidebar-icons/analytics.svg",
+      //   items: [
+      //     {
+      //       type: "link",
+      //       href: "/email-campaigns/dashboard",
+      //       label: "Dashboard",
+      //       icon: "/sidebar-icons/analytics.svg",
+      //     },
+      //     {
+      //       type: "link",
+      //       href: "/email-campaigns/templates",
+      //       label: "Templates",
+      //       icon: "/sidebar-icons/analytics.svg",
+      //     },
+      //     {
+      //       type: "link",
+      //       href: "/email-campaigns/mailbox",
+      //       label: "Mailbox",
+      //       icon: "/sidebar-icons/analytics.svg",
+      //     },
+      //     {
+      //       type: "link",
+      //       href: "/email-campaigns/email-lists",
+      //       label: "Email Lists",
+      //       icon: "/sidebar-icons/analytics.svg",
+      //     },
+      //   ],
+      // },
+      // {
+      //   type: "dropdown",
+      //   label: "SMS",
+      //   icon: "/sidebar-icons/sms.svg",
+      //   items: [
+      //     {
+      //       type: "link",
+      //       href: "/sms/send-bulk-sms",
+      //       label: "Send Bulk SMS",
+      //     },
+      //     {
+      //       type: "link",
+      //       href: "/sms/create-sender-id",
+      //       label: "Create a Sender ID",
+      //     },
+      //     {
+      //       type: "link",
+      //       href: "/sms/manage-recipient-groups",
+      //       label: "Manage Recipient Groups",
+      //     },
+      //     {
+      //       type: "link",
+      //       href: "/sms/sms-drafts",
+      //       label: "SMS Drafts",
+      //     },
+      //     {
+      //       type: "link",
+      //       href: "/sms/sms-templates",
+      //       label: "SMS Templates",
+      //     },
+      //   ],
+      // },
     ],
   },
-  {
-    type: "section",
-    title: "Finance",
-    items: [
-      {
-        type: "link",
-        href: "/wallet",
-        label: "Wallet",
-        icon: "/sidebar-icons/wallet.svg",
-      },
-      {
-        type: "link",
-        href: "/subscriptions",
-        label: "Subscriptions",
-        icon: "/sidebar-icons/subscription.svg",
-      },
-      {
-        type: "link",
-        href: "/refer",
-        label: "Invite and Earn",
-        icon: "/sidebar-icons/invite.svg",
-      },
-    ],
-  },
-  {
-    type: "section",
-    title: "System",
-    items: [
-      {
-        type: "link",
-        href: "/user-and-roles",
-        label: "Users and Roles",
-        icon: "/sidebar-icons/subscription.svg",
-      },
-      {
-        type: "link",
-        href: "/profile",
-        label: "Profile",
-        icon: "/sidebar-icons/profile.svg",
-      },
-      {
-        type: "link",
-        href: "/settings",
-        label: "Settings",
-        icon: "/sidebar-icons/settings.svg",
-      },
-    ],
-  },
+  // {
+  //   type: "section",
+  //   title: "Finance",
+  //   items: [
+  //     {
+  //       type: "link",
+  //       href: "/wallet",
+  //       label: "Wallet",
+  //       icon: "/sidebar-icons/wallet.svg",
+  //     },
+  //     {
+  //       type: "link",
+  //       href: "/subscriptions",
+  //       label: "Subscriptions",
+  //       icon: "/sidebar-icons/subscription.svg",
+  //     },
+  //     {
+  //       type: "link",
+  //       href: "/refer",
+  //       label: "Invite and Earn",
+  //       icon: "/sidebar-icons/invite.svg",
+  //     },
+  //   ],
+  // },
+  // {
+  //   type: "section",
+  //   title: "System",
+  //   items: [
+  //     {
+  //       type: "link",
+  //       href: "/user-and-roles",
+  //       label: "Users and Roles",
+  //       icon: "/sidebar-icons/subscription.svg",
+  //     },
+  //     {
+  //       type: "link",
+  //       href: "/profile",
+  //       label: "Profile",
+  //       icon: "/sidebar-icons/profile.svg",
+  //     },
+  //     {
+  //       type: "link",
+  //       href: "/settings",
+  //       label: "Settings",
+  //       icon: "/sidebar-icons/settings.svg",
+  //     },
+  //   ],
+  // },
 ];
 
 export const Sidebar: React.FC = () => {
