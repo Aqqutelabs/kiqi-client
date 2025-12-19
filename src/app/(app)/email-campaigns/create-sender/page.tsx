@@ -22,6 +22,47 @@ type SenderData = {
   updatedAt?: string;
 };
 
+// Nigerian States Array
+const nigerianStates = [
+  { label: "AB - Abia", value: "AB" },
+  { label: "AD - Adamawa", value: "AD" },
+  { label: "AK - Akwa Ibom", value: "AK" },
+  { label: "AN - Anambra", value: "AN" },
+  { label: "BA - Bauchi", value: "BA" },
+  { label: "BY - Bayelsa", value: "BY" },
+  { label: "BE - Benue", value: "BE" },
+  { label: "BO - Borno", value: "BO" },
+  { label: "CR - Cross River", value: "CR" },
+  { label: "DE - Delta", value: "DE" },
+  { label: "EB - Ebonyi", value: "EB" },
+  { label: "ED - Edo", value: "ED" },
+  { label: "EK - Ekiti", value: "EK" },
+  { label: "EN - Enugu", value: "EN" },
+  { label: "GO - Gombe", value: "GO" },
+  { label: "IM - Imo", value: "IM" },
+  { label: "JI - Jigawa", value: "JI" },
+  { label: "KD - Kaduna", value: "KD" },
+  { label: "KN - Kano", value: "KN" },
+  { label: "KT - Katsina", value: "KT" },
+  { label: "KE - Kebbi", value: "KE" },
+  { label: "KO - Kogi", value: "KO" },
+  { label: "KW - Kwara", value: "KW" },
+  { label: "LA - Lagos", value: "LA" },
+  { label: "NA - Nasarawa", value: "NA" },
+  { label: "NI - Niger", value: "NI" },
+  { label: "OG - Ogun", value: "OG" },
+  { label: "ON - Ondo", value: "ON" },
+  { label: "OS - Osun", value: "OS" },
+  { label: "OY - Oyo", value: "OY" },
+  { label: "PL - Plateau", value: "PL" },
+  { label: "RI - Rivers", value: "RS" },
+  { label: "SO - Sokoto", value: "SO" },
+  { label: "TA - Taraba", value: "TS" },
+  { label: "YO - Yobe", value: "YO" },
+  { label: "ZA - Zamfara", value: "ZA" },
+  { label: "FC - Federal Capital Territory", value: "FC" }
+];
+
 const CreateSenderEmailPage = () => {
   const dispatch = useDispatch();
   const authToken = useSelector((state: any) => state.auth?.token ?? null);
@@ -154,30 +195,120 @@ const CreateSenderEmailPage = () => {
     <>
       {/* toasts are handled by the global ToasterClient component */}
       <main className="flex-1 overflow-y-auto">
-        <PageHeader title="Create a sender email" backLink="/email-campaigns/dashboard" />
+        <PageHeader title="Create a sender email" backLink="/email-campaigns/settings" />
 
         <Card className="mb-6 p-6">
           <h3 className="text-lg font-semibold mb-2">Create & Verify SendGrid Sender</h3>
           <p className="text-sm text-gray-500 mb-4">Fill the form to initiate SendGrid verification. A confirmation link will be emailed to the sender address.</p>
 
           <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={handleRequestVerification}>
-            <FormField label="Nickname" id="nickname" value={nickname} onChange={(e:any) => setNickname(e.target.value)} placeholder="e.g. My Company" required />
-            <FormField label="From Email" id="from_email" type="email" value={from_email} onChange={(e:any) => setFromEmail(e.target.value)} placeholder="you@company.com" required />
-            <FormField label="From Name" id="from_name" value={from_name} onChange={(e:any) => setFromName(e.target.value)} placeholder="Your Name or Company" required />
-            <FormField label="Reply To Email" id="reply_to" type="email" value={reply_to} onChange={(e:any) => setReplyTo(e.target.value)} placeholder="reply@company.com" required />
-            <FormField label="Reply To Name" id="reply_to_name" value={reply_to_name} onChange={(e:any) => setReplyToName(e.target.value)} placeholder="Reply Name" />
-            <FormField label="Address" id="address" value={address} onChange={(e:any) => setAddress(e.target.value)} placeholder="Street address" />
-            <FormField label="City" id="city" value={city} onChange={(e:any) => setCity(e.target.value)} placeholder="City" />
-            <FormField label="State" id="state" value={stateVal} onChange={(e:any) => setStateVal(e.target.value)} placeholder="State" />
-            <FormField label="ZIP" id="zip" value={zip} onChange={(e:any) => setZip(e.target.value)} placeholder="Postal code" />
-            <FormField label="Country" id="country" value={country} onChange={(e:any) => setCountry(e.target.value)} placeholder="Country" />
+            <FormField 
+              label="Nickname" 
+              id="nickname" 
+              value={nickname} 
+              onChange={(e:any) => setNickname(e.target.value)} 
+              placeholder="e.g. My Company" 
+              required 
+            />
+            <FormField 
+              label="From Email" 
+              id="from_email" 
+              type="email" 
+              value={from_email} 
+              onChange={(e:any) => setFromEmail(e.target.value)} 
+              placeholder="you@company.com" 
+              required 
+            />
+            <FormField 
+              label="From Name" 
+              id="from_name" 
+              value={from_name} 
+              onChange={(e:any) => setFromName(e.target.value)} 
+              placeholder="Your Name or Company" 
+              required 
+            />
+            <FormField 
+              label="Reply To Email" 
+              id="reply_to" 
+              type="email" 
+              value={reply_to} 
+              onChange={(e:any) => setReplyTo(e.target.value)} 
+              placeholder="reply@company.com" 
+              required 
+            />
+            <FormField 
+              label="Reply To Name" 
+              id="reply_to_name" 
+              value={reply_to_name} 
+              onChange={(e:any) => setReplyToName(e.target.value)} 
+              placeholder="Reply Name" 
+            />
+            <FormField 
+              label="Address" 
+              id="address" 
+              value={address} 
+              onChange={(e:any) => setAddress(e.target.value)} 
+              placeholder="Street address" 
+            />
+            <FormField 
+              label="City" 
+              id="city" 
+              value={city} 
+              onChange={(e:any) => setCity(e.target.value)} 
+              placeholder="City" 
+            />
+            
+            {/* Nigerian States Dropdown */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                State
+              </label>
+              <select
+                className="w-full bg-[#00000014] rounded-md p-3 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-sm"
+                value={stateVal}
+                onChange={(e) => setStateVal(e.target.value)}
+                required
+              >
+                <option value="">Select a state</option>
+                {nigerianStates.map((state) => (
+                  <option key={state.value} value={state.value}>
+                    {state.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <FormField 
+              label="ZIP" 
+              id="zip" 
+              value={zip} 
+              onChange={(e:any) => setZip(e.target.value)} 
+              placeholder="Postal code" 
+            />
+            <FormField 
+              label="Country" 
+              id="country" 
+              value={country} 
+              onChange={(e:any) => setCountry(e.target.value)} 
+              placeholder="Country" 
+              required
+            />
 
             <div className="col-span-1 md:col-span-2 flex gap-3 items-center">
               <Button type="submit" className="transition-transform transform hover:scale-105" disabled={submitLoading}>
                 {submitLoading ? "Initiating..." : "Initiate Verification"}
               </Button>
               <Button type="button" className="bg-gray-100 text-gray-800" onClick={() => {
-                setNickname(""); setFromEmail(""); setFromName(""); setReplyTo(""); setReplyToName(""); setAddress(""); setCity(""); setStateVal(""); setZip(""); setCountry("");
+                setNickname(""); 
+                setFromEmail(""); 
+                setFromName(""); 
+                setReplyTo(""); 
+                setReplyToName(""); 
+                setAddress(""); 
+                setCity(""); 
+                setStateVal(""); 
+                setZip(""); 
+                setCountry("");
               }}>Reset</Button>
             </div>
           </form>

@@ -103,16 +103,18 @@ export default function PRDashboard() {
             ).token
           : null
         : null;
-    const fetchPRs = async () => {
-      try {
-        const res = await axios.get(`${BASE_URL}/api/v1/press-releases/list`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const result = res.data.data;
-        
-        console.log(result);
+
+    if (token) {
+      const fetchPRs = async () => {
+        try {
+          const res = await axios.get(`${BASE_URL}/api/v1/press-releases/list`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const result = res.data.data;
+          
+          console.log(result);
 
         const formatted = result.map((item: any) => ({
           id: item._id,
@@ -124,16 +126,14 @@ export default function PRDashboard() {
           date_created: formatDate(item.date_created),
         }));
 
-        setData(formatted);
-      } catch (error) {
-        console.error("Failed to load PR list:", error);
-      }
-      //  finally {
-      //   setLoading(false);
-      // }
-    };
+          setData(formatted);
+        } catch (error) {
+          console.error("Failed to load PR list:", error);
+        }
+      };
 
-    fetchPRs();
+      fetchPRs();
+    }
   }, []);
 
   return (

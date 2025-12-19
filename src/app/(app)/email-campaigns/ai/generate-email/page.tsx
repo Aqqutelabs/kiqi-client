@@ -269,14 +269,14 @@ export default function AIGeneratedEmail() {
         <PageHeader title="AI Generated Email" backLink="/email-campaigns/dashboard" />
 
         {/* subject line */}
-        <FormField
+        {/* <FormField
           label="Add a subject line for this campaign"
           id="subjectLine"
           placeholder="Enter a subject line"
           className="bg-transparent mt-2 h-14 mb-5"
           value={subjectLine}
           onChange={(e: any) => setSubjectLine(e.target.value)}
-        />
+        /> */}
       </Card>
 
       {/* cards */}

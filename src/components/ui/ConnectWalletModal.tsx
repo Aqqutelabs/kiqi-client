@@ -9,9 +9,11 @@ import Heading from "./TextHeading";
 import { Button } from "./Button";
 import BASE_URL from "@/lib/utils/baseUrl";
 import axios from "axios";
+import { useWallet } from '@solana/wallet-adapter-react';
 import toast from "react-hot-toast";
+import { Loader2, CheckCircle, AlertCircle } from "lucide-react";
 
-interface ConnectWalletProps {
+interface ConnectWalletModalProps {
   isOpen: boolean;
   onClose: () => void;
   redeemAmount: string; // value from first modal
@@ -105,7 +107,12 @@ export default function ConnectWallet({
         <Button variant={"outline"} onClick={onClose}>
           Cancel
         </Button>
-        <Button onClick={handleProceed}>Proceed</Button>
+        <Button 
+          onClick={handleProceed}
+          disabled={(!connected && !redeemAmount) || loading || isSigning}
+        >
+          {redeemAmount ? "Proceed" : (mode === "signup" ? "Sign Up" : "Sign In")}
+        </Button>
       </div>
     </Modal>
   );

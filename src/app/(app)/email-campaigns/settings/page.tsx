@@ -11,19 +11,21 @@ import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { Modal } from "@/components/ui/Modal";
 import ToggleSwitch from "@/components/ui/SwitchComponent";
 import Heading from "@/components/ui/TextHeading";
-import { CircleCheck, ChevronDown, ChevronUp, Users, Upload, FileText, X } from "lucide-react";
-import { redirect } from "next/navigation";
-import { ChangeEvent, useEffect, useState } from "react";
+import {
+  CircleCheck,
+  ChevronDown,
+  ChevronUp,
+  Users,
+  Upload,
+  FileText,
+  X,
+} from "lucide-react";
+import { redirect, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useAppSelector } from "@/redux/hooks";
 import BASE_URL from "@/lib/utils/baseUrl";
 import apiClient from "@/lib/utils/apiClient";
-// interface EmailList {
-//   _id: string;
-//   name: string;
-//   emails: string[];
-//   createdAt: string;
-// }
 
 interface ContactChip {
   id: string;
@@ -38,44 +40,49 @@ export default function CampaignSettings() {
   const [emailLists, setEmailLists] = useState<any>([]);
   const [audienceOption, setAudienceOption] = useState("existing");
   const [loadingLists, setLoadingLists] = useState(false);
-  const [manualContacts, setManualContacts] = useState<string>('');
+  const [manualContacts, setManualContacts] = useState<string>("");
   const [contactChips, setContactChips] = useState<ContactChip[]>([]);
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [csvPreview, setCsvPreview] = useState<string[]>([]);
   const [saveListModal, setSaveListModal] = useState(false);
-  const [newListName, setNewListName] = useState('');
+  const [newListName, setNewListName] = useState("");
   const [savingList, setSavingList] = useState(false);
-  
-  const user = useAppSelector((state) => state.auth.user);
+
+  // const user = useAppSelector((state) => state.auth.user);
   const token = useAppSelector((state) => state.auth.token);
-  const userEmail = user?.email || "";
+  // const userEmail = user?.email || "";
+  const router = useRouter();
 
   const [data, setData] = useState({
     campaignName: "",
     subjectLine: "",
-    senderId: userEmail,
+    senderId: "",
     autoStart: true,
     audience: {
-      emailLists: emailLists, // For existing list ID
-      emails: [] as string[], // For manual/csv emails
+      emailLists: [] as string[], // For existing list IDs
     },
   });
 
-   // Fetch existing email lists
+  // Update data.senderId when userEmail changes
+  // useEffect(() => {
+  //   if (userEmail) {
+  //     setData((prev) => ({ ...prev, senderId: userEmail }));
+  //   }
+  // }, [userEmail]);
+
+  // Fetch existing email lists
   useEffect(() => {
     const fetchEmailLists = async () => {
       if (!token) return;
-      
+
       setLoadingLists(true);
       try {
         const response = await apiClient.get(
           `${BASE_URL}/api/v1/email-lists/user/me`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        
-        setEmailLists(response.data)
-        console.log(emailLists)
-        console.log(response.data)
+
+        setEmailLists(response.data);
       } catch (error) {
         console.error("Error fetching email lists:", error);
         toast.error("Failed to load email lists");
@@ -90,13 +97,13 @@ export default function CampaignSettings() {
   // Handle manual contacts input
   const handleManualContactsChange = (value: string) => {
     setManualContacts(value);
-    
+
     // Process on comma to create chips
-    if (value.endsWith(',')) {
+    if (value.endsWith(",")) {
       const email = value.slice(0, -1).trim();
       if (email && isValidEmail(email)) {
         addContactChip(email);
-        setManualContacts('');
+        setManualContacts("");
       }
     }
   };
@@ -106,20 +113,23 @@ export default function CampaignSettings() {
       toast.error("Please enter a valid email address");
       return;
     }
-    
-    if (contactChips.some(chip => chip.email === email)) {
+
+    if (contactChips.some((chip) => chip.email === email)) {
       toast.error("Email already added");
       return;
     }
-    
-    setContactChips(prev => [...prev, {
-      id: Date.now().toString() + Math.random(),
-      email: email.trim()
-    }]);
+
+    setContactChips((prev) => [
+      ...prev,
+      {
+        id: Date.now().toString() + Math.random(),
+        email: email.trim(),
+      },
+    ]);
   };
 
   const removeContactChip = (id: string) => {
-    setContactChips(prev => prev.filter(chip => chip.id !== id));
+    setContactChips((prev) => prev.filter((chip) => chip.id !== id));
   };
 
   // Handle CSV file upload
@@ -127,24 +137,24 @@ export default function CampaignSettings() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (!file.name.endsWith('.csv')) {
+    if (!file.name.endsWith(".csv")) {
       toast.error("Please upload a CSV file");
       return;
     }
 
     setCsvFile(file);
-    
+
     // Read and preview CSV
     const reader = new FileReader();
     reader.onload = (e) => {
       const text = e.target?.result as string;
       const emails = parseCsvEmails(text);
       setCsvPreview(emails.slice(0, 10)); // Show first 10 emails as preview
-      
+
       // Convert to chips for editing
       const chips: ContactChip[] = emails.map((email, index) => ({
         id: `csv-${index}`,
-        email
+        email,
       }));
       setContactChips(chips);
     };
@@ -153,17 +163,19 @@ export default function CampaignSettings() {
 
   const parseCsvEmails = (csvText: string): string[] => {
     const emails: string[] = [];
-    const lines = csvText.split('\n');
-    
-    lines.forEach(line => {
+    const lines = csvText.split("\n");
+
+    lines.forEach((line) => {
       // Extract emails from CSV line (simple parsing)
-      const emailMatches = line.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g);
+      const emailMatches = line.match(
+        /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g
+      );
       if (emailMatches) {
-        emails.push(...emailMatches.map(email => email.trim()));
+        emails.push(...emailMatches.map((email) => email.trim()));
       }
     });
-    
-    return Array.from(new Set(emails)).filter(email => isValidEmail(email));
+
+    return Array.from(new Set(emails)).filter((email) => isValidEmail(email));
   };
 
   const isValidEmail = (email: string): boolean => {
@@ -185,11 +197,11 @@ export default function CampaignSettings() {
 
     setSavingList(true);
     try {
-      const emails = contactChips.map(chip => chip.email);
-      
+      const emails = contactChips.map((chip) => chip.email);
+
       const payload = {
         name: newListName,
-        emails: emails
+        emails: emails,
       };
 
       const response = await apiClient.post(
@@ -201,52 +213,82 @@ export default function CampaignSettings() {
       if (response.success) {
         toast.success("Email list saved successfully!");
         setSaveListModal(false);
-        setNewListName('');
-        
+        setNewListName("");
+
         // Refresh email lists
         const refreshResponse = await apiClient.get(
           `${BASE_URL}/api/v1/email-lists/user/me`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        
+
         if (refreshResponse.success && refreshResponse.data) {
-          setEmailLists(Array.isArray(refreshResponse.data) ? refreshResponse.data : [refreshResponse.data]);
+          setEmailLists(
+            Array.isArray(refreshResponse.data)
+              ? refreshResponse.data
+              : [refreshResponse.data]
+          );
         }
-        
+
         // Switch back to existing lists
-        setAudienceOption('existing');
+        setAudienceOption("existing");
       } else {
         toast.error(response.message || "Failed to save email list");
       }
     } catch (error: any) {
       console.error("Error saving email list:", error);
-      toast.error(error?.message || "An error occurred while saving the email list");
+      toast.error(
+        error?.message || "An error occurred while saving the email list"
+      );
     } finally {
       setSavingList(false);
     }
   };
 
-  // Prepare data for API based on selected audience option
-  const prepareAudienceData = () => {
-    if (audienceOption === 'existing') {
-      return {
-        emailLists: [data.audience.emailLists[0]],
-        emails: []
-      };
-    } else {
-      // For manual or CSV
-      const emails = contactChips.map(chip => chip.email);
-      
-      // If there are emails, prompt to save as a new list
-      if (emails.length > 0) {
-        setSaveListModal(true);
-        return null; // Wait for user decision
+  // const prepareAudienceData = () => {
+  //   if (audienceOption === "existing" && data.audience.emailLists[0]) {
+  //     // EXACT format that works: ONLY emailLists, NO emails array
+  //     return {
+  //       emailLists: [data.audience.emailLists[0]], // Single ID in array
+  //       // NO emails: [] field
+  //     };
+  //   } else {
+  //     // For manual/CSV: send emails directly
+  //     const emails = contactChips.map((chip) => chip.email);
+  //     return {
+  //       emails: emails.filter((email) => isValidEmail(email)),
+  //     };
+  //   }
+  // };
+
+  // Main API call for creating campaign - UPDATED WITH BETTER ERROR LOGGING
+  const createCampaign = async (payload: any) => {
+    setLoading(true);
+    try {
+      // Make API call to create campaign
+      const response = await apiClient.post(
+        `${BASE_URL}/api/v1/campaigns`,
+        payload,
+        token ? { headers: { Authorization: `Bearer ${token}` } } : {}
+      );
+
+      if (response.success) {
+        toast.success("Campaign created successfully!");
+        setSuccessModal(true);
+        router.push("/email-campaigns/dashboard")
+        return response;
+      } else {
+        toast.error(response.message || "Failed to create campaign");
+        return null;
       }
-      
-      return {
-        emailLists: [],
-        emails: emails
-      };
+    } catch (error: any) {
+      toast.error(
+        error?.response?.data?.message ||
+          error?.message ||
+          "An error occurred while creating campaign"
+      );
+      return null;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -269,62 +311,58 @@ export default function CampaignSettings() {
     }
 
     // Validate audience based on selected option
-    if (audienceOption === 'existing' && !data.audience.emailLists[0]?.trim()) {
+    if (
+      audienceOption === "existing" &&
+      data.audience.emailLists.length === 0
+    ) {
       toast.error("Please select an audience email list");
       return;
     }
 
-    if ((audienceOption === 'manual' || audienceOption === 'csv') && contactChips.length === 0) {
+    if (
+      (audienceOption === "manual" || audienceOption === "csv") &&
+      contactChips.length === 0
+    ) {
       toast.error("Please add at least one contact");
       return;
     }
 
-    // Prepare audience data
-    const audienceData = prepareAudienceData();
-    if (!audienceData) return; // User needs to decide about saving list
+    let payload;
 
-    setLoading(true);
-    try {
-      // Prepare the exact 5-field payload
-      const payload = {
-        campaignName: data.campaignName,
-        subjectLine: data.subjectLine,
-        senderId: data.senderId,
+    if (audienceOption === "existing" && data.audience.emailLists[0]) {
+      payload = {
+        campaignName: data.campaignName.trim(),
+        subjectLine: data.subjectLine.trim(),
+        senderId: data.senderId.trim(),
         autoStart: scheduleLater ? false : true,
-        audience: audienceData
+        audience: {
+          emailLists: [data.audience.emailLists[0]], // SINGLE ID in array
+          // NO emails field
+        },
       };
+    } else {
+      // For manual/CSV
+      const emails = contactChips.map((chip) => chip.email);
 
-      console.log("Sending payload:", payload);
-
-      // Make API call
-      const response = await apiClient.post(
-        `${BASE_URL}/api/v1/campaigns`,
-        payload,
-        token ? { headers: { Authorization: `Bearer ${token}` } } : {}
-      );
-
-      if (response.success) {
-        toast.success("Campaign created successfully!");
-        setSuccessModal(true);
-      } else {
-        toast.error(response.message || "Failed to create campaign");
-      }
-    } catch (error: any) {
-      console.error("API Error:", error);
-      toast.error(
-        error?.message || "An error occurred while creating campaign"
-      );
-    } finally {
-      setLoading(false);
+      payload = {
+        campaignName: data.campaignName.trim(),
+        subjectLine: data.subjectLine.trim(),
+        senderId: data.senderId.trim(),
+        autoStart: scheduleLater ? false : true,
+        audience: {
+          emails: emails.filter((email) => isValidEmail(email)),
+        },
+      };
     }
+    await createCampaign(payload);
   };
 
   // Continue without saving list
-  const handleContinueWithoutSaving = () => {
+  const handleContinueWithoutSaving = async () => {
     setSaveListModal(false);
-    
+
     // Prepare payload with emails directly
-    const emails = contactChips.map(chip => chip.email);
+    const emails = contactChips.map((chip) => chip.email);
     const payload = {
       campaignName: data.campaignName,
       subjectLine: data.subjectLine,
@@ -332,13 +370,14 @@ export default function CampaignSettings() {
       autoStart: scheduleLater ? false : true,
       audience: {
         emailLists: [],
-        emails: emails
-      }
+        emails: emails,
+      },
     };
-    
-    // Proceed with API call
+
     console.log("Continuing with payload:", payload);
-    // ... API call logic here
+
+    // Proceed with API call
+    await createCampaign(payload);
   };
 
   return (
@@ -356,25 +395,49 @@ export default function CampaignSettings() {
         {/* rest of component */}
         <div className="px-8 py-4 space-y-5">
           {/* campaign name */}
-          <div className="space-y-1 w-full">
-            <label className="text-[#1B223C] text-sm">Campaign Name</label>
-            <Select
-              placeholder="Select campaign name"
-              className="bg-[#00000014]">
-              <option value="">Campaign 1</option>
-            </Select>
-          </div>
+          <FormField
+            label="Campaign Name"
+            name="campaign-name"
+            value={data.campaignName}
+            onChange={(e) =>
+              setData((prev) => ({ ...prev, campaignName: e.target.value }))
+            }
+            id="campaign-name"
+            placeholder="Enter campaign name"
+          />
+
+          {/* subject line */}
+          <FormField
+            label="Subject Line"
+            name="subject-line"
+            value={data.subjectLine}
+            onChange={(e) =>
+              setData((prev) => ({ ...prev, subjectLine: e.target.value }))
+            }
+            id="subject-line"
+            placeholder="Enter subject line"
+          />
 
           {/* sender email dropdown */}
           <div className="flex items-end gap-4">
-            <div className="space-y-1 w-full">
+            <FormField
+              name="sender-email"
+              label="Sender Email"
+              value={data.senderId}
+              onChange={(e) =>
+                setData((prev) => ({ ...prev, senderId: e.target.value }))
+              }
+              id="sender-email"
+              placeholder="Enter your sender ID that has been verified with SendGrid"
+            />
+            {/* <div className="space-y-1 w-full">
               <label className="text-[#1B223C] text-sm">Sender Email</label>
               <Select
                 placeholder="Select sender email"
                 className="bg-[#00000014]">
                 <option value="">Email 1</option>
               </Select>
-            </div>
+            </div> */}
             <Button
               className="w-[30%]"
               onClick={() => redirect("/email-campaigns/create-sender")}>
@@ -386,80 +449,84 @@ export default function CampaignSettings() {
           <hr className="text-gray-200" />
 
           {/* AUDIENCE SECTION - MODIFIED */}
-            <label className="text-[#1B223C] text-sm">Audience *</label>
-            
+          <div className="space-y-4">
+            <label className="text-[#1B223C] text-sm font-medium">
+              Audience *
+            </label>
+
             {/* Audience Option Tabs */}
             <div className="flex gap-2 pb-2">
               <button
-                onClick={() => setAudienceOption('existing')}
+                onClick={() => setAudienceOption("existing")}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  audienceOption === 'existing'
-                    ? 'bg-blue-50 text-blue-600 border border-blue-200'
-                    : 'text-gray-600 hover:bg-gray-50'
+                  audienceOption === "existing"
+                    ? "bg-blue-50 text-blue-600 border border-blue-200"
+                    : "text-gray-600 hover:bg-gray-50"
                 }`}>
                 <Users size={16} className="inline mr-2" />
                 Existing Lists
               </button>
               <button
-                onClick={() => setAudienceOption('manual')}
+                onClick={() => setAudienceOption("manual")}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  audienceOption === 'manual'
-                    ? 'bg-blue-50 text-blue-600 border border-blue-200'
-                    : 'text-gray-600 hover:bg-gray-50'
+                  audienceOption === "manual"
+                    ? "bg-blue-50 text-blue-600 border border-blue-200"
+                    : "text-gray-600 hover:bg-gray-50"
                 }`}>
                 <FileText size={16} className="inline mr-2" />
                 Manual Input
               </button>
               <button
-                onClick={() => setAudienceOption('csv')}
+                onClick={() => setAudienceOption("csv")}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  audienceOption === 'csv'
-                    ? 'bg-blue-50 text-blue-600 border border-blue-200'
-                    : 'text-gray-600 hover:bg-gray-50'
+                  audienceOption === "csv"
+                    ? "bg-blue-50 text-blue-600 border border-blue-200"
+                    : "text-gray-600 hover:bg-gray-50"
                 }`}>
                 <Upload size={16} className="inline mr-2" />
                 Upload CSV
               </button>
-            <Button
-              onClick={() => redirect("/email-campaigns/email-lists")}>
-              Create a new Email list
-            </Button>
+              <Button onClick={() => redirect("/email-campaigns/email-lists")}>
+                Create a new Email list
+              </Button>
             </div>
 
-           {/* Existing Lists Option */}
-            <div> {audienceOption === 'existing' && (
+            {/* Existing Lists Option */}
+            {audienceOption === "existing" && (
               <div className="space-y-3">
                 <Select
-                  placeholder={loadingLists ? "Loading lists..." : "Select from email list"}
+                  placeholder={
+                    loadingLists ? "Loading lists..." : "Select from email list"
+                  }
                   className="bg-[#00000014]"
                   value={data.audience.emailLists[0] || ""}
-                  onChange={(e) => setData(prev => ({
-                    ...prev,
-                    audience: {
-                      ...prev.audience,
-                      emailLists: [e.target.value]
-                    }
-                  }))}
+                  onChange={(e) => {
+                    const listId = e.target.value;
+                    console.log("Selected list ID:", listId);
+                    setData((prev) => ({
+                      ...prev,
+                      audience: {
+                        emailLists: listId ? [listId] : [], // Store as single-item array
+                        emails: [], // Clear emails when using list
+                      },
+                    }));
+                  }}
                   disabled={loadingLists}
                   required>
                   <option value="">Select an email list</option>
-                  {emailLists.map((list: any) => (
-                    <option key={list._id} value={list._id}>
-                      {list.email_listName} - ({list.emails?.length || 0} contacts)
-                    </option>
-                  ))}
+                  {Array.isArray(emailLists) &&
+                    emailLists.map((list: any) => (
+                      <option key={list._id} value={list._id}>
+                        {list.name || list.email_listName || list._id} - (
+                        {list.emails?.length || 0} contacts)
+                      </option>
+                    ))}
                 </Select>
-                
-                {data.audience.emailLists[0] && (
-                  <div className="text-sm text-gray-600">
-                    Selected list: {emailLists.find((l: { _id: string; }) => l._id === data.audience.emailLists[0])?.name}
-                  </div>
-                )}
               </div>
             )}
 
             {/* Manual Input Option */}
-            {audienceOption === 'manual' && (
+            {audienceOption === "manual" && (
               <div className="space-y-3">
                 <div className="relative">
                   <textarea
@@ -468,11 +535,11 @@ export default function CampaignSettings() {
                     placeholder="Enter email addresses separated by commas. Press comma or enter after each email."
                     className="w-full bg-[#00000014] rounded-md p-3 min-h-[100px] resize-none border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-sm"
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
+                      if (e.key === "Enter") {
                         e.preventDefault();
                         if (manualContacts.trim()) {
                           addContactChip(manualContacts);
-                          setManualContacts('');
+                          setManualContacts("");
                         }
                       }
                     }}
@@ -481,7 +548,7 @@ export default function CampaignSettings() {
                     Type email and press comma or enter to add
                   </div>
                 </div>
-                
+
                 {/* Contact Chips */}
                 <div className="flex flex-wrap gap-2 min-h-[60px] p-2 border rounded-lg">
                   {contactChips.map((chip) => (
@@ -502,7 +569,7 @@ export default function CampaignSettings() {
                     </div>
                   )}
                 </div>
-                
+
                 <div className="text-sm text-gray-600">
                   Total contacts: {contactChips.length}
                 </div>
@@ -510,7 +577,7 @@ export default function CampaignSettings() {
             )}
 
             {/* CSV Upload Option */}
-            {audienceOption === 'csv' && (
+            {audienceOption === "csv" && (
               <div className="space-y-4">
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
                   <input
@@ -530,7 +597,7 @@ export default function CampaignSettings() {
                     </p>
                   </label>
                 </div>
-                
+
                 {csvFile && (
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
@@ -547,7 +614,7 @@ export default function CampaignSettings() {
                         Remove
                       </button>
                     </div>
-                    
+
                     {csvPreview.length > 0 && (
                       <div className="space-y-2">
                         <p className="text-sm font-medium text-gray-700">
@@ -555,12 +622,14 @@ export default function CampaignSettings() {
                         </p>
                         <div className="max-h-[120px] overflow-y-auto border rounded p-2">
                           {csvPreview.map((email, index) => (
-                            <div key={index} className="text-sm text-gray-600 py-1 border-b last:border-b-0">
+                            <div
+                              key={index}
+                              className="text-sm text-gray-600 py-1 border-b last:border-b-0">
                               {email}
                             </div>
                           ))}
                         </div>
-                        
+
                         {/* Contact Chips for editing */}
                         <div className="space-y-2">
                           <p className="text-sm font-medium text-gray-700">
@@ -575,7 +644,7 @@ export default function CampaignSettings() {
                                 <button
                                   onClick={() => removeContactChip(chip.id)}
                                   className="ml-1 hover:bg-green-200 rounded-full p-0.5">
-                                  <X   size={14} />
+                                  <X size={14} />
                                 </button>
                               </div>
                             ))}
@@ -586,7 +655,7 @@ export default function CampaignSettings() {
                             )}
                           </div>
                         </div>
-                        
+
                         <div className="text-sm text-gray-600">
                           Total contacts loaded: {contactChips.length}
                         </div>
@@ -750,7 +819,6 @@ export default function CampaignSettings() {
                     placeholder="You are receiving this email because you signed up for our newsletter at ..."
                   />
                 </div>
-
               </div>
             )}
           </div>
@@ -770,10 +838,12 @@ export default function CampaignSettings() {
           </div>
 
           {/* schedule date */}
-         {scheduleLater && <div className="flex flex-col md:flex-row items-end gap-3 w-[800px]">
-            <DateInput label="Schedule Date" />
-            <TimeInput label="Schedule Time" />
-          </div>}
+          {scheduleLater && (
+            <div className="flex flex-col md:flex-row items-end gap-3 w-[800px]">
+              <DateInput label="Schedule Date" />
+              <TimeInput label="Schedule Time" />
+            </div>
+          )}
         </div>
 
         {/* cta buttons */}
@@ -788,8 +858,13 @@ export default function CampaignSettings() {
             size={"lg"}
             className="w-full"
             variant={"secondary"}
-            onClick={() => {toast.success("Sent successfully!"); redirect("/email-campaigns/dashboard")}}>
-            {scheduleLater ? 'Schedule Email' : 'Send Now'}
+            onClick={handleSendNow}
+            disabled={loading}>
+            {loading
+              ? "Sending..."
+              : scheduleLater
+              ? "Schedule Email"
+              : "Send Now"}
           </Button>
         </div>
       </div>
@@ -808,6 +883,42 @@ export default function CampaignSettings() {
           <Button onClick={() => redirect("/email-campaigns/dashboard")}>
             Back to Dashboard
           </Button>
+        </div>
+      </Modal>
+
+      {/* Save List Modal */}
+      <Modal
+        isOpen={saveListModal}
+        onClose={() => setSaveListModal(false)}
+        width="450px">
+        <div className="flex flex-col justify-center items-center gap-6">
+          <Heading
+            heading="Save Email List"
+            subtitle="Would you like to save these contacts as a new email list?"
+            className="text-center"
+          />
+          <FormField
+            label="List Name"
+            id="list-name"
+            value={newListName}
+            onChange={(e) => setNewListName(e.target.value)}
+            placeholder="Enter list name"
+            className="w-full"
+          />
+          <div className="flex gap-4 w-full">
+            <Button
+              variant="secondary"
+              onClick={handleContinueWithoutSaving}
+              className="w-full">
+              Continue Without Saving
+            </Button>
+            <Button
+              onClick={handleSaveEmailList}
+              disabled={savingList}
+              className="w-full">
+              {savingList ? "Saving..." : "Save List"}
+            </Button>
+          </div>
         </div>
       </Modal>
     </Card>

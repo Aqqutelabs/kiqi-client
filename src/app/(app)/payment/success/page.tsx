@@ -21,10 +21,10 @@ export default function PaymentSuccess() {
           : null
         : null;
 
-    if (!reference) {
-      setVerifyStatus("invalid");
-      return;
-    }
+      if (!reference) {
+        setVerifyStatus("invalid");
+        return;
+      }
 
     axios
       .post(

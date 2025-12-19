@@ -1,6 +1,7 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import axios from "axios";
 
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -9,12 +10,43 @@ import { Input } from "@/components/ui/Input";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { Textarea } from "@/components/ui/Textarea";
 
-const emailLists = [
-  { id: "1", name: "My emails", date: "10-04-2025", count: 45 },
-  { id: "2", name: "Podcast Subscribers", date: "09-28-2025", count: 120 },
-];
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+
+interface EmailList {
+  id: string;
+  name: string;
+  date: string;
+  count: number;
+}
 
 const ManageEmailListPage = () => {
+  const [emailLists, setEmailLists] = useState<EmailList[]>([]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const token = JSON.parse(localStorage.getItem("persist:root") || "{}").auth
+        ? JSON.parse(
+            JSON.parse(localStorage.getItem("persist:root") || "{}").auth
+          ).token
+        : null;
+
+      if (token) {
+        axios
+          .get(`${BASE_URL}/api/v1/email-lists`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          .then((res) => {
+            setEmailLists(res.data);
+          })
+          .catch((error) => {
+            console.error("Error fetching email lists:", error);
+          });
+      }
+    }
+  }, []);
+
   return (
     <>
       <PageHeader
