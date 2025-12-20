@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import "./kiki.css";
 import { usePathname } from "next/navigation";
 import NavBar from "@/components/landing/navbar";
-import "bootstrap/dist/css/bootstrap.min.css";
+// import "bootstrap/dist/css/bootstrap.min.css";
 import LandingFooterSecond from "@/components/landing/landingfooter";
 
 export default function Home() {

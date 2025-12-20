@@ -27,32 +27,7 @@ interface PRList {
 
 export default function PRDashboard() {
   // dashboard statistics
-  const dashboard_stats: StatCardProps[] = [
-    {
-      title: "Press Releases",
-      value: "0",
-      change: "0",
-      changeType: "intermediate",
-    },
-    {
-      title: "Press Release Views",
-      value: "0",
-      change: "0",
-      changeType: "intermediate",
-    },
-    {
-      title: "Total Amount Spent",
-      value: "$0",
-      change: "0",
-      changeType: "intermediate",
-    },
-    {
-      title: "Media Channels",
-      value: "0",
-      change: "0",
-      changeType: "intermediate",
-    },
-  ];
+  
 
   // const data: PRList[] = [
   //   {
@@ -84,6 +59,7 @@ export default function PRDashboard() {
   //   },
   // ];
   const [data, setData] = useState<PRList[]>([]);
+  const [prs, setPrs] = useState<any[]>([]);
   // Table columns
   const columns: Column<PRList>[] = [
     { header: "Title", accessor: "title" },
@@ -113,6 +89,8 @@ export default function PRDashboard() {
             },
           });
           const result = res.data.data;
+
+          setPrs(result);          
           
           console.log(result);
 
@@ -135,6 +113,35 @@ export default function PRDashboard() {
       fetchPRs();
     }
   }, []);
+  
+  const totalPrs = prs.length;
+
+  const dashboard_stats: StatCardProps[] = [
+    {
+      title: "Press Releases",
+      value: totalPrs.toString(),
+      change: "0",
+      changeType: "intermediate",
+    },
+    {
+      title: "Press Release Views",
+      value: "0",
+      change: "0",
+      changeType: "intermediate",
+    },
+    {
+      title: "Total Amount Spent",
+      value: "$0",
+      change: "0",
+      changeType: "intermediate",
+    },
+    {
+      title: "Media Channels",
+      value: "0",
+      change: "0",
+      changeType: "intermediate",
+    },
+  ];
 
   return (
     <div className="flex-1 flex flex-col">

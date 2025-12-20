@@ -30,11 +30,26 @@ export default function CreatePressRelease() {
   const [image, setImage] = useState<File | null>(null);
 
   useEffect(() => {
-    localStorage.removeItem("pr_step_one");
-    localStorage.removeItem("pr_step_one_image");
-    localStorage.removeItem("cart");
-    localStorage.removeItem("pr_id");
-  }, []);
+  const savedDraft = localStorage.getItem("pr_step_one");
+  if (!savedDraft) return;
+
+  try {
+    const draft = JSON.parse(savedDraft);
+
+    // Restore title (ref-based input)
+    if (title.current && draft.title) {
+      title.current.value = draft.title;
+    }
+
+    // Restore content (state-based)
+    if (draft.pr_content) {
+      setPrContent(draft.pr_content);
+    }
+  } catch (err) {
+    console.error("Failed to restore draft:", err);
+  }
+}, []);
+
 
   const token =
     typeof window !== "undefined"

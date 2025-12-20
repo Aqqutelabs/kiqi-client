@@ -34,10 +34,12 @@ interface PRData {
   _id: string;
   metrics: PRMetrics;
   status: string;
+  title: string;
   date_created: string;
   content: string;
   campaign_id: string;
   image?: string;
+  distribution: string;
   distribution_report: any[];
   createdAt: string;
   updatedAt: string;
@@ -62,6 +64,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
   const [pr, setPr] = useState<PRData | null>(null);
   const [dashboard_stats, setDashboardStats] = useState<StatCardProps[]>([]);
+  const distributionReports: DistributionReport[] = [];
 
   useEffect(() => {
     if (!id) return;
@@ -107,26 +110,41 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   if (!pr) return <p>Loading...</p>;
 
   //   table data
-  const data: DistributionReport[] = [
-    {
-      id: 1,
-      outlet: "Forbes",
-      status: "Published",
-      clicks: 420,
-      views: "5.2K Views",
+  const data: DistributionReport[] = pr.distribution
+  ? pr.distribution.split(",").map((outlet, index) => ({
+      id: index + 1,
+      outlet: outlet.trim(),
+      status: pr.status as "Published" | "Pending" | "Failed",
+      clicks: pr.metrics?.total_clicks || 0,
+      views: pr.metrics?.total_views
+        ? pr.metrics.total_views >= 1000
+          ? `${(pr.metrics.total_views / 1000).toFixed(1)}K Views`
+          : `${pr.metrics.total_views} Views`
+        : "0 Views",
       link: "www.link.here.com",
-      date: "Sept 28, 2025 -14:32",
-    },
-    {
-      id: 2,
-      outlet: "Forbes",
-      status: "Published",
-      clicks: 420,
-      views: "5.2K Views",
-      link: "www.link.here.com",
-      date: "Sept 28, 2025 -14:32",
-    },
-  ];
+      date: formatDate(pr.date_created),
+    }))
+  : [];
+  // const data: DistributionReport[] = [
+  //   {
+  //     id: 1,
+  //     outlet: "Forbes",
+  //     status: "Published",
+  //     clicks: 420,
+  //     views: "5.2K Views",
+  //     link: "www.link.here.com",
+  //     date: "Sept 28, 2025 -14:32",
+  //   },
+  //   {
+  //     id: 2,
+  //     outlet: "Forbes",
+  //     status: "Published",
+  //     clicks: 420,
+  //     views: "5.2K Views",
+  //     link: "www.link.here.com",
+  //     date: "Sept 28, 2025 -14:32",
+  //   },
+  // ];
 
   const columns: Column<DistributionReport>[] = [
     { header: "Outlet", accessor: "outlet" },
@@ -163,7 +181,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             <div className="flex justify-between items-start">
               <p className="text-gray-600">Title</p>
               <strong className="text-right max-w-[60%]">
-                {/* {pr.title ?? "N/A"} */}
+                {pr.title ?? "N/A"}
               </strong>
             </div>
             <div className="flex justify-between items-center">
