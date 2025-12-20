@@ -19,7 +19,7 @@ interface DistributionReport {
   status: "Published" | "Pending" | "Failed";
   clicks: number;
   views: string;
-  link: string;
+  // link: string;
   date: string;
 }
 
@@ -121,7 +121,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           ? `${(pr.metrics.total_views / 1000).toFixed(1)}K Views`
           : `${pr.metrics.total_views} Views`
         : "0 Views",
-      link: "www.link.here.com",
+      // link: "www.link.here.com",
       date: formatDate(pr.date_created),
     }))
   : [];
@@ -151,7 +151,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     { header: "Status", accessor: "status" },
     { header: "Clicks", accessor: "clicks" },
     { header: "Views", accessor: "views" },
-    { header: "Link", accessor: "link" },
+    // { header: "Link", accessor: "link" },
     { header: "Date", accessor: "date" },
   ];
   return (
