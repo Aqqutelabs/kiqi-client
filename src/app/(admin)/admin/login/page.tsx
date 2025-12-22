@@ -20,10 +20,13 @@ const AdminLoginPage = () => {
         email,
         password,
       });
+const { token, user } = res.data;
 
-      // Save token in localStorage (or cookies if you prefer)
-      localStorage.setItem("adminToken", res.data.token);
+    // Save admin token and user info
+    localStorage.setItem("adminToken", token);
+    localStorage.setItem("adminUser", JSON.stringify(user));
 
+    // console.log("User saved:", user);
       // Redirect to admin dashboard
       router.push("/admin/dashboard");
     } catch (err: any) {
