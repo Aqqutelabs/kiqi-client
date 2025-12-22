@@ -251,7 +251,15 @@ export default function Home() {
         </div>
       </div>
 
-      
+      {/* recent blogs */}
+      <div className="h-fit bg-[#EEF5FD] my-10 space-y-8 p-12">
+        <h2 className="font-bold text-4xl">Recent Blogs</h2>
+        <div className="overflow-y-auto">
+          <div className="h-[260px] w-[450px] rounded-3xl bg-gray-200 flex items-center gap-4">
+            <h3>Lorem ipsum dolor sit amet consectetur.</h3>
+          </div>
+        </div>
+      </div>
 
     </section>
   );
