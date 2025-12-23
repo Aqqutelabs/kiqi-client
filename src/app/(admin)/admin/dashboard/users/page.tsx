@@ -1,19 +1,15 @@
 "use client";
 
-import {
-  Eye,
-  Edit3,
-  Trash2,
-  Loader2,
-  AlertCircle,
-  CardSim,
-} from "lucide-react";
+import { Edit3, Trash2, Loader2, AlertCircle, Plus } from "lucide-react";
 import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import BASE_URL from "@/lib/utils/baseUrl";
 import UserModal from "@/components/admin/UserModal";
 import toast from "react-hot-toast";
+import { formatDate } from "@/lib/utils/dateFormatter";
+import DeleteUserModal from "@/components/admin/DeleteUserModal";
+import BASE_URL from "@/lib/utils/baseUrl";
 
 interface User {
   _id: string;
@@ -24,69 +20,127 @@ interface User {
   createdAt: string;
 }
 
-interface Props {
-  users: User[];
-  loading: boolean;
-  total: number;
-  onView: (user: User) => void;
-  onEdit: (user: User) => void;
-  onDelete: (user: User) => void;
-}
-
 export default function UsersTable() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [modalMode, setModalMode] = useState<"create" | "edit">("edit");
   const [showModal, setShowModal] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const [deleteUser, setDeleteUser] = useState<User | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  // const token =
+  //   typeof window !== "undefined"
+  //     ? JSON.parse(localStorage.getItem("persist:root") || "{}").auth
+  //       ? JSON.parse(
+  //           JSON.parse(localStorage.getItem("persist:root") || "{}").auth
+  //         ).token
+  //       : null
+  //     : null;
 
   const token =
-    typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("persist:root") || "{}").auth
-        ? JSON.parse(
-            JSON.parse(localStorage.getItem("persist:root") || "{}").auth
-          ).token
-        : null
-      : null;
+    typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
+
+  const fetchUsers = async () => {
+    try {
+      const res = await axios.get("${BASE_URL}/api/v1/admin/users", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setUsers(res.data?.users || []);
+    } catch (error) {
+      toast.error("Failed to load users");
+      setUsers([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const res = await axios.get(
-          "http://localhost:8000/api/v1/admin/users",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        setUsers(res.data?.users || []);
-      } catch (error) {
-        console.error("Failed to load users", error);
-        setUsers([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchUsers();
   }, []);
 
+  const handleSave = async (data: Partial<User>) => {
+    setSaving(true);
+
+    try {
+      if (modalMode === "create") {
+        const res = await axios.post(
+          `${BASE_URL}/api/v1/admin/users`,
+          data,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        setUsers((prev) => [res.data.user, ...prev]);
+        toast.success("User created successfully");
+      }
+
+      if (modalMode === "edit" && selectedUser) {
+        await axios.put(
+          `${BASE_URL}/api/v1/admin/users/${selectedUser._id}`,
+          data,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        setUsers((prev) =>
+          prev.map((u) => (u._id === selectedUser._id ? { ...u, ...data } : u))
+        );
+
+        toast.success("User updated successfully");
+      }
+
+      setShowModal(false);
+      setSelectedUser(null);
+    } catch (error) {
+      toast.error("Something went wrong");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <>
-      {/* MODAL MUST BE HERE */}
+      {/* MODAL */}
       <UserModal
         isOpen={showModal}
+        mode={modalMode}
         user={selectedUser}
+        isLoading={saving}
         onClose={() => {
           setShowModal(false);
           setSelectedUser(null);
         }}
-        onSave={async (data) => {
-          if (!selectedUser) return;
+        onSave={handleSave}
+      />
+
+      <DeleteUserModal
+        isOpen={!!deleteUser}
+        userName={
+          deleteUser
+            ? `${deleteUser.firstName} ${deleteUser.lastName}`
+            : undefined
+        }
+        isLoading={deleting}
+        onClose={() => setDeleteUser(null)}
+        onConfirm={async () => {
+          if (!deleteUser) return;
 
           try {
-            const res = await axios.put(
-              `http://localhost:8000/api/v1/admin/users/${selectedUser._id}`,
-              data,
+            setDeleting(true);
+
+            await axios.delete(
+              `${BASE_URL}/api/v1/admin/users/${deleteUser._id}`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`,
@@ -94,37 +148,45 @@ export default function UsersTable() {
               }
             );
 
-            setUsers((prev) =>
-              prev.map((u) =>
-                u._id === selectedUser._id ? { ...u, ...data } : u
-              )
-            );
+            setUsers((prev) => prev.filter((u) => u._id !== deleteUser._id));
 
-            setShowModal(false);
-            setSelectedUser(null);
-
-            toast.success("User Successfuly edited");
+            toast.success("User deleted successfully");
+            setDeleteUser(null);
           } catch (error) {
-            console.error("Failed to update user", error);
+            console.error("Delete failed", error);
+            toast.error("Failed to delete user");
+          } finally {
+            setDeleting(false);
           }
         }}
       />
+
       <Card className="overflow-hidden">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200">
+        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Users</h1>
             <p className="text-gray-600 mt-1">Manage users</p>
           </div>
-          <div className="mt-2 text-sm text-gray-600">
-            {/* Total: {total} users */}
-          </div>
+
+          {/* CREATE USER BUTTON */}
+          <Button
+            onClick={() => {
+              setModalMode("create");
+              setSelectedUser(null);
+              setShowModal(true);
+            }}
+            className="flex items-center gap-2"
+          >
+            <Plus size={18} />
+            Create User
+          </Button>
         </div>
 
         {/* Table states */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 size={32} className="text-blue-600 animate-spin" />
+            <Loader2 size={32} className="animate-spin text-gray-600" />
           </div>
         ) : users.length === 0 ? (
           <div className="flex items-center justify-center py-12">
@@ -142,9 +204,6 @@ export default function UsersTable() {
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
                     Email
                   </th>
-                  {/* <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                  Role
-                </th> */}
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
                     Joined
                   </th>
@@ -158,61 +217,38 @@ export default function UsersTable() {
                 {users.map((user) => (
                   <tr
                     key={user._id}
-                    className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
+                    className="border-b border-gray-200 hover:bg-gray-50 transition"
                   >
-                    {/* Name */}
                     <td className="px-6 py-4">
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">
-                          {user.firstName} {user.lastName}
-                        </p>
-                        {/* <p className="text-xs text-gray-500 mt-1">
-                        ID: {user._id.slice(0, 8)}...
-                      </p> */}
-                      </div>
+                      <p className="text-sm font-medium text-gray-900">
+                        {user.firstName} {user.lastName}
+                      </p>
                     </td>
 
-                    {/* Email */}
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-600">{user.email}</div>
+                    <td className="px-6 py-4 text-sm text-gray-600">
+                      {user.email}
                     </td>
 
-                    {/* Role */}
-                    {/* <td className="px-6 py-4">
-                    <span className="text-sm font-medium text-gray-900 capitalize">
-                      {user.role}
-                    </span>
-                  </td> */}
-
-                    {/* Created At */}
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-600">
-                        {new Date(user.createdAt).toLocaleDateString()}
-                      </div>
+                    <td className="px-6 py-4 text-sm text-gray-600">
+                      {formatDate(user.createdAt)}
                     </td>
 
-                    {/* Actions */}
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
+                      <div className="flex gap-3">
                         <button
                           onClick={() => {
+                            setModalMode("edit");
                             setSelectedUser(user);
                             setShowModal(true);
                           }}
-                          className="text-gray-500 hover:text-blue-600 transition"
+                          className="text-gray-500 hover:text-blue-600"
                           title="Edit"
                         >
                           <Edit3 size={18} />
                         </button>
 
                         <button
-                          className="text-gray-500 hover:text-green-600 transition"
-                          title="Edit"
-                        >
-                          <CardSim size={18} />
-                        </button>
-
-                        <button
+                          onClick={() => setDeleteUser(user)}
                           className="text-gray-500 hover:text-red-600 transition"
                           title="Delete"
                         >

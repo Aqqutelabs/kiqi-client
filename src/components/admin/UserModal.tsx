@@ -1,28 +1,31 @@
 "use client";
 
-import { X } from "lucide-react";
+import { X, Info } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
 
+type ModalMode = "create" | "edit";
+
 type AdminUser = {
-  _id: string;
+  _id?: string;
   firstName: string;
   lastName: string;
   email: string;
   role: string;
-  createdAt?: string;
 };
 
 interface UserModalProps {
   isOpen: boolean;
+  mode: ModalMode;
   user: AdminUser | null;
   isLoading?: boolean;
   onClose: () => void;
-  onSave: (data: Partial<AdminUser>) => void;
+  onSave: (data: Partial<AdminUser> & { password?: string }) => void;
 }
 
 const UserModal = ({
   isOpen,
+  mode,
   user,
   isLoading = false,
   onClose,
@@ -36,7 +39,16 @@ const UserModal = ({
   });
 
   useEffect(() => {
-    if (user) {
+    if (mode === "create") {
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        role: "user",
+      });
+    }
+
+    if (mode === "edit" && user) {
       setFormData({
         firstName: user.firstName,
         lastName: user.lastName,
@@ -44,17 +56,22 @@ const UserModal = ({
         role: user.role,
       });
     }
-  }, [user]);
+  }, [mode, user]);
 
-  if (!isOpen || !user) return null;
+  if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      role: formData.role,
-    });
+
+    if (mode === "create") {
+      onSave({
+        ...formData,
+        password: formData.lastName,
+      });
+      return;
+    }
+
+    onSave(formData);
   };
 
   return (
@@ -62,7 +79,9 @@ const UserModal = ({
       <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Edit User</h2>
+          <h2 className="text-lg font-semibold text-gray-900">
+            {mode === "create" ? "Create User" : "Edit User"}
+          </h2>
           <button
             onClick={onClose}
             disabled={isLoading}
@@ -74,6 +93,17 @@ const UserModal = ({
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {/* Create Notice */}
+          {mode === "create" && (
+            <div className="flex gap-2 p-3 text-sm text-blue-700 bg-blue-50 rounded-lg">
+              <Info size={16} className="mt-0.5" />
+              <span>
+                Default password will be the user’s <strong>last name</strong>.
+                They can change it after logging in.
+              </span>
+            </div>
+          )}
+
           {/* First Name */}
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-2">
@@ -85,6 +115,7 @@ const UserModal = ({
                 setFormData({ ...formData, firstName: e.target.value })
               }
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+              required
             />
           </div>
 
@@ -99,37 +130,27 @@ const UserModal = ({
                 setFormData({ ...formData, lastName: e.target.value })
               }
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+              required
             />
           </div>
 
-          {/* Email (read-only) */}
+          {/* Email */}
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-2">
               Email
             </label>
             <input
               value={formData.email}
-              disabled
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-100"
+              disabled={mode === "edit"}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
+              className={`w-full px-3 py-2 border border-gray-200 rounded-lg text-sm ${
+                mode === "edit" ? "bg-gray-100" : ""
+              }`}
+              required
             />
           </div>
-
-          {/* Role */}
-          {/* <div>
-            <label className="block text-sm font-medium text-gray-900 mb-2">
-              Role
-            </label>
-            <select
-              value={formData.role}
-              onChange={(e) =>
-                setFormData({ ...formData, role: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
-            >
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div> */}
 
           {/* Actions */}
           <div className="flex gap-3 pt-4">
@@ -142,7 +163,11 @@ const UserModal = ({
               Cancel
             </Button>
             <Button type="submit" disabled={isLoading} className="flex-1">
-              {isLoading ? "Saving..." : "Save Changes"}
+              {isLoading
+                ? "Saving..."
+                : mode === "create"
+                ? "Create User"
+                : "Save Changes"}
             </Button>
           </div>
         </form>

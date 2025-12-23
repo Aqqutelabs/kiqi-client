@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import BASE_URL from "@/lib/utils/baseUrl";
 
 interface Props {
   children: ReactNode;
@@ -26,7 +27,7 @@ export default function AdminDashboardLayout({ children }: Props) {
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
 
-    fetch("http://localhost:8000/api/v1/admin/logout", {
+    fetch(`${BASE_URL}/api/v1/admin/logout`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("adminToken") || ""}`,

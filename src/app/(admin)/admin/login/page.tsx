@@ -2,6 +2,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import BASE_URL from "@/lib/utils/baseUrl";
 
 const AdminLoginPage = () => {
   const router = useRouter();
@@ -16,7 +17,7 @@ const AdminLoginPage = () => {
     setError("");
 
     try {
-      const res = await axios.post("http://localhost:8000/api/v1/admin/login", {
+      const res = await axios.post(`${BASE_URL}/api/v1/admin/login`, {
         email,
         password,
       });
