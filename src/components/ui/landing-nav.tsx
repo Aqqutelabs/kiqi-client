@@ -22,7 +22,7 @@ export default function LandingNav() {
       children: [
         { name: "Feature 1", href: "/features/feature-one" },
         { name: "Feature 2", href: "/features/feature-two" },
-        { name: "Feature 3", href: "/features/feature-third" },
+        { name: "Feature 3", href: "/features/feature-three" },
       ],
     },
     { name: "Services", href: "/services" },
@@ -79,7 +79,7 @@ export default function LandingNav() {
       <div className="hidden lg:flex gap-6 xl:gap-8 items-center">
         {links.map((link) => {
           const isActive =
-            pathname === link.href || pathname.startsWith(link.href + "/");
+            pathname === link.href || pathname.startsWith(link.href + "/")
 
           const hasChildren = !!link.children;
 
