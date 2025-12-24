@@ -3,12 +3,12 @@
 import Image from "next/image";
 import { GoArrowUp } from "react-icons/go";
 import { FaCircleCheck } from "react-icons/fa6";
-import LandingCarousel from "@/components/landing/carousel";
-import KiQiFeatures from "@/components/landing/kiqi-features";
-import FAQ from "@/components/landing/faq";
-import LandingFooter from "@/components/landing/footer";
-import TestimonialCarousel from "@/components/landing/testimonial-carousel";
-import BlogCarousel from "@/components/landing/blog-carousel";
+// import LandingCarousel from "@/components/landing/carousel";
+// import KiQiFeatures from "@/components/landing/kiqi-features";
+// import FAQ from "@/components/landing/faq";
+// import LandingFooter from "@/components/landing/footer";
+// import TestimonialCarousel from "@/components/landing/testimonial-carousel";
+// import BlogCarousel from "@/components/landing/blog-carousel";
 import { useState } from "react";
 import Link from "next/link";
 
@@ -221,7 +221,7 @@ export default function Home() {
           </div>
         </div>
 
-        <LandingCarousel />
+        {/* <LandingCarousel /> */}
 
         {/* easy integration */}
         <div className="flex flex-col justify-center items-center gap-6 my-20">
@@ -274,7 +274,7 @@ export default function Home() {
           </div>
         </div>
 
-        <KiQiFeatures />
+        {/* <KiQiFeatures /> */}
 
         {/* grid section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 bg-[#E6E6E6] rounded-[30px] p-4 md:p-10">
@@ -324,7 +324,7 @@ export default function Home() {
           </div>
         </div>
 
-        <BlogCarousel />
+        {/* <BlogCarousel /> */}
 
         {/* plans */}
         <div className="space-y-4 flex flex-col items-center my-20 px-4 md:px-10">
@@ -434,7 +434,7 @@ export default function Home() {
         </div>
 
         {/* testimony */}
-        <TestimonialCarousel />
+        {/* <TestimonialCarousel /> */}
         {/* getting started */}
         <div className="space-y-4 flex flex-col items-center my-20">
           <h2 className="font-bold text-center text-2xl md:text-[52px]">
@@ -489,9 +489,9 @@ export default function Home() {
             />
           </div>
         </div>
-        <FAQ />
+        {/* <FAQ /> */}
       </section>
-      <LandingFooter />
+      {/* <LandingFooter /> */}
     </>
   );
 }
