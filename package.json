@@ -22,6 +22,8 @@
     "@solana/wallet-adapter-wallets": "^0.19.37",
     "@solana/web3.js": "^1.98.4",
     "@supabase/supabase-js": "^2.81.1",
+    "@tiptap/react": "^3.14.0",
+    "@tiptap/starter-kit": "^3.14.0",
     "@types/redux-persist": "^4.3.1",
     "axios": "^1.13.2",
     "bs58": "^6.0.0",
