@@ -4,9 +4,9 @@ import Head from "next/head";
 import Link from "next/link";
 import '../kiki.css';
 import { usePathname } from "next/navigation";
-import NavBar from '@/components/landing/navbar';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import LandingFooterSecond from '@/components/landing/landingfooter';
+// import NavBar from '@/components/landing/navbar';
+// import 'bootstrap/dist/css/bootstrap.min.css';
+// import LandingFooterSecond from '@/components/landing/landingfooter';
 
 
 export default function Home() {
@@ -26,7 +26,7 @@ export default function Home() {
                 <title>Kiki — Email Marketing Without the Headache</title>
             </Head>
 
-            <NavBar/>
+            {/* <NavBar/> */}
 
             <section className="py-4 py-lg-5">
                 <div className="container-xxl">
@@ -799,7 +799,7 @@ export default function Home() {
                 </div>
             </section>
             {/* FAQ ends here */}
-            <LandingFooterSecond/>
+            {/* <LandingFooterSecond/> */}
         </>
     )
 }
