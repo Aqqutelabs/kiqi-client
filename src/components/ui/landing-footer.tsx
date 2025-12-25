@@ -103,7 +103,7 @@ const FAQFooter: React.FC = () => {
           {/* Email Signup */}
           <div className="mt-8 sm:mt-10 md:mt-12 max-w-md">
             <h3 className="text-sm sm:text-base font-medium mb-3 sm:mb-4">Stay Up To Date</h3>
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-0 sm:flex-1 bg-transparent border border-gray-600 rounded-full sm:rounded-full text-xs sm:text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-600 transition-colors h-auto sm:h-[50px] md:h-[60px]">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-0 sm:flex-1 bg-transparent md:border border-gray-600 rounded-full sm:rounded-full text-xs sm:text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-600 transition-colors h-auto sm:h-[50px] md:h-[60px]">
               <input
                 type="email"
                 placeholder="Enter Your Email"
