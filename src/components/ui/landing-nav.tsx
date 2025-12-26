@@ -19,9 +19,9 @@ export default function LandingNav() {
     {
       name: "Features",
       children: [
-        { name: "Feature 1", href: "/features/feature-one" },
-        { name: "Feature 2", href: "/features/feature-two" },
-        { name: "Feature 3", href: "/features/feature-three" },
+        { name: "PR Distribution", href: "/features/feature-one" },
+        { name: "Email Concierge Service", href: "/features/feature-two" },
+        { name: "Blogging & SEO", href: "/features/feature-three" },
       ],
     },
     { name: "Services", href: "/services" },
@@ -133,7 +133,7 @@ export default function LandingNav() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 8 }}
                     transition={{ duration: 0.2, ease: "easeOut" }}
-                    className="absolute top-full mt-3 w-48 rounded-xl border border-gray-200 bg-white shadow-lg overflow-hidden z-50"
+                    className="absolute top-full mt-3 w-52 rounded-xl border border-gray-200 bg-white shadow-lg overflow-hidden z-50"
                   >
                     {link.children?.map((child) => {
                       const childActive = pathname === child.href;

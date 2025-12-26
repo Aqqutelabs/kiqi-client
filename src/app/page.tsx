@@ -7,6 +7,7 @@ import {
   CirclePlay,
   ChevronLeft,
   ChevronRight,
+  ArrowUp,
 } from "lucide-react";
 import Image from "next/image";
 import { useState, useRef } from "react";
@@ -235,7 +236,7 @@ export default function Home() {
       <LandingNav />
 
       {/* hero section */}
-      <div className="min-h-screen w-[95%] lg:w-full max-w-7xl bg-gradient-to-b from-blue-900 via-blue-800 to-cyan-400 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-10 mx-auto rounded-2xl">
+      <div className="min-h-screen w-[95%] lg:w-full max-w-[95%] bg-gradient-to-b from-blue-900 via-blue-800 to-cyan-400 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-10 mx-auto rounded-2xl">
         <div className="max-w-7xl w-full flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12">
           {/* Left Content */}
           <div className="flex-1 space-y-6 lg:space-y-8 px-4 sm:px-6 lg:px-0">
@@ -255,10 +256,13 @@ export default function Home() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-4 text-sm font-medium">
-              <button className="h-11 px-6 w-full sm:w-auto rounded-lg flex justify-center items-center bg-white text-[#111111] hover:cursor-pointer">
+              <button className="h-14 px-6 w-full md:w-[160px] rounded-lg flex justify-center items-center bg-white text-[#111111] hover:cursor-pointer relative">
                 Start for Free
+                <div className="size-[30px] rounded-full flex justify-center items-center bg-[#020617] border border-white rotate-45 absolute -right-3 z-10">
+                  <ArrowUp color="white" size={16}/>
+                </div>
               </button>
-              <button className="h-11 px-6 w-full sm:w-auto rounded-lg flex justify-center items-center border-white border text-white hover:cursor-pointer">
+              <button className="h-14 px-6 w-full md:w-[160px] rounded-lg flex justify-center items-center border-white border text-white hover:cursor-pointer">
                 Watch Demo
               </button>
             </div>
@@ -581,6 +585,7 @@ export default function Home() {
 
       <TestimonialsCarousel/>
 
+      {/* email marketing in 3 steps */}
       <div className="bg-[#EEF5FD] p-4 md:p-6 lg:p-10 space-y-3 md:space-y-4">
         <h3 className="font-bold text-2xl sm:text-3xl md:text-4xl lg:text-[50px] text-center">
           From zero to email marketing in 
