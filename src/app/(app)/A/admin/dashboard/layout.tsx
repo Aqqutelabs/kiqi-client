@@ -1,4 +1,3 @@
-
 export const metadata = {
   title: "Admin Dashboard | Kiqi",
   description: "Platform administration and monitoring dashboard",
