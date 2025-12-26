@@ -19,11 +19,22 @@ export default function PaymentDetailModal({
 }: PaymentDetailModalProps) {
   if (!isOpen) return null;
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount);
+  const parseCurrencyString = (value: string | number): number => {
+    if (typeof value === "number") return value;
+    if (typeof value !== "string") return 0;
+    
+    // Remove currency symbols and non-numeric characters (except decimals)
+    const cleaned = value.replace(/[₦$€£,\s]/g, "").trim();
+    const parsed = parseFloat(cleaned);
+    return isNaN(parsed) ? 0 : parsed;
+  };
+
+  const formatCurrency = (amount: string | number) => {
+    const numAmount = parseCurrencyString(amount);
+    return `₦${numAmount.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
   };
 
   const formatDate = (dateString: string) => {
@@ -120,7 +131,7 @@ export default function PaymentDetailModal({
                       </p>
                     </div>
                     <p className="text-sm font-semibold text-gray-900">
-                      {formatCurrency(Number(item.price) || 0)}
+                      {formatCurrency(item.price || "₦0")}
                     </p>
                   </div>
                 ))
@@ -142,10 +153,7 @@ export default function PaymentDetailModal({
                 <span className="text-sm text-gray-600">Subtotal</span>
                 <span className="text-sm font-medium text-gray-900">
                   {formatCurrency(
-                    Number(
-                      payment.order_summary?.subtotal ||
-                        payment.order_summary?.total_amount
-                    ) || 0
+                    payment.order_summary?.subtotal || "₦0"
                   )}
                 </span>
               </div>
@@ -153,10 +161,7 @@ export default function PaymentDetailModal({
                 <span className="text-sm text-gray-600">VAT (Tax)</span>
                 <span className="text-sm font-medium text-gray-900">
                   {formatCurrency(
-                    Number(
-                      payment.order_summary?.VAT ||
-                        payment.order_summary?.vat_amount
-                    ) || 0
+                    payment.order_summary?.vat_amount || "₦0"
                   )}
                 </span>
               </div>
@@ -166,10 +171,7 @@ export default function PaymentDetailModal({
                 </span>
                 <span className="text-lg font-bold text-blue-600">
                   {formatCurrency(
-                    Number(
-                      payment.order_summary?.total ||
-                        payment.order_summary?.total_amount
-                    ) || 0
+                    payment.order_summary?.total_amount || "₦0"
                   )}
                 </span>
               </div>
@@ -177,11 +179,9 @@ export default function PaymentDetailModal({
                 <span className="text-sm text-gray-600">Payment Status</span>
                 <span
                   className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    (payment.order_summary?.payment_status ||
-                      payment.payment_status) === "Successful"
+                    (payment.order_summary?.payment_status as string || payment.payment_status || "").toLowerCase() === "successful"
                       ? "bg-green-100 text-green-800"
-                      : (payment.order_summary?.payment_status ||
-                          payment.payment_status) === "Pending"
+                      : (payment.order_summary?.payment_status as string || payment.payment_status || "").toLowerCase() === "pending"
                         ? "bg-yellow-100 text-yellow-800"
                         : "bg-red-100 text-red-800"
                   }`}

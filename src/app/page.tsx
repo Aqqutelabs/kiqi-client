@@ -6,1143 +6,612 @@ import NavBar from "@/components/landing/navbar";
 // import "bootstrap/dist/css/bootstrap.min.css";
 import LandingFooterSecond from "@/components/landing/landingfooter";
 
-export default function Home() {
-  const pathname = usePathname();
+import FAQFooter from "@/components/ui/landing-footer";
+import LandingNav from "@/components/ui/landing-nav";
+import {
+  CheckCircleIcon,
+  CirclePlay,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import Image from "next/image";
+import { useState, useRef } from "react";
 
-  const [year, setYear] = useState(new Date().getFullYear());
-  pathname.startsWith("/feature");
+const TestimonialsCarousel = () => {
+  const scrollerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    setYear(new Date().getFullYear());
-  }, []);
+  const testimonials = [
+    {
+      id: 1,
+      quote:
+        "As a fashion designer I always struggled with juggling sewing, content creation, and responding to clients. Kiki solved that for me!",
+      name: "Kelly",
+      role: "Fashion Designer",
+      avatar: "https://i.pravatar.cc/80?img=5",
+    },
+    {
+      id: 2,
+      quote:
+        "I tried Kiki once and I was sold. It so easy to use and even better at responding to customers than I am😂",
+      name: "David",
+      role: "Freelance Social media manager",
+      avatar: "https://i.pravatar.cc/80?img=15",
+    },
+    {
+      id: 3,
+      quote:
+        "I tried Kiki once and I was sold. It so easy to use and even better at responding to customers than I am😂",
+      name: "David",
+      role: "Freelance Social media manager",
+      avatar: "https://i.pravatar.cc/80?img=23",
+    },
+    {
+      id: 4,
+      quote:
+        "I tried Kiki once and I was sold. It so easy to use and even better at responding to customers than I am😂",
+      name: "David",
+      role: "Freelance Social media manager",
+      avatar: "https://i.pravatar.cc/80?img=23",
+    },
+  ];
+
+  const scroll = (direction: string) => {
+    if (scrollerRef.current) {
+      const scrollAmount = window.innerWidth < 768 ? 300 : 340;
+      const newPosition =
+        direction === "prev"
+          ? scrollerRef.current.scrollLeft - scrollAmount
+          : scrollerRef.current.scrollLeft + scrollAmount;
+
+      scrollerRef.current.scrollTo({
+        left: newPosition,
+        behavior: "smooth",
+      });
+    }
+  };
 
   return (
-    <>
-      <NavBar />
+    <section className="py-8 md:py-16 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 md:mb-12 px-4">
+          See what others are saying about{" "}
+          <span className="text-blue-600">Kiki.</span>
+        </h2>
 
-      <section className="py-4 py-lg-5">
-        <div className="container-xxl">
-          <div className="hero rounded-xxl px-4 px-lg-5 py-5">
-            <div className="row align-items-center gy-5">
-              <div className="col-lg-6">
-                <h1 className="marketing-main">
-                  Email Marketing
-                  <br />
-                  Without the Headache
-                </h1>
-                <p className="lead mb-4">
-                  Launch campaigns, grow subscribers, and drive sales — without
-                  learning “Email Marketing”.
+        <div className="relative">
+          {/* Left Arrow */}
+          <button
+            onClick={() => scroll("prev")}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 md:w-10 md:h-10 bg-[#0C31A1] border border-gray-300 rounded-full shadow-sm flex items-center justify-center transition-colors"
+            aria-label="Scroll left">
+            <ChevronLeft className="w-4 h-4 md:w-5 md:h-5 text-white" />
+          </button>
+
+          {/* Scrollable Container */}
+          <div
+            ref={scrollerRef}
+            className="overflow-x-auto scrollbar-hide flex gap-4 px-8 md:px-12 snap-x snap-mandatory"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+            {testimonials.map((testimonial) => (
+              <article
+                key={testimonial.id}
+                className="flex-none w-[280px] sm:w-[320px] md:w-[400px] bg-white border border-gray-200 rounded-2xl p-4 md:p-6 snap-start">
+                <p className="text-gray-700 text-base sm:text-lg md:text-[22px] leading-relaxed mb-4 md:mb-6">
+                  "{testimonial.quote}"
                 </p>
 
-                <div className="d-flex flex-wrap align-items-center gap-3 mb-4">
-                  <a href="#" className="btn btn-white btn-pill">
-                    Start For Free <i className="bi bi-arrow-right ms-1"></i>
-                  </a>
-                  <a href="#" className="btn btn-outline-ice btn-pill">
-                    <i className="bi bi-play-fill me-1"></i> Watch Demo
-                  </a>
+                <div className="flex items-center gap-3">
                   <img
-                    className="avatar"
-                    src="https://i.pravatar.cc/80?img=32"
-                    alt="Customer avatar"
-                    loading="lazy"
+                    src={testimonial.avatar}
+                    alt={testimonial.name}
+                    className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover"
                   />
-                </div>
-
-                <div className="d-flex flex-wrap gap-4">
-                  <div className="d-flex align-items-center gap-2 text-white">
-                    <i className="bi bi-check-circle-fill mini-check"></i>
-                    <span>No technical experience required</span>
-                  </div>
-                  <div className="d-flex align-items-center gap-2 text-white">
-                    <i className="bi bi-check-circle-fill mini-check"></i>
-                    <span>No credit card required</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right: image + floating UI */}
-              <div className="col-lg-6">
-                <div className="hero-art ms-lg-5">
-                  <div className="photo-card shadow-lift">
-                    <img
-                      src="/assets/img/main.png"
-                      alt="Model wearing a blue sweater"
-                      loading="lazy"
-                    />
-                  </div>
-                  <div className="photo-outline" aria-hidden="true"></div>
-
-                  {/* Floating bits */}
-                  <div className="float pos-tl">
-                    <img
-                      className="avatar"
-                      src="https://i.pravatar.cc/100?img=4"
-                      alt="Avatar"
-                      loading="lazy"
-                    />
-                  </div>
-
-                  <a href="#" className="float btn-campaign bg-info text-white">
-                    <span>
-                      <i className="bi bi-plus-lg me-1"></i>
-                      Create Campaign
-                    </span>
-                  </a>
-
-                  <div className="float pos-mid-r stat-card">
-                    <div className="d-flex align-items-center justify-content-between">
-                      <span className="percent-text">88.60%</span>
-                      <span className="text-success small">
-                        <i className="bi bi-arrow-up-right"></i> 1.3%
-                      </span>
+                  <div>
+                    <div className="font-semibold text-gray-900 text-sm">
+                      {testimonial.name}
                     </div>
-                    <div className="text-secondary small">Avg. open rate</div>
-                  </div>
-
-                  <div className="float pos-mid-l chat-bubble">
-                    Hi, do you have a blue dress in UK size 12?
-                  </div>
-                  <div className="float" style={{ top: "48%", left: "-.9rem" }}>
-                    <img
-                      className="avatar"
-                      src="https://i.pravatar.cc/100?img=11"
-                      alt="Avatar"
-                      loading="lazy"
-                    />
-                  </div>
-
-                  <div className="product-card shadow">
-                    <img
-                      src="/assets/img/ladyslide.jpg"
-                      alt="Blue dress"
-                      loading="lazy"
-                    />
-                    <div style={{ paddingLeft: 10 }}>
-                      <div className="product-title">Amiri Dress</div>
-                      <div className="product-subtitle">
-                        Soft weight light chiffon dress
-                      </div>
-                      <div className="product-subtitle mt-2">Fabric: 100%</div>
-                      <div className="product-subtitle">Polyester: 100%</div>
-                      <div className="d-flex flex-wrap gap-2 small text-secondary">
-                        <span>
-                          Color: <b>Blue</b>
-                        </span>
-                      </div>
-                      <div className="d-flex flex-wrap gap-2 small text-secondary">
-                        <span>Size: 12</span>
-                      </div>
-                      <button className="add-to-cart">
-                        <i className="bi bi-bag-plus me-1"></i>Add to Cart
-                      </button>
+                    <div className="text-gray-500 text-xs">
+                      {testimonial.role}
                     </div>
                   </div>
                 </div>
+              </article>
+            ))}
+          </div>
+
+          {/* Right Arrow */}
+          <button
+            onClick={() => scroll("next")}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 md:w-10 md:h-10 bg-[#0C31A1] border border-gray-300 rounded-full shadow-sm flex items-center justify-center transition-colors"
+            aria-label="Scroll right">
+            <ChevronRight className="w-4 h-4 md:w-5 md:h-5 text-white" />
+          </button>
+        </div>
+      </div>
+
+      <style jsx>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
+    </section>
+  );
+};
+
+export default function Home() {
+  const carouselText = [
+    "Never Miss a Sale",
+    "Close More Deals",
+    "Immediate Response 24/7",
+    "100% Customer Sales",
+  ];
+
+  const features = [
+    { id: 1, title: "Manage Campaigns", img: "/landing-feature-img-1.svg" },
+    { id: 2, title: "Email Lists", img: "/landing-feature-img-2.svg" },
+    { id: 3, title: "Automation", img: "/landing-feature-img-3.svg" },
+    { id: 4, title: "Analytics", img: "/landing-feature-img-4.svg" },
+  ];
+  const [activeFeatureTab, setActiveFeatureTab] = useState<number>(1);
+  const activeFeature = features.find((f) => f.id === activeFeatureTab);
+
+  const smarterEmailsFeatures = [
+    {
+      title: "Engagement score simplified",
+      description:
+        "Auto-generate meaningful alternative text for thousands of images with a single click—saving your team hours of manual tagging. Perfect for ecommerce, media-heavy sites, and content-rich platforms.",
+      img: "/engagement-score.svg",
+    },
+    {
+      title: "Subscriber growth trends",
+      description:
+        "Auto-generate meaningful alternative text for thousands of images with a single click—saving your team hours of manual tagging. Perfect for ecommerce, media-heavy sites, and content-rich platforms.",
+      img: "/subscriber-growth.svg",
+    },
+    {
+      title: "Encrypted data protection",
+      description:
+        "Auto-generate meaningful alternative text for thousands of images with a single click—saving your team hours of manual tagging. Perfect for ecommerce, media-heavy sites, and content-rich platforms.",
+      img: "/encrypted-data-protecttion.svg",
+    },
+  ];
+
+  const plans = [
+    {
+      name: "Free",
+      description: "Perfect for beginners testing email.",
+      price: "0",
+      perks: [
+        "500 emails",
+        "Extended Quota @ $0.005/email",
+        "1 Campaign",
+        "Basic analytics",
+      ],
+    },
+    {
+      name: "Solo",
+      description: "Built for freelancers and side hustles.",
+      price: "0.99",
+      perks: [
+        "Everything in Free +",
+        "2000 emails",
+        "Extended Quota @ $0.002/email",
+        "5 Campaigns",
+        "Engagement score",
+        "Smart templates",
+        "Basic automation",
+        "Support",
+      ],
+    },
+    {
+      name: "MSME",
+      description: " For growing small businesses.",
+      price: "9.85",
+      perks: [
+        "20,000 emails",
+        "Extended Quota @ $0.001/email",
+        "Unlimited Campaigns",
+        "Concierge access (4 emails per month)",
+        "Advanced analytics",
+        "Campaign A/B testing",
+      ],
+    },
+    {
+      name: "Business",
+      description: "Serious power for scale.",
+      price: "56",
+      perks: [
+        "100,000 emails",
+        "Extended Quota @ $0.001/email",
+        "Team accounts",
+        "Security compliance",
+        "Custom integrations",
+        "Concierge+ automation",
+      ],
+    },
+  ];
+
+  const emailMarketingSteps = [
+    { id: 1, title: "Upload Contacts", img: "/landing/landing-step-1.svg" },
+    { id: 2, title: "Approve campaign", img: "/landing/landing-step-2.svg" },
+    { id: 3, title: "Track result", img: "/landing/landing-step-3.svg" },
+  ]
+  return (
+    <section>
+      <LandingNav />
+
+      {/* hero section */}
+      <div className="min-h-screen w-[95%] lg:w-full max-w-7xl bg-gradient-to-b from-blue-900 via-blue-800 to-cyan-400 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-10 mx-auto rounded-2xl">
+        <div className="max-w-7xl w-full flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12">
+          {/* Left Content */}
+          <div className="flex-1 space-y-6 lg:space-y-8 px-4 sm:px-6 lg:px-0">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight text-center lg:text-left">
+              Email Marketing
+              <br />
+              Without the
+              <br />
+              <span className="bg-gradient-to-b from-[#FFF] via-[#f8e58f] to-[#FED93B] text-transparent bg-clip-text">
+                Headache
+              </span>
+            </h1>
+
+            <p className="text-white text-base sm:text-lg max-w-md text-center lg:text-left mx-auto lg:mx-0">
+              Launch campaigns, grow subscribers, and drive sales — without
+              learning <span className="font-semibold">"Email Marketing"</span>.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center gap-4 text-sm font-medium">
+              <button className="h-11 px-6 w-full sm:w-auto rounded-lg flex justify-center items-center bg-white text-[#111111] hover:cursor-pointer">
+                Start for Free
+              </button>
+              <button className="h-11 px-6 w-full sm:w-auto rounded-lg flex justify-center items-center border-white border text-white hover:cursor-pointer">
+                Watch Demo
+              </button>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 text-white text-sm">
+              <div className="flex items-center gap-2">
+                <CheckCircleIcon color="green" size={20} className="shrink-0" />
+                <span>No technical experience required</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <CheckCircleIcon color="green" size={20} className="shrink-0" />
+                <span>No credit card required</span>
               </div>
             </div>
           </div>
-          {/* /hero */}
-        </div>
-      </section>
 
-      <section className="ticker">
-        <div className="container-xxl">
-          <div className="ticker-viewport">
-            <div className="ticker-track">
-              <ul className="ticker-group">
-                <li>
-                  <i className="bi bi-check2-circle me-2"></i>Quick campaigns
-                </li>
-                <li>
-                  <i className="bi bi-people me-2"></i>Subscribers on autopilot
-                </li>
-                <li>
-                  <i className="bi bi-graph-up-arrow me-2"></i>Magic metrics
-                  dashboard
-                </li>
-                <li>
-                  <i className="bi bi-emoji-smile me-2"></i>Sales, not stress
-                </li>
-                <li>
-                  <i className="bi bi-shield-check me-2"></i>100% deliverability
-                  focus
-                </li>
-                <li>
-                  <i className="bi bi-phone me-2"></i>Mobile friendly templates
-                </li>
-              </ul>
-              <ul className="ticker-group" aria-hidden="true">
-                <li>
-                  <i className="bi bi-check2-circle me-2"></i>Quick campaigns
-                </li>
-                <li>
-                  <i className="bi bi-people me-2"></i>Subscribers on autopilot
-                </li>
-                <li>
-                  <i className="bi bi-graph-up-arrow me-2"></i>Magic metrics
-                  dashboard
-                </li>
-                <li>
-                  <i className="bi bi-emoji-smile me-2"></i>Sales, not stress
-                </li>
-                <li>
-                  <i className="bi bi-shield-check me-2"></i>100% deliverability
-                  focus
-                </li>
-                <li>
-                  <i className="bi bi-phone me-2"></i>Mobile friendly templates
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-5 text-center">
-        <div className="container-xxl">
-          <span className="badge rounded-pill bg-warning-subtle text-warning-emphasis fw-semibold px-3 py-2 mb-3">
-            Inbox Magic
-          </span>
-
-          <h2 className="display-6 fw-bold mb-2">
-            We send the <span className="text-primary">Emails.</span> You get
-            the <span className="text-success">Sales.</span>
-          </h2>
-          <p className="text-secondary mb-5">
-            Upload a sheet, paste contacts, or connect your inbox. Our concierge
-            does the rest.
-          </p>
-
-          {/* halo + icons */}
-          <div className="inbox-art mx-auto">
-            <div className="inbox-halo"></div>
-
-            <div className="inbox-core shadow-sm">
-              <img src="/assets/img/kiki.png" alt="App logo" />
-            </div>
-
-            {/* orbiting icons */}
-            <div className="orbit icon ig">
-              <i className="bi bi-instagram"></i>
-            </div>
-            <div className="orbit icon fb">
-              <i className="bi bi-facebook"></i>
-            </div>
-            <div className="orbit icon wa">
-              <i className="bi bi-whatsapp"></i>
-            </div>
-            <div className="orbit icon sheets">
-              <i className="bi bi-file-earmark-spreadsheet"></i>
-            </div>
-            <div className="orbit icon csv">
-              <i className="bi bi-filetype-csv"></i>
-            </div>
-
-            {/* tiny avatar */}
+          {/* Right Content - Mockup */}
+          <div className="flex-1 relative w-full max-w-[500px] lg:w-[550px] h-[350px] sm:h-[450px] lg:h-[570px] mt-8 lg:mt-0">
             <img
-              className="orbit avatar"
-              src="https://i.pravatar.cc/72?img=12"
-              alt="Customer avatar"
+              src="/new-hero-img.svg"
+              alt="Hero Image"
+              className="w-full h-full object-contain"
             />
-          </div>
-
-          <div className="mt-4">
-            <a href="#" className="btn-kiki btn-primary btn btn-pill px-4">
-              Launch My First Campaign <i className="bi bi-send ms-1"></i>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      <section className="features-section py-5 py-lg-6">
-        <div className="container-xxl">
-          <div className="features-wrap rounded-xxl p-5 text-center">
-            <h2 className="fw-bold display-6 mb-3">Kiki Features</h2>
-
-            <div className="d-flex justify-content-center">
-              <ul
-                className="nav nav-pills feature-tabs justify-content-center gap-1 mb-5"
-                role="tablist">
-                <li className="nav-item" role="presentation">
-                  <button className="nav-link active" type="button" role="tab">
-                    Manage Campaigns
-                  </button>
-                </li>
-                <li className="nav-item" role="presentation">
-                  <button className="nav-link" type="button" role="tab">
-                    Email Lists
-                  </button>
-                </li>
-                <li className="nav-item" role="presentation">
-                  <button className="nav-link" type="button" role="tab">
-                    Automation
-                  </button>
-                </li>
-                <li className="nav-item" role="presentation">
-                  <button className="nav-link" type="button" role="tab">
-                    Analytics
-                  </button>
-                </li>
-              </ul>
-            </div>
-
-            {/* Feature stage */}
-            <div className="feature-stage mx-auto">
-              <div className="feature-screen shadow-lift">
-                <img
-                  src="/assets/img/campaign.png"
-                  alt="Kiki dashboard preview"
-                  loading="lazy"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <div className="container d-flex flex-column align-items-center">
-        <div className="heading demo-box">
-          <div className="play-icon">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              fill="black"
-              className="bi bi-play-fill"
-              viewBox="0 0 16 16">
-              <path d="M11.596 8.697l-6.363 3.692A.5.5 0 0 1 4.5 11.92V4.08a.5.5 0 0 1 .733-.442l6.363 3.692a.5.5 0 0 1 0 .866z" />
-            </svg>
-          </div>
-          <span>
-            Watch full <span className="demo-video">Demo Video</span> Below
-          </span>
-          <img src="/assets/img/arrow.png" alt="" className="arrow" />
-        </div>
-
-        {/* Video Player Container */}
-        <div className="video-wrapper mt-4 position-relative">
-          <img
-            src="/assets/img/video-modal.png"
-            alt="Demo Video Screenshot"
-            draggable="false"
-          />
-          <div
-            className="play-button-overlay"
-            role="button"
-            aria-label="Play Video"
-            tabIndex={0}>
-            <svg
-              className="play-icon-svg"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 16 16">
-              <path d="M11.596 8.697l-6.363 3.692A.5.5 0 0 1 4.5 11.92V4.08a.5.5 0 0 1 .733-.442l6.363 3.692a.5.5 0 0 1 0 .866z" />
-            </svg>
           </div>
         </div>
       </div>
 
-      <section className="analytics-section py-5">
-        <div className="container-xxl">
-          <div className="analytics-wrap rounded-xxl px-lg-15  py-5 text-center text-white">
-            <h2 className="fw-bold mb-2">
-              Smarter <span className="text-warning">Emails</span>. Safer Data.
-            </h2>
-            <p className="text-white mb-5">
-              Kiki gives you analytics that make sense and security that keeps
-              your emails safe — without extra setup.
-            </p>
+      {/* carousel */}
+      <div className="overflow-hidden h-[40px] md:h-[92px] bg-[#111111] flex items-center my-4 md:my-6">
+        <style jsx>{`
+          @keyframes slide {
+            0% {
+              transform: translateX(0);
+            }
+            100% {
+              transform: translateX(-50%);
+            }
+          }
 
-            <div className="d-grid gap-4 gap-lg-5 text-start">
-              {/* Card 1 */}
-              <div className="feature-box p-3 p-lg-4 shadow-sm">
-                <div className="row align-items-center g-3 g-lg-4">
-                  <div className="col-md-5">
-                    <div className="screen">
-                      <img
-                        src="/assets/img/feature1.png"
-                        alt="Engagement score dashboard"
-                        loading="lazy"
-                      />
-                    </div>
-                  </div>
-                  <div className="col-md-7">
-                    <h5 className="fw-semibold mb-2 text-black">
-                      Engagement score simplified
-                    </h5>
-                    <p className="text-secondary mb-0">
-                      Auto-generate meaningful alternative text for thousands of
-                      images with a single click - saving your team hours of
-                      manual tagging. Perfect for ecommerce, media-heavy sites,
-                      and content-rich platforms.
-                    </p>
-                  </div>
-                </div>
-              </div>
+          .carousel-slide {
+            animation: slide 30s linear infinite;
+            display: flex;
+            align-items: center;
+          }
+          
+          @media (max-width: 640px) {
+            .carousel-slide {
+              animation: slide 20s linear infinite;
+            }
+          }
+        `}</style>
 
-              {/* Card 2 (image on the right) */}
-              <div className="feature-box p-3 p-lg-4 shadow-sm">
-                <div className="row align-items-center g-3 g-lg-4 flex-md-row-reverse">
-                  <div className="col-md-5">
-                    <div className="screen">
-                      <img
-                        src="/assets/img/feature2.png"
-                        alt="Subscriber growth trends"
-                        loading="lazy"
-                      />
-                    </div>
-                  </div>
-                  <div className="col-md-7">
-                    <h5 className="fw-semibold mb-2 text-black">
-                      Subscriber growth trends
-                    </h5>
-                    <p className="text-secondary mb-0">
-                      Auto-generate meaningful alternative text for thousands of
-                      images with a single click - saving your team hours of
-                      manual tagging. Perfect for ecommerce, media-heavy sites,
-                      and content-rich platforms.
-                    </p>
-                  </div>
-                </div>
+        <div className="flex items-center carousel-slide">
+          {/* First set */}
+          <div className="flex items-center shrink-0">
+            {carouselText.map((text, index) => (
+              <div
+                key={`first-${index}`}
+                className="flex items-center text-white gap-4 md:gap-16 mx-4 md:mx-10">
+                <p className="text-sm md:text-lg whitespace-nowrap">{text}</p>
+                <CheckCircleIcon size={20} className="shrink-0" />
               </div>
+            ))}
+          </div>
 
-              {/* Card 3 */}
-              <div className="feature-box p-3 p-lg-4 shadow-sm">
-                <div className="row align-items-center g-3 g-lg-4">
-                  <div className="col-md-5">
-                    <div className="screen">
-                      <img
-                        src="/assets/img/feature3.png"
-                        alt="Encrypted data protection"
-                        loading="lazy"
-                      />
-                    </div>
-                  </div>
-                  <div className="col-md-7">
-                    <h5 className="fw-semibold mb-2 text-black">
-                      Encrypted data protection
-                    </h5>
-                    <p className="text-secondary mb-0">
-                      Auto-generate meaningful alternative text for thousands of
-                      images with a single click - saving your team hours of
-                      manual tagging. Perfect for ecommerce, media-heavy sites,
-                      and content-rich platforms.
-                    </p>
-                  </div>
-                </div>
+          {/* Second set (duplicate) */}
+          <div className="flex items-center shrink-0">
+            {carouselText.map((text, index) => (
+              <div
+                key={`second-${index}`}
+                className="flex items-center text-white gap-4 md:gap-16 mx-4 md:mx-10">
+                <p className="text-sm md:text-lg whitespace-nowrap">{text}</p>
+                <CheckCircleIcon size={20} className="shrink-0" />
               </div>
-            </div>
+            ))}
           </div>
         </div>
-      </section>
+      </div>
 
-      <section className="bg-blogs py-5 ">
-        <div className="container-xxl" data-scroller>
-          <div className="d-flex align-items-end justify-content-between mb-3">
-            <h2 className="fw-bold mb-0">Recent Blogs</h2>
-            <div className="d-none d-md-flex align-items-center gap-2">
-              <button
-                className="scroll-btn btn btn-light border"
-                type="button"
-                data-dir="prev"
-                aria-label="Scroll left">
-                <i className="bi bi-chevron-left"></i>
-              </button>
-              <button
-                className="scroll-btn btn btn-light border"
-                type="button"
-                data-dir="next"
-                aria-label="Scroll right">
-                <i className="bi bi-chevron-right"></i>
-              </button>
-            </div>
-          </div>
+      {/* inbox magic*/}
+      <div className="gap-4 md:gap-5 flex items-center flex-col my-8 md:my-10 px-4">
+        <div className="h-9 md:h-10.5 w-[160px] md:w-[194px] rounded-full bg-[#FED93B] flex justify-center items-center">
+          <p className="font-medium text-[#0C31A1] text-base md:text-lg text-center">
+            Inbox Magic
+          </p>
+        </div>
+        <h2 className="text-[#111111] font-bold text-2xl sm:text-3xl md:text-[45px] text-center">
+           We send the <span className="text-[#0C31A1]">Emails</span>. You get
+          the <span className="text-[#4CAF50]">Sales.</span>
+        </h2>
+        <p className="text-base md:text-xl text-[#797878] font-normal text-center max-w-3xl">
+           Upload a sheet, paste contacts, or connect your inbox. Our concierge does the rest.
+        </p>
+        <img src={"/inbox-magic.svg"} className="cursor-pointer w-full max-w-4xl px-4" />
+      </div>
 
-          <div className="blog-scroller">
-            {/* Card 1 */}
-            <article className="blog-card blog-blue">
-              <div className="blog-content">
-                <h3 className="blog-title">
-                  5 Mistakes Beginners Make in Email Marketing
-                </h3>
-                <span className="vline"></span>
-                <div className="brand-badge">
-                  <img src="/assets/img/logo.png" alt="KiKi" />
+      {/* features */}
+      <div className="bg-[#EEF5FD] rounded-3xl md:rounded-4xl mx-2 md:mx-4 lg:mx-10 my-8 md:my-14 p-4 md:p-6 lg:p-10 flex flex-col items-center gap-6 md:gap-8">
+        <h2 className="text-black font-bold text-2xl md:text-3xl lg:text-5xl text-center">
+          Kiki Features
+        </h2>
+
+        {/* Tabs Container */}
+        <div className="w-full max-w-3xl">
+          <div className="rounded-lg bg-white flex flex-wrap items-center justify-center gap-2 md:gap-3 p-2 md:p-3 lg:px-5 lg:py-2">
+            {features.map((f) => {
+              const isActive = activeFeatureTab === f.id;
+              return (
+                <div
+                  key={f.id}
+                  onClick={() => setActiveFeatureTab(f.id)}
+                  className={`rounded-md py-2 px-3 md:py-3 md:px-4 lg:px-8 flex justify-center items-center cursor-pointer transition-all duration-200 ease-in whitespace-nowrap text-xs md:text-sm lg:text-base ${
+                    isActive
+                      ? "text-[#233E97] bg-[#2BAAE233] font-semibold"
+                      : "text-gray-400 bg-transparent hover:bg-gray-50"
+                  }`}>
+                  {f.title}
                 </div>
-              </div>
-              <div className="blog-media">
-                <img src="/assets/img/blog1.png" alt="Email marketing screen" />
-              </div>
-            </article>
-
-            {/* Card 2 (yellow with title bubble) */}
-            <article className="blog-card blog-yellow">
-              <div className="blog-content">
-                <h3 className="blog-title bubble-chip">
-                  Why Engagement Open Rate in 2025
-                </h3>
-                <span className="vline dark"></span>
-                <div className="brand-badge">
-                  <img src="/assets/img/logo.png" alt="KiKi" />
-                </div>
-              </div>
-              <div className="blog-media">
-                <img src="/assets/img/blog2.png" alt="Analytics on laptop" />
-              </div>
-            </article>
-
-            {/* Card 3 */}
-            <article className="blog-card blog-indigo">
-              <div className="blog-content">
-                <h3 className="blog-title">
-                  How AI Writes Emails That Convert
-                </h3>
-                <span className="vline"></span>
-                <div className="brand-badge">
-                  <img src="/assets/img/logo.png" alt="KiKi" />
-                </div>
-              </div>
-              <div className="blog-media">
-                <img src="/assets/img/blog3.png" alt="AI illustration" />
-              </div>
-            </article>
-            {/* Card 4 */}
-            <article className="blog-card blog-indigo">
-              <div className="blog-content">
-                <h3 className="blog-title">
-                  How AI Writes Emails That Convert
-                </h3>
-                <span className="vline"></span>
-                <div className="brand-badge">
-                  <img src="/assets/img/logo.png" alt="KiKi" />
-                </div>
-              </div>
-              <div className="blog-media">
-                <img src="/assets/img/blog4.png" alt="AI illustration" />
-              </div>
-            </article>
-          </div>
-
-          {/* Mobile arrows */}
-          <div className="d-flex d-md-none justify-content-center gap-2 mt-3">
-            <button
-              className="scroll-btn btn btn-light border"
-              type="button"
-              data-dir="prev"
-              aria-label="Scroll left">
-              <i className="bi bi-chevron-left"></i>
-            </button>
-            <button
-              className="scroll-btn btn btn-light border"
-              type="button"
-              data-dir="next"
-              aria-label="Scroll right">
-              <i className="bi bi-chevron-right"></i>
-            </button>
+              );
+            })}
           </div>
         </div>
-      </section>
 
-      <section className="py-5">
-        <div className="container-xxl">
-          <div className="pr-blend rounded-xxl p-4 p-lg-5">
-            <div className="row align-items-center gy-4">
-              <div className="col-lg-6">
-                <h2 className="fw-bold display-6 mb-3">
-                  Blend Your Campaign With PR
-                </h2>
-                <p className="text-secondary mb-3">
-                  Why stop at inboxes? Amplify your email marketing with
-                  guaranteed PR placements on top media outlets. Turn every
-                  campaign into a headline, boost credibility, and reach
-                  audiences beyond your list.
-                </p>
-                <p className="text-secondary mb-4">
-                  With Kiki, your story travels further, faster, and with more
-                  authority.
-                </p>
-                <a href="#" className="btn btn-dark btn-pill">
-                  Get Started
-                </a>
-              </div>
-
-              <div className="col-lg-6">
-                <div className="pr-art ms-lg-3">
-                  {/* soft arcs */}
-                  <span className="pr-blob blob-a" aria-hidden="true"></span>
-                  <span className="pr-blob blob-b" aria-hidden="true"></span>
-                  <span className="pr-blob blob-c" aria-hidden="true"></span>
-                </div>
-              </div>
+        {/* Image Display Area */}
+        <div className="w-full max-w-5xl mt-4 md:mt-6">
+          {activeFeature && (
+            <div className="relative w-full rounded-xl md:rounded-2xl overflow-hidden transition-all duration-300 ease-in-out">
+              <img
+                src={activeFeature.img}
+                alt={`Feature ${activeFeature.id} - ${activeFeature.title}`}
+                className="w-full h-auto object-cover"
+              />
             </div>
-          </div>
-          {/* /pr-blend */}
+          )}
         </div>
-      </section>
+      </div>
 
-      <section className="py-5" id="pricing">
-        <div className="container-xxl">
-          <div className="text-center mb-4">
-            <span className="badge rounded-pill bg-body-secondary text-body fw-semibold px-3 py-2">
-              Pricing Plans
-            </span>
-            <h2 className="fw-bold display-6 mt-3 mb-2">
-              Find Your Perfect Plan
-            </h2>
-            <p className="text-secondary mb-3">
-              Choose the plan that grows with you. Start free, scale when you’re
-              ready, cancel anytime.
-            </p>
+      {/* demo video section */}
+      <div className="flex flex-col items-center relative gap-6 md:gap-10 px-4">
+        <h2 className="text-center font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl flex flex-col sm:flex-row items-center gap-2">
+          <CirclePlay size={25} className="sm:mr-2" /> Watch full{" "}
+          <span className="text-[#2BAAE2]">Demo Video</span> Below
+        </h2>
+        <img src="/blue-arrow.svg" className="absolute left-[65%] sm:left-[70%] top-6 md:top-9 w-16 md:w-auto hidden sm:block" />
+        <img
+          src="/demo-video-placeholder.svg"
+          className="w-full h-auto object-cover cursor-pointer rounded-lg"
+        />
+      </div>
 
+      {/* smarter emails section */}
+      <div className="rounded-2xl md:rounded-[30px] bg-linear-to-br from-[#0C31A1] to-[#2BAAE2] mx-2 md:mx-4 lg:mx-10 p-4 md:p-6 lg:p-10">
+        <h2 className="font-bold text-2xl sm:text-3xl md:text-4xl lg:text-[45px] text-center">
+          <span className="text-[#FED93B]">Smarter Emails</span>
+          <span className="text-white">. Safer Data</span>
+        </h2>
+        <p className="text-base md:text-lg lg:text-xl text-white font-normal text-center max-w-3xl mx-auto mt-2 md:mt-4">
+          Kiki gives you analytics that make sense and security that keeps your emails safe — without extra setup.
+        </p>
+        <div className="space-y-4 md:space-y-6 mt-6 md:mt-10 mb-4 px-2 sm:px-4 md:px-8 lg:px-24">
+          {smarterEmailsFeatures.map((s, idx) => (
             <div
-              className="btn-group pricing-toggle"
-              role="group"
-              aria-label="Billing period">
-              <input
-                type="radio"
-                className="btn-check"
-                name="billing"
-                id="bill-monthly"
-                defaultChecked
-              />
-              <label
-                className="btn btn-light border me-1"
-                htmlFor="bill-monthly">
-                Monthly
-              </label>
-
-              <input
-                type="radio"
-                className="btn-check"
-                name="billing"
-                id="bill-yearly"
-              />
-              <label className="btn btn-light border" htmlFor="bill-yearly">
-                Yearly
-              </label>
-            </div>
-            <div className="small text-secondary mt-2 pricing-save d-none">
-              Save 15% when billed yearly
-            </div>
-          </div>
-
-          <div className="row g-4 align-items-stretch">
-            <div className="col-md-6 col-lg-3">
-              <article className="plan-card h-100">
-                <div className="plan-top">
-                  <span className="plan-chip">
-                    <i className="bi bi-shield-check"></i>
-                  </span>
-                  <h5 className="plan-name">Free</h5>
-                  <p className="plan-desc">
-                    Perfect for beginners testing email.
-                  </p>
-
-                  <div className="price-line">
-                    <span className="currency">$</span>
-                    <span
-                      className="price-amount"
-                      data-monthly="0"
-                      data-yearly="0">
-                      0
-                    </span>
-                    <span className="period">per month</span>
-                  </div>
-                </div>
-
-                <hr className="my-3" />
-                <ul className="plan-list">
-                  <li>
-                    <i className="bi bi-check2-circle"></i> 500 emails
-                  </li>
-                  <li>
-                    <i className="bi bi-check2-circle"></i> Extended Quota @
-                    $0.005/email
-                  </li>
-                  <li>
-                    <i className="bi bi-check2-circle"></i> 1 Campaign
-                  </li>
-                  <li>
-                    <i className="bi bi-check2-circle"></i> Basic analytics
-                  </li>
-                </ul>
-
-                <a
-                  href="#"
-                  className="btn btn-outline-dark btn-pill w-100 mt-auto">
-                  Get Started
-                </a>
-              </article>
-            </div>
-
-            <div className="col-md-6 col-lg-3">
-              <article className="plan-card plan-featured h-100 text-white">
-                <div className="plan-top">
-                  <span className="plan-chip soft">
-                    <i className="bi bi-rocket-takeoff"></i>
-                  </span>
-                  <h5 className="plan-name">Solo</h5>
-                  <p className="plan-desc">
-                    Built for freelancers and side hustles.
-                  </p>
-
-                  <div className="price-line">
-                    <span className="currency">$</span>
-                    <span
-                      className="price-amount"
-                      data-monthly="0.99"
-                      data-yearly="0.85">
-                      0.99
-                    </span>
-                    <span className="period">per month</span>
-                  </div>
-                </div>
-
-                <hr className="my-3 border-light opacity-25" />
-                <ul className="plan-list">
-                  <li>
-                    <i className="bi bi-check2-circle"></i> Everything in Free +
-                  </li>
-                  <li>
-                    <i className="bi bi-check2-circle"></i> 2,000 emails
-                  </li>
-                  <li>
-                    <i className="bi bi-check2-circle"></i> Extended Quota @
-                    $0.002/email
-                  </li>
-                  <li>
-                    <i className="bi bi-check2-circle"></i> 5 Campaigns
-                  </li>
-                  <li>
-                    <i className="bi bi-check2-circle"></i> Engagement score
-                  </li>
-                  <li>
-                    <i className="bi bi-check2-circle"></i> Smart templates
-                  </li>
-                  <li>
-                    <i className="bi bi-check2-circle"></i> Basic automation
-                  </li>
-                  <li>
-                    <i className="bi bi-check2-circle"></i> Support
-                  </li>
-                </ul>
-
-                <a href="#" className="btn btn-light btn-pill w-100 mt-auto">
-                  Get Started
-                </a>
-              </article>
-            </div>
-
-            {/* MSME */}
-            <div className="col-md-6 col-lg-3">
-              <article className="plan-card h-100">
-                <div className="plan-top">
-                  <span className="plan-chip">
-                    <i className="bi bi-building"></i>
-                  </span>
-                  <h5 className="plan-name">MSME</h5>
-                  <p className="plan-desc">For growing small businesses.</p>
-
-                  <div className="price-line">
-                    <span className="currency">$</span>
-                    <span
-                      className="price-amount"
-                      data-monthly="9.85"
-                      data-yearly="8.35">
-                      9.85
-                    </span>
-                    <span className="period">per month</span>
-                  </div>
-                </div>
-
-                <hr className="my-3" />
-                <ul className="plan-list">
-                  <li>
-                    <i className="bi bi-check2-circle"></i> 20,000 emails
-                  </li>
-                  <li>
-                    <i className="bi bi-check2-circle"></i> Extended Quota @
-                    $0.001/email
-                  </li>
-                  <li>
-                    <i className="bi bi-check2-circle"></i> Unlimited Campaigns
-                  </li>
-                  <li>
-                    <i className="bi bi-check2-circle"></i> Concierge access (4
-                    emails per month)
-                  </li>
-                  <li>
-                    <i className="bi bi-check2-circle"></i> Advanced analytics
-                  </li>
-                  <li>
-                    <i className="bi bi-check2-circle"></i> Campaign A/B testing
-                  </li>
-                </ul>
-
-                <a
-                  href="#"
-                  className="btn btn-outline-dark btn-pill w-100 mt-auto">
-                  Get Started
-                </a>
-              </article>
-            </div>
-
-            {/* Business (dark) */}
-            <div className="col-md-6 col-lg-3">
-              <article className="plan-card plan-business h-100 text-white">
-                <div className="plan-top">
-                  <span className="plan-chip soft">
-                    <i className="bi bi-shield-lock"></i>
-                  </span>
-                  <h5 className="plan-name">Business</h5>
-                  <p className="plan-desc">Serious power for scale.</p>
-
-                  <div className="price-line">
-                    <span className="currency">$</span>
-                    <span
-                      className="price-amount"
-                      data-monthly="56"
-                      data-yearly="48">
-                      56
-                    </span>
-                    <span className="period">per month</span>
-                  </div>
-                </div>
-
-                <hr className="my-3 border-light opacity-25" />
-                <ul className="plan-list">
-                  <li>
-                    <i className="bi bi-check2-circle"></i> 100,000 emails
-                  </li>
-                  <li>
-                    <i className="bi bi-check2-circle"></i> Extended Quota @
-                    $0.001/email
-                  </li>
-                  <li>
-                    <i className="bi bi-check2-circle"></i> Team accounts
-                  </li>
-                  <li>
-                    <i className="bi bi-check2-circle"></i> Security compliance
-                  </li>
-                  <li>
-                    <i className="bi bi-check2-circle"></i> Custom integrations
-                  </li>
-                  <li>
-                    <i className="bi bi-check2-circle"></i> Concierge+
-                    automation
-                  </li>
-                </ul>
-
-                <a href="#" className="btn btn-light btn-pill w-100 mt-auto">
-                  Get Started
-                </a>
-              </article>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-5">
-        <div className="container-xxl">
-          <h2 className="fw-bold text-center mb-4">
-            See what others are saying about{" "}
-            <span className="text-primary">Kiki.</span>
-          </h2>
-
-          <div className="t-wrap position-relative" data-scroller>
-            {/* arrows */}
-            <button
-              className="t-arrow btn btn-light border"
-              type="button"
-              data-dir="prev"
-              aria-label="Scroll left">
-              <i className="bi bi-chevron-left"></i>
-            </button>
-
-            <div className="t-scroller">
-              {/* Card 1 */}
-              <article className="t-card">
-                <p className="t-quote">
-                  ‘As a fashion designer I always struggled with juggling
-                  sewing, content creation, and responding to clients. Kiki
-                  solved that for me!’
-                </p>
-                <div className="t-author">
-                  <img src="https://i.pravatar.cc/80?img=5" alt="" />
-                  <div>
-                    <div className="t-name">Kelly</div>
-                    <div className="t-role">Fashion Designer</div>
-                  </div>
-                </div>
-              </article>
-
-              {/* Card 2 */}
-              <article className="t-card">
-                <p className="t-quote">
-                  I tried Kiki once and I was sold. It’s so easy to use and even
-                  better at responding to customers than I am 😂
-                </p>
-                <div className="t-author">
-                  <img src="https://i.pravatar.cc/80?img=15" alt="" />
-                  <div>
-                    <div className="t-name">David</div>
-                    <div className="t-role">Freelance Social media manager</div>
-                  </div>
-                </div>
-              </article>
-
-              {/* Card 3 */}
-              <article className="t-card">
-                <p className="t-quote">
-                  Our newsletter finally ships on time. Templates are clean,
-                  analytics make sense, and support is fast.
-                </p>
-                <div className="t-author">
-                  <img src="https://i.pravatar.cc/80?img=23" alt="" />
-                  <div>
-                    <div className="t-name">Alex</div>
-                    <div className="t-role">E‑commerce Owner</div>
-                  </div>
-                </div>
-              </article>
-
-              {/* Card 4 */}
-              <article className="t-card">
-                <p className="t-quote">
-                  The automations are simple but powerful. We recovered
-                  abandoned cart sales in the first week.
-                </p>
-                <div className="t-author">
-                  <img src="https://i.pravatar.cc/80?img=41" alt="" />
-                  <div>
-                    <div className="t-name">Maya</div>
-                    <div className="t-role">Store Manager</div>
-                  </div>
-                </div>
-              </article>
-            </div>
-
-            <button
-              className="t-arrow t-arrow-right btn btn-light border"
-              type="button"
-              data-dir="next"
-              aria-label="Scroll right">
-              <i className="bi bi-chevron-right"></i>
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-5">
-        <div className="container-xxl">
-          <div className="steps-wrap rounded-xxl  p-lg-5 text-center">
-            <h2 className="fw-bold mb-1">From zero to email marketing in</h2>
-            <h2 className="fw-bold mb-4">
-              <span className="text-primary">3 simple steps</span>
-            </h2>
-
-            <div className="row g-4 mt-3 justify-content-center">
-              {/* Step 1 */}
-              <div className="col-md-6 col-lg-4">
-                <div className="step-card">
-                  <span className="step-badge">Step 1</span>
-                  <div className="step-screen shadow-sm">
-                    <div className="dz">
-                      <div className="dz-box">
-                        <img
-                          src="/assets/img/file-rep.png"
-                          className="file-rep"
-                          alt=""
-                        />
-                        <img
-                          src="/assets/img/user-add.png"
-                          className="user-add"
-                          alt=""
-                        />
-                        <div className="centralize mb-3 mt-3">
-                          <img
-                            src="/assets/img/link-upload.png"
-                            className="upd"
-                            alt="file upload"
-                          />
-                        </div>
-                        <h6>Drag and drop here or choose a file</h6>
-                        <small>
-                          All doc, word, pdf, csv, xls file types are supported
-                        </small>
-                      </div>
-                      <div className="w-100 px-3">
-                        <button className="btn btn-primary w-100 btn-sm mt-3">
-                          Create Email List
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="step-caption">Upload contacts</div>
-                </div>
+              key={idx}
+              className={`bg-white rounded-xl md:rounded-2xl flex flex-col md:flex-row justify-between gap-6 md:gap-8 lg:gap-16 items-center h-auto md:h-[400px] p-4 md:p-6 lg:p-10 ${
+                idx % 2 !== 0
+                  ? "md:flex-col lg:flex-row-reverse"
+                  : "md:flex-col lg:flex-row"
+              }`}>
+              {/* image card */}
+              <div className="rounded-xl md:rounded-2xl bg-[#67B2FE47] h-auto w-full md:w-2/5 p-4 md:p-5 flex justify-center items-center order-2 md:order-1">
+                <img
+                  src={s.img}
+                  alt={`Image ${idx}`}
+                  className="h-auto w-full max-w-[200px] md:max-w-none object-cover"
+                />
               </div>
 
-              {/* Step 2 */}
-              <div className="col-md-6 col-lg-4">
-                <div className="step-card">
-                  <span className="step-badge">Step 2</span>
-                  <div className="step-screen shadow-sm">
-                    <div className="ok text-center mt-4">
-                      <div className="display-6 mb-2 text-success">
-                        <i className="bi bi-check-circle-fill"></i>
-                      </div>
-                      <div className="fw-semibold">Successful</div>
-                      <p className="small text-secondary mb-2">
-                        Your campaign has been created. Copy the link to share.
-                      </p>
-
-                      <div className="w-100 px-3">
-                        <button className="btn btn-primary w-100 btn-sm mt-3">
-                          Copy Link
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="step-caption">Approve campaign</div>
-                </div>
-              </div>
-
-              {/* Step 3 */}
-              <div className="col-md-6 col-lg-4">
-                <div className="step-card">
-                  <span className="step-badge">Step 3</span>
-                  <div className="step-screen shadow-sm">
-                    <div className="bg-body-tertiary mt-4">
-                      <img
-                        src="/assets/img/step3.png"
-                        alt=""
-                        className="img-contain"
-                      />
-                    </div>
-                  </div>
-                  <div className="step-caption">Track result</div>
-                </div>
+              {/* title and description */}
+              <div className="space-y-3 md:space-y-5 w-full md:w-3/5 order-1 md:order-2">
+                <h4 className="text-[#1E1E1E] text-lg sm:text-xl md:text-2xl lg:text-[30px] font-bold">
+                  {s.title}
+                </h4>
+                <p className="text-[#1E1E1ECC] text-sm md:text-base font-normal">
+                  {s.description}
+                </p>
               </div>
             </div>
+          ))}
+        </div>
+      </div>
+
+      {/* recent blogs */}
+      <div className="h-fit bg-[#EEF5FD] my-8 md:my-10 space-y-6 md:space-y-8 p-4 md:p-6 lg:p-12">
+        <h2 className="font-bold text-2xl md:text-3xl lg:text-4xl">Recent Blogs</h2>
+        <div className="overflow-x-auto">
+          <div className="h-[200px] md:h-[260px] w-[280px] sm:w-[350px] md:w-[450px] rounded-2xl md:rounded-3xl bg-gray-200 flex items-center justify-center gap-4 p-4">
+            <h3 className="text-base md:text-lg">Lorem ipsum dolor sit amet consectetur.</h3>
           </div>
         </div>
-      </section>
-      {/* Three steps ends here */}
+      </div>
 
-      {/* FAQ */}
-      <section className="py-5 d-flex ">
-        <div className="container-xxl ">
-          <div className="row  d-flex justify-content-center align-items-center">
-            <div className="col-lg-7 col-xl-6">
-              <h3 className="fw-bold text-primary mb-4">FAQ</h3>
+      {/* blend campaign with pr */}
+      <div className="relative m-4 md:m-8 lg:m-12 p-4 md:p-6 lg:p-12 h-[300px] sm:h-[250px] md:h-[300px] lg:h-[355px] rounded-xl md:rounded-2xl lg:rounded-3xl overflow-hidden text-[#000015]">
+        {/* Background image */}
+        <Image
+          src="/landing/blend-campaign-with-pr.svg"
+          alt="Background"
+          fill
+          priority
+          className="object-cover z-0"
+        />
+        {/* Content */}
+        <div className="relative z-10 space-y-3 md:space-y-4 lg:space-y-6 w-full md:w-3/4 lg:w-[45%]">
+          <h1 className="font-extrabold text-xl sm:text-2xl md:text-3xl lg:text-4xl">
+            Blend your campaign with PR
+          </h1>
+          <p className="text-sm md:text-base">
+            Why stop at inboxes? Amplify your email marketing with guaranteed PR
+            placements on top media outlets. Turn every campaign into a
+            headline, boost credibility, and reach audiences beyond your list.
+          </p>
+          <p className="text-sm md:text-base">
+            With Kiki, your story travels further, faster, and with more
+            authority.
+          </p>
+          <button className="bg-black text-white rounded-lg h-9 md:h-11 w-28 md:w-36 text-xs cursor-pointer mt-2">
+            Get Started
+          </button>
+        </div>
+      </div>
 
-              <div className="accordion faq-plain" id="faq">
-                {/* Q1 */}
-                <div className="accordion-item">
-                  <h2 className="accordion-header" id="q1">
-                    <button
-                      className="accordion-button collapsed"
-                      type="button"
-                      data-bs-toggle="collapse"
-                      data-bs-target="#a1"
-                      aria-expanded="false"
-                      aria-controls="a1">
-                      Do I need marketing experience?
-                    </button>
-                  </h2>
-                  <div
-                    id="a1"
-                    className="accordion-collapse collapse"
-                    aria-labelledby="q1"
-                    data-bs-parent="#faq">
-                    <div className="accordion-body">
-                      Nope. Use our templates and guided flows—just add your
-                      brand and products.
-                    </div>
-                  </div>
+      {/* pricing plans */}
+      <div className="flex flex-col justify-center items-center gap-4 md:gap-6 my-8 md:my-10 px-4">
+        <div className="h-8 md:h-10.5 w-[160px] md:w-[194px] rounded-full bg-[#0C31A126] flex justify-center items-center">
+          <p className="font-medium text-[#0C31A1] text-base md:text-lg text-center">
+            Pricing Plans
+          </p>
+        </div>
+        <h2 className="text-[#111111] font-bold text-2xl sm:text-3xl md:text-4xl lg:text-[45px] text-center">
+          Find Your Perfect Plan
+        </h2>
+        <p className="text-base md:text-lg lg:text-xl text-[#797878] font-normal text-center max-w-3xl -mt-2 md:-mt-6">
+            Choose the plan that grows with you. Start free, scale when you're ready, cancel anytime.
+        </p>
+        <div className="flex items-center bg-[#FBFBFB] border border-[#E7EBFF] shadow-sm h-[44px] md:h-[50px] w-fit rounded-lg py-4 md:py-6 px-3 md:px-4 gap-2 md:gap-3 text-xs md:text-sm">
+          <p className="bg-white border border-[#E7EBFF] py-2 px-3 md:px-4 rounded-lg">
+            Monthly
+          </p>
+          <p className="py-2 px-3 md:px-4 rounded-xl">Yearly</p>
+        </div>
+        <div className="flex flex-wrap md:flex-nowrap items-start justify-center gap-4 mx-2 md:mx-4 w-full max-w-6xl">
+          {plans.map((plan, idx) => {
+            const isEven = idx % 2 === 0;
+            return (
+              <div
+                key={idx}
+                className={`border border-[#E7EBFF] shadow-sm rounded-xl md:rounded-2xl p-4 md:p-6 space-y-1.5 ${
+                  !isEven ? "bg-[#0C31A1]" : "bg-white"
+                } w-full sm:w-[calc(50%-8px)] md:w-1/4 last:bg-black`}>
+                <div
+                  className={`size-[28px] md:size-[34px] rounded-lg flex justify-center items-center ${
+                    !isEven ? "bg-white" : "bg-[#6A8AFF]"
+                  }`}>
+                  <img
+                    src={isEven ? "/bullseye-arrow.svg" : "/gem.svg"}
+                    alt="Icon"
+                    className="w-4 h-4 md:w-auto md:h-auto"
+                  />
                 </div>
-
-                {/* Q2 */}
-                <div className="accordion-item">
-                  <h2 className="accordion-header" id="q2">
-                    <button
-                      className="accordion-button collapsed"
-                      type="button"
-                      data-bs-toggle="collapse"
-                      data-bs-target="#a2"
-                      aria-expanded="false"
-                      aria-controls="a2">
-                      How fast can I start?
-                    </button>
-                  </h2>
-                  <div
-                    id="a2"
-                    className="accordion-collapse collapse"
-                    aria-labelledby="q2"
-                    data-bs-parent="#faq">
-                    <div className="accordion-body">
-                      Import contacts, pick a template, hit send—most folks
-                      launch in under 15 minutes.
-                    </div>
-                  </div>
-                </div>
-
-                {/* Q3 */}
-                <div className="accordion-item">
-                  <h2 className="accordion-header" id="q3">
-                    <button
-                      className="accordion-button collapsed"
-                      type="button"
-                      data-bs-toggle="collapse"
-                      data-bs-target="#a3"
-                      aria-expanded="false"
-                      aria-controls="a3">
-                      What makes Kiki different?
-                    </button>
-                  </h2>
-                  <div
-                    id="a3"
-                    className="accordion-collapse collapse"
-                    aria-labelledby="q3"
-                    data-bs-parent="#faq">
-                    <div className="accordion-body">
-                      Clear analytics, deliverability focus, and automation
-                      that’s simple enough for beginners.
-                    </div>
-                  </div>
-                </div>
-
-                {/* Q4 (open by default) */}
-                <div className="accordion-item">
-                  <h2 className="accordion-header" id="q4">
-                    <button
-                      className="accordion-button"
-                      type="button"
-                      data-bs-toggle="collapse"
-                      data-bs-target="#a4"
-                      aria-expanded="true"
-                      aria-controls="a4">
-                      Can I cancel anytime?
-                    </button>
-                  </h2>
-                  <div
-                    id="a4"
-                    className="accordion-collapse collapse show"
-                    aria-labelledby="q4"
-                    data-bs-parent="#faq">
-                    <div className="accordion-body">
-                      Yes. No lock‑ins, no hidden fees.
-                    </div>
-                  </div>
-                </div>
+                <h4
+                  className={`text-lg md:text-xl lg:text-[26px] font-normal ${
+                    !isEven ? "text-white" : "text-[#1B223C]"
+                  }`}>
+                  {plan.name}
+                </h4>
+                <p
+                  className={`text-xs md:text-sm ${
+                    !isEven ? "text-white" : "text-[#797878]"
+                  }`}>
+                  {plan.description}
+                </p>
+                <p className="flex items-center gap-2">
+                  <span
+                    className={`font-bold text-2xl md:text-3xl lg:text-[35px] ${
+                      !isEven ? "text-white" : "text-[#1B223C]"
+                    }`}>
+                    ${plan.price}
+                  </span>
+                  <span
+                    className={`text-xs md:text-sm font-normal ${
+                      !isEven ? "text-white" : "text-[#797878]"
+                    }`}>
+                    per month
+                  </span>
+                </p>
+                <hr className="text-[#E7EBFF]" />
+                <ul className="space-y-1.5 md:space-y-2 my-3 md:my-4">
+                  {plan.perks.map((perk, perkIdx) => (
+                    <li
+                      key={perkIdx}
+                      className={`text-xs md:text-sm flex gap-2 md:gap-2.5 items-start md:items-center ${
+                        !isEven ? "text-white" : "text-[#1B223C]"
+                      }`}>
+                      <img src="/check-2.svg" alt="Check" className="w-4 h-4 mt-0.5 md:mt-0 flex-shrink-0" />
+                      <span className="flex-1">{perk}</span>
+                    </li>
+                  ))}
+                </ul>
+                <button className={`border border-gray-400 py-2 md:py-3 px-4 md:px-7 rounded-lg text-xs md:text-sm h-[40px] md:h-[46px] w-full ${
+                  !isEven ? "bg-white text-[#1B223C]" : "bg-white text-[#1B223C]"
+                }`}>
+                  Get Started
+                </button>
               </div>
-            </div>
-          </div>
+            );
+          })}
         </div>
-      </section>
-      {/* FAQ ends here */}
-      <LandingFooterSecond />
-    </>
+      </div>
+
+      <TestimonialsCarousel/>
+
+      <div className="bg-[#EEF5FD] p-4 md:p-6 lg:p-10 space-y-3 md:space-y-4">
+        <h3 className="font-bold text-2xl sm:text-3xl md:text-4xl lg:text-[50px] text-center">
+          From zero to email marketing in 
+          <span className="text-[#233E97] block">3 simple steps</span>
+        </h3>
+        <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 lg:gap-10 mt-6 md:mt-10 px-4">
+          {emailMarketingSteps.map((step) => (
+            <div key={step.id} className="flex flex-col items-center gap-3 md:gap-4 relative w-full max-w-sm md:max-w-none">
+              <div className="absolute -top-4 rounded-md bg-radial from-[#233E97] to-[#2BAAE2] text-white text-sm md:text-base h-7 md:h-8 w-16 md:w-20 flex justify-center items-center">Step {step.id}</div>
+              <div className="rounded-xl md:rounded-2xl bg-white p-4 md:p-6 flex justify-center items-center w-full h-[200px] md:h-[250px] lg:h-[300px]">
+                <img
+                  src={step.img}
+                  alt={step.title}
+                  className="h-auto w-auto max-h-[150px] md:max-h-full object-contain"
+                />
+              </div>
+              <h4 className="text-[#1E1E1E] text-lg md:text-xl lg:text-[24px] font-bold text-center">
+                {step.title}
+              </h4>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <FAQFooter />
+    </section>
   );
 }

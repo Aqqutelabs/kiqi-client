@@ -216,7 +216,7 @@ export const Sidebar: React.FC = () => {
   const handleLogout = async () => {
     dispatch(logout());
     await persistor.purge();
-    router.push("/");
+    router.push("/login");
   };
 
   const isLinkActive = (href: string): boolean => {

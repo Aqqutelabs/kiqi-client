@@ -49,11 +49,22 @@ export default function PaymentsSection() {
     setShowDetailModal(true);
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount);
+  const parseCurrencyString = (value: string | number): number => {
+    if (typeof value === "number") return value;
+    if (typeof value !== "string") return 0;
+    
+    // Remove currency symbols and non-numeric characters (except decimals)
+    const cleaned = value.replace(/[₦$€£,\s]/g, "").trim();
+    const parsed = parseFloat(cleaned);
+    return isNaN(parsed) ? 0 : parsed;
+  };
+
+  const formatCurrency = (amount: string | number) => {
+    const numAmount = parseCurrencyString(amount);
+    return `₦${numAmount.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
   };
 
   const getPaymentStatus = (payment: Payment) => {
@@ -146,23 +157,17 @@ export default function PaymentsSection() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm font-medium text-gray-900">
-                        {formatCurrency(
-                          Number(payment.order_summary?.subtotal) || 0
-                        )}
+                        {formatCurrency(payment.order_summary?.subtotal || "₦0")}
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm font-medium text-gray-900">
-                        {formatCurrency(
-                          Number(payment.order_summary?.VAT) || 0
-                        )}
+                        {formatCurrency(payment.order_summary?.vat_amount || "₦0")}
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm font-bold text-gray-900">
-                        {formatCurrency(
-                          Number(payment.order_summary?.total) || 0
-                        )}
+                        {formatCurrency(payment.order_summary?.total_amount || "₦0")}
                       </div>
                     </td>
                     <td className="px-6 py-4">

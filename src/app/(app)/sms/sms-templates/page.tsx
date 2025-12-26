@@ -528,11 +528,15 @@ export default function SMSTemplates() {
   };
 
   const handleUseTemplate = (template: SMSTemplateTable) => {
-    console.log("Using template:", template);
-    // Redirect to send page with template data
-    router.push(`/sms/send-bulk-sms?templateId=${template.id}`);
-    toast.success("Loading template...");
-  };
+  // console.log("Using template:", template.message);
+  
+  // Encode the message for URL safety
+  const encodedMessage = encodeURIComponent(template.message);
+  
+  // Pass both templateId and message
+  router.push(`/sms/send-bulk-sms?templateId=${template.id}&message=${encodedMessage}`);
+  toast.success("Loading template...");
+};
 
   // Extra actions for the table
   const extraActions = (template: SMSTemplateTable) => (
