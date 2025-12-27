@@ -37,7 +37,6 @@ interface PRData {
   title?: string;
   metrics: PRMetrics;
   status: string;
-  title: string;
   date_created: string;
   content: string;
   campaign_id: string;

@@ -7,7 +7,7 @@ import ToasterClient from "./ToasterClient";
 import { ProductsProvider } from "@/context/ProductContext";
 import { SidebarProvider } from "@/context/SidebarContext";
 import { WalletProvider } from "@/context/WalletContext";
-import { SolanaProvider } from "@/context/Web3Context";
+// import { SolanaProvider } from "@/context/Web3Context";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -53,7 +53,7 @@ export default function RootLayout({
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
       </head>
       <body className={inter.className}>
-        <SolanaProvider>
+        {/* <SolanaProvider> */}
           <SidebarProvider>
             <ProductsProvider>
               <ReduxProvider>
@@ -65,7 +65,7 @@ export default function RootLayout({
               </ReduxProvider>
             </ProductsProvider>
           </SidebarProvider>
-        </SolanaProvider>
+        {/* </SolanaProvider> */}
       </body>
     </html>
   );

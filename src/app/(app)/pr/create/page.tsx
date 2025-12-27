@@ -28,18 +28,27 @@ export default function CreatePressRelease() {
 
   // Initialize state from localStorage to preserve data on navigation
   useEffect(() => {
+  // Clear old data ONCE
+  try {
+    localStorage.removeItem("pr_step_one");
+    localStorage.removeItem("pr_step_one_image");
+    localStorage.removeItem("cart");
+    localStorage.removeItem("pr_id");
+  } catch (e) {
+    console.warn("Failed to clear localStorage:", e);
+  }
+
+  // Restore saved draft
   const savedDraft = localStorage.getItem("pr_step_one");
   if (!savedDraft) return;
 
   try {
     const draft = JSON.parse(savedDraft);
 
-    // Restore title (ref-based input)
     if (title.current && draft.title) {
       title.current.value = draft.title;
     }
 
-    // Restore content (state-based)
     if (draft.pr_content) {
       setPrContent(draft.pr_content);
     }
@@ -48,20 +57,21 @@ export default function CreatePressRelease() {
   }
 }, []);
 
-    const clearOldData = () => {
-      try {
-        localStorage.removeItem("pr_step_one");
-        localStorage.removeItem("pr_step_one_image");
-        localStorage.removeItem("cart");
-        localStorage.removeItem("pr_id");
-      } catch (e) {
-        console.warn("Failed to clear localStorage:", e);
-      }
-    };
 
-    // Only clear on initial mount
-    clearOldData();
-  }, []);
+  //   const clearOldData = () => {
+  //     try {
+  //       localStorage.removeItem("pr_step_one");
+  //       localStorage.removeItem("pr_step_one_image");
+  //       localStorage.removeItem("cart");
+  //       localStorage.removeItem("pr_id");
+  //     } catch (e) {
+  //       console.warn("Failed to clear localStorage:", e);
+  //     }
+  //   };
+
+  //   // Only clear on initial mount
+  //   clearOldData();
+  // }, []);
 
   const token =
     typeof window !== "undefined"
