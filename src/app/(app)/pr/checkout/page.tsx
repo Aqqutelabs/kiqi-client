@@ -7,6 +7,7 @@ import {
   CreditCard,
   Smartphone,
   Wallet,
+  XCircleIcon,
 } from "lucide-react";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { Button } from "@/components/ui/Button";
@@ -61,6 +62,7 @@ export default function PRCheckoutPage() {
       const res = await axios.get(`${BASE_URL}/api/v1/press-releases/cart`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      console.log("Cart item:", res);
 
       setCartData(res.data.data);
     } catch (error) {
@@ -84,14 +86,7 @@ export default function PRCheckoutPage() {
 
   const completePayment = async () => {
     try {
-      const token =
-        typeof window !== "undefined"
-          ? JSON.parse(localStorage.getItem("persist:root") || "{}").auth
-            ? JSON.parse(
-                JSON.parse(localStorage.getItem("persist:root") || "{}").auth
-              ).token
-            : null
-          : null;
+      
 
       const res = await axios.post(
         `${BASE_URL}/api/v1/press-releases/orders/checkout`,
@@ -113,6 +108,32 @@ export default function PRCheckoutPage() {
       // router.push("/pr/dashboard");
     } catch (error: any) {
       toast.error("Unable to complete payment");
+    }
+  };
+
+  const handleRemoveFromCart = async (publisherId: string) => {
+    try {
+      
+console.log("Deleting item:", publisherId);
+
+      await fetch(`${BASE_URL}/api/v1/press-releases/cart/${publisherId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      setCartData((prev) => {
+        if (!prev) return prev;
+
+        return {
+          ...prev, // preserves _id, user_id, timestamps
+          items: prev.items.filter((item) => item._id !== publisherId),
+        };
+      });
+      toast.success("Removed from cart");
+      window.location.reload();
+    } catch (error) {
+      console.error("Failed to remove item from cart", error);
+      toast.error("Failed to remove item");
     }
   };
 
@@ -168,9 +189,17 @@ export default function PRCheckoutPage() {
                         return (
                           <div
                             key={`${pub._id}-${pubIndex}`}
-                            className="flex items-start justify-between p-4 rounded-xl border border-gray-100 bg-gradient-to-r from-[#F8FAFC] to-[#FFFFFF]"
+                            className="relative flex items-start justify-between p-4 rounded-xl border border-gray-100 bg-gradient-to-r from-[#F8FAFC] to-[#FFFFFF]"
                           >
-                            <div className="flex-1">
+                            {/* Close icon */}
+                            <button
+                              onClick={() => handleRemoveFromCart(pub.publisherId)}
+                              className="absolute top-3 right-3 text-gray-400 hover:text-red-500"
+                            >
+                              <XCircleIcon size={8} className="w-5 h-5" />
+                            </button>
+
+                            <div className="flex-1 pr-6">
                               <h4 className="font-semibold text-gray-900 mb-2">
                                 {pub.name}
                               </h4>
@@ -181,21 +210,19 @@ export default function PRCheckoutPage() {
                                 </span>
 
                                 {pub.region_reach?.map(
-                                  (region, regionIndex) => {
-                                    return (
-                                      <span
-                                        key={`${pub._id}-${pubIndex}-region-${regionIndex}`}
-                                        className="bg-white border border-[#E2E8F0] h-6 px-3 flex justify-center items-center rounded-md"
-                                      >
-                                        {region}
-                                      </span>
-                                    );
-                                  }
+                                  (region, regionIndex) => (
+                                    <span
+                                      key={`${pub._id}-${regionIndex}`}
+                                      className="bg-white border border-[#E2E8F0] h-6 px-3 flex justify-center items-center rounded-md"
+                                    >
+                                      {region}
+                                    </span>
+                                  )
                                 )}
                               </div>
                             </div>
 
-                            <div className="text-right ml-4 font-bold text-gray-900">
+                            <div className="text-right ml-4 mt-auto font-bold text-gray-900">
                               {pub.price}
                             </div>
                           </div>

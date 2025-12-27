@@ -1,6 +1,13 @@
 "use client";
+import { useEffect, useState } from "react";
+import "./kiki.css";
+import { usePathname } from "next/navigation";
+// import NavBar from "@/components/landing/navbar";
+// import "bootstrap/dist/css/bootstrap.min.css";
+// import LandingFooterSecond from "@/components/landing/landingfooter";
 
 import FAQFooter from "@/components/ui/landing-footer";
+import NavBar from "@/components/ui/landing-nav";
 import LandingNav from "@/components/ui/landing-nav";
 import HorizontalCarousel from "@/components/ui/LandingCarousel";
 import {
@@ -11,7 +18,7 @@ import {
   ArrowUp,
 } from "lucide-react";
 import Image from "next/image";
-import { useState, useRef } from "react";
+import { useRef } from "react";
 
 const TestimonialsCarousel = () => {
   const scrollerRef = useRef<HTMLDivElement>(null);

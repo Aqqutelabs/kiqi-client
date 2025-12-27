@@ -21,7 +21,7 @@ interface DistributionReport {
   status: "Published" | "Pending" | "Failed";
   clicks: number;
   views: string;
-  link: string;
+  // link: string;
   date: string;
 }
 
@@ -32,6 +32,7 @@ interface PRMetrics {
   avg_time_on_page: string;
 }
 
+
 interface PRData {
   _id: string;
   title?: string;
@@ -41,6 +42,7 @@ interface PRData {
   content: string;
   campaign_id: string;
   image?: string;
+  distribution: string;
   distribution_report: any[];
   createdAt: string;
   updatedAt: string;
@@ -56,6 +58,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
   const [pr, setPr] = useState<PRData | null>(null);
   const [dashboard_stats, setDashboardStats] = useState<StatCardProps[]>([]);
+  const distributionReports: DistributionReport[] = [];
   const [trackerData, setTrackerData] = useState<any>(null);
   const [statusConfig, setStatusConfig] = useState<any>(null);
   const [isProgressTrackerOpen, setIsProgressTrackerOpen] = useState(false);
@@ -237,33 +240,48 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   if (!pr) return <p>Press release not found</p>;
 
   //   table data
-  const data: DistributionReport[] = [
-    {
-      id: 1,
-      outlet: "Forbes",
-      status: "Published",
-      clicks: 420,
-      views: "5.2K Views",
-      link: "www.link.here.com",
-      date: "Sept 28, 2025 -14:32",
-    },
-    {
-      id: 2,
-      outlet: "Forbes",
-      status: "Published",
-      clicks: 420,
-      views: "5.2K Views",
-      link: "www.link.here.com",
-      date: "Sept 28, 2025 -14:32",
-    },
-  ];
+  const data: DistributionReport[] = pr.distribution
+  ? pr.distribution.split(",").map((outlet, index) => ({
+      id: index + 1,
+      outlet: outlet.trim(),
+      status: pr.status as "Published" | "Pending" | "Failed",
+      clicks: pr.metrics?.total_clicks || 0,
+      views: pr.metrics?.total_views
+        ? pr.metrics.total_views >= 1000
+          ? `${(pr.metrics.total_views / 1000).toFixed(1)}K Views`
+          : `${pr.metrics.total_views} Views`
+        : "0 Views",
+      // link: "www.link.here.com",
+      date: formatDate(pr.date_created),
+    }))
+  : [];
+  // const data: DistributionReport[] = [
+  //   {
+  //     id: 1,
+  //     outlet: "Forbes",
+  //     status: "Published",
+  //     clicks: 420,
+  //     views: "5.2K Views",
+  //     link: "www.link.here.com",
+  //     date: "Sept 28, 2025 -14:32",
+  //   },
+  //   {
+  //     id: 2,
+  //     outlet: "Forbes",
+  //     status: "Published",
+  //     clicks: 420,
+  //     views: "5.2K Views",
+  //     link: "www.link.here.com",
+  //     date: "Sept 28, 2025 -14:32",
+  //   },
+  // ];
 
   const columns: Column<DistributionReport>[] = [
     { header: "Outlet", accessor: "outlet" },
     { header: "Status", accessor: "status" },
     { header: "Clicks", accessor: "clicks" },
     { header: "Views", accessor: "views" },
-    { header: "Link", accessor: "link" },
+    // { header: "Link", accessor: "link" },
     { header: "Date", accessor: "date" },
   ];
   return (
