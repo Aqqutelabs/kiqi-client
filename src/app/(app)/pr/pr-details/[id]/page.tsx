@@ -32,6 +32,7 @@ interface PRMetrics {
   avg_time_on_page: string;
 }
 
+
 interface PRData {
   _id: string;
   title?: string;
