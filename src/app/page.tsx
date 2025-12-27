@@ -2,6 +2,7 @@
 
 import FAQFooter from "@/components/ui/landing-footer";
 import LandingNav from "@/components/ui/landing-nav";
+import HorizontalCarousel from "@/components/ui/LandingCarousel";
 import {
   CheckCircleIcon,
   CirclePlay,
@@ -231,6 +232,29 @@ export default function Home() {
     { id: 2, title: "Approve campaign", img: "/landing/landing-step-2.svg" },
     { id: 3, title: "Track result", img: "/landing/landing-step-3.svg" },
   ]
+
+   const recentBlogs = [
+    {
+      id: 1,
+      title: "5 Mistakes Beginners Make in Email Marketing",
+      image: "/landing/use-case-one.png",
+    },
+    {
+      id: 2,
+      title: "Why Engagement > Open Rate in 2025",
+      image: "/landing/use-case-one.png",
+    },
+    {
+      id: 3,
+      title: "How AI Writes Emails That Convert",
+      image: "/landing/use-case-one.png",
+    },
+    {
+      id: 4,
+      title: "The Only Email Metric That Matters",
+      image: "/landing/use-case-one.png",
+    },
+  ];
   return (
     <section>
       <LandingNav />
@@ -458,11 +482,7 @@ export default function Home() {
       {/* recent blogs */}
       <div className="h-fit bg-[#EEF5FD] my-8 md:my-10 space-y-6 md:space-y-8 p-4 md:p-6 lg:p-12">
         <h2 className="font-bold text-2xl md:text-3xl lg:text-4xl">Recent Blogs</h2>
-        <div className="overflow-x-auto">
-          <div className="h-[200px] md:h-[260px] w-[280px] sm:w-[350px] md:w-[450px] rounded-2xl md:rounded-3xl bg-gray-200 flex items-center justify-center gap-4 p-4">
-            <h3 className="text-base md:text-lg">Lorem ipsum dolor sit amet consectetur.</h3>
-          </div>
-        </div>
+        <HorizontalCarousel items={recentBlogs}/>
       </div>
 
       {/* blend campaign with pr */}

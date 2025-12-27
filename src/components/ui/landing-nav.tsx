@@ -63,7 +63,7 @@ export default function LandingNav() {
   }, [pathname]);
 
   return (
-    <nav className="flex justify-between items-center px-4 sm:px-6 md:px-8 lg:px-10 h-16 md:h-20 lg:h-[97px] relative">
+    <nav className="flex justify-between items-center px-4 sm:px-6 md:px-8 lg:px-10 h-16 md:h-20 lg:h-[97px] relative md:sticky top-0 bg-white z-30">
       {/* Logo */}
       <Link href="/" className="relative h-12 w-32 md:h-16 md:w-40 lg:h-[90px] lg:w-[200px]">
         <Image 

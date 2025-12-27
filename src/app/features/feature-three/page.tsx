@@ -2,6 +2,7 @@
 
 import FAQFooter from "@/components/ui/landing-footer";
 import LandingNav from "@/components/ui/landing-nav";
+import HorizontalCarousel from "@/components/ui/LandingCarousel";
 import { ArrowRight, ArrowUp, MoveRight } from "lucide-react";
 import Image from "next/image";
 
@@ -52,6 +53,42 @@ export default function FeatureThreePage() {
       img: "/landing/how-it-works-3.svg",
     },
   ];
+
+  const useCases = [
+    {
+      id: 1,
+      title: "Boost Local Authority",
+      image: "/landing/use-case-one.png",
+      subtitle: "Dominate search in your city/region.",
+    },
+    {
+      id: 2,
+      title: "Startup Growth",
+      image: "/landing/use-case-one.png",
+      subtitle: "Attract investors and partners through thought leadership.",
+    },
+    {
+      id: 3,
+      title: "E-commerce Sales",
+      image: "/landing/use-case-one.png",
+      subtitle: "Rank product pages & buying guides.",
+    },
+    {
+      id: 4,
+      title: "Enterprise Visibility",
+      image: "/landing/use-case-one.png",
+      subtitle: "Show up where decision-makers search.",
+    },
+  ];
+
+  const whyChooseUsPoints = [
+    { text: "Content that ranks fast.", icon: "/landing/rank.svg" },
+    { text: "Lower cost than hiring in-house.", icon: "/landing/low-price.svg" },
+    { text: "Transparent SEO reports.", icon: "/landing/graph.svg" },
+    { text: "Scale as you grow.", icon: "/landing/search.svg" },
+    { text: "AI + Human blend = speed & quality.", icon: "/landing/ai-component.svg" },
+  ];
+
   return (
     <section>
       <LandingNav />
@@ -205,6 +242,70 @@ export default function FeatureThreePage() {
         </div>
       </div>
 
+      {/* use cases */}
+      <div className="bg-[#EEF5FD] p-10 space-y-10">
+        <div className="h-[67px] w-[194px] border border-[#233E97] rounded-full flex justify-center items-center">
+          <p className="text-[#233E97] font-bold text-lg">Use Cases</p>
+        </div>
+        <HorizontalCarousel items={useCases} />
+      </div>
+
+      {/* why choose us */}
+      <div className="min-h-screen bg-linear-to-b to-[#2BAAE2] from-[#020D1D] p-10">
+        <h4 className="text-white text-center text-[45px] font-bold">Why Choose Kiki SEO?</h4>
+        <div className="h-[500px] mx-auto max-w-6xl border border-white/30 rounded-xl backdrop-blur-2xl bg-white/10 my-8 flex items-center justify-between gap-14 py-12 px-16">
+          <div className="space-y-4">
+            {whyChooseUsPoints.map((point, index) => (
+              <div key={index} className="flex items-center gap-4 bg-white py-2.5 px-4 rounded-xl">
+                <div className="h-12 w-12 flex justify-center items-center bg-black rounded-full">
+                  <img
+                    src={point.icon}
+                    alt={point.text}
+                    className="h-6 w-6 object-contain"
+                  />
+                </div>
+                <p className="text-black font-bold text-lg">{point.text}</p>
+              </div>
+            ))}
+          </div>
+          <img src="/landing/why-choose-us.svg" alt="Picture of a woman holding a laptop" />
+        </div>
+
+        {/* cards */}
+        <div className="flex justify-center items-center gap-6 mx-auto max-w-7xl my-20 overflow-x-auto pb-6 scrollbar-hide px-4">
+          <div className="rounded-[30px] bg-white w-[400px] h-[330px] flex flex-col items-start justify-between p-6 shadow-lg">
+            <p className="text-[22px] font-normal">“Kiki helped us grow from 200 monthly visitors to 10,000 in 6 months — without hiring an agency.”</p>
+            <div className="flex items-center gap-2.5">
+              <img src="/landing/man-placeholder.svg" alt="Man" className="object-cover" />
+              <div>
+                <p className="text-base text-black">Tunde</p>
+                <p className="text-sm text-[#797878]">Startup Founder</p>
+              </div>
+            </div>
+          </div>
+           <div className="rounded-[30px] bg-white w-[400px] h-[330px] flex flex-col items-start justify-between p-6 shadow-lg hover:shadow-2xl transition-shadow duration-300">
+            <p className="text-[22px] font-normal">“Our ecommerce blog now ranks on page 1 for 12 key terms. Sales doubled.”</p>
+            <div className="flex items-center gap-2.5">
+              <img src="/landing/man-placeholder.svg" alt="Man" className="object-cover" />
+              <div>
+                <p className="text-base text-black">Mike</p>
+                <p className="text-sm text-[#797878]">Online Store Owner</p>
+              </div>
+            </div>
+          </div>
+           <div className="rounded-[30px] bg-white w-[400px] h-[330px] flex flex-col items-start justify-between p-6 shadow-lg hover:shadow-2xl transition-shadow duration-300">
+            <p className="text-[22px] font-normal">“The SEO reports are simple enough for my investors to understand. Huge win.”</p>
+            <div className="flex items-center gap-2.5">
+              <img src="/landing/man-placeholder.svg" alt="Man" className="object-cover" />
+              <div>
+                <p className="text-base text-black">Chuka</p>
+                <p className="text-sm text-[#797878]">Saas CEO</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
       {/* blend campaign with pr */}
       <div className="relative m-4 md:m-8 lg:m-12 p-4 md:p-6 lg:p-12 h-[300px] sm:h-[250px] md:h-[300px] lg:h-[355px] rounded-xl md:rounded-2xl lg:rounded-3xl overflow-hidden text-[#000015]">
         {/* Background image */}
@@ -263,6 +364,33 @@ export default function FeatureThreePage() {
           ))}
         </div>
       </div>
+
+      {/* last cta section */}
+      <div className="bg-gradient-to-b from-blue-900 via-blue-800 to-cyan-400 flex flex-col md:flex-row items-center justify-between gap-8 lg:gap-20 px-4 sm:px-6 lg:px-16 py-10 lg:py-20 w-[95%] lg:w-full max-w-[95%] rounded-2xl mx-auto my-20">
+        {/* left corner */}
+        <div className="max-w-2xl space-y-6 lg:space-y-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight">
+            🔥 Turn Your Website <br className="hidden md:block" /> Into a 24/7 Sales Machine.
+          </h1>
+          <p className="text-lg sm:text-xl text-gray-300">
+           Stop guessing with SEO. Let Kiki run your content engine so you can run your business.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center gap-4 text-sm font-medium">
+            <button className="h-14 px-6 w-full md:w-[160px] rounded-lg flex justify-center items-center bg-[#FED93B] text-[#111111] hover:cursor-pointer relative">
+              Start for Free
+              <div className="w-[30px] h-[30px] rounded-full flex justify-center items-center bg-[#020617] border border-[#FED93B] rotate-45 absolute -right-3 z-10">
+                <ArrowUp color="#FED93B" size={16} />
+              </div>
+            </button>
+            <button className="h-14 px-6 w-full md:w-[160px] rounded-lg flex justify-center items-center border-white border text-white hover:cursor-pointer">
+              See Pricing
+            </button>
+          </div>
+        </div>
+        {/* right corner */}
+        <img src="/landing/website-into-sales.svg" alt="Image" className="w-2/5 h-auto object-contain" />
+      </div>
+
       <FAQFooter />
     </section>
   );
