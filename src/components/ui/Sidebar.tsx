@@ -51,7 +51,7 @@ const navigationConfig: NavSection[] = [
     type: "section",
     title: "Campaigns",
     items: [
-       {
+      {
         type: "link",
         href: "/pr/dashboard",
         label: "PR",
@@ -258,7 +258,7 @@ export const Sidebar: React.FC = () => {
           md:translate-x-0 h-screen
         `}>
         {/* Header */}
-        <div className="h-16 flex-shrink-0 flex items-center px-5 border-b border-gray-200">
+        <div className="h-16 shrink-0 flex items-center px-5 border-b border-gray-200">
           <Image
             src="/kiki-logo.svg"
             alt="KiQi 2025"
@@ -306,15 +306,15 @@ export const Sidebar: React.FC = () => {
                               <img
                                 src={item.icon}
                                 alt=""
-                                className="size-4 md:size-5 flex-shrink-0"
+                                className="size-4 md:size-5 shrink-0"
                               />
                             )}
                             <span>{item.label}</span>
                           </div>
                           {isOpen ? (
-                            <ChevronDown className="w-3.5 h-3.5 flex-shrink-0" />
+                            <ChevronDown className="w-3.5 h-3.5 shrink-0" />
                           ) : (
-                            <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" />
+                            <ChevronRight className="w-3.5 h-3.5 shrink-0" />
                           )}
                         </button>
 
@@ -331,7 +331,7 @@ export const Sidebar: React.FC = () => {
                                     className={clsx(
                                       "flex items-center gap-1.5 pl-8 py-2 text-[10px] md:text-[13px] font-normal transition-colors relative",
                                       {
-                                        "text-[var(--primary)] bg-gradient-to-r from-[#233E9726] via-white to-[##C4C4C400]":
+                                        "text-[var(--primary)] bg-linear-to-r from-[#233E9726] via-white to-[##C4C4C400]":
                                           isActive,
                                         "text-[#42526D] hover:text-[var(--primary)]":
                                           !isActive,
@@ -344,7 +344,7 @@ export const Sidebar: React.FC = () => {
                                     <img
                                       src="/sidebar-icons/arrow-right.svg"
                                       alt="Right arrow"
-                                      className="size-3.5 flex-shrink-0"
+                                      className="size-3.5 shrink-0"
                                     />
                                     <span>{subItem.label}</span>
                                   </Link>
@@ -367,7 +367,7 @@ export const Sidebar: React.FC = () => {
                         className={clsx(
                           "flex items-center gap-2.5 px-5 py-2 text-xs sm:text-sm font-normal h-[50px] transition-colors relative",
                           {
-                            "text-[var(--primary)] bg-gradient-to-r from-[#233E9726] via-white to-[##C4C4C400]":
+                            "text-[var(--primary)] bg-linear-to-r from-[#233E9726] via-white to-[##C4C4C400]":
                               isActive,
                             "text-[#42526D] hover:text-[var(--primary)]":
                               !isActive,
@@ -382,7 +382,7 @@ export const Sidebar: React.FC = () => {
                           <img
                             src={item.icon}
                             alt=""
-                            className="size-4 md:size-5 flex-shrink-0"
+                            className="size-4 md:size-5 shrink-0"
                           />
                         )}
                         <span>{item.label}</span>
@@ -396,11 +396,11 @@ export const Sidebar: React.FC = () => {
         </nav>
 
         {/* Logout Button - Fixed at Bottom */}
-        <div className="flex-shrink-0 px-5 py-4 border-t border-gray-200">
+        <div className="shrink-0 px-5 py-4 border-t border-gray-200">
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-2.5 py-2 text-[13px] font-normal text-[#42526D] hover:text-[var(--primary)] transition-colors">
-            <LogOut className="w-4 h-4 flex-shrink-0" />
+            <LogOut className="w-4 h-4 shrink-0" />
             <span>Log out</span>
           </button>
         </div>

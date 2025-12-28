@@ -138,9 +138,11 @@ const DateInput: React.FC<DateInputProps> = ({
 
   return (
     <div className={`relative max-w-[450px] ${className}`}>
-     {label && <label className="text-sm capitalize font-medium text-gray-900 block mb-2">
-        {label}
-      </label>}
+      {label && (
+        <label className="text-sm capitalize font-medium text-gray-900 block mb-2">
+          {label}
+        </label>
+      )}
       <div
         ref={inputRef}
         className="relative flex items-center bg-white border border-gray-300 rounded-md px-3 py-2 h-10 cursor-pointer hover:border-gray-400 transition-colors"
@@ -152,7 +154,7 @@ const DateInput: React.FC<DateInputProps> = ({
           readOnly
           className="flex-1 outline-none text-gray-700 placeholder-gray-400 text-sm cursor-pointer bg-transparent"
         />
-        <Calendar className="w-5 h-5 text-gray-500 ml-2 flex-shrink-0" />
+        <Calendar className="w-5 h-5 text-gray-500 ml-2 shrink-0" />
       </div>
 
       {isCalendarOpen && (

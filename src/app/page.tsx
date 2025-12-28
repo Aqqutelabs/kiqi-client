@@ -231,9 +231,9 @@ export default function Home() {
     { id: 1, title: "Upload Contacts", img: "/landing/landing-step-1.svg" },
     { id: 2, title: "Approve campaign", img: "/landing/landing-step-2.svg" },
     { id: 3, title: "Track result", img: "/landing/landing-step-3.svg" },
-  ]
+  ];
 
-   const recentBlogs = [
+  const recentBlogs = [
     {
       id: 1,
       title: "5 Mistakes Beginners Make in Email Marketing",
@@ -260,7 +260,7 @@ export default function Home() {
       <LandingNav />
 
       {/* hero section */}
-      <div className="min-h-screen w-[95%] lg:w-full max-w-[95%] bg-gradient-to-b from-blue-900 via-blue-800 to-cyan-400 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-10 mx-auto rounded-2xl">
+      <div className="min-h-screen w-[95%] lg:w-full max-w-[95%] bg-linear-to-b from-blue-900 via-blue-800 to-cyan-400 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-10 mx-auto rounded-2xl">
         <div className="max-w-7xl w-full flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12">
           {/* Left Content */}
           <div className="flex-1 space-y-6 lg:space-y-8 px-4 sm:px-6 lg:px-0">
@@ -269,7 +269,7 @@ export default function Home() {
               <br />
               Without the
               <br />
-              <span className="bg-gradient-to-b from-[#FFF] via-[#f8e58f] to-[#FED93B] text-transparent bg-clip-text">
+              <span className="bg-linear-to-b from-[#FFF] via-[#f8e58f] to-[#FED93B] text-transparent bg-clip-text">
                 Headache
               </span>
             </h1>
@@ -283,7 +283,7 @@ export default function Home() {
               <button className="h-14 px-6 w-full md:w-[160px] rounded-lg flex justify-center items-center bg-white text-[#111111] hover:cursor-pointer relative">
                 Start for Free
                 <div className="size-[30px] rounded-full flex justify-center items-center bg-[#020617] border border-white rotate-45 absolute -right-3 z-10">
-                  <ArrowUp color="white" size={16}/>
+                  <ArrowUp color="white" size={16} />
                 </div>
               </button>
               <button className="h-14 px-6 w-full md:w-[160px] rounded-lg flex justify-center items-center border-white border text-white hover:cursor-pointer">
@@ -332,7 +332,7 @@ export default function Home() {
             display: flex;
             align-items: center;
           }
-          
+
           @media (max-width: 640px) {
             .carousel-slide {
               animation: slide 20s linear infinite;
@@ -379,9 +379,13 @@ export default function Home() {
           the <span className="text-[#4CAF50]">Sales.</span>
         </h2>
         <p className="text-base md:text-xl text-[#797878] font-normal text-center max-w-3xl">
-           Upload a sheet, paste contacts, or connect your inbox. Our concierge does the rest.
+           Upload a sheet, paste contacts, or connect your inbox. Our concierge
+          does the rest.
         </p>
-        <img src={"/inbox-magic.svg"} className="cursor-pointer w-full max-w-4xl px-4" />
+        <img
+          src={"/inbox-magic.svg"}
+          className="cursor-pointer w-full max-w-4xl px-4"
+        />
       </div>
 
       {/* features */}
@@ -431,7 +435,10 @@ export default function Home() {
           <CirclePlay size={25} className="sm:mr-2" /> Watch full{" "}
           <span className="text-[#2BAAE2]">Demo Video</span> Below
         </h2>
-        <img src="/blue-arrow.svg" className="absolute left-[65%] sm:left-[70%] top-6 md:top-9 w-16 md:w-auto hidden sm:block" />
+        <img
+          src="/blue-arrow.svg"
+          className="absolute left-[65%] sm:left-[70%] top-6 md:top-9 w-16 md:w-auto hidden sm:block"
+        />
         <img
           src="/demo-video-placeholder.svg"
           className="w-full h-auto object-cover cursor-pointer rounded-lg"
@@ -445,7 +452,8 @@ export default function Home() {
           <span className="text-white">. Safer Data</span>
         </h2>
         <p className="text-base md:text-lg lg:text-xl text-white font-normal text-center max-w-3xl mx-auto mt-2 md:mt-4">
-          Kiki gives you analytics that make sense and security that keeps your emails safe — without extra setup.
+          Kiki gives you analytics that make sense and security that keeps your
+          emails safe — without extra setup.
         </p>
         <div className="space-y-4 md:space-y-6 mt-6 md:mt-10 mb-4 px-2 sm:px-4 md:px-8 lg:px-24">
           {smarterEmailsFeatures.map((s, idx) => (
@@ -481,8 +489,10 @@ export default function Home() {
 
       {/* recent blogs */}
       <div className="h-fit bg-[#EEF5FD] my-8 md:my-10 space-y-6 md:space-y-8 p-4 md:p-6 lg:p-12">
-        <h2 className="font-bold text-2xl md:text-3xl lg:text-4xl">Recent Blogs</h2>
-        <HorizontalCarousel items={recentBlogs}/>
+        <h2 className="font-bold text-2xl md:text-3xl lg:text-4xl">
+          Recent Blogs
+        </h2>
+        <HorizontalCarousel items={recentBlogs} />
       </div>
 
       {/* blend campaign with pr */}
@@ -526,7 +536,8 @@ export default function Home() {
           Find Your Perfect Plan
         </h2>
         <p className="text-base md:text-lg lg:text-xl text-[#797878] font-normal text-center max-w-3xl -mt-2 md:-mt-6">
-            Choose the plan that grows with you. Start free, scale when you're ready, cancel anytime.
+            Choose the plan that grows with you. Start free, scale when you're
+          ready, cancel anytime.
         </p>
         <div className="flex items-center bg-[#FBFBFB] border border-[#E7EBFF] shadow-sm h-[44px] md:h-[50px] w-fit rounded-lg py-4 md:py-6 px-3 md:px-4 gap-2 md:gap-3 text-xs md:text-sm">
           <p className="bg-white border border-[#E7EBFF] py-2 px-3 md:px-4 rounded-lg">
@@ -587,14 +598,21 @@ export default function Home() {
                       className={`text-xs md:text-sm flex gap-2 md:gap-2.5 items-start md:items-center ${
                         !isEven ? "text-white" : "text-[#1B223C]"
                       }`}>
-                      <img src="/check-2.svg" alt="Check" className="w-4 h-4 mt-0.5 md:mt-0 flex-shrink-0" />
+                      <img
+                        src="/check-2.svg"
+                        alt="Check"
+                        className="w-4 h-4 mt-0.5 md:mt-0 shrink-0"
+                      />
                       <span className="flex-1">{perk}</span>
                     </li>
                   ))}
                 </ul>
-                <button className={`border border-gray-400 py-2 md:py-3 px-4 md:px-7 rounded-lg text-xs md:text-sm h-[40px] md:h-[46px] w-full ${
-                  !isEven ? "bg-white text-[#1B223C]" : "bg-white text-[#1B223C]"
-                }`}>
+                <button
+                  className={`border border-gray-400 py-2 md:py-3 px-4 md:px-7 rounded-lg text-xs md:text-sm h-[40px] md:h-[46px] w-full ${
+                    !isEven
+                      ? "bg-white text-[#1B223C]"
+                      : "bg-white text-[#1B223C]"
+                  }`}>
                   Get Started
                 </button>
               </div>
@@ -603,18 +621,22 @@ export default function Home() {
         </div>
       </div>
 
-      <TestimonialsCarousel/>
+      <TestimonialsCarousel />
 
       {/* email marketing in 3 steps */}
       <div className="bg-[#EEF5FD] p-4 md:p-6 lg:p-10 space-y-3 md:space-y-4">
         <h3 className="font-bold text-2xl sm:text-3xl md:text-4xl lg:text-[50px] text-center">
-          From zero to email marketing in 
+          From zero to email marketing in
           <span className="text-[#233E97] block">3 simple steps</span>
         </h3>
         <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 lg:gap-10 mt-6 md:mt-10 px-4">
           {emailMarketingSteps.map((step) => (
-            <div key={step.id} className="flex flex-col items-center gap-3 md:gap-4 relative w-full max-w-sm md:max-w-none">
-              <div className="absolute -top-4 rounded-md bg-radial from-[#233E97] to-[#2BAAE2] text-white text-sm md:text-base h-7 md:h-8 w-16 md:w-20 flex justify-center items-center">Step {step.id}</div>
+            <div
+              key={step.id}
+              className="flex flex-col items-center gap-3 md:gap-4 relative w-full max-w-sm md:max-w-none">
+              <div className="absolute -top-4 rounded-md bg-radial from-[#233E97] to-[#2BAAE2] text-white text-sm md:text-base h-7 md:h-8 w-16 md:w-20 flex justify-center items-center">
+                Step {step.id}
+              </div>
               <div className="rounded-xl md:rounded-2xl bg-white p-4 md:p-6 flex justify-center items-center w-full h-[200px] md:h-[250px] lg:h-[300px]">
                 <img
                   src={step.img}

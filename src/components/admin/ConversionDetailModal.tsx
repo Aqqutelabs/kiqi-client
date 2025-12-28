@@ -80,7 +80,9 @@ const ConversionDetailModal: React.FC<ConversionDetailModalProps> = ({
         <div className="flex flex-col items-center justify-center py-8 gap-2">
           <AlertCircle className="w-12 h-12 text-red-500" />
           <p className="text-gray-900 font-semibold">Invalid Conversion Data</p>
-          <p className="text-gray-600 text-sm">Unable to load conversion details</p>
+          <p className="text-gray-600 text-sm">
+            Unable to load conversion details
+          </p>
           <Button onClick={onClose} variant="primary" className="mt-4">
             Close
           </Button>
@@ -93,7 +95,7 @@ const ConversionDetailModal: React.FC<ConversionDetailModalProps> = ({
     <Modal isOpen={isOpen} onClose={onClose} title="Conversion Details">
       <div className="space-y-6">
         {/* Status Section */}
-        <div className="flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg">
+        <div className="flex items-center justify-between bg-linear-to-r from-blue-50 to-indigo-50 p-4 rounded-lg">
           <div>
             <p className="text-sm font-medium text-gray-600">Current Status</p>
             <StatusBadge variant={getStatusVariant(conversion.status)}>
@@ -130,9 +132,10 @@ const ConversionDetailModal: React.FC<ConversionDetailModalProps> = ({
                   {conversion.user_id.email}
                 </p>
                 <button
-                  onClick={() => copyToClipboard(conversion.user_id.email, "Email")}
-                  className="ml-2 p-1 hover:bg-gray-200 rounded transition-colors"
-                >
+                  onClick={() =>
+                    copyToClipboard(conversion.user_id.email, "Email")
+                  }
+                  className="ml-2 p-1 hover:bg-gray-200 rounded transition-colors">
                   <Copy className="w-4 h-4 text-gray-600" />
                 </button>
               </div>
@@ -185,14 +188,15 @@ const ConversionDetailModal: React.FC<ConversionDetailModalProps> = ({
                 onClick={() =>
                   copyToClipboard(conversion.solana_wallet, "Wallet address")
                 }
-                className="ml-2 p-2 hover:bg-gray-200 rounded transition-colors flex-shrink-0"
-              >
+                className="ml-2 p-2 hover:bg-gray-200 rounded transition-colors shrink-0">
                 <Copy className="w-4 h-4 text-gray-600" />
               </button>
             </div>
           ) : (
             <div className="bg-yellow-50 border border-yellow-200 rounded p-3">
-              <p className="text-sm text-yellow-800">No wallet address provided</p>
+              <p className="text-sm text-yellow-800">
+                No wallet address provided
+              </p>
             </div>
           )}
         </div>
@@ -248,8 +252,7 @@ const ConversionDetailModal: React.FC<ConversionDetailModalProps> = ({
             <button
               onClick={handleReject}
               disabled={isLoading}
-              className="flex-1 inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium bg-red-100 text-red-700 hover:bg-red-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
+              className="flex-1 inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium bg-red-100 text-red-700 hover:bg-red-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
@@ -262,8 +265,7 @@ const ConversionDetailModal: React.FC<ConversionDetailModalProps> = ({
             <button
               onClick={handleApprove}
               disabled={isLoading}
-              className="flex-1 inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium bg-green-100 text-green-700 hover:bg-green-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
+              className="flex-1 inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium bg-green-100 text-green-700 hover:bg-green-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
@@ -277,11 +279,7 @@ const ConversionDetailModal: React.FC<ConversionDetailModalProps> = ({
         )}
 
         {conversion.status !== "Pending" && (
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="w-full"
-          >
+          <Button variant="outline" onClick={onClose} className="w-full">
             Close
           </Button>
         )}

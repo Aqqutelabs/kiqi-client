@@ -29,15 +29,15 @@ export default function EmailCampaignAIPage() {
 
   return (
     <Card>
-          <div className="flex justify-between items-center">
-            <PageHeader title="KiKi Ai" backLink="/email-campaigns/dashboard" />
-            <Link href="/subscriptions">
-              <Button size={"lg"}>
-                <Sparkles size={16} className="mr-1.5" />
-                Upgrade
-              </Button>
-            </Link>
-          </div>
+      <div className="flex justify-between items-center">
+        <PageHeader title="KiKi Ai" backLink="/email-campaigns/dashboard" />
+        <Link href="/subscriptions">
+          <Button size={"lg"}>
+            <Sparkles size={16} className="mr-1.5" />
+            Upgrade
+          </Button>
+        </Link>
+      </div>
       <h1 className="text-center text-4xl space-x-2 leading-14">
         <span className="text-[#1B223C]">
           Supercharge your campaigns <br /> with
@@ -48,7 +48,7 @@ export default function EmailCampaignAIPage() {
       {/* custom ai text area */}
       <div className="space-y-11 flex flex-col justify-center items-center mt-10">
         {/* text area */}
-        <div className="p-0.5 bg-gradient-to-r from-[#7997F9] to-[#3D66EC] rounded-4xl w-full max-w-[860px] flex justify-center items-center">
+        <div className="p-0.5 bg-linear-to-r from-[#7997F9] to-[#3D66EC] rounded-4xl w-full max-w-[860px] flex justify-center items-center">
           <div className="resize-none h-[180px] w-full bg-[#F3F6F8] rounded-4xl outline-none p-4 flex flex-col justify-between">
             <textarea
               name="ai-chat"

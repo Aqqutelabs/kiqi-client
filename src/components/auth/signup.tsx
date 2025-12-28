@@ -18,11 +18,11 @@
 //                     <h1 className="text-4xl font-bold">Streamline your business with KiKi.</h1>
 //                     <div className="space-y-6">
 //                         <div className="flex items-start space-x-3">
-//                             <CheckCircle className="mt-1 flex-shrink-0" />
+//                             <CheckCircle className="mt-1 shrink-0" />
 //                             <p><span className="font-semibold">Lorem ipsum dolor sit amet</span><br/>Receive detailed insights on all your numbers in real-time.</p>
 //                         </div>
 //                         <div className="flex items-start space-x-3">
-//                             <CheckCircle className="mt-1 flex-shrink-0" />
+//                             <CheckCircle className="mt-1 shrink-0" />
 //                             <p><span className="font-semibold">Consectetur adipiscing elit</span><br/>Keep your team members and customers in the loop.</p>
 //                         </div>
 //                     </div>

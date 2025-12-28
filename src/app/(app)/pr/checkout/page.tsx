@@ -125,7 +125,7 @@ export default function PRCheckoutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
           {/* Header */}
           <div className="text-center mb-8 lg:mb-12">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-b from-[#233E97] to-[#1C3178] rounded-full mb-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-b from-[#233E97] to-[#1C3178] rounded-full mb-4">
               <ShoppingBag className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-2xl lg:text-3xl font-bold text-[#1B223C] mb-2">
@@ -168,8 +168,7 @@ export default function PRCheckoutPage() {
                         return (
                           <div
                             key={`${pub._id}-${pubIndex}`}
-                            className="flex items-start justify-between p-4 rounded-xl border border-gray-100 bg-gradient-to-r from-[#F8FAFC] to-[#FFFFFF]"
-                          >
+                            className="flex items-start justify-between p-4 rounded-xl border border-gray-100 bg-linear-to-r from-[#F8FAFC] to-[#FFFFFF]">
                             <div className="flex-1">
                               <h4 className="font-semibold text-gray-900 mb-2">
                                 {pub.name}
@@ -185,8 +184,7 @@ export default function PRCheckoutPage() {
                                     return (
                                       <span
                                         key={`${pub._id}-${pubIndex}-region-${regionIndex}`}
-                                        className="bg-white border border-[#E2E8F0] h-6 px-3 flex justify-center items-center rounded-md"
-                                      >
+                                        className="bg-white border border-[#E2E8F0] h-6 px-3 flex justify-center items-center rounded-md">
                                         {region}
                                       </span>
                                     );
@@ -222,10 +220,9 @@ export default function PRCheckoutPage() {
                       selectedPayment === "paystack"
                         ? "border-blue-600 bg-blue-50"
                         : "border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
+                    }`}>
                     <div className="flex items-start gap-3 flex-1 text-left">
-                      <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center shrink-0">
                         <CreditCard size={20} color="white" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -251,10 +248,9 @@ export default function PRCheckoutPage() {
                       selectedPayment === "crypto"
                         ? "border-blue-600 bg-blue-50"
                         : "border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
+                    }`}>
                     <div className="flex items-start gap-3 flex-1 text-left">
-                      <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center shrink-0">
                         <Smartphone size={20} color="gray" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -280,10 +276,9 @@ export default function PRCheckoutPage() {
                       selectedPayment === "go-credit"
                         ? "border-blue-600 bg-blue-50"
                         : "border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
+                    }`}>
                     <div className="flex items-start gap-3 flex-1 text-left">
-                      <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center shrink-0">
                         <div className="w-8 h-8 bg-blue-600 rounded-md flex items-center justify-center">
                           <Wallet size={20} color="white" />
                         </div>
@@ -359,15 +354,13 @@ export default function PRCheckoutPage() {
                       selectedPayment !== "paystack"
                         ? "opacity-50 cursor-not-allowed"
                         : ""
-                    }`}
-                  >
+                    }`}>
                     Complete Payment
                   </Button>
 
                   <Button
                     variant={"tertiary"}
-                    onClick={() => redirect("/pr/create/publisher-platform")}
-                  >
+                    onClick={() => redirect("/pr/create/publisher-platform")}>
                     Back to Selection
                   </Button>
                 </div>
