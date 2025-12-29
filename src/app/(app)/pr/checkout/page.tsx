@@ -93,9 +93,14 @@ export default function PRCheckoutPage() {
             : null
           : null;
 
+      // Get press_release_id from localStorage
+      const pressReleaseId = localStorage.getItem("pr_id");
+
       const res = await axios.post(
         `${BASE_URL}/api/v1/press-releases/orders/checkout`,
-        null,
+        {
+          press_release_id: pressReleaseId,
+        },
         {
           headers: { Authorization: `Bearer ${token}` },
         }

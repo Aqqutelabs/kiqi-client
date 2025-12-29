@@ -34,6 +34,7 @@ interface KikiAiChatbotProps {
   showCard?: boolean;
   maxHeight?: string;
   chatHistoryKey?: string;
+  resetChatOnMount?: boolean;
 }
 
 export const KikiAiChatbot: React.FC<KikiAiChatbotProps> = ({
@@ -46,6 +47,7 @@ export const KikiAiChatbot: React.FC<KikiAiChatbotProps> = ({
   showCard = true,
   maxHeight = "max-h-[500px]",
   chatHistoryKey = "kiki_chat_history",
+  resetChatOnMount = false,
 }) => {
   const kikiPanelRef = React.useRef<HTMLDivElement>(null);
 
@@ -77,6 +79,13 @@ export const KikiAiChatbot: React.FC<KikiAiChatbotProps> = ({
   // Load chat history from localStorage
   React.useEffect(() => {
     try {
+      // If resetChatOnMount is true, clear the history and don't load from localStorage
+      if (resetChatOnMount && chatHistoryKey) {
+        localStorage.removeItem(chatHistoryKey);
+        setChat([]);
+        return;
+      }
+
       if (chatHistoryKey) {
         const stored = localStorage.getItem(chatHistoryKey);
         if (stored) {
@@ -89,7 +98,7 @@ export const KikiAiChatbot: React.FC<KikiAiChatbotProps> = ({
     } catch (e) {
       console.warn("Failed to load chat history:", e);
     }
-  }, [chatHistoryKey]);
+  }, [chatHistoryKey, resetChatOnMount]);
 
   // Save chat history to localStorage
   React.useEffect(() => {
