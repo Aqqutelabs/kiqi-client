@@ -178,7 +178,7 @@ const handleAddToCart = async (pub: Publications) => {
     // }
 
     if (!stepOne.pr_content) {
-      toast.error('Fill PR content in Step 2');
+      toast.error('Fill all fields before payment');
       setCreatingPR(false);
       return;
     }
@@ -251,16 +251,17 @@ const handleAddToCart = async (pub: Publications) => {
   const total = cartData?.total ?? 0;
 
   return (
-    <motion.main
-      className="flex-1 overflow-y-auto   space-y-6"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
+  <motion.main
+    className="h-full grid grid-rows-[auto_1fr_auto]"
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5 }}
+  >
+    {/* Heading */}
+    <div className="p-4 bg-white">
       <PageHeader title="Select a Publisher Platform" backLink="/pr/create" />
 
-      {/* Header & Filters */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mt-4">
         <h4 className="text-base text-[#1B223C] font-medium">
           Choose Distribution Platforms
         </h4>
@@ -269,8 +270,10 @@ const handleAddToCart = async (pub: Publications) => {
           <Filter value="" onChange={() => {}} />
         </div>
       </div>
+    </div>
 
-      {/* Publications Grid */}
+    {/* Publications */}
+    <div className="overflow-y-auto p-4">
       <div className="grid grid-cols-3 gap-5">
         {publications.map((publication) => (
           <ProductCard
@@ -281,18 +284,21 @@ const handleAddToCart = async (pub: Publications) => {
           />
         ))}
       </div>
+    </div>
 
-      {/* Footer */}
+    {/* Footer */}
+    <div className="p-4 bg-white">
       <div className="flex justify-between items-center">
         <div className="space-y-2">
           <p className="text-sm text-[#64748B]">
-            {platformCount} {platformCount === 1 ? "platform" : "platforms"}{" "}
-            selected
+            {platformCount}{" "}
+            {platformCount === 1 ? "platform" : "platforms"} selected
           </p>
           <h4 className="text-[#1B223C] text-2xl font-medium">
             Total: NGN {subtotal.toLocaleString()}
           </h4>
         </div>
+
         <Button
           size="lg"
           onClick={handleProceedToCheckout}
@@ -301,6 +307,8 @@ const handleAddToCart = async (pub: Publications) => {
           {creatingPR ? "Processing..." : "Continue to Checkout"}
         </Button>
       </div>
-    </motion.main>
-  );
+    </div>
+  </motion.main>
+);
+
 }
