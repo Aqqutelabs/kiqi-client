@@ -3,7 +3,7 @@
 import FAQFooter from "@/components/ui/landing-footer";
 import LandingNav from "@/components/ui/landing-nav";
 import TestimonialsCarousel from "@/components/ui/LandingTestimonialCarousel";
-import { ArrowUp, CircleUserRound } from "lucide-react";
+import { ArrowUp, CircleUserRound, MousePointer2 } from "lucide-react";
 import Image from "next/image";
 
 export default function FeatureOnePage() {
@@ -41,6 +41,40 @@ export default function FeatureOnePage() {
       mainText: "Without media coverage, you look small and untrustworthy.",
     },
   ];
+
+  const whyPRWorks = [
+    {
+      icon: "/landing/pr-work1.svg",
+      header: "⭐ Instant Authority", 
+      text: "As Seen On Forbes builds credibility overnight.",
+    },
+     {
+      icon: "/landing/pr-work2.svg",
+      header: "✅ Guaranteed Placements", 
+      text: " No editor declines. You pay, you publish.",
+    },
+     {
+      icon: "/landing/pr-work3.svg",
+      header: "🔗 SEO Power", 
+      text: "High-authority backlinks that rank on Google.",
+    },
+     {
+      icon: "/landing/pr-work4.svg",
+      header: "🌍 Global Reach",
+      text: "Local, African, or worldwide syndication.",
+    },
+     {
+      icon: "/landing/pr-work5.svg",
+      header: "💼 Investor Trust",
+      text: "Media validation that closes funding faster.",
+    },
+     {
+      icon: "/landing/pr-work6.svg",
+      header: "🔄 Multi-Channel Flow", 
+      text: "Syncs with your email, SMS & influencer campaigns.",
+    },
+  ];
+
   return (
     <section>
       <LandingNav />
@@ -243,6 +277,39 @@ export default function FeatureOnePage() {
             </h4>
             <p className="text-sm font-normal">Rolls down from 90 days</p>
           </div>
+        </div>
+      </div>
+
+      {/* floating btn */}
+      <div className="w-115 h-35 rounded-2xl p-4 bg-white border border-gray-300 mx-auto my-20">
+        <div className="border border-gray-300 p-4 rounded-2xl h-full">
+          <button className="bg-linear-to-r from-[#2BAAE2] to-[#233E97] border border-black shadow h-full w-full rounded-2xl text-white flex items-center justify-between p-4 text-xl cursor-pointer">
+            Launch Your PR Now
+            <MousePointer2 color="white" size={30} className="rotate-90"/>
+          </button>
+        </div>
+      </div>
+
+      {/* why kiki pr works */}
+      <div className="bg-linear-to-br from-[#010921] via-[#010921] to-[#7e6c20] rounded-[30px] p-10 w-[95%] mx-auto">
+        <h4 className="text-center text-[45px] text-[#FED93B] font-bold capitalize">
+          Why Kiki PR Works.
+        </h4>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-5xl mx-auto my-8">
+            {whyPRWorks.map((item, idx) => (
+              <div key={idx} className="bg-white/20 backdrop-blur-2xl rounded-xl border border-white h-58 w-full p-6 flex flex-col justify-center items-center gap-6">
+                {/* icon */}
+                <div className="bg-linear-to-b from-[#2BAAE2] to-[#233E97] size-25 rounded-full flex justify-center items-center">
+                  <img src={item.icon} alt={`Icon ${idx}`} />
+                </div>
+
+                {/* content */}
+                <div className="text-center text-white">
+                  <h4 className="font-bold text-xl">{item.header}</h4>
+                  <p className="text-sm">{item.text}</p>
+                </div>
+              </div>
+            ))}
         </div>
       </div>
 
