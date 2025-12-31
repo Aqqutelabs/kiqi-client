@@ -389,7 +389,7 @@ export default function ProductSidebar({
     <>
       {/* Overlay */}
       <div
-        className={`fixed inset-0 bg-black transition-opacity duration-300 z-40 ${
+        className={`fixed inset-0 bg-black/40 transition-opacity duration-300 z-40 ${
           isOpen ? "opacity-50" : "opacity-0 pointer-events-none"
         }`}
         onClick={onClose}
