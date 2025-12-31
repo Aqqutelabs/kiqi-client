@@ -155,6 +155,42 @@ const navigationConfig: NavSection[] = [
       // },
     ],
   },
+  {
+    type: "section",
+    title: "Contacts",
+    items: [
+      {
+        type: "link",
+        href: "/contacts/all",
+        label: "All Contacts",
+        icon: "/sidebar-icons/subscription.svg",
+      },
+      {
+        type: "link",
+        href: "/contacts/lists",
+        label: "Lists",
+        icon: "/sidebar-icons/lists.svg",
+      },
+      {
+        type: "link",
+        href: "/contacts/forms",
+        label: "Lead Forms",
+        icon: "/sidebar-icons/forms.svg",
+      },
+      {
+        type: "link",
+        href: "/contacts/segment",
+        label: "Segment",
+        icon: "/sidebar-icons/subscription.svg",
+      },
+      {
+        type: "link",
+        href: "/contacts/audience",
+        label: "Audience",
+        icon: "/sidebar-icons/subscription.svg",
+      },
+    ],
+  },
   // {
   //   type: "section",
   //   title: "Finance",
@@ -251,7 +287,7 @@ export const Sidebar: React.FC = () => {
       )}
       <aside
         className={`
-          fixed top-0 left-0 w-4/5 md:w-[300px] z-40
+          fixed top-0 left-0 w-4/5 md:w-75 z-40
           bg-white border-r border-gray-200 flex flex-col
           transform transition-transform duration-300 ease-in-out
           ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
@@ -294,10 +330,10 @@ export const Sidebar: React.FC = () => {
                         <button
                           onClick={() => toggleDropdown(item.label)}
                           className={clsx(
-                            "w-full h-[50px] flex items-center justify-between px-5 py-2 text-xs sm:text-sm font-normal transition-colors",
+                            "w-full h-12.5 flex items-center justify-between px-5 py-2 text-xs sm:text-sm font-normal transition-colors",
                             {
-                              "text-[var(--primary)]": hasActiveChild,
-                              "text-[#42526D] hover:text-[var(--primary)]":
+                              "text-[(--primary)]": hasActiveChild,
+                              "text-[#42526D] hover:text-[(--primary)]":
                                 !hasActiveChild,
                             }
                           )}>
@@ -331,15 +367,15 @@ export const Sidebar: React.FC = () => {
                                     className={clsx(
                                       "flex items-center gap-1.5 pl-8 py-2 text-[10px] md:text-[13px] font-normal transition-colors relative",
                                       {
-                                        "text-[var(--primary)] bg-linear-to-r from-[#233E9726] via-white to-[##C4C4C400]":
+                                        "text-[(--primary)] bg-linear-to-r from-[#233E9726] via-white to-[##C4C4C400]":
                                           isActive,
-                                        "text-[#42526D] hover:text-[var(--primary)]":
+                                        "text-[#42526D] hover:text-[(--primary)]":
                                           !isActive,
                                       }
                                     )}>
                                     {/* Active indicator - left border */}
                                     {isActive && (
-                                      <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[var(--primary)] rounded-r" />
+                                      <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[(--primary)] rounded-r" />
                                     )}
                                     <img
                                       src="/sidebar-icons/arrow-right.svg"
@@ -365,17 +401,17 @@ export const Sidebar: React.FC = () => {
                       <Link
                         href={item.href}
                         className={clsx(
-                          "flex items-center gap-2.5 px-5 py-2 text-xs sm:text-sm font-normal h-[50px] transition-colors relative",
+                          "flex items-center gap-2.5 px-5 py-2 text-xs sm:text-sm font-normal h-12.5 transition-colors relative",
                           {
-                            "text-[var(--primary)] bg-linear-to-r from-[#233E9726] via-white to-[##C4C4C400]":
+                            "text-[(--primary)] bg-linear-to-r from-[#233E9726] via-white to-[##C4C4C400]":
                               isActive,
-                            "text-[#42526D] hover:text-[var(--primary)]":
+                            "text-[#42526D] hover:text-[(--primary)]":
                               !isActive,
                           }
                         )}>
                         {/* Active indicator - left border */}
                         {isActive && (
-                          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[var(--primary)] rounded-r" />
+                          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[(--primary)] rounded-r" />
                         )}
 
                         {item.icon && (
@@ -399,7 +435,7 @@ export const Sidebar: React.FC = () => {
         <div className="shrink-0 px-5 py-4 border-t border-gray-200">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-2.5 py-2 text-[13px] font-normal text-[#42526D] hover:text-[var(--primary)] transition-colors">
+            className="w-full flex items-center gap-2.5 py-2 text-[13px] font-normal text-[#42526D] hover:text-[(--primary)] transition-colors">
             <LogOut className="w-4 h-4 shrink-0" />
             <span>Log out</span>
           </button>
