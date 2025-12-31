@@ -17,7 +17,6 @@ import {
   ArrowUp,
 } from "lucide-react";
 import Image from "next/image";
-import { useState, useRef } from "react";
 
 
 export default function Home() {
