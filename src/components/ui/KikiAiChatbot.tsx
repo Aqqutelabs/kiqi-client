@@ -4,12 +4,7 @@ import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Sparkles,
-  ArrowRight,
-  SendHorizontal,
-  Plus,
-} from "lucide-react";
+import { Sparkles, ArrowRight, SendHorizontal, Plus } from "lucide-react";
 import apiClient from "@/lib/utils/apiClient";
 import BASE_URL from "@/lib/utils/baseUrl";
 import { useAppSelector } from "@/redux/hooks";
@@ -108,7 +103,10 @@ export const KikiAiChatbot: React.FC<KikiAiChatbotProps> = ({
     try {
       let t = String(tok);
       t = t.replace(/^\s+|\s+$/g, "");
-      if ((t.startsWith('"') && t.endsWith('"')) || (t.startsWith("'") && t.endsWith("'"))) {
+      if (
+        (t.startsWith('"') && t.endsWith('"')) ||
+        (t.startsWith("'") && t.endsWith("'"))
+      ) {
         t = t.slice(1, -1);
       }
       t = t.replace(/\r|\n/g, "");
@@ -149,7 +147,10 @@ export const KikiAiChatbot: React.FC<KikiAiChatbotProps> = ({
         .replace(/---\s*Reply\s*continued\s*---/gi, "")
         .replace(/---\s*Continued\s*---/gi, "")
         .replace(/_{3,}.*?_{3,}/g, "")
-        .replace(/^(hi there|hello|hey)[\s\S]*?---\s*Reply\s*continued\s*---/gi, "")
+        .replace(
+          /^(hi there|hello|hey)[\s\S]*?---\s*Reply\s*continued\s*---/gi,
+          ""
+        )
         .replace(/^(hi there|hello|hey)[,.\s]*/gi, "")
         .replace(/\b(?:previously|earlier|before|as mentioned)\b.*?\./gi, "")
         .trim();
@@ -162,11 +163,11 @@ export const KikiAiChatbot: React.FC<KikiAiChatbotProps> = ({
           const parsed = JSON.parse(filteredContent);
           if (parsed && typeof parsed === "object") {
             if (parsed.subject || parsed.body) {
-              return `${parsed.subject ? parsed.subject + "\n\n" : ""}${parsed.body ?? ""}`.trim();
+              return `${parsed.subject ? parsed.subject + "\n\n" : ""}${
+                parsed.body ?? ""
+              }`.trim();
             }
-            return Object.values(parsed)
-              .filter(Boolean)
-              .join("\n\n");
+            return Object.values(parsed).filter(Boolean).join("\n\n");
           }
         } catch (e) {
           // ignore JSON parse error
@@ -176,11 +177,11 @@ export const KikiAiChatbot: React.FC<KikiAiChatbotProps> = ({
     }
     if (typeof content === "object") {
       if (content.subject || content.body) {
-        return `${content.subject ? content.subject + "\n\n" : ""}${content.body ?? ""}`.trim();
+        return `${content.subject ? content.subject + "\n\n" : ""}${
+          content.body ?? ""
+        }`.trim();
       }
-      return Object.values(content)
-        .filter(Boolean)
-        .join("\n\n");
+      return Object.values(content).filter(Boolean).join("\n\n");
     }
     return String(content);
   };
@@ -213,7 +214,8 @@ export const KikiAiChatbot: React.FC<KikiAiChatbotProps> = ({
         ? { headers: { Authorization: `Bearer ${cleanToken}` } }
         : {};
 
-      const shouldContinueThread = chat.filter((msg) => msg.role === "user").length > 0;
+      const shouldContinueThread =
+        chat.filter((msg) => msg.role === "user").length > 0;
 
       const payload: any = {
         context,
@@ -276,7 +278,7 @@ export const KikiAiChatbot: React.FC<KikiAiChatbotProps> = ({
   const content = (
     <>
       {/* Header */}
-      <div className="flex justify-between items-center flex-shrink-0 mb-5">
+      <div className="flex justify-between items-center shrink-0 mb-5">
         <div className="flex gap-3 items-center">
           <Sparkles color="#1B223C" size={20} />
           <Heading heading="KiKi AI" />
@@ -284,8 +286,7 @@ export const KikiAiChatbot: React.FC<KikiAiChatbotProps> = ({
         <button
           onClick={startNewChat}
           className="flex justify-center items-center border border-[#E2E8F0] h-10.5 px-3 py-2.5 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors"
-          title="Start new chat"
-        >
+          title="Start new chat">
           <Plus size={16} color="gray" />
         </button>
       </div>
@@ -293,8 +294,7 @@ export const KikiAiChatbot: React.FC<KikiAiChatbotProps> = ({
       {/* Chat Messages */}
       <div
         ref={kikiPanelRef}
-        className={`space-y-5 overflow-y-auto scrollbar-hide flex-1 pr-2 min-h-0 ${maxHeight}`}
-      >
+        className={`space-y-5 overflow-y-auto scrollbar-hide flex-1 pr-2 min-h-0 ${maxHeight}`}>
         <AnimatePresence>
           {chat.length > 0 ? (
             chat.map((msg, idx) => (
@@ -302,13 +302,16 @@ export const KikiAiChatbot: React.FC<KikiAiChatbotProps> = ({
                 key={idx}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex gap-3 items-start"
-              >
+                className="flex gap-3 items-start">
                 {msg.role === "user" ? (
                   <Avatar name={displayName} />
                 ) : (
                   <div className="flex justify-center items-center bg-white p-2 rounded-full min-w-8 h-8 mt-2">
-                    <img src="/favicon.svg" alt="Icon" className="size-11 object-cover" />
+                    <img
+                      src="/favicon.svg"
+                      alt="Icon"
+                      className="size-11 object-cover"
+                    />
                   </div>
                 )}
 
@@ -333,8 +336,7 @@ export const KikiAiChatbot: React.FC<KikiAiChatbotProps> = ({
                     <button
                       onClick={() => handleApplyMessage(idx)}
                       title="Apply this AI message"
-                      className="absolute right-2 top-2 p-2 rounded-full shadow-md bg-gradient-to-tr from-[#1E3A8A] to-[#233E97] text-white hover:scale-105 transition-transform"
-                    >
+                      className="absolute right-2 top-2 p-2 rounded-full shadow-md bg-gradient-to-tr from-[#1E3A8A] to-[#233E97] text-white hover:scale-105 transition-transform">
                       <ArrowRight size={14} />
                     </button>
                   )}
@@ -342,7 +344,9 @@ export const KikiAiChatbot: React.FC<KikiAiChatbotProps> = ({
               </motion.div>
             ))
           ) : (
-            <div className="text-gray-400 text-center py-6">{emptyStateMessage}</div>
+            <div className="text-gray-400 text-center py-6">
+              {emptyStateMessage}
+            </div>
           )}
         </AnimatePresence>
 
@@ -350,8 +354,7 @@ export const KikiAiChatbot: React.FC<KikiAiChatbotProps> = ({
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="flex gap-2 items-start"
-          >
+            className="flex gap-2 items-start">
             <div className="flex justify-center items-center bg-white p-2 rounded-full min-w-8 h-8">
               <img src="/favicon.svg" alt="Icon" className="size-11" />
             </div>
@@ -373,7 +376,7 @@ export const KikiAiChatbot: React.FC<KikiAiChatbotProps> = ({
       </div>
 
       {/* Input Area */}
-      <div className="mt-auto pt-2 bg-white flex-shrink-0">
+      <div className="mt-auto pt-2 bg-white shrink-0">
         <div className="relative w-full">
           <div className="bg-[#F3F6F8] rounded-xl p-3">
             <div className="relative">
@@ -395,8 +398,7 @@ export const KikiAiChatbot: React.FC<KikiAiChatbotProps> = ({
                 onClick={sendMessage}
                 disabled={loading || !context.trim()}
                 className="absolute right-2 bottom-2 p-2 bg-[var(--primary)] rounded-lg hover:opacity-90 disabled:opacity-50 transition-all"
-                title="Send message"
-              >
+                title="Send message">
                 <SendHorizontal size={16} color="white" />
               </button>
             </div>
@@ -407,11 +409,7 @@ export const KikiAiChatbot: React.FC<KikiAiChatbotProps> = ({
   );
 
   if (showCard) {
-    return (
-      <Card className="flex flex-col h-full min-h-0">
-        {content}
-      </Card>
-    );
+    return <Card className="flex flex-col h-full min-h-0">{content}</Card>;
   }
 
   return <div className="flex flex-col h-full min-h-0">{content}</div>;

@@ -149,7 +149,7 @@ function TotalReferredCard() {
             {/* Left side - User info */}
             <div className="flex items-center gap-3 flex-1 min-w-0">
               {/* Avatar */}
-              <div className="w-10 h-10 rounded-full bg-[var(--primary)] flex items-center justify-center text-white font-medium text-sm flex-shrink-0">
+              <div className="w-10 h-10 rounded-full bg-[var(--primary)] flex items-center justify-center text-white font-medium text-sm shrink-0">
                 {referee.name
                   .split(" ")
                   .map((n) => n[0])

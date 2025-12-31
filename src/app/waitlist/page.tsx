@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
-import { Loader2, CheckCircle2, AlertCircle, X } from 'lucide-react';
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
+import { Loader2, CheckCircle2, AlertCircle, X } from "lucide-react";
 
 interface FormData {
   firstname: string;
@@ -26,35 +26,35 @@ const WaitlistPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const [formData, setFormData] = useState<FormData>({
-    firstname: '',
-    lastname: '',
-    email: '',
-    role: '',
-    company: '',
-    referral: 'Social Media',
+    firstname: "",
+    lastname: "",
+    email: "",
+    role: "",
+    company: "",
+    referral: "Social Media",
   });
 
   const validateForm = (): boolean => {
     const errors: FormErrors = {};
 
     if (!formData.firstname.trim()) {
-      errors.firstname = 'First name is required';
+      errors.firstname = "First name is required";
     }
     if (!formData.lastname.trim()) {
-      errors.lastname = 'Last name is required';
+      errors.lastname = "Last name is required";
     }
     if (!formData.email.trim()) {
-      errors.email = 'Email is required';
+      errors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.email = 'Please enter a valid email';
+      errors.email = "Please enter a valid email";
     }
     if (!agreedToTerms) {
-      errors.terms = 'You must agree to the terms';
+      errors.terms = "You must agree to the terms";
     }
 
     setFormErrors(errors);
@@ -87,7 +87,7 @@ const WaitlistPage = () => {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.from('kiki-waitlist').insert([
+      const { error } = await supabase.from("kiki-waitlist").insert([
         {
           firstname: formData.firstname.trim(),
           lastname: formData.lastname.trim(),
@@ -104,15 +104,16 @@ const WaitlistPage = () => {
 
       setShowSuccessModal(true);
       setTimeout(() => {
-        router.push('/waitlist/success');
+        router.push("/waitlist/success");
       }, 1000);
     } catch (error: any) {
-      console.error('Error:', error);
+      console.error("Error:", error);
 
-      let message = 'Please try again or contact support if the problem persists.';
+      let message =
+        "Please try again or contact support if the problem persists.";
 
-      if (error.code === '23505') {
-        message = 'This email is already on the waitlist!';
+      if (error.code === "23505") {
+        message = "This email is already on the waitlist!";
       } else if (error.message) {
         message = error.message;
       }
@@ -125,7 +126,7 @@ const WaitlistPage = () => {
   };
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+    <div className="relative flex min-h-screen w-full flex-col bg-linear-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       {/* Decorative elements */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl -z-10" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -z-10" />
@@ -178,12 +179,14 @@ const WaitlistPage = () => {
                     placeholder="John"
                     className={`px-4 py-3 rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 ${
                       formErrors.firstname
-                        ? 'border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/20'
-                        : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500'
+                        ? "border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/20"
+                        : "border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                     }`}
                   />
                   {formErrors.firstname && (
-                    <p className="text-red-500 text-xs mt-1">{formErrors.firstname}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {formErrors.firstname}
+                    </p>
                   )}
                 </div>
 
@@ -199,12 +202,14 @@ const WaitlistPage = () => {
                     placeholder="Doe"
                     className={`px-4 py-3 rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 ${
                       formErrors.lastname
-                        ? 'border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/20'
-                        : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500'
+                        ? "border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/20"
+                        : "border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                     }`}
                   />
                   {formErrors.lastname && (
-                    <p className="text-red-500 text-xs mt-1">{formErrors.lastname}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {formErrors.lastname}
+                    </p>
                   )}
                 </div>
               </div>
@@ -222,12 +227,14 @@ const WaitlistPage = () => {
                   placeholder="john@example.com"
                   className={`px-4 py-3 rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-primary/50 ${
                     formErrors.email
-                      ? 'border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/20'
-                      : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500'
+                      ? "border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/20"
+                      : "border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   }`}
                 />
                 {formErrors.email && (
-                  <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    {formErrors.email}
+                  </p>
                 )}
               </div>
 
@@ -270,8 +277,7 @@ const WaitlistPage = () => {
                   name="referral"
                   value={formData.referral}
                   onChange={handleInputChange}
-                  className="px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white transition-all focus:outline-none focus:ring-2 focus:ring-primary/50"
-                >
+                  className="px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white transition-all focus:outline-none focus:ring-2 focus:ring-primary/50">
                   <option>Social Media</option>
                   <option>Friend/Colleague</option>
                   <option>From KiKi</option>
@@ -298,9 +304,13 @@ const WaitlistPage = () => {
                   }}
                   className="mt-1.5 h-5 w-5 rounded border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-primary focus:ring-primary/50 cursor-pointer"
                 />
-                <label htmlFor="terms" className="text-sm text-slate-600 dark:text-slate-400">
-                  I agree to be contacted about KiKi and accept the{' '}
-                  <a href="#" className="font-medium text-primary hover:underline">
+                <label
+                  htmlFor="terms"
+                  className="text-sm text-slate-600 dark:text-slate-400">
+                  I agree to be contacted about KiKi and accept the{" "}
+                  <a
+                    href="#"
+                    className="font-medium text-primary hover:underline">
                     privacy policy
                   </a>
                   . <span className="text-red-500">*</span>
@@ -314,15 +324,14 @@ const WaitlistPage = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 mt-8"
-              >
+                className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 mt-8">
                 {isLoading ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
                     Joining...
                   </>
                 ) : (
-                  'Join the Waitlist'
+                  "Join the Waitlist"
                 )}
               </button>
             </form>
@@ -348,7 +357,8 @@ const WaitlistPage = () => {
               You're on the list!
             </h3>
             <p className="text-slate-600 dark:text-slate-400 text-center text-sm">
-              Thanks for joining! We'll notify you as soon as KiKi launches. Redirecting you now...
+              Thanks for joining! We'll notify you as soon as KiKi launches.
+              Redirecting you now...
             </p>
           </div>
         </div>
@@ -360,8 +370,7 @@ const WaitlistPage = () => {
           <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-8 animate-in fade-in zoom-in duration-300 relative">
             <button
               onClick={() => setShowErrorModal(false)}
-              className="absolute top-4 right-4 p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
-            >
+              className="absolute top-4 right-4 p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
               <X className="w-5 h-5 text-slate-500" />
             </button>
             <div className="flex items-center justify-center w-16 h-16 mx-auto mb-6 rounded-full bg-red-100 dark:bg-red-900/30">
@@ -375,8 +384,7 @@ const WaitlistPage = () => {
             </p>
             <button
               onClick={() => setShowErrorModal(false)}
-              className="w-full bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-900 dark:text-white font-semibold py-3 px-4 rounded-lg transition-colors"
-            >
+              className="w-full bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-900 dark:text-white font-semibold py-3 px-4 rounded-lg transition-colors">
               Close
             </button>
           </div>
