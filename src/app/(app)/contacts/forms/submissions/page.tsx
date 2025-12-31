@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/ui/layout/PageHeader";
 import SearchInput from "@/components/ui/Search";
 import { Download, Eye } from "lucide-react";
 
+// this will be based on id for each lead form submissions
 interface FormSubmissions {
   id: number;
   name: string;

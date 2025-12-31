@@ -4,8 +4,10 @@ import { PageHeader } from "@/components/ui/layout/PageHeader";
 import SearchInput from "@/components/ui/Search";
 import { FileText, Edit, Copy, Eye, Trash2, Code, Plus } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function ContactLeadForms() {
+  const router = useRouter();
   return (
     <section>
       <PageHeader
@@ -23,7 +25,7 @@ export default function ContactLeadForms() {
               name="search"
               placeholder="Search Contact name"
             />
-            <Button className="w-2/4">
+            <Button onClick={() => router.push("/contacts/forms/create")} className="w-2/4">
             <Plus className="mr-1" size={20}/>
             Create Form
             </Button>
