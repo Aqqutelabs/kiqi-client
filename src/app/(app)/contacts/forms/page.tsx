@@ -2,7 +2,8 @@
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import SearchInput from "@/components/ui/Search";
-import { FileText, Edit, Copy, Eye, Trash2, Code } from "lucide-react";
+import { FileText, Edit, Copy, Eye, Trash2, Code, Plus } from "lucide-react";
+import Link from "next/link";
 
 export default function ContactLeadForms() {
   return (
@@ -22,7 +23,10 @@ export default function ContactLeadForms() {
               name="search"
               placeholder="Search Contact name"
             />
-            <Button className="w-2/4">Create Form</Button>
+            <Button className="w-2/4">
+            <Plus className="mr-1" size={20}/>
+            Create Form
+            </Button>
           </div>
         </div>
         {/* table */}
@@ -60,9 +64,9 @@ export default function ContactLeadForms() {
                   </div>
                 </td>
                 <td className="py-4 px-4">
-                  <span className="text-sm text-[#233E97] font-medium">
+                  <Link href={"/contacts/forms/submissions"} className="text-sm text-[#233E97] font-medium block hover:underline cursor-pointer">
                     342 submissions
-                  </span>
+                  </Link>
                 </td>
                 <td className="py-4 px-4">
                   <span className="text-sm text-[#2D3748]">01/09/2024</span>
