@@ -23,6 +23,7 @@ import SearchInput from "@/components/ui/Search";
 import Filter from "@/components/ui/Filter";
 import ContactModal from "@/components/ui/ContactModal";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
+import SuccessModal from "@/components/ui/SuccessModal";
 
 interface Contact {
   id: number;
@@ -244,7 +245,9 @@ export default function ContactsMainContent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [contacts, setContacts] = useState([]);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [showCreateList, setShowCreateList] = useState(false);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const data: Contact[] = useMemo(
     () => [
@@ -337,15 +340,25 @@ export default function ContactsMainContent() {
 
   return (
     <>
+      {/* Contact Details Modal */}
       <ContactDetailsModal
         isOpen={isDetailsOpen}
         onClose={() => setIsDetailsOpen(false)}
         contact={selectedContact}
       />
+      {/* New Contact Modal */}
       <ContactModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />
+      {/* Success Modal */}
+      <SuccessModal
+        isOpen={showSuccess}
+        title="New List Created"
+        description="To add contacts to your lists, select contacts from All contacts tab, and click add to list."
+        onClose={() => setShowSuccess(false)}
+      />
+
       <PageHeader title="Contacts" />
       <div className="flex flex-col gap-6">
         {/* Stats */}
@@ -391,6 +404,7 @@ export default function ContactsMainContent() {
             subtitle="Organize your contacts"
             iconBg="bg-[#233E97]/10"
             iconColor="text-[#233E97]"
+            onClick={() => setShowCreateList(true)}
           />
           <ActionCard
             icon={FileText}
@@ -484,7 +498,10 @@ export default function ContactsMainContent() {
                     />
                   </td>
                   {columns.map((col) => (
-                    <td className="px-6 py-4 text-sm text-gray-700 w-[500px]">
+                    <td
+                      key={col.accessor}
+                      className="px-6 py-4 text-sm text-gray-700 w-[500px]"
+                    >
                       {renderCellValue(row[col.accessor])}
                     </td>
                   ))}
@@ -527,6 +544,70 @@ export default function ContactsMainContent() {
           </table>
         </div>
       </div>
+
+      {showCreateList && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4">
+              <h2 className="text-lg font-semibold text-gray-900">
+                Create New List
+              </h2>
+              <button
+                onClick={() => setShowCreateList(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="h-px bg-gray-200 w-full" />
+
+            {/* Form */}
+            <div className="px-6 py-6 space-y-5">
+              <div>
+                <label className="block text-sm font-medium text-[#364153] mb-1">
+                  List Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g., VIP Customers"
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#233E97]/30"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-[#364153] mb-1">
+                  Description <span className="text-[#6A7282]">(optional)</span>
+                </label>
+                <textarea
+                  placeholder="Add a description for this list..."
+                  rows={3}
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#233E97]/30"
+                />
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex justify-end gap-3 px-6 pb-6">
+              <Button
+                onClick={() => setShowCreateList(false)}
+                variant="outline"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowCreateList(false);
+                  setShowSuccess(true);
+                }}
+              >
+                Create List
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
