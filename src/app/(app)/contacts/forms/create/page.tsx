@@ -3,6 +3,8 @@
 import { Button } from "@/components/ui/Button";
 import Checkbox from "@/components/ui/CheckBox";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
+import { Modal } from "@/components/ui/Modal";
+import Heading from "@/components/ui/TextHeading";
 import {
   Eye,
   Save,
@@ -28,55 +30,13 @@ type FieldType = {
 };
 
 const FIELD_TYPES: FieldType[] = [
-  {
-    id: "text",
-    label: "Text Input",
-    icon: Type,
-    defaultLabel: "Text Field",
-    defaultPlaceholder: "Enter text",
-  },
-  {
-    id: "email",
-    label: "Email Field",
-    icon: Mail,
-    defaultLabel: "Email",
-    defaultPlaceholder: "email@example.com",
-  },
-  {
-    id: "phone",
-    label: "Phone Field",
-    icon: Phone,
-    defaultLabel: "Phone Number",
-    defaultPlaceholder: "+234 0002 2000 000",
-  },
-  {
-    id: "dropdown",
-    label: "Dropdown",
-    icon: ChevronDown,
-    defaultLabel: "New Dropdown Field",
-    defaultPlaceholder: "Select an option",
-  },
-  {
-    id: "checkbox",
-    label: "Checkbox",
-    icon: CheckSquare,
-    defaultLabel: "New checkbox field",
-    defaultPlaceholder: "",
-  },
-  {
-    id: "multiselect",
-    label: "Multi-select",
-    icon: List,
-    defaultLabel: "New multiselect Field",
-    defaultPlaceholder: "Select multiple options",
-  },
-  {
-    id: "paragraph",
-    label: "Paragraph Text",
-    icon: AlignLeft,
-    defaultLabel: "New textarea field",
-    defaultPlaceholder: "Enter detailed text",
-  },
+  { id: "text", label: "Text Input", icon: Type, defaultLabel: "Text Field", defaultPlaceholder: "Enter text",},
+  { id: "email", label: "Email Field", icon: Mail, defaultLabel: "Email", defaultPlaceholder: "email@example.com",},
+  { id: "phone", label: "Phone Field", icon: Phone, defaultLabel: "Phone Number", defaultPlaceholder: "+234 0002 2000 000",},
+  { id: "dropdown", label: "Dropdown", icon: ChevronDown, defaultLabel: "New Dropdown Field", defaultPlaceholder: "Select an option",},
+  { id: "checkbox", label: "Checkbox", icon: CheckSquare, defaultLabel: "New checkbox field", defaultPlaceholder: "",},
+  { id: "multiselect", label: "Multi-select", icon: List, defaultLabel: "New multiselect Field", defaultPlaceholder: "Select multiple options",},
+  { id: "paragraph", label: "Paragraph Text", icon: AlignLeft, defaultLabel: "New textarea field", defaultPlaceholder: "Enter detailed text",},
 ];
 
 export default function CreateLeadForm() {
@@ -94,6 +54,10 @@ export default function CreateLeadForm() {
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
   const [draggedType, setDraggedType] = useState<string | null>(null);
   const fieldIdCounter = useRef<number>(0);
+  const [formNameError, setFormNameError] = useState("");
+
+  // for publish success
+  const [confirmPublish, setConfirmPublish] = useState(false);
 
   const selectedField = fields.find((f) => f.id === selectedFieldId) as
     | Field
@@ -203,10 +167,19 @@ export default function CreateLeadForm() {
     window.open("/contacts/forms/preview", "_blank");
   };
 
-  const getFieldIcon = (type: string): React.ComponentType<any> => {
-    const fieldType = FIELD_TYPES.find((ft) => ft.id === type);
-    return fieldType ? fieldType.icon : Type;
-  };
+  // const getFieldIcon = (type: string): React.ComponentType<any> => {
+  //   const fieldType = FIELD_TYPES.find((ft) => ft.id === type);
+  //   return fieldType ? fieldType.icon : Type;
+  // };
+
+  const handlePublish = () => {
+    if (!formName) {
+      setFormNameError("Form name cannot be empty!")
+    } else (
+      setFormNameError(''),
+      setConfirmPublish(true)
+    )
+  }
 
   return (
     <section className="min-h-screen bg-gray-50">
@@ -222,7 +195,7 @@ export default function CreateLeadForm() {
           <Save className="mr-2" size={16} />
           Save
         </Button>
-        <Button>Publish</Button>
+        <Button onClick={handlePublish}>Publish</Button>
       </div>
 
       {/* Main Content */}
@@ -270,6 +243,7 @@ export default function CreateLeadForm() {
               placeholder="Enter form name"
               className="w-full px-4 py-2 border border-[#D1D5DC] text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
             />
+            {formNameError && <span className="text-xs text-red-500 text-left ml-2.5 mt-1">{formNameError}</span>}
           </div>
 
           {/* form body */}
@@ -500,6 +474,51 @@ export default function CreateLeadForm() {
           </div>
         )}
       </div>
+
+      <Modal isOpen={confirmPublish} onClose={() => setConfirmPublish(false)} width="500px">
+        <Heading heading={`${formName} Published!`} />
+        <hr className="text-gray-200 my-4" />
+
+        {/* hosted link */}
+        <div className="space-y-2 text-sm text-[#364153] my-6">
+          <p>Hosted Form Link</p>
+          <div className="flex flex-col md:flex-row items-center gap-2">
+            <input 
+              type="text" 
+              value="https://kiqi.com/forms/abc123"
+              readOnly
+              className="outline-none border border-[#D1D5DC] bg-[#F9FAFB] px-4 py-2 rounded-lg h-10.5 w-4/5" 
+            />
+            <button className="border border-[#D1D5DC] h-10.5 rounded-lg w-1/5 text-sm cursor-pointer hover:bg-gray-50">
+              Copy
+            </button>
+          </div>
+        </div>
+
+        {/* embed code */}
+        <div className="space-y-2">
+          <p className="text-sm text-[#364153]">Embed Code</p>
+          <div className="min-h-37.5 w-full rounded-lg relative bg-[#101828] p-6">
+            <button 
+              className="absolute top-3 right-3 border border-gray-600 bg-[#1F2937] text-white px-3 py-1.5 rounded-lg text-xs cursor-pointer hover:bg-[#374151]"
+            >
+              Copy
+            </button>
+            <pre className="text-sm overflow-x-auto">
+              <code className="text-green-400">
+                {`<iframe 
+src="https://kiqi.com/forms/abc123"
+width="100%"
+height="600"
+frameborder="0"
+></iframe>`}
+              </code>
+            </pre>
+          </div>
+        </div>
+
+        <Button variant={"tertiary"} className="mt-4 w-full cursor-pointer">Close</Button>
+      </Modal>
     </section>
   );
 }
