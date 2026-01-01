@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Plus,
   Upload,
@@ -108,10 +108,7 @@ export function ContactDetailsModal({
   return (
     <>
       {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/30"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 bg-black/30" onClick={onClose} />
 
       {/* Modal */}
       <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-50 overflow-y-auto">
@@ -243,6 +240,7 @@ export function ContactDetailsModal({
 
 export default function ContactsMainContent() {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [openMenuId, setOpenMenuId] = useState<string | number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [contacts, setContacts] = useState([]);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -253,8 +251,8 @@ export default function ContactsMainContent() {
       {
         id: 1,
         name: "Sarah Johnson",
-        initials: 'SJ',
-        title: 'Marketing Director',
+        initials: "SJ",
+        title: "Marketing Director",
         company: "TechCorp Inc.",
         emails: ["sarah.johnson@techcorp.com", "sarah.j@gmail.com"],
         phones: ["+1 (555) 123-4567", "+1 (555) 987-6543"],
@@ -265,8 +263,8 @@ export default function ContactsMainContent() {
       {
         id: 2,
         name: "Michael Phelps",
-        initials: 'MP',
-        title: 'Marketing Director',
+        initials: "MP",
+        title: "Marketing Director",
         company: "Swimming Corps.",
         emails: ["micheal.phelps@swim.com", "phelps.m@gmail.com"],
         phones: ["+1 (555) 123-4567", "+1 (555) 987-6543"],
@@ -277,8 +275,8 @@ export default function ContactsMainContent() {
       {
         id: 3,
         name: "Sarah Johnson",
-        initials: 'SJ',
-        title: 'Marketing Director',
+        initials: "SJ",
+        title: "Marketing Director",
         company: "TechCorp Inc.",
         emails: ["sarah.johnson@techcorp.com", "sarah.j@gmail.com"],
         phones: ["+1 (555) 123-4567", "+1 (555) 987-6543"],
@@ -292,6 +290,12 @@ export default function ContactsMainContent() {
     setSelectedContact(contact);
     setIsDetailsOpen(true);
   };
+
+  useEffect(() => {
+    const close = () => setOpenMenuId(null);
+    window.addEventListener("click", close);
+    return () => window.removeEventListener("click", close);
+  }, []);
 
   const columns: Column<Contact>[] = [
     {
@@ -323,6 +327,13 @@ export default function ContactsMainContent() {
   };
 
   const clearSelection = () => setSelectedIds([]);
+
+  const renderCellValue = (value: unknown) => {
+    if (Array.isArray(value)) {
+      return value[0] ?? "";
+    }
+    return value;
+  };
 
   return (
     <>
@@ -402,7 +413,7 @@ export default function ContactsMainContent() {
                 <ListPlus className="w-4 h-4 mr-1" />
                 Add to list
               </Button>
-              <Button size="sm">
+              {/* <Button size="sm">
                 <Mail className="w-4 h-4 mr-1" />
                 Send Email
               </Button>
@@ -417,7 +428,7 @@ export default function ContactsMainContent() {
               <Button size="sm">
                 <Trash2 className="w-4 h-4 mr-1" />
                 Delete
-              </Button>
+              </Button> */}
               <Button size="sm" onClick={clearSelection}>
                 <X className="w-4 h-4" />
                 Clear
@@ -427,14 +438,14 @@ export default function ContactsMainContent() {
         )}
 
         <div className="flex justify-between items-center text-[#1B223C] font-medium ">
-          <h3 className="text-lg md:text-xl">Contacts</h3>
+          <h3 className="text-lg md:text-xl text-[#42526D]">Contacts</h3>
           <div className="flex items-center gap-2">
             <SearchInput name="search" value="" onChange={() => {}} />
             <Filter value="" onChange={() => {}} />
           </div>
         </div>
         {/* Table */}
-        <div className="bg-white rounded-xl overflow-hidden">
+        <div className="bg-white overflow-hidden">
           <table className="min-w-full">
             <thead className="bg-[#D1DAF4] h-[66px]">
               <tr>
@@ -473,14 +484,11 @@ export default function ContactsMainContent() {
                     />
                   </td>
                   {columns.map((col) => (
-                    <td
-                      key={String(col.accessor)}
-                      className="px-6 py-4 text-sm text-gray-700 w-[500px]"
-                    >
-                      {row[col.accessor]}
+                    <td className="px-6 py-4 text-sm text-gray-700 w-[500px]">
+                      {renderCellValue(row[col.accessor])}
                     </td>
                   ))}
-                  <td className="px-6 py-4 text-right">
+                  <td className="px-6 py-4 text-right relative">
                     <div className="flex justify-end items-center gap-3">
                       <button
                         onClick={() => handleViewContact(row)}
@@ -489,9 +497,28 @@ export default function ContactsMainContent() {
                         <Eye className="w-4 h-4" />
                       </button>
 
-                      <button className="text-gray-500 hover:text-gray-700">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpenMenuId(openMenuId === row.id ? null : row.id);
+                        }}
+                        className="text-gray-500 hover:text-gray-700"
+                      >
                         <MoreVertical className="w-4 h-4" />
                       </button>
+                      {openMenuId === row.id && (
+                        <div className="absolute right-0 mt-2 w-44 bg-white border border-[#E5E7EB] rounded-lg shadow-lg z-50">
+                          <button className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50">
+                            Edit Contact
+                          </button>
+                          <button className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50">
+                            Add to List
+                          </button>
+                          <button className="w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50">
+                            Delete Contact
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </td>
                 </tr>
