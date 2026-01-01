@@ -84,14 +84,16 @@ const ProgressTracker = ({ isOpen = true, onClose = () => {}, trackerData, statu
   const getStatusConfig = () => {
     if (!apiStatusConfig) return defaultStatusConfig;
     
-    const converted: Record<StatusType, { icon: any; color: string; textColor: string }> = {} as any;
+    const converted: Record<StatusType, { icon: any; color: string; textColor: string }> = { ...defaultStatusConfig } as any;
     
     (Object.entries(apiStatusConfig) as [StatusType, StatusConfig][]).forEach(([key, value]) => {
-      converted[key] = {
-        icon: iconMap[value.icon] || defaultStatusConfig[key].icon,
-        color: value.color.startsWith('#') ? convertHexToBgClass(value.color) : value.color,
-        textColor: value.textColor.startsWith('#') ? convertHexToTextClass(value.textColor) : value.textColor,
-      };
+      if (value && typeof value === 'object') {
+        converted[key] = {
+          icon: (value.icon && iconMap[value.icon]) || defaultStatusConfig[key]?.icon || CheckCircle,
+          color: value.color?.startsWith('#') ? convertHexToBgClass(value.color) : value.color || 'bg-gray-500',
+          textColor: value.textColor?.startsWith('#') ? convertHexToTextClass(value.textColor) : value.textColor || 'text-gray-600',
+        };
+      }
     });
     
     return converted;
@@ -316,7 +318,14 @@ const ProgressTracker = ({ isOpen = true, onClose = () => {}, trackerData, statu
                   
                   {event.items.map((item, idx) => {
                     const status = item.status as StatusType;
-                    const StatusIcon = statusConfigResolved[status].icon;
+                    const statusConfig = statusConfigResolved[status];
+                    
+                    // Safety check: if status doesn't exist in config, skip rendering
+                    if (!statusConfig || !statusConfig.icon) {
+                      return null;
+                    }
+                    
+                    const StatusIcon = statusConfig.icon;
                     
                     return (
                       <div key={idx} className="relative mb-6 last:mb-0">
