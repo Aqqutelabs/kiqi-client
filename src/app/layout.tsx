@@ -57,11 +57,11 @@ export default function RootLayout({
           <SidebarProvider>
             <ProductsProvider>
               <ReduxProvider>
-                <WalletProvider>
+                {/* <WalletProvider> */}
                   <ToasterClient />
                   <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js" />
                   {children}
-                </WalletProvider>
+                {/* </WalletProvider> */}
               </ReduxProvider>
             </ProductsProvider>
           </SidebarProvider>
