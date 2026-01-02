@@ -51,7 +51,7 @@ const navigationConfig: NavSection[] = [
     type: "section",
     title: "Campaigns",
     items: [
-       {
+      {
         type: "link",
         href: "/pr/dashboard",
         label: "PR",
@@ -155,6 +155,42 @@ const navigationConfig: NavSection[] = [
       // },
     ],
   },
+  {
+    type: "section",
+    title: "Contacts",
+    items: [
+      {
+        type: "link",
+        href: "/contacts/all",
+        label: "All Contacts",
+        icon: "/sidebar-icons/subscription.svg",
+      },
+      {
+        type: "link",
+        href: "/contacts/lists",
+        label: "Lists",
+        icon: "/sidebar-icons/lists.svg",
+      },
+      {
+        type: "link",
+        href: "/contacts/forms",
+        label: "Lead Forms",
+        icon: "/sidebar-icons/forms.svg",
+      },
+      {
+        type: "link",
+        href: "/contacts/segment",
+        label: "Segment",
+        icon: "/sidebar-icons/subscription.svg",
+      },
+      {
+        type: "link",
+        href: "/contacts/audience",
+        label: "Audience",
+        icon: "/sidebar-icons/subscription.svg",
+      },
+    ],
+  },
   // {
   //   type: "section",
   //   title: "Finance",
@@ -251,14 +287,14 @@ export const Sidebar: React.FC = () => {
       )}
       <aside
         className={`
-          fixed top-0 left-0 w-4/5 md:w-[300px] z-40
+          fixed top-0 left-0 w-4/5 md:w-75 z-40
           bg-white border-r border-gray-200 flex flex-col
           transform transition-transform duration-300 ease-in-out
           ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
           md:translate-x-0 h-screen
         `}>
         {/* Header */}
-        <div className="h-16 flex-shrink-0 flex items-center px-5 border-b border-gray-200">
+        <div className="h-16 shrink-0 flex items-center px-5 border-b border-gray-200">
           <Image
             src="/kiki-logo.svg"
             alt="KiQi 2025"
@@ -294,10 +330,10 @@ export const Sidebar: React.FC = () => {
                         <button
                           onClick={() => toggleDropdown(item.label)}
                           className={clsx(
-                            "w-full h-[50px] flex items-center justify-between px-5 py-2 text-xs sm:text-sm font-normal transition-colors",
+                            "w-full h-12.5 flex items-center justify-between px-5 py-2 text-xs sm:text-sm font-normal transition-colors",
                             {
-                              "text-[var(--primary)]": hasActiveChild,
-                              "text-[#42526D] hover:text-[var(--primary)]":
+                              "text-[(--primary)]": hasActiveChild,
+                              "text-[#42526D] hover:text-[(--primary)]":
                                 !hasActiveChild,
                             }
                           )}>
@@ -306,15 +342,15 @@ export const Sidebar: React.FC = () => {
                               <img
                                 src={item.icon}
                                 alt=""
-                                className="size-4 md:size-5 flex-shrink-0"
+                                className="size-4 md:size-5 shrink-0"
                               />
                             )}
                             <span>{item.label}</span>
                           </div>
                           {isOpen ? (
-                            <ChevronDown className="w-3.5 h-3.5 flex-shrink-0" />
+                            <ChevronDown className="w-3.5 h-3.5 shrink-0" />
                           ) : (
-                            <ChevronRight className="w-3.5 h-3.5 flex-shrink-0" />
+                            <ChevronRight className="w-3.5 h-3.5 shrink-0" />
                           )}
                         </button>
 
@@ -331,20 +367,20 @@ export const Sidebar: React.FC = () => {
                                     className={clsx(
                                       "flex items-center gap-1.5 pl-8 py-2 text-[10px] md:text-[13px] font-normal transition-colors relative",
                                       {
-                                        "text-[var(--primary)] bg-gradient-to-r from-[#233E9726] via-white to-[##C4C4C400]":
+                                        "text-[(--primary)] bg-linear-to-r from-[#233E9726] via-white to-[##C4C4C400]":
                                           isActive,
-                                        "text-[#42526D] hover:text-[var(--primary)]":
+                                        "text-[#42526D] hover:text-[(--primary)]":
                                           !isActive,
                                       }
                                     )}>
                                     {/* Active indicator - left border */}
                                     {isActive && (
-                                      <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[var(--primary)] rounded-r" />
+                                      <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[(--primary)] rounded-r" />
                                     )}
                                     <img
                                       src="/sidebar-icons/arrow-right.svg"
                                       alt="Right arrow"
-                                      className="size-3.5 flex-shrink-0"
+                                      className="size-3.5 shrink-0"
                                     />
                                     <span>{subItem.label}</span>
                                   </Link>
@@ -365,24 +401,24 @@ export const Sidebar: React.FC = () => {
                       <Link
                         href={item.href}
                         className={clsx(
-                          "flex items-center gap-2.5 px-5 py-2 text-xs sm:text-sm font-normal h-[50px] transition-colors relative",
+                          "flex items-center gap-2.5 px-5 py-2 text-xs sm:text-sm font-normal h-12.5 transition-colors relative",
                           {
-                            "text-[var(--primary)] bg-gradient-to-r from-[#233E9726] via-white to-[##C4C4C400]":
+                            "text-[(--primary)] bg-linear-to-r from-[#233E9726] via-white to-[##C4C4C400]":
                               isActive,
-                            "text-[#42526D] hover:text-[var(--primary)]":
+                            "text-[#42526D] hover:text-[(--primary)]":
                               !isActive,
                           }
                         )}>
                         {/* Active indicator - left border */}
                         {isActive && (
-                          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[var(--primary)] rounded-r" />
+                          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[(--primary)] rounded-r" />
                         )}
 
                         {item.icon && (
                           <img
                             src={item.icon}
                             alt=""
-                            className="size-4 md:size-5 flex-shrink-0"
+                            className="size-4 md:size-5 shrink-0"
                           />
                         )}
                         <span>{item.label}</span>
@@ -396,11 +432,11 @@ export const Sidebar: React.FC = () => {
         </nav>
 
         {/* Logout Button - Fixed at Bottom */}
-        <div className="flex-shrink-0 px-5 py-4 border-t border-gray-200">
+        <div className="shrink-0 px-5 py-4 border-t border-gray-200">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-2.5 py-2 text-[13px] font-normal text-[#42526D] hover:text-[var(--primary)] transition-colors">
-            <LogOut className="w-4 h-4 flex-shrink-0" />
+            className="w-full flex items-center gap-2.5 py-2 text-[13px] font-normal text-[#42526D] hover:text-[(--primary)] transition-colors">
+            <LogOut className="w-4 h-4 shrink-0" />
             <span>Log out</span>
           </button>
         </div>

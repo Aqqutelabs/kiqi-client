@@ -52,7 +52,7 @@ const chatHistory = [
 const AiGeneratePage = () => {
   return (
     <main className="h-full flex flex-col">
-      <div className="flex-shrink-0 flex items-center justify-between p-4 border-b">
+      <div className="shrink-0 flex items-center justify-between p-4 border-b">
         <h2 className="text-xl font-semibold">AI Generated Email</h2>
         <Button variant="tertiary" className="!bg-white border">
           <X size={20} /> Close
@@ -64,7 +64,7 @@ const AiGeneratePage = () => {
         <div className="col-span-1 xl:col-span-1 p-6 bg-white overflow-y-auto">
           <Card className="h-full flex flex-col">
             {/* Toolbar */}
-            <div className="flex-shrink-0 flex flex-wrap gap-2 items-center p-3 border-b">
+            <div className="shrink-0 flex flex-wrap gap-2 items-center p-3 border-b">
               <Button size="sm" variant="tertiary">
                 <Bold size={16} />
               </Button>
@@ -93,7 +93,7 @@ const AiGeneratePage = () => {
               dangerouslySetInnerHTML={{ __html: initialEmail }}
             />
 
-            <div className="flex-shrink-0 p-4 border-t">
+            <div className="shrink-0 p-4 border-t">
               <Button>Send Email</Button>
             </div>
           </Card>

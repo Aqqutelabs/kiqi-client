@@ -30,7 +30,7 @@ export function DataTable<T extends { id: string | number }>({
   return (
     <div className="w-full overflow-x-auto">
       <table className="min-w-full bg-white">
-        <thead className="bg-[#D1DAF4] h-[66px]">
+        <thead className="bg-[#D1DAF4] h-16.5">
           <tr>
             {columns.map((col) => (
               <th
@@ -80,7 +80,7 @@ export function DataTable<T extends { id: string | number }>({
             data.map((row) => (
               <tr key={row.id} className="bg-white h-20">
                 {columns.map((col) => (
-                  <td key={String(col.accessor)} className="px-6 py-4 whitespace-wrap text-sm text-gray-700 w-[500px]">
+                  <td key={String(col.accessor)} className="px-6 py-4 whitespace-wrap text-sm text-gray-700 w-125">
                     {String(row[col.accessor])}
                   </td>
                 ))}
