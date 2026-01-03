@@ -165,30 +165,30 @@ const navigationConfig: NavSection[] = [
         label: "All Contacts",
         icon: "/sidebar-icons/subscription.svg",
       },
-      {
-        type: "link",
-        href: "/contacts/lists",
-        label: "Lists",
-        icon: "/sidebar-icons/lists.svg",
-      },
+      // {
+      //   type: "link",
+      //   href: "/contacts/lists",
+      //   label: "Lists",
+      //   icon: "/sidebar-icons/lists.svg",
+      // },
       {
         type: "link",
         href: "/contacts/forms",
         label: "Lead Forms",
         icon: "/sidebar-icons/forms.svg",
       },
-      {
-        type: "link",
-        href: "/contacts/segment",
-        label: "Segment",
-        icon: "/sidebar-icons/subscription.svg",
-      },
-      {
-        type: "link",
-        href: "/contacts/audience",
-        label: "Audience",
-        icon: "/sidebar-icons/subscription.svg",
-      },
+      // {
+      //   type: "link",
+      //   href: "/contacts/segment",
+      //   label: "Segment",
+      //   icon: "/sidebar-icons/subscription.svg",
+      // },
+      // {
+      //   type: "link",
+      //   href: "/contacts/audience",
+      //   label: "Audience",
+      //   icon: "/sidebar-icons/subscription.svg",
+      // },
     ],
   },
   // {
