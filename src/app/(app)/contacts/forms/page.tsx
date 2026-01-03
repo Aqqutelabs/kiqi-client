@@ -202,7 +202,7 @@ export default function ContactLeadForms() {
             <Button variant="outline" onClick={closeDeleteModal}>
               Cancel
             </Button>
-            <Button variant="danger" onClick={confirmDelete}>
+            <Button variant="destructive" onClick={confirmDelete}>
               Delete
             </Button>
           </div>

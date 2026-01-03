@@ -161,7 +161,7 @@ const navigationConfig: NavSection[] = [
     items: [
       {
         type: "link",
-        href: "/contacts/all",
+        href: "/contacts/dashboard",
         label: "All Contacts",
         icon: "/sidebar-icons/subscription.svg",
       },
@@ -177,18 +177,18 @@ const navigationConfig: NavSection[] = [
         label: "Lead Forms",
         icon: "/sidebar-icons/forms.svg",
       },
-      {
-        type: "link",
-        href: "/contacts/segment",
-        label: "Segment",
-        icon: "/sidebar-icons/subscription.svg",
-      },
-      {
-        type: "link",
-        href: "/contacts/audience",
-        label: "Audience",
-        icon: "/sidebar-icons/subscription.svg",
-      },
+      // {
+      //   type: "link",
+      //   href: "/contacts/segment",
+      //   label: "Segment",
+      //   icon: "/sidebar-icons/subscription.svg",
+      // },
+      // {
+      //   type: "link",
+      //   href: "/contacts/audience",
+      //   label: "Audience",
+      //   icon: "/sidebar-icons/subscription.svg",
+      // },
     ],
   },
   // {
