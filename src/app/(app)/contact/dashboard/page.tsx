@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Plus,
   Upload,
@@ -16,6 +16,10 @@ import {
   Phone,
   Building,
   Tag,
+  Download,
+  ChevronDown,
+  UserPlus,
+  UserMinus,
 } from "lucide-react";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { Button } from "@/components/ui/Button";
@@ -24,6 +28,10 @@ import Filter from "@/components/ui/Filter";
 import ContactModal from "@/components/ui/ContactModal";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import SuccessModal from "@/components/ui/SuccessModal";
+import { redirect } from "next/navigation";
+import { useClickOutside } from "@/hooks/useClickOutside";
+import SelectListModal from "@/components/ui/SelectListModal";
+import { ImportContactsModal } from "@/components/ui/ImportContactsModal";
 
 interface Contact {
   id: number;
@@ -36,6 +44,11 @@ interface Contact {
   tags?: string[];
   notes?: string;
   lastUpdated: string;
+}
+
+interface List {
+  id: number;
+  name: string;
 }
 
 function StatCard({
@@ -89,6 +102,58 @@ function ActionCard({
         <p className="text-xs text-gray-500 mt-1">{subtitle}</p>
       </div>
     </div>
+  );
+}
+
+function Dropdown({
+  open,
+  onClose,
+  children,
+}: {
+  open: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useClickOutside(ref, onClose, open);
+
+  if (!open) return null;
+
+  return (
+    <div
+      ref={ref}
+      className="absolute top-full left-0 mt-2 w-52 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
+    >
+      {children}
+    </div>
+  );
+}
+
+function DropdownItem({
+  icon: Icon,
+  iconColor = "text-gray-500",
+  children,
+  onClick,
+  danger,
+}: {
+  icon?: React.ElementType;
+  iconColor?: string;
+  children: React.ReactNode;
+  onClick?: () => void;
+  danger?: boolean;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`w-full flex items-center gap-2 px-4 py-2 rounded-md text-sm text-left
+        hover:bg-gray-50
+        ${danger ? "text-[#E7000B] hover:bg-red-50" : "text-gray-700"}
+      `}
+    >
+      {Icon && <Icon className={`w-4 h-4 ${iconColor}`} />}
+      {children}
+    </button>
   );
 }
 
@@ -152,7 +217,7 @@ export function ContactDetailsModal({
                 {contact.tags.map((tag: string, index: number) => (
                   <span
                     key={index}
-                    className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-200"
+                    className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-[12px]"
                   >
                     {tag}
                   </span>
@@ -163,13 +228,16 @@ export function ContactDetailsModal({
 
           {/* Email Section */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
+            <label className="flex items-center gap-2 text-sm font-medium text-[#4A5565] mb-3">
               <Mail className="w-4 h-4" />
               Email
             </label>
             <div className="space-y-2">
               {contact.emails.map((email: string, index: number) => (
-                <div key={index} className="flex items-center justify-between">
+                <div
+                  key={index}
+                  className="flex items-center justify-between bg-gray-50 rounded-lg px-4 py-2 mb-2"
+                >
                   <span className="text-sm text-[#4A5565]">{email}</span>
                   <span className="px-2 py-1 bg-[#233E97] text-white text-xs rounded">
                     Primary
@@ -181,13 +249,16 @@ export function ContactDetailsModal({
 
           {/* Phone Section */}
           <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
+            <label className="flex items-center gap-2 text-sm font-medium text-[#4A5565] mb-3">
               <Phone className="w-4 h-4" />
               Phone
             </label>
             <div className="space-y-2">
               {contact.phones.map((phone: string, index: number) => (
-                <div key={index} className="flex items-center justify-between">
+                <div
+                  key={index}
+                  className="flex items-center justify-between bg-gray-50 rounded-lg px-4 py-2 mb-2"
+                >
                   <span className="text-sm text-[#4A5565]">{phone}</span>
                   <span className="px-2 py-1 bg-[#233E97] text-white text-xs rounded">
                     Primary
@@ -226,7 +297,10 @@ export function ContactDetailsModal({
             <MessageSquare className="w-4 h-4" />
             Send Message
           </button>
-          <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+          <button
+            onClick={() => redirect("/contact/[id]")}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+          >
             <Eye className="w-4 h-4" />
             View Full Profile
           </button>
@@ -244,10 +318,26 @@ export default function ContactsMainContent() {
   const [openMenuId, setOpenMenuId] = useState<string | number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [contacts, setContacts] = useState([]);
+  const [openLists, setOpenLists] = useState(false);
+  const [openMore, setOpenMore] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [showCreateList, setShowCreateList] = useState(false);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isSelectListOpen, setIsSelectListOpen] = useState(false);
+  const [isImportOpen, setIsImportOpen] = useState(false);
+
+  const openSelectListModal = () => {
+    setIsSelectListOpen(true);
+  };
+
+  const closeSelectListModal = () => {
+    setIsSelectListOpen(false);
+  };
+
+  const closeImportModal = () => {
+    setIsImportOpen(false);
+  };
 
   const data: Contact[] = useMemo(
     () => [
@@ -285,6 +375,17 @@ export default function ContactsMainContent() {
         phones: ["+1 (555) 123-4567", "+1 (555) 987-6543"],
         lastUpdated: "08-04-2025",
       },
+    ],
+    []
+  );
+
+  const lists: List[] = useMemo(
+    () => [
+      { id: 1, name: "Enterprise Clients" },
+      { id: 2, name: "Q4 2024 Leads" },
+      { id: 3, name: "Newsletter Subscribers" },
+      { id: 4, name: "Conference Attendees" },
+      { id: 5, name: "VIP Customers" },
     ],
     []
   );
@@ -356,8 +457,21 @@ export default function ContactsMainContent() {
         isOpen={showSuccess}
         title="New List Created"
         description="To add contacts to your lists, select contacts from All contacts tab, and click add to list."
+        buttonText="Go to All Contacts"
         onClose={() => setShowSuccess(false)}
       />
+
+      <SelectListModal
+        isOpen={isSelectListOpen}
+        onClose={closeSelectListModal}
+        lists={lists}
+        onSubmit={(ids) => {
+          console.log(ids);
+          closeSelectListModal();
+        }}
+      />
+
+      <ImportContactsModal isOpen={isImportOpen} onClose={closeImportModal} />
 
       <PageHeader title="Contacts" />
       <div className="flex flex-col gap-6">
@@ -397,6 +511,7 @@ export default function ContactsMainContent() {
             subtitle="Upload CSV or Excel file"
             iconBg="bg-[#FF8C42]/10"
             iconColor="text-[#FF8C42]"
+            onClick={() => setIsImportOpen(true)}
           />
           <ActionCard
             icon={ListPlus}
@@ -417,36 +532,97 @@ export default function ContactsMainContent() {
 
         {/* Bulk action bar */}
         {selectedIds.length > 0 && (
-          <div className="flex items-center justify-between bg-[#1E2E8C] text-white px-4 py-3 rounded-xl">
-            <p className="text-sm font-medium">
-              {selectedIds.length} contact{selectedIds.length > 1 ? "s" : ""}{" "}
-              selected
-            </p>
-            <div className="flex items-center gap-2">
-              <Button size="sm">
-                <ListPlus className="w-4 h-4 mr-1" />
-                Add to list
-              </Button>
-              {/* <Button size="sm">
-                <Mail className="w-4 h-4 mr-1" />
-                Send Email
-              </Button>
-              <Button size="sm">
-                <MessageSquare className="w-4 h-4 mr-1" />
-                Send SMS
-              </Button>
-              <Button size="sm">
-                <Archive className="w-4 h-4 mr-1" />
-                Archive
-              </Button>
-              <Button size="sm">
-                <Trash2 className="w-4 h-4 mr-1" />
-                Delete
-              </Button> */}
-              <Button size="sm" onClick={clearSelection}>
+          <div className="flex items-center bg-[#1E2E8C] text-white px-4 py-3 rounded-xl relative">
+            <div
+              className="flex items-center gap-2 px-3 py-1.5
+             bg-white/10 rounded-xl text-sm font-medium"
+            >
+              <span className="w-2 h-2 rounded-full bg-[#22C55E]" />
+
+              <span>
+                {selectedIds.length} contact{selectedIds.length > 1 ? "s" : ""}{" "}
+                selected
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2 ml-6 relative">
+              {/* LISTS */}
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setOpenLists(!openLists);
+                    setOpenMore(false);
+                  }}
+                  className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium
+            bg-white/10   rounded-xl transition"
+                >
+                  <ListPlus className="w-4 h-4" />
+                  Lists
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+
+                <Dropdown open={openLists} onClose={() => setOpenLists(false)}>
+                  <DropdownItem
+                    icon={UserPlus}
+                    iconColor="text-[#00A63E]"
+                    onClick={openSelectListModal}
+                  >
+                    Add to List
+                  </DropdownItem>
+                  <DropdownItem icon={UserMinus} iconColor="text-[#F54900]">
+                    Remove from List
+                  </DropdownItem>
+                  <DropdownItem icon={ListPlus} iconColor="text-[#233E97]">
+                    Create New List & Add
+                  </DropdownItem>
+                </Dropdown>
+              </div>
+
+              <button
+                className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium
+          bg-white/10   rounded-xl transition"
+              >
+                <Download className="w-4 h-4" />
+                Export
+              </button>
+
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setOpenMore(!openMore);
+                    setOpenLists(false);
+                  }}
+                  className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium
+            bg-white/10   rounded-xl transition"
+                >
+                  More
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+
+                <Dropdown open={openMore} onClose={() => setOpenMore(false)}>
+                  <DropdownItem icon={Mail} iconColor="text-[#155DFC]">
+                    Send Email
+                  </DropdownItem>
+                  <DropdownItem icon={MessageSquare} iconColor="text-[#00A63E]">
+                    Send SMS
+                  </DropdownItem>
+                  <DropdownItem icon={Archive}>Archive</DropdownItem>
+                  <DropdownItem icon={Trash2} iconColor="text-[#E7000B]" danger>
+                    Delete
+                  </DropdownItem>
+                </Dropdown>
+              </div>
+            </div>
+
+            <div className="ml-auto">
+              <button
+                onClick={clearSelection}
+                className="ml-auto flex items-center gap-2 px-3 py-1.5 text-sm font-medium
+        bg-white/10   rounded-xl transition"
+              >
                 <X className="w-4 h-4" />
                 Clear
-              </Button>
+              </button>
             </div>
           </div>
         )}
@@ -472,6 +648,7 @@ export default function ContactsMainContent() {
                         e.target.checked ? data.map((d) => d.id) : []
                       )
                     }
+                    className="accent-[#059459]"
                   />
                 </th>
                 {columns.map((col) => (
@@ -495,6 +672,7 @@ export default function ContactsMainContent() {
                       type="checkbox"
                       checked={selectedIds.includes(row.id)}
                       onChange={() => toggleSelect(row.id)}
+                      className="accent-[#059459]"
                     />
                   </td>
                   {columns.map((col) => (
@@ -528,7 +706,10 @@ export default function ContactsMainContent() {
                           <button className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50">
                             Edit Contact
                           </button>
-                          <button className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50">
+                          <button
+                            className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50"
+                            onClick={openSelectListModal}
+                          >
                             Add to List
                           </button>
                           <button className="w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50">
@@ -550,7 +731,7 @@ export default function ContactsMainContent() {
           <div className="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4">
-              <h2 className="text-lg font-semibold text-gray-900">
+              <h2 className="text-base font-semibold text-gray-900">
                 Create New List
               </h2>
               <button
