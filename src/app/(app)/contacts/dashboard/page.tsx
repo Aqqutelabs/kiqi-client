@@ -195,7 +195,7 @@ export function ContactDetailsModal({
         <div className="px-6 py-2 space-y-6">
           {/* Profile Section */}
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-[#233E97] rounded-full flex items-center justify-center text-white font-semibold text-lg flex-shrink-0">
+            <div className="w-12 h-12 bg-[#233E97] rounded-full flex items-center justify-center text-white font-semibold text-lg shrink-0">
               {contact.initials}
             </div>
             <div>
@@ -637,7 +637,7 @@ export default function ContactsMainContent() {
         {/* Table */}
         <div className="bg-white overflow-hidden">
           <table className="min-w-full">
-            <thead className="bg-[#D1DAF4] h-[66px]">
+            <thead className="bg-[#D1DAF4] h-16.5">
               <tr>
                 <th className="px-4">
                   <input

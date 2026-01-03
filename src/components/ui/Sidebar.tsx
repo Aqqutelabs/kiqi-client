@@ -161,16 +161,16 @@ const navigationConfig: NavSection[] = [
     items: [
       {
         type: "link",
-        href: "/contacts/all",
+        href: "/contacts/dashboard",
         label: "All Contacts",
         icon: "/sidebar-icons/subscription.svg",
       },
-      // {
-      //   type: "link",
-      //   href: "/contacts/lists",
-      //   label: "Lists",
-      //   icon: "/sidebar-icons/lists.svg",
-      // },
+      {
+        type: "link",
+        href: "/contacts/lists",
+        label: "Lists",
+        icon: "/sidebar-icons/lists.svg",
+      },
       {
         type: "link",
         href: "/contacts/forms",
