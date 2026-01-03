@@ -20,6 +20,9 @@ import {
   Plus,
 } from "lucide-react";
 import React, { useState, useRef } from "react";
+import { createForm } from "@/lib/contacts-api";
+import { useSelector } from "react-redux";
+import { selectToken } from "@/redux/selectors/authSelectors";
 
 type FieldType = {
   id: string;
@@ -58,6 +61,9 @@ export default function CreateLeadForm() {
 
   // for publish success
   const [confirmPublish, setConfirmPublish] = useState(false);
+  const [publicLink, setPublicLink] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const accessToken = useSelector(selectToken);
 
   const selectedField = fields.find((f) => f.id === selectedFieldId) as
     | Field
@@ -167,18 +173,23 @@ export default function CreateLeadForm() {
     window.open("/contacts/forms/preview", "_blank");
   };
 
-  // const getFieldIcon = (type: string): React.ComponentType<any> => {
-  //   const fieldType = FIELD_TYPES.find((ft) => ft.id === type);
-  //   return fieldType ? fieldType.icon : Type;
-  // };
-
-  const handlePublish = () => {
+  const handlePublish = async () => {
     if (!formName) {
       setFormNameError("Form name cannot be empty!")
-    } else (
-      setFormNameError(''),
-      setConfirmPublish(true)
-    )
+    } else {
+      setFormNameError('');
+      try {
+        const response = await createForm(
+          { name: formName, fields },
+          accessToken
+        );
+        setPublicLink(response.publicLink);
+        setIsModalOpen(true);
+        setConfirmPublish(true);
+      } catch (error) {
+        console.error("Failed to create form:", error);
+      }
+    }
   }
 
   return (
@@ -485,11 +496,13 @@ export default function CreateLeadForm() {
           <div className="flex flex-col md:flex-row items-center gap-2">
             <input 
               type="text" 
-              value="https://kiqi.com/forms/abc123"
+              value={publicLink}
               readOnly
               className="outline-none border border-[#D1D5DC] bg-[#F9FAFB] px-4 py-2 rounded-lg h-10.5 w-4/5" 
             />
-            <button className="border border-[#D1D5DC] h-10.5 rounded-lg w-1/5 text-sm cursor-pointer hover:bg-gray-50">
+            <button 
+              onClick={() => navigator.clipboard.writeText(publicLink)}
+              className="border border-[#D1D5DC] h-10.5 rounded-lg w-1/5 text-sm cursor-pointer hover:bg-gray-50">
               Copy
             </button>
           </div>
@@ -500,6 +513,7 @@ export default function CreateLeadForm() {
           <p className="text-sm text-[#364153]">Embed Code</p>
           <div className="min-h-37.5 w-full rounded-lg relative bg-[#101828] p-6">
             <button 
+              onClick={() => navigator.clipboard.writeText(`<iframe src=\"${publicLink}\" width=\"100%\" height=\"600\" frameborder=\"0\"></iframe>`)}
               className="absolute top-3 right-3 border border-gray-600 bg-[#1F2937] text-white px-3 py-1.5 rounded-lg text-xs cursor-pointer hover:bg-[#374151]"
             >
               Copy
@@ -507,7 +521,7 @@ export default function CreateLeadForm() {
             <pre className="text-sm overflow-x-auto">
               <code className="text-green-400">
                 {`<iframe 
-src="https://kiqi.com/forms/abc123"
+src="${publicLink}"
 width="100%"
 height="600"
 frameborder="0"
@@ -518,6 +532,31 @@ frameborder="0"
         </div>
 
         <Button variant={"tertiary"} className="mt-4 w-full cursor-pointer">Close</Button>
+      </Modal>
+
+      {/* Modal to display public link */}
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Form Published">
+        <iframe
+          src={publicLink}
+          title="Published Form"
+          className="w-full h-96 border rounded"
+        ></iframe>
+        <div className="space-y-2 text-sm text-[#364153] my-6">
+          <p>Hosted Form Link</p>
+          <div className="flex flex-col md:flex-row items-center gap-2">
+            <input 
+              type="text" 
+              value={publicLink}
+              readOnly
+              className="outline-none border border-[#D1D5DC] bg-[#F9FAFB] px-4 py-2 rounded-lg h-10.5 w-4/5" 
+            />
+            <button 
+              onClick={() => navigator.clipboard.writeText(publicLink)}
+              className="border border-[#D1D5DC] h-10.5 rounded-lg w-1/5 text-sm cursor-pointer hover:bg-gray-50">
+              Copy
+            </button>
+          </div>
+        </div>
       </Modal>
     </section>
   );
