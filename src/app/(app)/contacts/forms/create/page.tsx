@@ -176,6 +176,9 @@ export default function CreateLeadForm() {
   const handlePublish = async () => {
     if (!formName) {
       setFormNameError("Form name cannot be empty!")
+    } else if (!accessToken) {
+      console.error("No access token available");
+      return;
     } else {
       setFormNameError('');
       try {

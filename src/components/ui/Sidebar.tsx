@@ -84,75 +84,75 @@ const navigationConfig: NavSection[] = [
       //     },
       //   ],
       // },
-      // {
-      //   type: "link",
-      //   href: "/analytics",
-      //   label: "Analytics",
-      //   icon: "/sidebar-icons/analytics.svg",
-      // },
-      // {
-      //   type: "dropdown",
-      //   label: "Email",
-      //   icon: "/sidebar-icons/analytics.svg",
-      //   items: [
-      //     {
-      //       type: "link",
-      //       href: "/email-campaigns/dashboard",
-      //       label: "Dashboard",
-      //       icon: "/sidebar-icons/analytics.svg",
-      //     },
-      //     {
-      //       type: "link",
-      //       href: "/email-campaigns/templates",
-      //       label: "Templates",
-      //       icon: "/sidebar-icons/analytics.svg",
-      //     },
-      //     {
-      //       type: "link",
-      //       href: "/email-campaigns/mailbox",
-      //       label: "Mailbox",
-      //       icon: "/sidebar-icons/analytics.svg",
-      //     },
-      //     {
-      //       type: "link",
-      //       href: "/email-campaigns/email-lists",
-      //       label: "Email Lists",
-      //       icon: "/sidebar-icons/analytics.svg",
-      //     },
-      //   ],
-      // },
-      // {
-      //   type: "dropdown",
-      //   label: "SMS",
-      //   icon: "/sidebar-icons/sms.svg",
-      //   items: [
-      //     {
-      //       type: "link",
-      //       href: "/sms/send-bulk-sms",
-      //       label: "Send Bulk SMS",
-      //     },
-      //     {
-      //       type: "link",
-      //       href: "/sms/create-sender-id",
-      //       label: "Create a Sender ID",
-      //     },
-      //     {
-      //       type: "link",
-      //       href: "/sms/manage-recipient-groups",
-      //       label: "Manage Recipient Groups",
-      //     },
-      //     {
-      //       type: "link",
-      //       href: "/sms/sms-drafts",
-      //       label: "SMS Drafts",
-      //     },
-      //     {
-      //       type: "link",
-      //       href: "/sms/sms-templates",
-      //       label: "SMS Templates",
-      //     },
-      //   ],
-      // },
+      {
+        type: "link",
+        href: "/analytics",
+        label: "Analytics",
+        icon: "/sidebar-icons/analytics.svg",
+      },
+      {
+        type: "dropdown",
+        label: "Email",
+        icon: "/sidebar-icons/analytics.svg",
+        items: [
+          {
+            type: "link",
+            href: "/email-campaigns/dashboard",
+            label: "Dashboard",
+            icon: "/sidebar-icons/analytics.svg",
+          },
+          {
+            type: "link",
+            href: "/email-campaigns/templates",
+            label: "Templates",
+            icon: "/sidebar-icons/analytics.svg",
+          },
+          {
+            type: "link",
+            href: "/email-campaigns/mailbox",
+            label: "Mailbox",
+            icon: "/sidebar-icons/analytics.svg",
+          },
+          {
+            type: "link",
+            href: "/email-campaigns/email-lists",
+            label: "Email Lists",
+            icon: "/sidebar-icons/analytics.svg",
+          },
+        ],
+      },
+      {
+        type: "dropdown",
+        label: "SMS",
+        icon: "/sidebar-icons/sms.svg",
+        items: [
+          {
+            type: "link",
+            href: "/sms/send-bulk-sms",
+            label: "Send Bulk SMS",
+          },
+          {
+            type: "link",
+            href: "/sms/create-sender-id",
+            label: "Create a Sender ID",
+          },
+          {
+            type: "link",
+            href: "/sms/manage-recipient-groups",
+            label: "Manage Recipient Groups",
+          },
+          {
+            type: "link",
+            href: "/sms/sms-drafts",
+            label: "SMS Drafts",
+          },
+          {
+            type: "link",
+            href: "/sms/sms-templates",
+            label: "SMS Templates",
+          },
+        ],
+      },
     ],
   },
   {

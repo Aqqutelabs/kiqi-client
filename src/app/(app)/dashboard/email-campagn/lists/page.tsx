@@ -52,7 +52,7 @@ const ManageEmailListPage = () => {
     
   }, []);
 
-  const handleCreateList = async (listData) => {
+  const handleCreateList = async (listData: { name: string; description: string; }) => {
     try {
       const response = await createList(listData);
       toast.success("List created successfully!");
@@ -76,10 +76,16 @@ const ManageEmailListPage = () => {
           className="space-y-4"
           onSubmit={(e) => {
             e.preventDefault();
-            const formData = new FormData(e.target);
+            const formData = new FormData(e.target as HTMLFormElement);
+            const name = formData.get("name")?.toString();
+            const description = formData.get("description")?.toString();
+            if (!name || !description) {
+              toast.error("Name and description are required.");
+              return;
+            }
             const listData = {
-              name: formData.get("name")?.toString(),
-              description: formData.get("description")?.toString(),
+              name,
+              description,
             };
             handleCreateList(listData);
           }}

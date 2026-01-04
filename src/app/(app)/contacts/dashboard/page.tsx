@@ -320,7 +320,6 @@ export default function ContactsMainContent() {
   const [openMenuId, setOpenMenuId] = useState<string | number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [contacts, setContacts] = useState<Contact[]>([]);
-  const [contacts, setContacts] = useState([]);
   const [openLists, setOpenLists] = useState(false);
   const [openMore, setOpenMore] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -413,46 +412,6 @@ export default function ContactsMainContent() {
   const closeImportModal = () => {
     setIsImportOpen(false);
   };
-
-  const data: Contact[] = useMemo(
-    () => [
-      {
-        id: 1,
-        name: "Sarah Johnson",
-        initials: "SJ",
-        title: "Marketing Director",
-        company: "TechCorp Inc.",
-        emails: ["sarah.johnson@techcorp.com", "sarah.j@gmail.com"],
-        phones: ["+1 (555) 123-4567", "+1 (555) 987-6543"],
-        tags: ["VIP", "Decision Maker", "Enterprise"],
-        notes: "Interested in enterprise package. Follow up next quarter.",
-        lastUpdated: "10-04-2025",
-      },
-      {
-        id: 2,
-        name: "Michael Phelps",
-        initials: "MP",
-        title: "Marketing Director",
-        company: "Swimming Corps.",
-        emails: ["micheal.phelps@swim.com", "phelps.m@gmail.com"],
-        phones: ["+1 (555) 123-4567", "+1 (555) 987-6543"],
-        tags: ["GOAT", "SA", "Swimming"],
-        notes: "All it takes is to breathe",
-        lastUpdated: "09-04-2025",
-      },
-      {
-        id: 3,
-        name: "Sarah Johnson",
-        initials: "SJ",
-        title: "Marketing Director",
-        company: "TechCorp Inc.",
-        emails: ["sarah.johnson@techcorp.com", "sarah.j@gmail.com"],
-        phones: ["+1 (555) 123-4567", "+1 (555) 987-6543"],
-        lastUpdated: "08-04-2025",
-      },
-    ],
-    []
-  );
 
   const lists: List[] = useMemo(
     () => [
@@ -742,72 +701,17 @@ export default function ContactsMainContent() {
             </div>
           ) : (
             <table className="min-w-full">
-              <thead className="bg-[#D1DAF4] h-[66px]">
-                <tr>
-                  <th className="px-4">
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.length === data.length && data.length > 0}
-                      onChange={(e) =>
-                        setSelectedIds(
-                          e.target.checked ? data.map((d) => d.id) : []
-                        )
-                      }
-                    />
-                  </th>
-                  {columns.map((col) => (
-                    <th
-                      key={String(col.accessor)}
-                      className="px-6 py-3 text-left text-xs font-medium uppercase"
-                    >
-                      {col.header}
-                    </th>
-                  ))}
-                  <th className="px-6 py-3 text-right text-xs font-medium uppercase">
-                    Action
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {data.length > 0 ? (
-                  data.map((row) => (
-                    <tr key={row.id} className="h-20">
-                      <td className="px-4">
-                        <input
-                          type="checkbox"
-                          checked={selectedIds.includes(row.id)}
-                          onChange={() => toggleSelect(row.id)}
-                        />
-                      </td>
-                      {columns.map((col) => (
-                        <td
-                          key={col.accessor}
-                          className="px-6 py-4 text-sm text-gray-700 w-[500px]"
-                        >
-                          {renderCellValue(row[col.accessor])}
-                        </td>
-                      ))}
-                      <td className="px-6 py-4 text-right relative">
-                        <div className="flex justify-end items-center gap-3">
-                          <button
-                            onClick={() => handleViewContact(row)}
-                            className="text-gray-500 hover:text-gray-700"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-          <table className="min-w-full">
-            <thead className="bg-[#D1DAF4] h-16.5">
+            <thead className="bg-[#D1DAF4] h-[66px]">
               <tr>
                 <th className="px-4">
                   <input
                     type="checkbox"
-                    checked={selectedIds.length === data.length}
+                    checked={selectedIds.length === data.length && data.length > 0}
                     onChange={(e) =>
                       setSelectedIds(
                         e.target.checked ? data.map((d) => d.id) : []
                       )
                     }
-                    className="accent-[#059459]"
                   />
                 </th>
                 {columns.map((col) => (
@@ -831,7 +735,6 @@ export default function ContactsMainContent() {
                       type="checkbox"
                       checked={selectedIds.includes(row.id)}
                       onChange={() => toggleSelect(row.id)}
-                      className="accent-[#059459]"
                     />
                   </td>
                   {columns.map((col) => (
@@ -851,42 +754,6 @@ export default function ContactsMainContent() {
                         <Eye className="w-4 h-4" />
                       </button>
 
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setOpenMenuId(openMenuId === row.id ? null : row.id);
-                            }}
-                            className="text-gray-500 hover:text-gray-700"
-                          >
-                            <MoreVertical className="w-4 h-4" />
-                          </button>
-                          {openMenuId === row.id && (
-                            <div className="absolute right-0 mt-2 w-44 bg-white border border-[#E5E7EB] rounded-lg shadow-lg z-50">
-                              <button className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50">
-                                Edit Contact
-                              </button>
-                              <button className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50">
-                                Add to List
-                              </button>
-                              <button className="w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50">
-                                Delete Contact
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={columns.length + 2} className="px-6 py-4 text-center text-gray-500">
-                      No contacts found
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          )}
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -918,6 +785,7 @@ export default function ContactsMainContent() {
               ))}
             </tbody>
           </table>
+          )}
         </div>
 
         {/* Pagination */}

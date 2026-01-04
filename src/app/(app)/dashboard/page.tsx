@@ -7,18 +7,18 @@ import { Card } from "@/components/ui/Card";
 
 
 const stats = [
-  // {
-  //   title: "Channels Connected",
-  //   amount: "8",
-  //   info: "Instagram, Facebook, SMS",
-  //   icon: "/dashboard/one.svg",
-  // },
-  // {
-  //   title: "Messages Sent",
-  //   amount: "12,459",
-  //   info: "Last 30 days",
-  //   icon: "/dashboard/sent.svg",
-  // },
+  {
+    title: "Channels Connected",
+    amount: "8",
+    info: "Instagram, Facebook, SMS",
+    icon: "/dashboard/one.svg",
+  },
+  {
+    title: "Messages Sent",
+    amount: "12,459",
+    info: "Last 30 days",
+    icon: "/dashboard/sent.svg",
+  },
  {
     title: "Campaigns Launched",
     amount: "23",
@@ -34,26 +34,26 @@ const stats = [
 ];
 
 const quickActions = [
-  // {
-  //   title: "Create Email Campaign",
-  //   desc: "Design and send beautiful email campaigns",
-  //   icon: "/dashboard/mail.svg",
-  // },
-  // {
-  //   title: "Send SMS Blast",
-  //   desc: "Reach customers instantly via SMS",
-  //   icon: "/dashboard/message.svg",
-  // },
-  // {
-  //   title: "Check Campaign Insights",
-  //   desc: "View analytics and performance metrics",
-  //   icon: "/dashboard/analytics.svg",
-  // },
-  // {
-  //   title: "Add/Import Email Contacts",
-  //   desc: "Grow your audience with new contacts",
-  //   icon: "/dashboard/users.svg",
-  // },
+  {
+    title: "Create Email Campaign",
+    desc: "Design and send beautiful email campaigns",
+    icon: "/dashboard/mail.svg",
+  },
+  {
+    title: "Send SMS Blast",
+    desc: "Reach customers instantly via SMS",
+    icon: "/dashboard/message.svg",
+  },
+  {
+    title: "Check Campaign Insights",
+    desc: "View analytics and performance metrics",
+    icon: "/dashboard/analytics.svg",
+  },
+  {
+    title: "Add/Import Email Contacts",
+    desc: "Grow your audience with new contacts",
+    icon: "/dashboard/users.svg",
+  },
   {
     title: "Run PR/Ad Campaign",
     desc: "Launch targeted advertising campaigns",
