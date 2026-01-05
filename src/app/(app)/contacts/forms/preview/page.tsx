@@ -68,9 +68,9 @@ export default function PreviewForm() {
         {/* Header Section */}
         <div className="bg-[#101828] text-white rounded-t-lg p-6">
           <h1 className="text-2xl font-semibold">{formData.name}</h1>
-          <p className="text-gray-300 text-sm mt-2">
+          {/* <p className="text-gray-300 text-sm mt-2">
             We'd love to hear from you! Fill out the form below and we'll get back to you within 24 hours.
-          </p>
+          </p> */}
         </div>
 
         {/* Form Section */}
