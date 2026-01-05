@@ -219,7 +219,7 @@ export function ContactDetailsModal({
                 {contact.tags.map((tag: string, index: number) => (
                   <span
                     key={index}
-                    className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-[12px]"
+                    className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-xl"
                   >
                     {tag}
                   </span>
@@ -701,7 +701,7 @@ export default function ContactsMainContent() {
             </div>
           ) : (
             <table className="min-w-full">
-            <thead className="bg-[#D1DAF4] h-[66px]">
+            <thead className="bg-[#D1DAF4] h-16.5">
               <tr>
                 <th className="px-4">
                   <input
@@ -740,7 +740,7 @@ export default function ContactsMainContent() {
                   {columns.map((col) => (
                     <td
                       key={col.accessor}
-                      className="px-6 py-4 text-sm text-gray-700 w-[500px]"
+                      className="px-6 py-4 text-sm text-gray-700 w-125"
                     >
                       {renderCellValue(row[col.accessor])}
                     </td>
