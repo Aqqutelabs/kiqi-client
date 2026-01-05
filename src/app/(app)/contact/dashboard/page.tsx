@@ -11,6 +11,8 @@ import {
   Archive,
   Trash2,
   X,
+  ChevronLeft,
+  ChevronRight,
   Eye,
   MoreVertical,
   Phone,
@@ -20,6 +22,8 @@ import {
   ChevronDown,
   UserPlus,
   UserMinus,
+  ArrowUpDown,
+  ArrowRight,
 } from "lucide-react";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { Button } from "@/components/ui/Button";
@@ -326,6 +330,8 @@ export default function ContactsMainContent() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [isSelectListOpen, setIsSelectListOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
+  const [sortBy, setSortBy] = useState<keyof Contact | null>(null);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   const openSelectListModal = () => {
     setIsSelectListOpen(true);
@@ -401,14 +407,38 @@ export default function ContactsMainContent() {
     return () => window.removeEventListener("click", close);
   }, []);
 
+  type Column<T> = {
+    header: React.ReactNode;
+    accessor: keyof T;
+    sortable?: boolean;
+  };
+
   const columns: Column<Contact>[] = [
     {
-      header: "Name",
+      header: (
+        <div
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => handleSort("name")}
+        >
+          Name
+          <ArrowUpDown className="w-4 h-4 text-gray-500" />
+        </div>
+      ),
       accessor: "name",
+      sortable: true,
     },
     {
-      header: "Email",
+      header: (
+        <div
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => handleSort("emails")}
+        >
+          Email
+          <ArrowUpDown className="w-4 h-4 text-gray-500" />
+        </div>
+      ),
       accessor: "emails",
+      sortable: true,
     },
     {
       header: "Phone",
@@ -423,6 +453,26 @@ export default function ContactsMainContent() {
       accessor: "lastUpdated",
     },
   ];
+
+  const handleSort = (accessor: keyof Contact) => {
+    if (sortBy === accessor) {
+      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setSortBy(accessor);
+      setSortOrder("asc");
+    }
+  };
+
+  const sortedData = [...data].sort((a, b) => {
+    if (!sortBy) return 0;
+
+    const aVal = String(a[sortBy] ?? "").toLowerCase();
+    const bVal = String(b[sortBy] ?? "").toLowerCase();
+
+    if (aVal < bVal) return sortOrder === "asc" ? -1 : 1;
+    if (aVal > bVal) return sortOrder === "asc" ? 1 : -1;
+    return 0;
+  });
 
   const toggleSelect = (id: number) => {
     setSelectedIds((prev) =>
@@ -626,103 +676,129 @@ export default function ContactsMainContent() {
             </div>
           </div>
         )}
-
-        <div className="flex justify-between items-center text-[#1B223C] font-medium ">
-          <h3 className="text-lg md:text-xl text-[#42526D]">Contacts</h3>
-          <div className="flex items-center gap-2">
-            <SearchInput name="search" value="" onChange={() => {}} />
-            <Filter value="" onChange={() => {}} />
+        <div className="bg-white border border-[#E2E8F0] rounded-xl py-6 space-y-4">
+          <div className="flex justify-between items-center text-[#1B223C] font-medium px-6">
+            <h3 className="text-lg md:text-xl text-[#42526D]">Contacts</h3>
+            <div className="flex items-center gap-2">
+              <SearchInput name="search" value="" onChange={() => {}} />
+              <Filter value="" onChange={() => {}} />
+            </div>
           </div>
-        </div>
-        {/* Table */}
-        <div className="bg-white overflow-hidden">
-          <table className="min-w-full">
-            <thead className="bg-[#D1DAF4] h-[66px]">
-              <tr>
-                <th className="px-4">
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.length === data.length}
-                    onChange={(e) =>
-                      setSelectedIds(
-                        e.target.checked ? data.map((d) => d.id) : []
-                      )
-                    }
-                    className="accent-[#059459]"
-                  />
-                </th>
-                {columns.map((col) => (
-                  <th
-                    key={String(col.accessor)}
-                    className="px-6 py-3 text-left text-xs font-medium uppercase"
-                  >
-                    {col.header}
-                  </th>
-                ))}
-                <th className="px-6 py-3 text-right text-xs font-medium uppercase">
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {data.map((row) => (
-                <tr key={row.id} className="h-20">
-                  <td className="px-4">
+          {/* Table */}
+          <div className="bg-white overflow-hidden">
+            <table className="min-w-full">
+              <thead className="bg-[#D1DAF4] h-[66px]">
+                <tr>
+                  <th className="px-4">
                     <input
                       type="checkbox"
-                      checked={selectedIds.includes(row.id)}
-                      onChange={() => toggleSelect(row.id)}
+                      checked={selectedIds.length === data.length}
+                      onChange={(e) =>
+                        setSelectedIds(
+                          e.target.checked ? data.map((d) => d.id) : []
+                        )
+                      }
                       className="accent-[#059459]"
                     />
-                  </td>
+                  </th>
                   {columns.map((col) => (
-                    <td
-                      key={col.accessor}
-                      className="px-6 py-4 text-sm text-gray-700 w-[500px]"
+                    <th
+                      key={String(col.accessor)}
+                      className="px-6 py-3 text-left text-xs font-medium uppercase"
                     >
-                      {renderCellValue(row[col.accessor])}
-                    </td>
+                      {col.header}
+                    </th>
                   ))}
-                  <td className="px-6 py-4 text-right relative">
-                    <div className="flex justify-end items-center gap-3">
-                      <button
-                        onClick={() => handleViewContact(row)}
-                        className="text-gray-500 hover:text-gray-700"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setOpenMenuId(openMenuId === row.id ? null : row.id);
-                        }}
-                        className="text-gray-500 hover:text-gray-700"
-                      >
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
-                      {openMenuId === row.id && (
-                        <div className="absolute right-0 mt-2 w-44 bg-white border border-[#E5E7EB] rounded-lg shadow-lg z-50">
-                          <button className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50">
-                            Edit Contact
-                          </button>
-                          <button
-                            className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50"
-                            onClick={openSelectListModal}
-                          >
-                            Add to List
-                          </button>
-                          <button className="w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50">
-                            Delete Contact
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </td>
+                  <th className="px-6 py-3 text-right text-xs font-medium uppercase">
+                    Action
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {sortedData.map((row) => (
+                  <tr key={row.id} className="h-20">
+                    <td className="px-4">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(row.id)}
+                        onChange={() => toggleSelect(row.id)}
+                        className="accent-[#059459]"
+                      />
+                    </td>
+                    {columns.map((col) => (
+                      <td
+                        key={col.accessor}
+                        className="px-6 py-4 text-sm text-gray-700 w-[500px]"
+                      >
+                        {renderCellValue(row[col.accessor])}
+                      </td>
+                    ))}
+                    <td className="px-6 py-4 text-right relative">
+                      <div className="flex justify-end items-center gap-3">
+                        <button
+                          onClick={() => handleViewContact(row)}
+                          className="text-gray-500 hover:text-gray-700"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenMenuId(
+                              openMenuId === row.id ? null : row.id
+                            );
+                          }}
+                          className="text-gray-500 hover:text-gray-700"
+                        >
+                          <MoreVertical className="w-4 h-4" />
+                        </button>
+                        {openMenuId === row.id && (
+                          <div className="absolute right-0 mt-2 w-44 bg-white border border-[#E5E7EB] rounded-lg shadow-lg z-50">
+                            <button className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50">
+                              Edit Contact
+                            </button>
+                            <button
+                              className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50"
+                              onClick={openSelectListModal}
+                            >
+                              Add to List
+                            </button>
+                            <button className="w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50">
+                              Delete Contact
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className="flex items-center justify-between px-6 py-4 text-sm text-gray-600">
+              <span>Showing 1 to 10 of {data.length} <br></br> transactions</span>
+
+              <div className="flex items-center gap-2">
+                <button className="px-3 py-1 border border-gray-200 rounded-md hover:bg-gray-100">
+                  <ChevronLeft className="w-4 h-4" />
+                  Previous
+                </button>
+
+                <button className="px-3 py-1 rounded-md bg-[#E5ECFF] text-[#1D4ED8]">
+                  1
+                </button>
+
+                <button className="px-3 py-1 border rounded-md hover:bg-gray-100">
+                  2
+                </button>
+
+                <button className="px-3 py-1 border border-gray-200 rounded-md hover:bg-gray-100">                  
+                  Next
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
