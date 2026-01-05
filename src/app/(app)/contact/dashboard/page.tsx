@@ -779,7 +779,7 @@ export default function ContactsMainContent() {
               <span>Showing 1 to 10 of {data.length} <br></br> transactions</span>
 
               <div className="flex items-center gap-2">
-                <button className="px-3 py-1 border border-gray-200 rounded-md hover:bg-gray-100">
+                <button className="flex items-center gap-1 px-3 py-1 border border-gray-200 rounded-md">
                   <ChevronLeft className="w-4 h-4" />
                   Previous
                 </button>
@@ -792,7 +792,7 @@ export default function ContactsMainContent() {
                   2
                 </button>
 
-                <button className="px-3 py-1 border border-gray-200 rounded-md hover:bg-gray-100">                  
+                <button className="flex items-center gap-1 px-3 py-1 border border-gray-200 rounded-md">                  
                   Next
                   <ChevronRight className="w-4 h-4" />
                 </button>
