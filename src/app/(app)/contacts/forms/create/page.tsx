@@ -100,9 +100,9 @@ export default function CreateLeadForm() {
   const [draggedType, setDraggedType] = useState<string | null>(null);
   const fieldIdCounter = useRef<number>(0);
   const [formNameError, setFormNameError] = useState("");
+  const [fieldError, setFieldError] = useState("");
 
   // for publish success
-  // const [confirmPublish, setConfirmPublish] = useState(false);
   const [publicLink, setPublicLink] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const accessToken = useSelector(selectToken);
@@ -137,6 +137,7 @@ export default function CreateLeadForm() {
       setFields((prev) => [...prev, newField]);
       setSelectedFieldId(newField.id);
       setDraggedType(null);
+      setFieldError("");
     }
   };
 
@@ -145,11 +146,15 @@ export default function CreateLeadForm() {
   };
 
   const handleDeleteField = (fieldId: string) => {
-    setFields((prev) => prev.filter((f) => f.id !== fieldId));
-    if (selectedFieldId === fieldId) {
-      setSelectedFieldId(null);
-    }
-  };
+  setFields((prev) => prev.filter((f) => f.id !== fieldId));
+  if (selectedFieldId === fieldId) {
+    setSelectedFieldId(null);
+  }
+  // If no fields left, set field error if trying to preview
+  if (fields.length === 1) { // About to delete the last field
+    setFieldError("");
+  }
+};
 
   const updateSelectedField = (updates: Partial<Field>) => {
     if (!selectedFieldId) return;
@@ -207,13 +212,22 @@ export default function CreateLeadForm() {
   };
 
   const handlePreview = () => {
+  if (!formName) {
+    setFormNameError("Form name cannot be empty!");
+  } else if (fields.length === 0) { 
+    setFieldError("Form must have at least one field included");
+  } else {
+    setFormNameError("");
+    setFieldError("");
+    
     const previewData = {
       name: formName || "New Form",
       fields: fields,
     };
     localStorage.setItem("form_preview", JSON.stringify(previewData));
     window.open("/contacts/forms/preview", "_blank");
-  };
+  }
+};
 
   const handlePublish = async () => {
     if (!formName) {
@@ -433,6 +447,11 @@ export default function CreateLeadForm() {
               </Button>
             )}
           </div>
+          {fieldError && (
+            <div className="text-xs text-red-500 text-left ml-2.5 mt-1">
+              {fieldError}
+            </div>
+          )}
         </div>
 
         {/* Right Sidebar - Field Settings */}
