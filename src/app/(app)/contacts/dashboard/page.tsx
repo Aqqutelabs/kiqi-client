@@ -32,6 +32,8 @@ import Filter from "@/components/ui/Filter";
 import ContactModal from "@/components/ui/ContactModal";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import SuccessModal from "@/components/ui/SuccessModal";
+import { fetchContacts, searchContacts, getContactsPaginated, createList } from "@/lib/contacts-api";
+import { Contact as ApiContact } from "@/types/contacts";
 import { redirect } from "next/navigation";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import SelectListModal from "@/components/ui/SelectListModal";
@@ -199,7 +201,7 @@ export function ContactDetailsModal({
         <div className="px-6 py-2 space-y-6">
           {/* Profile Section */}
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-[#233E97] rounded-full flex items-center justify-center text-white font-semibold text-lg flex-shrink-0">
+            <div className="w-12 h-12 bg-[#233E97] rounded-full flex items-center justify-center text-white font-semibold text-lg shrink-0">
               {contact.initials}
             </div>
             <div>
@@ -321,13 +323,85 @@ export default function ContactsMainContent() {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [openMenuId, setOpenMenuId] = useState<string | number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [contacts, setContacts] = useState([]);
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [openLists, setOpenLists] = useState(false);
   const [openMore, setOpenMore] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [showCreateList, setShowCreateList] = useState(false);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalContacts, setTotalContacts] = useState(0);
+  const itemsPerPage = 5;
+
+  // Transform API contact to UI contact
+  const transformContact = (apiContact: ApiContact, index: number): Contact => {
+    const initials = `${apiContact.firstName[0]}${apiContact.lastName[0]}`.toUpperCase();
+    const emailAddresses = apiContact.emails.map((e) => e.address);
+    const phoneNumbers = apiContact.phones.map((p) => p.number);
+    const lastUpdated = new Date(apiContact.updatedAt).toLocaleDateString();
+
+    return {
+      id: index,
+      name: `${apiContact.firstName} ${apiContact.lastName}`,
+      initials,
+      title: apiContact.jobTitle,
+      emails: emailAddresses,
+      phones: phoneNumbers,
+      company: apiContact.company,
+      tags: apiContact.tags,
+      notes: apiContact.notes,
+      lastUpdated,
+    };
+  };
+
+  // Fetch contacts on component mount and when search/page changes
+  useEffect(() => {
+    const loadContacts = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        let response;
+        console.log("Loading contacts with currentPage:", currentPage, "itemsPerPage:", itemsPerPage);
+        
+        if (searchTerm) {
+          console.log("Searching for:", searchTerm);
+          response = await searchContacts(searchTerm, itemsPerPage, currentPage);
+        } else {
+          console.log("Fetching all contacts");
+          response = await getContactsPaginated(currentPage, itemsPerPage);
+        }
+
+        console.log("Response received:", response);
+        console.log("Contacts array length:", response.contacts?.length);
+
+        const transformedContacts = response.contacts.map((contact, index) =>
+          transformContact(contact, index)
+        );
+        console.log("Transformed contacts:", transformedContacts);
+        
+        setContacts(transformedContacts);
+        setTotalPages(response.totalPages);
+        setTotalContacts(response.totalContacts);
+        
+        console.log("State updated - totalContacts:", response.totalContacts);
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : "Failed to fetch contacts";
+        console.error("Error fetching contacts:", err);
+        setError(errorMsg);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadContacts();
+  }, [searchTerm, currentPage]);
+
+  const data: Contact[] = useMemo(() => contacts, [contacts]);
   const [isSelectListOpen, setIsSelectListOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [sortBy, setSortBy] = useState<keyof Contact | null>(null);
@@ -344,46 +418,6 @@ export default function ContactsMainContent() {
   const closeImportModal = () => {
     setIsImportOpen(false);
   };
-
-  const data: Contact[] = useMemo(
-    () => [
-      {
-        id: 1,
-        name: "Sarah Johnson",
-        initials: "SJ",
-        title: "Marketing Director",
-        company: "TechCorp Inc.",
-        emails: ["sarah.johnson@techcorp.com", "sarah.j@gmail.com"],
-        phones: ["+1 (555) 123-4567", "+1 (555) 987-6543"],
-        tags: ["VIP", "Decision Maker", "Enterprise"],
-        notes: "Interested in enterprise package. Follow up next quarter.",
-        lastUpdated: "10-04-2025",
-      },
-      {
-        id: 2,
-        name: "Michael Phelps",
-        initials: "MP",
-        title: "Marketing Director",
-        company: "Swimming Corps.",
-        emails: ["micheal.phelps@swim.com", "phelps.m@gmail.com"],
-        phones: ["+1 (555) 123-4567", "+1 (555) 987-6543"],
-        tags: ["GOAT", "SA", "Swimming"],
-        notes: "All it takes is to breathe",
-        lastUpdated: "09-04-2025",
-      },
-      {
-        id: 3,
-        name: "Sarah Johnson",
-        initials: "SJ",
-        title: "Marketing Director",
-        company: "TechCorp Inc.",
-        emails: ["sarah.johnson@techcorp.com", "sarah.j@gmail.com"],
-        phones: ["+1 (555) 123-4567", "+1 (555) 987-6543"],
-        lastUpdated: "08-04-2025",
-      },
-    ],
-    []
-  );
 
   const lists: List[] = useMemo(
     () => [
@@ -489,6 +523,16 @@ export default function ContactsMainContent() {
     return value;
   };
 
+  const handleCreateList = async (name: string, description: string) => {
+    try {
+      const response = await createList({ name, description });
+      console.log("List created successfully:", response.list);
+      setShowSuccess(true);
+    } catch (error) {
+      console.error("Failed to create list:", error);
+    }
+  };
+
   return (
     <>
       {/* Contact Details Modal */}
@@ -525,12 +569,19 @@ export default function ContactsMainContent() {
 
       <PageHeader title="Contacts" />
       <div className="flex flex-col gap-6">
+        {/* Loading or Error State */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            {error}
+          </div>
+        )}
+
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <StatCard
             title="Total Contacts"
-            value="8"
-            change="+12.5% from last month"
+            value={totalContacts.toString()}
+            change={"+12.5% from last month"}
           />
           <StatCard
             title="New Contacts (30d)"
@@ -680,26 +731,38 @@ export default function ContactsMainContent() {
           <div className="flex justify-between items-center text-[#1B223C] font-medium px-6">
             <h3 className="text-lg md:text-xl text-[#42526D]">Contacts</h3>
             <div className="flex items-center gap-2">
-              <SearchInput name="search" value="" onChange={() => {}} />
+              <SearchInput
+              name="search"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+              placeholder="Search contacts..."
+            />
               <Filter value="" onChange={() => {}} />
             </div>
           </div>
           {/* Table */}
           <div className="bg-white overflow-hidden">
+            {isLoading ? (
+            <div className="flex items-center justify-center h-64">
+              <p className="text-gray-500">Loading contacts...</p>
+            </div>
+          ) : (
             <table className="min-w-full">
               <thead className="bg-[#D1DAF4] h-[66px]">
                 <tr>
                   <th className="px-4">
                     <input
                       type="checkbox"
-                      checked={selectedIds.length === data.length}
+                      checked={selectedIds.length === data.length && data.length > 0}
                       onChange={(e) =>
                         setSelectedIds(
                           e.target.checked ? data.map((d) => d.id) : []
                         )
                       }
-                      className="accent-[#059459]"
-                    />
+                      />
                   </th>
                   {columns.map((col) => (
                     <th
@@ -722,8 +785,7 @@ export default function ContactsMainContent() {
                         type="checkbox"
                         checked={selectedIds.includes(row.id)}
                         onChange={() => toggleSelect(row.id)}
-                        className="accent-[#059459]"
-                      />
+                        />
                     </td>
                     {columns.map((col) => (
                       <td
@@ -800,6 +862,30 @@ export default function ContactsMainContent() {
             </div>
           </div>
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-gray-600">
+              Page {currentPage} of {totalPages}
+            </p>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                variant="outline"
+              >
+                Previous
+              </Button>
+              <Button
+                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       {showCreateList && (
@@ -855,8 +941,18 @@ export default function ContactsMainContent() {
               </Button>
               <Button
                 onClick={() => {
+                  const nameInput = document.querySelector(
+                    'input[placeholder="e.g., VIP Customers"]'
+                  ) as HTMLInputElement;
+                  const descriptionInput = document.querySelector(
+                    'textarea[placeholder="Add a description for this list..."]'
+                  ) as HTMLTextAreaElement;
+
+                  const name = nameInput?.value || "";
+                  const description = descriptionInput?.value || "";
+
+                  handleCreateList(name, description);
                   setShowCreateList(false);
-                  setShowSuccess(true);
                 }}
               >
                 Create List

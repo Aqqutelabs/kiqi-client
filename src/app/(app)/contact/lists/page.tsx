@@ -1,41 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, Users } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import SearchInput from "@/components/ui/Search";
 import ActionsMenu from "@/components/ui/ActionsMenu";
+import { fetchLists } from "@/lib/contacts-api";
 
 export default function ContactListsPage() {
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const [lists, setLists] = useState<any[]>([]);
 
-  const lists = [
-    {
-      id: 1,
-      name: "Enterprise Clients",
-      description: "All enterprise-level contacts and decision makers",
-      contactsCount: 24,
-      createdAt: "12 Mar 2025",
-      updatedAt: "18 Apr 2025",
-    },
-    {
-      id: 2,
-      name: "Leads",
-      description: "Inbound and outbound leads",
-      contactsCount: 56,
-      createdAt: "02 Feb 2025",
-      updatedAt: "10 Apr 2025",
-    },
-    {
-      id: 3,
-      name: "Partners",
-      description: "Strategic partners and affiliates",
-      contactsCount: 14,
-      createdAt: "18 Jan 2025",
-      updatedAt: "01 Apr 2025",
-    },
-  ];
+  useEffect(() => {
+    const loadLists = async () => {
+      try {
+        const { lists } = await fetchLists();
+        setLists(lists);
+      } catch (error) {
+        console.error("Failed to load contact lists", error);
+      }
+    };
+
+    loadLists();
+  }, []);
 
   return (
     <div className="flex-1 flex flex-col">
@@ -84,7 +72,7 @@ export default function ContactListsPage() {
 
               <tbody className="divide-y divide-gray-100">
                 {lists.map((list) => (
-                  <tr key={list.id} className="hover:bg-gray-50">
+                  <tr key={list._id} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
                         <span className="text-sm font-medium text-gray-900">
@@ -99,22 +87,22 @@ export default function ContactListsPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2 text-sm text-gray-700">
                         <Users className="w-4 h-4 text-gray-400" />
-                        {list.contactsCount}
+                        {list.contactCount}
                       </div>
                     </td>
 
                     <td className="px-6 py-4 text-sm text-gray-700">
-                      {list.createdAt}
+                      {new Date(list.createdAt).toLocaleDateString()}
                     </td>
 
                     <td className="px-6 py-4 text-sm text-gray-700">
-                      {list.updatedAt}
+                      {new Date(list.updatedAt).toLocaleDateString()}
                     </td>
 
                     <td className="px-6 py-4 text-right">
                       <ActionsMenu
-                        isOpen={openMenuId === list.id}
-                        onOpen={() => setOpenMenuId(list.id)}
+                        isOpen={openMenuId === list._id}
+                        onOpen={() => setOpenMenuId(list._id)}
                         onClose={() => setOpenMenuId(null)}
                       />
                     </td>
