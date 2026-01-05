@@ -189,7 +189,7 @@ function Metrics({ product }: { product: Products }) {
         <h4 className="font-bold text-[#1B223C] text-base">Sample Results</h4>
         <div className="flex items-center gap-4">
           {/* publish time */}
-          <div className="p-5 rounded-xl shadow-sm flex-1 min-w-[150px] transition-shadow hover:shadow-md border border-[#A4F4CF] bg-gradient-to-r from-[#ECFDF5] to-[#F0FDF4]">
+          <div className="p-5 rounded-xl shadow-sm flex-1 min-w-37.5 transition-shadow hover:shadow-md border border-[#A4F4CF] bg-linear-to-r from-[#ECFDF5] to-[#F0FDF4]">
             <div
               className={`w-10 h-10 flex items-center justify-center rounded-lg mb-3`}>
               <Calendar className="w-5 h-5" color="#009966" />
@@ -201,7 +201,7 @@ function Metrics({ product }: { product: Products }) {
           </div>
 
           {/* backlinks */}
-          <div className="p-5 rounded-xl shadow-sm flex-1 min-w-[150px] transition-shadow hover:shadow-md border border-[#BEDBFF] bg-gradient-to-r from-[#EFF6FF] to-[#EEF2FF]">
+          <div className="p-5 rounded-xl shadow-sm flex-1 min-w-37.5 transition-shadow hover:shadow-md border border-[#BEDBFF] bg-linear-to-r from-[#EFF6FF] to-[#EEF2FF]">
             <div
               className={`w-10 h-10 flex items-center justify-center rounded-lg mb-3`}>
               <ExternalLink className="w-5 h-5" color="#155DFC" />
@@ -237,7 +237,12 @@ interface ReviewsComponentProps {
   reviews: Review[];
 }
 
-function Reviews({ rating, totalReviews, ratingBreakdown, reviews }: ReviewsComponentProps) {
+function Reviews({
+  rating,
+  totalReviews,
+  ratingBreakdown,
+  reviews,
+}: ReviewsComponentProps) {
   return (
     <div className="w-full max-w-2xl mx-auto p-5">
       {/* Rating Summary */}
@@ -267,7 +272,9 @@ function Reviews({ rating, totalReviews, ratingBreakdown, reviews }: ReviewsComp
           <div className="flex-1 space-y-2">
             {ratingBreakdown.map((bar) => (
               <div key={bar.stars} className="flex items-center gap-3">
-                <div className="text-sm text-gray-700 w-6 flex items-center gap-1">{bar.stars} <span className="block">★</span></div>
+                <div className="text-sm text-gray-700 w-6 flex items-center gap-1">
+                  {bar.stars} <span className="block">★</span>
+                </div>
                 <div className="flex-1 h-2 rounded-full bg-gray-200 overflow-hidden">
                   <div
                     style={{
@@ -355,29 +362,29 @@ export default function ProductSidebar({
   if (!product) return null;
   const { isAdded, handleAddToCart } = useProducts();
   const ratingBreakdown: RatingBreakdown[] = [
-  { stars: 5, percentage: 95, color: '#FBBF24' },
-  { stars: 4, percentage: 12, color: '#FBBF24' },
-  { stars: 3, percentage: 3, color: '#FBBF24' },
-  { stars: 2, percentage: 3, color: '#D1D5DB' },
-  { stars: 1, percentage: 3, color: '#D1D5DB' },
-];
+    { stars: 5, percentage: 95, color: "#FBBF24" },
+    { stars: 4, percentage: 12, color: "#FBBF24" },
+    { stars: 3, percentage: 3, color: "#FBBF24" },
+    { stars: 2, percentage: 3, color: "#D1D5DB" },
+    { stars: 1, percentage: 3, color: "#D1D5DB" },
+  ];
 
-const reviews: Review[] = [
-  {
-    verified: true,
-    verifiedText: 'Excellent platform! Great ROI and professional service.',
-    name: '',
-    rating: 0,
-    timeAgo: '',
-    comment: ''
-  },
-  {
-    name: 'Sarah M.',
-    rating: 5,
-    timeAgo: '1 week ago',
-    comment: 'Fast delivery and high-quality content distribution.'
-  }
-];
+  const reviews: Review[] = [
+    {
+      verified: true,
+      verifiedText: "Excellent platform! Great ROI and professional service.",
+      name: "",
+      rating: 0,
+      timeAgo: "",
+      comment: "",
+    },
+    {
+      name: "Sarah M.",
+      rating: 5,
+      timeAgo: "1 week ago",
+      comment: "Fast delivery and high-quality content distribution.",
+    },
+  ];
   return (
     <>
       {/* Overlay */}
@@ -390,11 +397,11 @@ const reviews: Review[] = [
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 right-0 h-full w-full sm:w-[400px] md:w-[600px] bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-out overflow-y-auto ${
+        className={`fixed top-0 right-0 h-full w-full sm:w-100 md:w-150 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-out overflow-y-auto ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}>
         {/* Header with Blue Background */}
-        <div className="bg-gradient-to-r from-[#233E97] to-[#155DFC] p-6 relative h-[170px]">
+        <div className="bg-linear-to-r from-[#233E97] to-[#155DFC] p-6 relative h-42.5">
           <button
             onClick={onClose}
             className="absolute top-4 right-4 text-white hover:bg-white/20 rounded-lg p-1 transition-colors">
@@ -402,7 +409,7 @@ const reviews: Review[] = [
           </button>
 
           <div className="flex items-start gap-3 mb-4">
-            <div className="size-16 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0">
+            <div className="size-16 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center shrink-0">
               <Package className="w-8 h-8 text-white" />
             </div>
             <div className="flex-1">
@@ -449,7 +456,7 @@ const reviews: Review[] = [
               <button
                 onClick={() => setActiveTab(tab.id)}
                 key={tab.id}
-                className={`flex items-center justify-center gap-2 rounded-[10px] h-[35px] w-[110px] cursor-pointer ${
+                className={`flex items-center justify-center gap-2 rounded-[10px] h-8.75 w-27.5 cursor-pointer ${
                   activeTab === tab.id
                     ? "bg-[#233E97] text-white"
                     : "bg-[#F1F5F9] text-[#45556C]"
@@ -464,7 +471,14 @@ const reviews: Review[] = [
         {/* Content */}
         {activeTab === 1 && <Overview product={product} />}
         {activeTab === 2 && <Metrics product={product} />}
-        {activeTab === 3 && <Reviews rating={5} ratingBreakdown={ratingBreakdown} reviews={reviews} totalReviews={2} />}
+        {activeTab === 3 && (
+          <Reviews
+            rating={5}
+            ratingBreakdown={ratingBreakdown}
+            reviews={reviews}
+            totalReviews={2}
+          />
+        )}
       </div>
     </>
   );

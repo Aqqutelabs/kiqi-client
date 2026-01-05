@@ -1,20 +1,26 @@
-'use client';
+"use client";
 
-import React, { useEffect } from 'react';
-import Link from 'next/link';
-import { CheckCircle2, ArrowRight, Mail, Share2, MessageCircle } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
+import React, { useEffect } from "react";
+import Link from "next/link";
+import {
+  CheckCircle2,
+  ArrowRight,
+  Mail,
+  Share2,
+  MessageCircle,
+} from "lucide-react";
+import { Button } from "@/components/ui/Button";
 
 const SuccessPage = () => {
   useEffect(() => {
     // Confetti animation would go here
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       // You could add confetti library here
     }
   }, []);
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 overflow-hidden">
+    <div className="relative flex min-h-screen w-full flex-col bg-linear-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl -z-10" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -z-10" />
@@ -44,10 +50,10 @@ const SuccessPage = () => {
           <div className="mb-8 flex justify-center">
             <div className="relative w-24 h-24 flex items-center justify-center">
               {/* Outer ring animation */}
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-blue-500/30 rounded-full animate-pulse" />
-              <div className="absolute inset-2 bg-gradient-to-r from-primary/20 to-blue-500/20 rounded-full" />
+              <div className="absolute inset-0 bg-linear-to-r from-primary/30 to-blue-500/30 rounded-full animate-pulse" />
+              <div className="absolute inset-2 bg-linear-to-r from-primary/20 to-blue-500/20 rounded-full" />
               {/* Icon */}
-              <div className="relative z-10 bg-gradient-to-br from-primary to-blue-600 rounded-full p-4">
+              <div className="relative z-10 bg-linear-to-br from-primary to-blue-600 rounded-full p-4">
                 <CheckCircle2 className="w-12 h-12 text-white" />
               </div>
             </div>
@@ -59,7 +65,8 @@ const SuccessPage = () => {
           </h1>
 
           <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 mb-8 max-w-lg mx-auto">
-            Welcome to the KiKi waitlist! We're excited to have you on board. You'll be among the first to experience what we're building.
+            Welcome to the KiKi waitlist! We're excited to have you on board.
+            You'll be among the first to experience what we're building.
           </p>
 
           {/* Info Cards */}
@@ -105,13 +112,13 @@ const SuccessPage = () => {
           </div>
 
           {/* Next Steps */}
-          <div className="bg-gradient-to-r from-primary/10 to-blue-500/10 dark:from-primary/20 dark:to-blue-500/20 rounded-xl p-8 mb-12 border border-primary/20 dark:border-primary/40">
+          <div className="bg-linear-to-r from-primary/10 to-blue-500/10 dark:from-primary/20 dark:to-blue-500/20 rounded-xl p-8 mb-12 border border-primary/20 dark:border-primary/40">
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
               What's Next?
             </h2>
             <ol className="text-left space-y-3 max-w-md mx-auto">
               <li className="flex gap-3">
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">
+                <span className="shrink-0 w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">
                   1
                 </span>
                 <span className="text-slate-700 dark:text-slate-300">
@@ -119,7 +126,7 @@ const SuccessPage = () => {
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">
+                <span className="shrink-0 w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">
                   2
                 </span>
                 <span className="text-slate-700 dark:text-slate-300">
@@ -127,7 +134,7 @@ const SuccessPage = () => {
                 </span>
               </li>
               <li className="flex gap-3">
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">
+                <span className="shrink-0 w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">
                   3
                 </span>
                 <span className="text-slate-700 dark:text-slate-300">
@@ -136,12 +143,11 @@ const SuccessPage = () => {
               </li>
             </ol>
             <Link href={"/waitlist"}>
-              <Button className='mt-5' variant={"primary"}>Back to Waitlist</Button>
+              <Button className="mt-5" variant={"primary"}>
+                Back to Waitlist
+              </Button>
             </Link>
           </div>
-
-        
-    
         </div>
       </div>
 

@@ -56,7 +56,7 @@ const TimeInput: React.FC<TimeInputProps> = ({
   const parseTimeValue = (timeStr: string) => {
     const timeRegex = /(\d{1,2}):(\d{2})\s*(AM|PM)?/i;
     const match = timeStr.match(timeRegex);
-    
+
     if (match) {
       let hour = parseInt(match[1]);
       const minute = parseInt(match[2]);
@@ -74,7 +74,11 @@ const TimeInput: React.FC<TimeInputProps> = ({
     }
   };
 
-  const formatTime = (hour: number, minute: number, per: "AM" | "PM"): string => {
+  const formatTime = (
+    hour: number,
+    minute: number,
+    per: "AM" | "PM"
+  ): string => {
     if (use24Hour) {
       let hour24 = hour;
       if (per === "PM" && hour !== 12) {
@@ -82,9 +86,13 @@ const TimeInput: React.FC<TimeInputProps> = ({
       } else if (per === "AM" && hour === 12) {
         hour24 = 0;
       }
-      return `${hour24.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+      return `${hour24.toString().padStart(2, "0")}:${minute
+        .toString()
+        .padStart(2, "0")}`;
     } else {
-      return `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")} ${per}`;
+      return `${hour.toString().padStart(2, "0")}:${minute
+        .toString()
+        .padStart(2, "0")} ${per}`;
     }
   };
 
@@ -117,15 +125,25 @@ const TimeInput: React.FC<TimeInputProps> = ({
   const scrollToSelected = () => {
     setTimeout(() => {
       if (hourScrollRef.current) {
-        const selectedElement = hourScrollRef.current.querySelector('[data-selected="true"]');
+        const selectedElement = hourScrollRef.current.querySelector(
+          '[data-selected="true"]'
+        );
         if (selectedElement) {
-          selectedElement.scrollIntoView({ block: "center", behavior: "smooth" });
+          selectedElement.scrollIntoView({
+            block: "center",
+            behavior: "smooth",
+          });
         }
       }
       if (minuteScrollRef.current) {
-        const selectedElement = minuteScrollRef.current.querySelector('[data-selected="true"]');
+        const selectedElement = minuteScrollRef.current.querySelector(
+          '[data-selected="true"]'
+        );
         if (selectedElement) {
-          selectedElement.scrollIntoView({ block: "center", behavior: "smooth" });
+          selectedElement.scrollIntoView({
+            block: "center",
+            behavior: "smooth",
+          });
         }
       }
     }, 50);
@@ -137,10 +155,10 @@ const TimeInput: React.FC<TimeInputProps> = ({
     }
   }, [isPickerOpen]);
 
-  const hours = use24Hour 
+  const hours = use24Hour
     ? Array.from({ length: 24 }, (_, i) => i)
     : Array.from({ length: 12 }, (_, i) => i + 1);
-  
+
   const minutes = Array.from({ length: 60 }, (_, i) => i);
 
   return (
@@ -153,8 +171,7 @@ const TimeInput: React.FC<TimeInputProps> = ({
       <div
         ref={inputRef}
         className="relative flex items-center bg-white border border-gray-300 rounded-md px-3 py-2 h-10 cursor-pointer hover:border-gray-400 transition-colors"
-        onClick={togglePicker}
-      >
+        onClick={togglePicker}>
         <input
           type="text"
           value={selectedTime}
@@ -162,14 +179,13 @@ const TimeInput: React.FC<TimeInputProps> = ({
           readOnly
           className="flex-1 outline-none text-gray-700 placeholder-gray-400 text-sm cursor-pointer bg-transparent"
         />
-        <Clock className="w-5 h-5 text-gray-500 ml-2 flex-shrink-0" />
+        <Clock className="w-5 h-5 text-gray-500 ml-2 shrink-0" />
       </div>
 
       {isPickerOpen && (
         <div
           ref={pickerRef}
-          className="absolute bottom-full left-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-50 p-4 w-4/5 min-w-[280px]"
-        >
+          className="absolute bottom-full left-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-50 p-4 w-4/5 min-w-[280px]">
           <div className="flex gap-2 mb-3">
             {/* Hours Column */}
             <div className="flex-1">
@@ -178,8 +194,7 @@ const TimeInput: React.FC<TimeInputProps> = ({
               </div>
               <div
                 ref={hourScrollRef}
-                className="h-40 overflow-y-auto scrollbar-hide rounded border border-gray-200"
-              >
+                className="h-40 overflow-y-auto scrollbar-hide rounded border border-gray-200">
                 {hours.map((hour) => (
                   <button
                     key={hour}
@@ -188,9 +203,12 @@ const TimeInput: React.FC<TimeInputProps> = ({
                     data-selected={selectedHour === hour}
                     className={`
                       w-full px-3 py-2 text-sm text-center hover:bg-blue-50 transition-colors
-                      ${selectedHour === hour ? "bg-blue-100 text-[#155DFC] font-medium" : "text-gray-700"}
-                    `}
-                  >
+                      ${
+                        selectedHour === hour
+                          ? "bg-blue-100 text-[#155DFC] font-medium"
+                          : "text-gray-700"
+                      }
+                    `}>
                     {use24Hour ? hour.toString().padStart(2, "0") : hour}
                   </button>
                 ))}
@@ -204,8 +222,7 @@ const TimeInput: React.FC<TimeInputProps> = ({
               </div>
               <div
                 ref={minuteScrollRef}
-                className="h-40 overflow-y-auto scrollbar-hide rounded border border-gray-200"
-              >
+                className="h-40 overflow-y-auto scrollbar-hide rounded border border-gray-200">
                 {minutes.map((minute) => (
                   <button
                     key={minute}
@@ -214,9 +231,12 @@ const TimeInput: React.FC<TimeInputProps> = ({
                     data-selected={selectedMinute === minute}
                     className={`
                       w-full px-3 py-2 text-sm text-center hover:bg-blue-50 transition-colors
-                      ${selectedMinute === minute ? "bg-blue-100 text-[#155DFC] font-medium" : "text-gray-700"}
-                    `}
-                  >
+                      ${
+                        selectedMinute === minute
+                          ? "bg-blue-100 text-[#155DFC] font-medium"
+                          : "text-gray-700"
+                      }
+                    `}>
                     {minute.toString().padStart(2, "0")}
                   </button>
                 ))}
@@ -235,9 +255,12 @@ const TimeInput: React.FC<TimeInputProps> = ({
                     type="button"
                     className={`
                       px-3 py-2 text-sm text-center rounded border transition-colors
-                      ${period === "AM" ? "bg-blue-100 text-[#155DFC] border-blue-300 font-medium" : "text-gray-700 border-gray-200 hover:bg-blue-50"}
-                    `}
-                  >
+                      ${
+                        period === "AM"
+                          ? "bg-blue-100 text-[#155DFC] border-blue-300 font-medium"
+                          : "text-gray-700 border-gray-200 hover:bg-blue-50"
+                      }
+                    `}>
                     AM
                   </button>
                   <button
@@ -245,9 +268,12 @@ const TimeInput: React.FC<TimeInputProps> = ({
                     type="button"
                     className={`
                       px-3 py-2 text-sm text-center rounded border transition-colors
-                      ${period === "PM" ? "bg-blue-100 text-[#155DFC] border-blue-300 font-medium" : "text-gray-700 border-gray-200 hover:bg-blue-50"}
-                    `}
-                  >
+                      ${
+                        period === "PM"
+                          ? "bg-blue-100 text-[#155DFC] border-blue-300 font-medium"
+                          : "text-gray-700 border-gray-200 hover:bg-blue-50"
+                      }
+                    `}>
                     PM
                   </button>
                 </div>
@@ -260,15 +286,13 @@ const TimeInput: React.FC<TimeInputProps> = ({
             <button
               onClick={() => setIsPickerOpen(false)}
               type="button"
-              className="flex-1 px-3 py-2 text-sm text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
-            >
+              className="flex-1 px-3 py-2 text-sm text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition-colors">
               Cancel
             </button>
             <button
               onClick={handleTimeSelect}
               type="button"
-              className="flex-1 px-3 py-2 text-sm text-white bg-[#155DFC] rounded hover:bg-[#1348d4] transition-colors"
-            >
+              className="flex-1 px-3 py-2 text-sm text-white bg-[#155DFC] rounded hover:bg-[#1348d4] transition-colors">
               Set Time
             </button>
           </div>

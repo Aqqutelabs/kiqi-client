@@ -32,7 +32,7 @@ const Header = () => {
     <header
       className={`${
         pathname.includes("/coming-soon") ? "hidden" : "flex"
-      } flex-shrink-0 bg-white h-16 border-b border-gray-200 items-center justify-between md:justify-end px-4 sm:px-6 lg:px-8`}>
+      } shrink-0 bg-white h-16 border-b border-gray-200 items-center justify-between md:justify-end px-4 sm:px-6 lg:px-8`}>
       {/* icon */}
       <div className="relative md:hidden">
         <Image
@@ -45,12 +45,12 @@ const Header = () => {
       </div>
       {/* User Menu Section */}
       <div className="ml-4 flex items-center space-x-3">
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gray-200">
             <ChevronDown className="hidden" />{" "}
             {/* Hidden, just to keep import if needed */}
             {/* <User className="h-6 w-6 text-gray-500" aria-label="User avatar" /> */}
-          <Avatar name={displayName}/>
+            <Avatar name={displayName} />
           </span>
         </div>
         <div className="hidden sm:block">
@@ -59,7 +59,12 @@ const Header = () => {
           </div>
           <div className="text-xs text-gray-500">{email}</div>
         </div>
-      <Menu onClick={openMobile} height={22} width={22} className="md:hidden" />
+        <Menu
+          onClick={openMobile}
+          height={22}
+          width={22}
+          className="md:hidden"
+        />
       </div>
     </header>
   );

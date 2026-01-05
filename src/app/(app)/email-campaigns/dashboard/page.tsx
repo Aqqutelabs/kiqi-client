@@ -440,7 +440,7 @@ const fetchCampaigns = async (showRefreshLoader = false) => {
               {tabs.map((t) => (
                 <button
                   key={t}
-                  className={`px-2 py-1 rounded font-medium text-sm w-[90px] cursor-pointer ${
+                  className={`px-2 py-1 rounded font-medium text-sm w-22.5 cursor-pointer ${
                     tab === t ? "bg-[#233E97] text-[#ECEDEE]" : "text-gray-700"
                   }`}
                   onClick={() => setTab(t)}>

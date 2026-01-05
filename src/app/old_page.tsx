@@ -160,9 +160,7 @@ export default function Home() {
             <Link href="/login" className="text-sm text-white cursor-pointer">
               Sign In
             </Link>
-            <Link
-              href="/signup"
-              className="text-sm text-white cursor-pointer">
+            <Link href="/signup" className="text-sm text-white cursor-pointer">
               Sign up
             </Link>
           </div>
@@ -181,12 +179,12 @@ export default function Home() {
 
             <h1 className="font-bold text-[28px] md:text-[52px]">
               Email Marketing <br className="hidden md:block" />
-               Without the Hassle
+              Without the Hassle
             </h1>
             <p className="text-base md:text-xl font-light my-12">
               Launch Campaigns, grow subcribers
               <br className="hidden md:block" />
-             and drive sales - without learning "Email Marketing"
+              and drive sales - without learning "Email Marketing"
             </p>
 
             <div className="flex flex-col md:flex-row gap-4 md:gap-5 items-center w-full md:w-[360px]">
@@ -196,7 +194,7 @@ export default function Home() {
                 link="/waitlist"
                 icon={<GoArrowUp />}
               />
-              
+
               <Button content="Watch Demo" variant="secondary" link="" />
             </div>
 
@@ -359,7 +357,7 @@ export default function Home() {
                 return (
                   <div
                     key={plan.id}
-                    className={`flex-shrink-0 h-auto md:h-[600px] w-[280px] sm:w-[320px] md:w-[360px] rounded-[20px] border border-[#E7EBFF] space-y-2 shadow-sm p-[20px] md:p-[30px] flex flex-col justify-between ${
+                    className={`shrink-0 h-auto md:h-[600px] w-[280px] sm:w-[320px] md:w-[360px] rounded-[20px] border border-[#E7EBFF] space-y-2 shadow-sm p-[20px] md:p-[30px] flex flex-col justify-between ${
                       isEven ? "bg-white" : "bg-[#BCCAFF21]"
                     }`}>
                     <div
