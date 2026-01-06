@@ -32,12 +32,19 @@ import Filter from "@/components/ui/Filter";
 import ContactModal from "@/components/ui/ContactModal";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import SuccessModal from "@/components/ui/SuccessModal";
-import { fetchContacts, searchContacts, getContactsPaginated, createList } from "@/lib/contacts-api";
+import {
+  fetchContacts,
+  searchContacts,
+  getContactsPaginated,
+  createList,
+  fetchContactDetails,
+} from "@/lib/contacts-api";
 import { Contact as ApiContact } from "@/types/contacts";
 import { redirect } from "next/navigation";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import SelectListModal from "@/components/ui/SelectListModal";
 import { ImportContactsModal } from "@/components/ui/ImportContactsModal";
+import EditContactModal from "@/components/ui/EditContactModal";
 
 interface Contact {
   id: number;
@@ -166,7 +173,7 @@ function DropdownItem({
 interface ContactDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  contact: any;
+  contact: Contact | null;
 }
 
 // ContactDetailsModal Component
@@ -175,10 +182,41 @@ export function ContactDetailsModal({
   onClose,
   contact,
 }: ContactDetailsModalProps) {
-  if (!isOpen || !contact) return null;
+  const [details, setDetails] = useState<Contact | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isOpen || !contact) return;
+
+    const loadDetails = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetchContactDetails(String(contact.id));
+
+        setDetails(response.contact);
+      } catch (err) {
+        setError("Failed to load contact details");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDetails();
+  }, [isOpen, contact]);
+
+  if (!isOpen) return null;
 
   return (
     <>
+      {loading && (
+        <div className="flex items-center justify-center h-full">
+          <p className="text-gray-500">Loading contact details...</p>
+        </div>
+      )}
+
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/30" onClick={onClose} />
 
@@ -202,25 +240,25 @@ export function ContactDetailsModal({
           {/* Profile Section */}
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-[#233E97] rounded-full flex items-center justify-center text-white font-semibold text-lg shrink-0">
-              {contact.initials}
+              {details?.initials}
             </div>
             <div>
               <h3 className="text-lg font-semibold text-[#1B223C]">
-                {contact.name}
+                {details?.name}
               </h3>
-              <p className="text-sm text-gray-600">{contact.title}</p>
+              <p className="text-sm text-gray-600">{details?.title}</p>
             </div>
           </div>
 
           {/* Tags */}
-          {contact.tags && contact.tags.length > 0 && (
+          {details?.tags && details?.tags.length > 0 && (
             <div>
               <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
                 <Tag className="w-4 h-4" />
                 Tags
               </label>
               <div className="flex flex-wrap gap-2">
-                {contact.tags.map((tag: string, index: number) => (
+                {details?.tags.map((tag: string, index: number) => (
                   <span
                     key={index}
                     className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-[12px]"
@@ -239,7 +277,7 @@ export function ContactDetailsModal({
               Email
             </label>
             <div className="space-y-2">
-              {contact.emails.map((email: string, index: number) => (
+              {details?.emails.map((email: string, index: number) => (
                 <div
                   key={index}
                   className="flex items-center justify-between bg-gray-50 rounded-lg px-4 py-2 mb-2"
@@ -260,7 +298,7 @@ export function ContactDetailsModal({
               Phone
             </label>
             <div className="space-y-2">
-              {contact.phones.map((phone: string, index: number) => (
+              {details?.phones.map((phone: string, index: number) => (
                 <div
                   key={index}
                   className="flex items-center justify-between bg-gray-50 rounded-lg px-4 py-2 mb-2"
@@ -275,24 +313,24 @@ export function ContactDetailsModal({
           </div>
 
           {/* Company Section */}
-          {contact.company && (
+          {details?.company && (
             <div>
               <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
                 <Building className="w-4 h-4" />
                 Company
               </label>
-              <p className="text-sm text-[#4A5565]">{contact.company}</p>
+              <p className="text-sm text-[#4A5565]">{details?.company}</p>
             </div>
           )}
 
           {/* Notes Section */}
-          {contact.notes && (
+          {details?.notes && (
             <div>
               <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
                 <FileText className="w-4 h-4" />
                 Notes
               </label>
-              <p className="text-sm text-gray-700">{contact.notes}</p>
+              <p className="text-sm text-gray-700">{details?.notes}</p>
             </div>
           )}
         </div>
@@ -328,6 +366,7 @@ export default function ContactsMainContent() {
   const [openMore, setOpenMore] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [showCreateList, setShowCreateList] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -340,7 +379,8 @@ export default function ContactsMainContent() {
 
   // Transform API contact to UI contact
   const transformContact = (apiContact: ApiContact, index: number): Contact => {
-    const initials = `${apiContact.firstName[0]}${apiContact.lastName[0]}`.toUpperCase();
+    const initials =
+      `${apiContact.firstName[0]}${apiContact.lastName[0]}`.toUpperCase();
     const emailAddresses = apiContact.emails.map((e) => e.address);
     const phoneNumbers = apiContact.phones.map((p) => p.number);
     const lastUpdated = new Date(apiContact.updatedAt).toLocaleDateString();
@@ -366,11 +406,20 @@ export default function ContactsMainContent() {
       setError(null);
       try {
         let response;
-        console.log("Loading contacts with currentPage:", currentPage, "itemsPerPage:", itemsPerPage);
-        
+        console.log(
+          "Loading contacts with currentPage:",
+          currentPage,
+          "itemsPerPage:",
+          itemsPerPage
+        );
+
         if (searchTerm) {
           console.log("Searching for:", searchTerm);
-          response = await searchContacts(searchTerm, itemsPerPage, currentPage);
+          response = await searchContacts(
+            searchTerm,
+            itemsPerPage,
+            currentPage
+          );
         } else {
           console.log("Fetching all contacts");
           response = await getContactsPaginated(currentPage, itemsPerPage);
@@ -383,14 +432,15 @@ export default function ContactsMainContent() {
           transformContact(contact, index)
         );
         console.log("Transformed contacts:", transformedContacts);
-        
+
         setContacts(transformedContacts);
         setTotalPages(response.totalPages);
         setTotalContacts(response.totalContacts);
-        
+
         console.log("State updated - totalContacts:", response.totalContacts);
       } catch (err) {
-        const errorMsg = err instanceof Error ? err.message : "Failed to fetch contacts";
+        const errorMsg =
+          err instanceof Error ? err.message : "Failed to fetch contacts";
         console.error("Error fetching contacts:", err);
         setError(errorMsg);
       } finally {
@@ -447,6 +497,15 @@ export default function ContactsMainContent() {
     sortable?: boolean;
   };
 
+  const handleSort = (accessor: keyof Contact) => {
+    if (sortBy === accessor) {
+      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setSortBy(accessor);
+      setSortOrder("asc");
+    }
+  };
+
   const columns: Column<Contact>[] = [
     {
       header: (
@@ -488,26 +547,6 @@ export default function ContactsMainContent() {
     },
   ];
 
-  const handleSort = (accessor: keyof Contact) => {
-    if (sortBy === accessor) {
-      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
-    } else {
-      setSortBy(accessor);
-      setSortOrder("asc");
-    }
-  };
-
-  const sortedData = [...data].sort((a, b) => {
-    if (!sortBy) return 0;
-
-    const aVal = String(a[sortBy] ?? "").toLowerCase();
-    const bVal = String(b[sortBy] ?? "").toLowerCase();
-
-    if (aVal < bVal) return sortOrder === "asc" ? -1 : 1;
-    if (aVal > bVal) return sortOrder === "asc" ? 1 : -1;
-    return 0;
-  });
-
   const toggleSelect = (id: number) => {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
@@ -532,6 +571,28 @@ export default function ContactsMainContent() {
       console.error("Failed to create list:", error);
     }
   };
+
+  const sortedData = useMemo(() => {
+    if (!sortBy) return data;
+
+    return [...data].sort((a, b) => {
+      let aValue = a[sortBy];
+      let bValue = b[sortBy];
+
+      // Handle array fields (emails, phones)
+      if (Array.isArray(aValue)) aValue = aValue[0] ?? "";
+      if (Array.isArray(bValue)) bValue = bValue[0] ?? "";
+
+      // Handle null / undefined
+      if (!aValue) return 1;
+      if (!bValue) return -1;
+
+      // String comparison (API-safe)
+      const comparison = String(aValue).localeCompare(String(bValue));
+
+      return sortOrder === "asc" ? comparison : -comparison;
+    });
+  }, [data, sortBy, sortOrder]);
 
   return (
     <>
@@ -566,6 +627,15 @@ export default function ContactsMainContent() {
       />
 
       <ImportContactsModal isOpen={isImportOpen} onClose={closeImportModal} />
+
+      <EditContactModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedContact(null);
+        }}
+        contact={selectedContact}
+      />
 
       <PageHeader title="Contacts" />
       <div className="flex flex-col gap-6">
@@ -732,134 +802,122 @@ export default function ContactsMainContent() {
             <h3 className="text-lg md:text-xl text-[#42526D]">Contacts</h3>
             <div className="flex items-center gap-2">
               <SearchInput
-              name="search"
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setCurrentPage(1);
-              }}
-              placeholder="Search contacts..."
-            />
+                name="search"
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
+                placeholder="Search contacts..."
+              />
               <Filter value="" onChange={() => {}} />
             </div>
           </div>
           {/* Table */}
           <div className="bg-white overflow-hidden">
             {isLoading ? (
-            <div className="flex items-center justify-center h-64">
-              <p className="text-gray-500">Loading contacts...</p>
-            </div>
-          ) : (
-            <table className="min-w-full">
-              <thead className="bg-[#D1DAF4] h-[66px]">
-                <tr>
-                  <th className="px-4">
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.length === data.length && data.length > 0}
-                      onChange={(e) =>
-                        setSelectedIds(
-                          e.target.checked ? data.map((d) => d.id) : []
-                        )
-                      }
-                      />
-                  </th>
-                  {columns.map((col) => (
-                    <th
-                      key={String(col.accessor)}
-                      className="px-6 py-3 text-left text-xs font-medium uppercase"
-                    >
-                      {col.header}
-                    </th>
-                  ))}
-                  <th className="px-6 py-3 text-right text-xs font-medium uppercase">
-                    Action
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {sortedData.map((row) => (
-                  <tr key={row.id} className="h-20">
-                    <td className="px-4">
+              <div className="flex items-center justify-center h-64">
+                <p className="text-gray-500">Loading contacts...</p>
+              </div>
+            ) : (
+              <table className="min-w-full">
+                <thead className="bg-[#D1DAF4] h-[66px]">
+                  <tr>
+                    <th className="px-4">
                       <input
                         type="checkbox"
-                        checked={selectedIds.includes(row.id)}
-                        onChange={() => toggleSelect(row.id)}
-                        />
-                    </td>
+                        checked={
+                          selectedIds.length === data.length && data.length > 0
+                        }
+                        onChange={(e) =>
+                          setSelectedIds(
+                            e.target.checked ? data.map((d) => d.id) : []
+                          )
+                        }
+                      />
+                    </th>
                     {columns.map((col) => (
-                      <td
-                        key={col.accessor}
-                        className="px-6 py-4 text-sm text-gray-700 w-[500px]"
+                      <th
+                        key={String(col.accessor)}
+                        className="px-6 py-3 text-left text-xs font-medium uppercase"
                       >
-                        {renderCellValue(row[col.accessor])}
-                      </td>
+                        {col.header}
+                      </th>
                     ))}
-                    <td className="px-6 py-4 text-right relative">
-                      <div className="flex justify-end items-center gap-3">
-                        <button
-                          onClick={() => handleViewContact(row)}
-                          className="text-gray-500 hover:text-gray-700"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
-
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setOpenMenuId(
-                              openMenuId === row.id ? null : row.id
-                            );
-                          }}
-                          className="text-gray-500 hover:text-gray-700"
-                        >
-                          <MoreVertical className="w-4 h-4" />
-                        </button>
-                        {openMenuId === row.id && (
-                          <div className="absolute right-0 mt-2 w-44 bg-white border border-[#E5E7EB] rounded-lg shadow-lg z-50">
-                            <button className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50">
-                              Edit Contact
-                            </button>
-                            <button
-                              className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50"
-                              onClick={openSelectListModal}
-                            >
-                              Add to List
-                            </button>
-                            <button className="w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50">
-                              Delete Contact
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    </td>
+                    <th className="px-6 py-3 text-right text-xs font-medium uppercase">
+                      Action
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-            <div className="flex items-center justify-between px-6 py-4 text-sm text-gray-600">
-              <span>Showing 1 to 10 of {data.length} <br></br> transactions</span>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {sortedData.map((row) => (
+                    <tr key={row.id} className="h-20">
+                      <td className="px-4">
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.includes(row.id)}
+                          onChange={() => toggleSelect(row.id)}
+                        />
+                      </td>
+                      {columns.map((col) => (
+                        <td
+                          key={col.accessor}
+                          className="px-6 py-4 text-sm text-gray-700 w-[500px]"
+                        >
+                          {renderCellValue(row[col.accessor])}
+                        </td>
+                      ))}
+                      <td className="px-6 py-4 text-right relative">
+                        <div className="flex justify-end items-center gap-3">
+                          <button
+                            onClick={() => handleViewContact(row)}
+                            className="text-gray-500 hover:text-gray-700"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
 
-              <div className="flex items-center gap-2">
-                <button className="flex items-center gap-1 px-3 py-1 border border-gray-200 rounded-md">
-                  <ChevronLeft className="w-4 h-4" />
-                  Previous
-                </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenMenuId(
+                                openMenuId === row.id ? null : row.id
+                              );
+                            }}
+                            className="text-gray-500 hover:text-gray-700"
+                          >
+                            <MoreVertical className="w-4 h-4" />
+                          </button>
+                          {openMenuId === row.id && (
+                            <div className="absolute right-0 mt-2 w-44 bg-white border border-[#E5E7EB] rounded-lg shadow-lg z-50">
+                              <button
+                                className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50"
+                                onClick={() => {
+                                  setSelectedContact(row);
+                                  setIsEditModalOpen(true);
+                                  setOpenMenuId(null);
+                                }}
+                              >
+                                Edit Contact
+                              </button>
 
-                <button className="px-3 py-1 rounded-md bg-[#E5ECFF] text-[#1D4ED8]">
-                  1
-                </button>
-
-                <button className="px-3 py-1 border rounded-md hover:bg-gray-100">
-                  2
-                </button>
-
-                <button className="flex items-center gap-1 px-3 py-1 border border-gray-200 rounded-md">                  
-                  Next
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
+                              <button
+                                className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50"
+                                onClick={openSelectListModal}
+                              >
+                                Add to List
+                              </button>
+                              <button className="w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50">
+                                Delete Contact
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
 
@@ -878,7 +936,9 @@ export default function ContactsMainContent() {
                 Previous
               </Button>
               <Button
-                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                onClick={() =>
+                  setCurrentPage(Math.min(totalPages, currentPage + 1))
+                }
                 disabled={currentPage === totalPages}
               >
                 Next

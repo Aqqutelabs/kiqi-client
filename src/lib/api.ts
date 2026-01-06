@@ -4,7 +4,8 @@ import axios from 'axios';
 import { getAuthToken } from './auth';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api/v1',
+  baseURL: 'https://kiqi-server-pqqr.onrender.com',
+  // baseURL: 'http://localhost:8000/api/v1',
   headers: {
     'Content-Type': 'application/json',
   },
