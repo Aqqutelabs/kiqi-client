@@ -3,6 +3,139 @@ import api from "@/lib/api";
 import { Contact, ContactsResponse, ContactsApiParams } from "@/types/contacts";
 
 /**
+ * Contact List interface
+ */
+export interface ContactList {
+  _id: string;
+  name: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+  contactCount: number;
+}
+
+export interface ContactListsResponse {
+  error: boolean;
+  lists: ContactList[];
+}
+
+export interface ContactListDetail {
+  _id: string;
+  userId: string;
+  name: string;
+  description: string;
+  contacts: Contact[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ContactListDetailResponse {
+  error: boolean;
+  list: ContactListDetail;
+}
+
+/**
+ * Fetch all contact lists
+ */
+export const fetchContactLists = async (): Promise<ContactListsResponse> => {
+  try {
+    const response = await api.get<ContactListsResponse>("/contacts/lists");
+    
+    if (response.data.error) {
+      throw new Error("Failed to fetch contact lists");
+    }
+    
+    return response.data;
+  } catch (error) {
+    console.error("Error in fetchContactLists:", error);
+    throw error;
+  }
+};
+
+/**
+ * Fetch a single contact list by ID
+ * @param listId - The ID of the list to fetch
+ */
+export const fetchContactListById = async (listId: string): Promise<ContactListDetailResponse> => {
+  try {
+    const response = await api.get<ContactListDetailResponse>(`/contacts/lists/${listId}`);
+    
+    if (response.data.error) {
+      throw new Error("Failed to fetch contact list");
+    }
+    
+    return response.data;
+  } catch (error) {
+    console.error("Error in fetchContactListById:", error);
+    throw error;
+  }
+};
+
+/**
+ * Delete a contact list by ID
+ * @param listId - The ID of the list to delete
+ */
+export const deleteContactList = async (listId: string): Promise<{ error: boolean; message: string }> => {
+  try {
+    const response = await api.delete<{ error: boolean; message: string }>(`/contacts/lists/${listId}`);
+    
+    if (response.data.error) {
+      throw new Error(response.data.message || "Failed to delete contact list");
+    }
+    
+    return response.data;
+  } catch (error) {
+    console.error("Error in deleteContactList:", error);
+    throw error;
+  }
+};
+
+/**
+ * Add contacts to a list
+ * @param listId - The ID of the list to add contacts to
+ * @param contactIds - Array of contact IDs to add
+ */
+export const addContactsToList = async (
+  listId: string,
+  contactIds: string[]
+): Promise<{ error: boolean; list: ContactListDetail }> => {
+  try {
+    const response = await api.post<{ error: boolean; list: ContactListDetail }>(
+      `/contacts/lists/${listId}/add-contacts`,
+      { contactIds }
+    );
+    
+    if (response.data.error) {
+      throw new Error("Failed to add contacts to list");
+    }
+    
+    return response.data;
+  } catch (error) {
+    console.error("Error in addContactsToList:", error);
+    throw error;
+  }
+};
+
+/**
+ * Fetch a single contact by ID
+ * @param contactId - The ID of the contact to fetch
+ */
+export const fetchContactById = async (contactId: string): Promise<{ error: boolean; contact: Contact }> => {
+  try {
+    const response = await api.get<{ error: boolean; contact: Contact }>(`/contacts/${contactId}`);
+    
+    if (response.data.error) {
+      throw new Error("Failed to fetch contact");
+    }
+    
+    return response.data;
+  } catch (error) {
+    console.error("Error in fetchContactById:", error);
+    throw error;
+  }
+};
+
+/**
  * Fetch all contacts with pagination, search, and sorting
  * Token is automatically injected by the API interceptor from Redux state
  * @param params - Query parameters (page, limit, search, sortBy)
@@ -106,6 +239,30 @@ export const createContact = async (contactData: {
     return response.data;
   } catch (error) {
     console.error("Error creating contact:", error);
+    throw error;
+  }
+};
+
+/**
+ * Update a contact by ID
+ * @param contactId - The ID of the contact to update
+ * @param contactData - The updated contact data
+ */
+export const updateContact = async (
+  contactId: string,
+  contactData: any
+): Promise<{ error: boolean; contact: Contact }> => {
+  try {
+    const response = await api.put<{ error: boolean; contact: Contact }>(
+      `/contacts/${contactId}`,
+      contactData
+    );
+    if (response.data.error) {
+      throw new Error("Failed to update contact");
+    }
+    return response.data;
+  } catch (error) {
+    console.error("Error updating contact:", error);
     throw error;
   }
 };
@@ -241,6 +398,78 @@ export const deleteForm = async (formId: string, accessToken: string): Promise<v
     }
   } catch (error) {
     console.error("Error deleting form:", error);
+    throw error;
+  }
+};
+
+/**
+ * Form submission data structure
+ */
+export interface FormSubmission {
+  _id: string;
+  formId: string;
+  userId: string;
+  contactId: string | null;
+  data: Record<string, string>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Fetch form submissions by form ID
+ * @param formId - The ID of the form to fetch submissions for
+ * @param accessToken - The access token for authorization
+ */
+export const fetchFormSubmissions = async (
+  formId: string,
+  accessToken: string
+): Promise<FormSubmission[]> => {
+  try {
+    const response = await api.get<FormSubmission[]>(`/forms/${formId}/submissions`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching form submissions:", error);
+    throw error;
+  }
+};
+
+/**
+ * Import contacts from a CSV file
+ * @param file - The CSV file to import
+ * @param onProgress - Optional callback for upload progress
+ */
+export const importContactsFromCSV = async (
+  file: File,
+  onProgress?: (progress: number) => void
+): Promise<{ error: boolean; message: string; importedCount?: number }> => {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await api.post<{ error: boolean; message: string; importedCount?: number }>(
+      "/contacts/import-csv",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress: (progressEvent) => {
+          if (progressEvent.total && onProgress) {
+            const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            onProgress(progress);
+          }
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error importing contacts from CSV:", error);
     throw error;
   }
 };

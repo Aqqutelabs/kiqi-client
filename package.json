@@ -44,6 +44,7 @@
     "next": "^16.0.8",
     "next-auth": "^4.24.13",
     "owl.carousel": "^2.3.4",
+    "papaparse": "^5.5.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-hot-toast": "^2.6.0",
@@ -55,11 +56,13 @@
     "recharts": "^3.2.0",
     "redux-persist": "^6.0.0",
     "tailwind-merge": "^3.3.1",
-    "tweetnacl": "^1.0.3"
+    "tweetnacl": "^1.0.3",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/papaparse": "^5.5.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "tailwindcss": "^4",

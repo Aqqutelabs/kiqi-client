@@ -11,6 +11,8 @@ import {
   Archive,
   Trash2,
   X,
+  ChevronLeft,
+  ChevronRight,
   Eye,
   MoreVertical,
   Phone,
@@ -20,23 +22,27 @@ import {
   ChevronDown,
   UserPlus,
   UserMinus,
+  ArrowUpDown,
+  ArrowRight,
 } from "lucide-react";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { Button } from "@/components/ui/Button";
 import SearchInput from "@/components/ui/Search";
 import Filter from "@/components/ui/Filter";
 import ContactModal from "@/components/ui/ContactModal";
+import EditContactModal from "@/components/ui/EditContactModal";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import SuccessModal from "@/components/ui/SuccessModal";
-import { fetchContacts, searchContacts, getContactsPaginated, createList } from "@/lib/contacts-api";
+import { fetchContacts, searchContacts, getContactsPaginated, createList, fetchContactLists, addContactsToList, ContactList, fetchContactById } from "@/lib/contacts-api";
 import { Contact as ApiContact } from "@/types/contacts";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import SelectListModal from "@/components/ui/SelectListModal";
 import { ImportContactsModal } from "@/components/ui/ImportContactsModal";
+import toast from "react-hot-toast";
 
 interface Contact {
-  id: number;
+  id: string;
   name: string;
   initials: string;
   title?: string;
@@ -49,7 +55,7 @@ interface Contact {
 }
 
 interface List {
-  id: number;
+  id: string;
   name: string;
 }
 
@@ -163,6 +169,7 @@ interface ContactDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
   contact: any;
+  onViewProfile?: (contactId: string) => void;
 }
 
 // ContactDetailsModal Component
@@ -170,6 +177,7 @@ export function ContactDetailsModal({
   isOpen,
   onClose,
   contact,
+  onViewProfile,
 }: ContactDetailsModalProps) {
   if (!isOpen || !contact) return null;
 
@@ -300,7 +308,10 @@ export function ContactDetailsModal({
             Send Message
           </button>
           <button
-            onClick={() => redirect("/contact/[id]")}
+            onClick={() => {
+              onViewProfile?.(contact.id);
+              onClose();
+            }}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
           >
             <Eye className="w-4 h-4" />
@@ -316,9 +327,12 @@ export function ContactDetailsModal({
 }
 
 export default function ContactsMainContent() {
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const router = useRouter();
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [openMenuId, setOpenMenuId] = useState<string | number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editContact, setEditContact] = useState<ApiContact | null>(null);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [openLists, setOpenLists] = useState(false);
   const [openMore, setOpenMore] = useState(false);
@@ -335,14 +349,14 @@ export default function ContactsMainContent() {
   const itemsPerPage = 5;
 
   // Transform API contact to UI contact
-  const transformContact = (apiContact: ApiContact, index: number): Contact => {
+  const transformContact = (apiContact: ApiContact): Contact => {
     const initials = `${apiContact.firstName[0]}${apiContact.lastName[0]}`.toUpperCase();
     const emailAddresses = apiContact.emails.map((e) => e.address);
     const phoneNumbers = apiContact.phones.map((p) => p.number);
     const lastUpdated = new Date(apiContact.updatedAt).toLocaleDateString();
 
     return {
-      id: index,
+      id: apiContact._id,
       name: `${apiContact.firstName} ${apiContact.lastName}`,
       initials,
       title: apiContact.jobTitle,
@@ -375,8 +389,8 @@ export default function ContactsMainContent() {
         console.log("Response received:", response);
         console.log("Contacts array length:", response.contacts?.length);
 
-        const transformedContacts = response.contacts.map((contact, index) =>
-          transformContact(contact, index)
+        const transformedContacts = response.contacts.map((contact) =>
+          transformContact(contact)
         );
         console.log("Transformed contacts:", transformedContacts);
         
@@ -400,6 +414,27 @@ export default function ContactsMainContent() {
   const data: Contact[] = useMemo(() => contacts, [contacts]);
   const [isSelectListOpen, setIsSelectListOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
+  const [sortBy, setSortBy] = useState<keyof Contact | null>(null);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [lists, setLists] = useState<List[]>([]);
+  const [isAddingToList, setIsAddingToList] = useState(false);
+
+  // Fetch lists on component mount
+  useEffect(() => {
+    const loadLists = async () => {
+      try {
+        const response = await fetchContactLists();
+        const transformedLists = response.lists.map((list) => ({
+          id: list._id,
+          name: list.name,
+        }));
+        setLists(transformedLists);
+      } catch (err) {
+        console.error("Error fetching lists:", err);
+      }
+    };
+    loadLists();
+  }, []);
 
   const openSelectListModal = () => {
     setIsSelectListOpen(true);
@@ -413,20 +448,67 @@ export default function ContactsMainContent() {
     setIsImportOpen(false);
   };
 
-  const lists: List[] = useMemo(
-    () => [
-      { id: 1, name: "Enterprise Clients" },
-      { id: 2, name: "Q4 2024 Leads" },
-      { id: 3, name: "Newsletter Subscribers" },
-      { id: 4, name: "Conference Attendees" },
-      { id: 5, name: "VIP Customers" },
-    ],
-    []
-  );
+  const handleAddToList = async (listIds: string[]) => {
+    if (selectedIds.length === 0 || listIds.length === 0) return;
+    
+    setIsAddingToList(true);
+    try {
+      // Add selected contacts to each selected list
+      for (const listId of listIds) {
+        await addContactsToList(listId, selectedIds);
+      }
+      
+      const listNames = lists
+        .filter((l) => listIds.includes(l.id))
+        .map((l) => l.name)
+        .join(", ");
+      
+      toast.success(
+        `Successfully added ${selectedIds.length} contact${selectedIds.length > 1 ? "s" : ""} to ${listNames}`
+      );
+      
+      // Clear selection after successful add
+      clearSelection();
+      closeSelectListModal();
+    } catch (error) {
+      console.error("Failed to add contacts to list:", error);
+      let errorMessage = "Failed to add contacts to list";
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as { response?: { data?: { message?: string } } };
+        if (axiosError.response?.data?.message) {
+          errorMessage = axiosError.response.data.message;
+        }
+      }
+      toast.error(errorMessage);
+    } finally {
+      setIsAddingToList(false);
+    }
+  };
 
   const handleViewContact = (contact: Contact) => {
     setSelectedContact(contact);
     setIsDetailsOpen(true);
+  };
+
+  const handleEditContact = async (contactId: string) => {
+    try {
+      const response = await fetchContactById(contactId);
+      setEditContact(response.contact);
+      setIsEditModalOpen(true);
+      setOpenMenuId(null);
+    } catch (error) {
+      console.error("Error fetching contact for edit:", error);
+      toast.error("Failed to load contact details");
+    }
+  };
+
+  const handleContactUpdated = (updated: ApiContact) => {
+    const transformed = transformContact(updated);
+    setContacts((prev) =>
+      prev.map((c) => (c.id === updated._id ? transformed : c))
+    );
+    setEditContact(null);
+    setIsEditModalOpen(false);
   };
 
   useEffect(() => {
@@ -435,14 +517,38 @@ export default function ContactsMainContent() {
     return () => window.removeEventListener("click", close);
   }, []);
 
+  type Column<T> = {
+    header: React.ReactNode;
+    accessor: keyof T;
+    sortable?: boolean;
+  };
+
   const columns: Column<Contact>[] = [
     {
-      header: "Name",
+      header: (
+        <div
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => handleSort("name")}
+        >
+          Name
+          <ArrowUpDown className="w-4 h-4 text-gray-500" />
+        </div>
+      ),
       accessor: "name",
+      sortable: true,
     },
     {
-      header: "Email",
+      header: (
+        <div
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => handleSort("emails")}
+        >
+          Email
+          <ArrowUpDown className="w-4 h-4 text-gray-500" />
+        </div>
+      ),
       accessor: "emails",
+      sortable: true,
     },
     {
       header: "Phone",
@@ -458,7 +564,27 @@ export default function ContactsMainContent() {
     },
   ];
 
-  const toggleSelect = (id: number) => {
+  const handleSort = (accessor: keyof Contact) => {
+    if (sortBy === accessor) {
+      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setSortBy(accessor);
+      setSortOrder("asc");
+    }
+  };
+
+  const sortedData = [...data].sort((a, b) => {
+    if (!sortBy) return 0;
+
+    const aVal = String(a[sortBy] ?? "").toLowerCase();
+    const bVal = String(b[sortBy] ?? "").toLowerCase();
+
+    if (aVal < bVal) return sortOrder === "asc" ? -1 : 1;
+    if (aVal > bVal) return sortOrder === "asc" ? 1 : -1;
+    return 0;
+  });
+
+  const toggleSelect = (id: string) => {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     );
@@ -490,12 +616,25 @@ export default function ContactsMainContent() {
         isOpen={isDetailsOpen}
         onClose={() => setIsDetailsOpen(false)}
         contact={selectedContact}
+        onViewProfile={(contactId) => router.push(`/contact/${contactId}`)}
       />
       {/* New Contact Modal */}
       <ContactModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />
+      {/* Edit Contact Modal */}
+      {editContact && (
+        <EditContactModal
+          isOpen={isEditModalOpen}
+          contact={editContact}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setEditContact(null);
+          }}
+          onContactUpdated={handleContactUpdated}
+        />
+      )}
       {/* Success Modal */}
       <SuccessModal
         isOpen={showSuccess}
@@ -509,10 +648,8 @@ export default function ContactsMainContent() {
         isOpen={isSelectListOpen}
         onClose={closeSelectListModal}
         lists={lists}
-        onSubmit={(ids) => {
-          console.log(ids);
-          closeSelectListModal();
-        }}
+        onSubmit={handleAddToList}
+        isLoading={isAddingToList}
       />
 
       <ImportContactsModal isOpen={isImportOpen} onClose={closeImportModal} />
@@ -729,8 +866,12 @@ export default function ContactsMainContent() {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {data.map((row) => (
-                <tr key={row.id} className="h-20">
-                  <td className="px-4">
+                <tr
+                  key={row.id}
+                  className="h-20 hover:bg-gray-50 cursor-pointer"
+                  onClick={() => router.push(`/contact/${row.id}`)}
+                >
+                  <td className="px-4" onClick={(e) => e.stopPropagation()}>
                     <input
                       type="checkbox"
                       checked={selectedIds.includes(row.id)}
@@ -745,7 +886,7 @@ export default function ContactsMainContent() {
                       {renderCellValue(row[col.accessor])}
                     </td>
                   ))}
-                  <td className="px-6 py-4 text-right relative">
+                  <td className="px-6 py-4 text-right relative" onClick={(e) => e.stopPropagation()}>
                     <div className="flex justify-end items-center gap-3">
                       <button
                         onClick={() => handleViewContact(row)}
@@ -765,7 +906,10 @@ export default function ContactsMainContent() {
                       </button>
                       {openMenuId === row.id && (
                         <div className="absolute right-0 mt-2 w-44 bg-white border border-[#E5E7EB] rounded-lg shadow-lg z-50">
-                          <button className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50">
+                          <button
+                            className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50"
+                            onClick={() => handleEditContact(row.id)}
+                          >
                             Edit Contact
                           </button>
                           <button

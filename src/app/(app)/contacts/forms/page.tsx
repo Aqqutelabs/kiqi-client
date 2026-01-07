@@ -154,7 +154,7 @@ export default function ContactLeadForms() {
                       </div>
                     </td>
                     <td className="py-4 px-4">
-                      <Link href={"/contacts/forms/submissions"} className="text-sm text-[#233E97] font-medium block hover:underline cursor-pointer">
+                      <Link href={`/contacts/forms/submissions/${form._id}`} className="text-sm text-[#233E97] font-medium block hover:underline cursor-pointer">
                         {form.submissionCount} submissions
                       </Link>
                     </td>
