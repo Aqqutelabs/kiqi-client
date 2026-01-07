@@ -403,7 +403,7 @@ export const Sidebar: React.FC = () => {
                         className={clsx(
                           "flex items-center gap-2.5 px-5 py-2 text-xs sm:text-sm font-normal h-12.5 transition-colors relative",
                           {
-                            "text-[(--primary)] bg-linear-to-r from-[#233E9726] via-white to-[##C4C4C400]":
+                            "text-[(--primary)] bg-linear-to-r from-[#233E9726] via-white to-[#C4C4C400]":
                               isActive,
                             "text-[#42526D] hover:text-[(--primary)]":
                               !isActive,
