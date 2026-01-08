@@ -51,7 +51,7 @@ export default function PreviewForm() {
 
   const handleSubmit = () => {
     console.log("Form submitted:", formValues);
-    alert("Form submitted successfully!");
+    // alert("Form submitted successfully!");
   };
 
   if (!formData) {
