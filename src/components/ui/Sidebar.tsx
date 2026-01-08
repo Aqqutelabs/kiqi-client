@@ -302,7 +302,7 @@ export const Sidebar: React.FC = () => {
             width={60}
             className="h-10 md:h-14 w-auto"
           />
-          <p className="text-[#FF5314] text-xl font-bold">XXING</p>
+          <p className="text-[#FF5314] text-xl font-bold">XINNG</p>
         </div>
 
         {/* Scrollable Navigation */}
