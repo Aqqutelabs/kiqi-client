@@ -296,12 +296,13 @@ export const Sidebar: React.FC = () => {
         {/* Header */}
         <div className="h-16 shrink-0 flex items-center px-5 border-b border-gray-200">
           <Image
-            src="/kiki-logo.svg"
+            src="/xxing-logo-colored.svg"
             alt="KiQi 2025"
             height={24}
             width={60}
             className="h-10 md:h-14 w-auto"
           />
+          <p className="text-[#FF5314] text-xl font-bold">XXING</p>
         </div>
 
         {/* Scrollable Navigation */}

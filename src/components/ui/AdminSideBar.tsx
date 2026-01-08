@@ -51,7 +51,7 @@ const navigationConfig: NavSection[] = [
     type: "section",
     title: "",
     items: [
-       {
+      {
         type: "link",
         href: "/admin/dashboard/users",
         label: "Users",
@@ -64,7 +64,7 @@ const navigationConfig: NavSection[] = [
     type: "section",
     title: "",
     items: [
-       {
+      {
         type: "link",
         href: "admin/",
         label: "Wallet",
@@ -83,28 +83,27 @@ export const Sidebar: React.FC = () => {
   ]);
 
   // Logout handler
-    const handleLogout = () => {
+  const handleLogout = () => {
     // Remove token from localStorage
     localStorage.removeItem("adminToken");
-  
+
     fetch("http://localhost:8000/api/v1/admin/logout", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("adminToken") || ""}`,
       },
-    }).catch(() => {}); 
-  
+    }).catch(() => {});
+
     router.push("/admin/login");
   };
-  
-  
-    // Check for token; if not present, redirect
-    React.useEffect(() => {
-      const token = localStorage.getItem("adminToken");
-      if (!token) {
-        router.push("/admin/login");
-      }
-    }, [router]);
+
+  // Check for token; if not present, redirect
+  React.useEffect(() => {
+    const token = localStorage.getItem("adminToken");
+    if (!token) {
+      router.push("/admin/login");
+    }
+  }, [router]);
 
   const isLinkActive = (href: string): boolean => {
     if (href === "/dashboard") {
@@ -147,7 +146,7 @@ export const Sidebar: React.FC = () => {
         {/* Header */}
         <div className="h-16 flex-shrink-0 flex items-center px-5 border-b border-gray-200">
           <Image
-            src="/kiki-logo.svg"
+            src="/xxing-logo-colored.svg"
             alt="KiQi 2025"
             height={24}
             width={60}

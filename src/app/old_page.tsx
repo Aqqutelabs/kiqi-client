@@ -138,7 +138,7 @@ export default function Home() {
         <nav className="flex justify-between items-center">
           {/* logo */}
           <Image
-            src={"/kiki-logo.svg"}
+            src={"/xxing-logo-colored.svg"}
             alt="KiKi 2025"
             height={66}
             width={140}

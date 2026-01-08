@@ -78,7 +78,7 @@ export default function FormTwo({
     <section className="flex flex-col items-center h-screen">
       {/* logo and steps */}
       <div className="flex flex-col items-center justify-center gap-5 my-4">
-        <img src="/kiki-logo.svg" alt="Logo" />
+        <img src="/xxing-logo-colored.svg" alt="Logo" />
         {/* steps */}
         <div className="flex items-center gap-2">
           {tabs.map((tab, index) => {

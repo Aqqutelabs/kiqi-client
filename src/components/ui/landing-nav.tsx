@@ -69,7 +69,7 @@ export default function LandingNav() {
         href="/"
         className="relative h-12 w-32 md:h-16 md:w-40 lg:h-[90px] lg:w-[200px]">
         <Image
-          src="/kiki-logo.svg"
+          src="/xxing-logo-colored.svg"
           alt="Logo"
           fill
           className="object-contain"
@@ -217,7 +217,7 @@ export default function LandingNav() {
                   className="relative h-10 w-28"
                   onClick={() => setIsMobileMenuOpen(false)}>
                   <Image
-                    src="/kiki-logo.svg"
+                    src="/xxing-logo-colored.svg"
                     alt="Logo"
                     fill
                     className="object-contain"

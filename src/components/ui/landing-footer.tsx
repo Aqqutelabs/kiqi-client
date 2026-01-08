@@ -98,7 +98,7 @@ const FAQFooter: React.FC = () => {
             {/* Left Section - Logo and Description */}
             <div className="max-w-lg">
               <img
-                src="/footer-logo.svg"
+                src="/xxing-logo.svg"
                 alt="Kiki Logo"
                 className="w-32 sm:w-36 md:w-40 mb-6 sm:mb-8"
               />
@@ -152,7 +152,8 @@ const FAQFooter: React.FC = () => {
             <h3 className="text-sm sm:text-base font-medium mb-3 sm:mb-4">
               Stay Up To Date
             </h3>
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-0 sm:flex-1 bg-transparent md:border border-gray-600 rounded-full sm:rounded-full text-xs sm:text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-600 transition-colors h-auto sm:h-12.5 md:h-15">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-0 sm:flex-1 bg-transparent md:border border-gray-600 rounded-full sm:rounded-full text-xs sm:text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-600 transition-colors h-auto sm:h-12.5
+             md:h-15">
               <input
                 type="email"
                 placeholder="Enter Your Email"
