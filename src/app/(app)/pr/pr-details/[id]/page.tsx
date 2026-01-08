@@ -32,7 +32,6 @@ interface PRMetrics {
   avg_time_on_page: string;
 }
 
-
 interface PRData {
   _id: string;
   title?: string;
@@ -71,15 +70,17 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     if (typeof window === "undefined") return;
     try {
       console.log("[Page] Initializing token from localStorage");
-      const persistRoot = JSON.parse(localStorage.getItem("persist:root") || "{}");
+      const persistRoot = JSON.parse(
+        localStorage.getItem("persist:root") || "{}"
+      );
       const auth = persistRoot.auth ? JSON.parse(persistRoot.auth) : null;
       const tokenValue = auth?.token || null;
-      
+
       console.log("[Page] Token initialized", {
         hasToken: !!tokenValue,
         tokenPreview: tokenValue ? tokenValue.substring(0, 20) + "..." : "null",
       });
-      
+
       setToken(tokenValue);
     } catch (err) {
       console.error("[Page] Error parsing token from localStorage:", err);
@@ -92,7 +93,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   useEffect(() => {
     if (!id) return;
     if (isLoading || !token) return;
-    
+
     const fetchPr = async () => {
       try {
         console.log("[Page.fetchPr] Starting PR fetch", {
@@ -106,30 +107,41 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             Authorization: `Bearer ${token}`,
           },
         });
-        
+
         console.log("[Page.fetchPr] Full response structure", {
           responseKeys: Object.keys(res.data),
-          hasStatusCode: 'statusCode' in res.data,
-          hasData: 'data' in res.data,
+          hasStatusCode: "statusCode" in res.data,
+          hasData: "data" in res.data,
         });
 
         // Response structure: { statusCode, data: { actual_pr_data }, message, success }
         // We need to check if we have this wrapper structure
         let fullPrData = res.data;
-        
+
         // If the response has statusCode, it's wrapped - extract the data property
-        if (res.data.statusCode && res.data.data && typeof res.data.data === 'object' && '_id' in res.data.data) {
+        if (
+          res.data.statusCode &&
+          res.data.data &&
+          typeof res.data.data === "object" &&
+          "_id" in res.data.data
+        ) {
           fullPrData = res.data.data;
           console.log("[Page.fetchPr] Unwrapped data from statusCode response");
-        } else if (res.data.data && typeof res.data.data === 'object' && '_id' in res.data.data) {
+        } else if (
+          res.data.data &&
+          typeof res.data.data === "object" &&
+          "_id" in res.data.data
+        ) {
           fullPrData = res.data.data;
           console.log("[Page.fetchPr] Unwrapped data from data property");
         }
-        
+
         console.log("[Page.fetchPr] Extracted PR data", {
           prId: fullPrData._id,
           title: fullPrData.title,
-          content: fullPrData.content ? fullPrData.content.substring(0, 50) + "..." : "N/A",
+          content: fullPrData.content
+            ? fullPrData.content.substring(0, 50) + "..."
+            : "N/A",
           dateCreated: fullPrData.date_created,
           hasMetrics: !!fullPrData.metrics,
           status: fullPrData.status,
@@ -137,9 +149,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         });
 
         setPr(fullPrData);
-        
+
         const metrics = fullPrData.metrics;
-        
+
         if (metrics) {
           console.log("[Page.fetchPr] Setting dashboard stats from metrics");
           setDashboardStats([
@@ -198,24 +210,27 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
         const trackerApi = new TrackerApi(token);
         const response = await trackerApi.getTracker(id, token);
-        
+
         console.log("[Page.fetchTracker] Tracker fetch successful", {
           statusCode: response.statusCode,
           hasData: !!response.data,
           dataKeys: response.data ? Object.keys(response.data) : [],
         });
-        
+
         // Extract the data from response
         const trackerData = response.data || response;
         console.log("[Page.fetchTracker] Setting tracker data", {
           hasTimeline: !!trackerData.timeline,
-          timelineLength: Array.isArray(trackerData.timeline) ? trackerData.timeline.length : 0,
+          timelineLength: Array.isArray(trackerData.timeline)
+            ? trackerData.timeline.length
+            : 0,
         });
-        
+
         setTrackerData(trackerData);
-        
+
         // status_config might be at response.data.status_config or response.status_config
-        const statusConfig = (trackerData as any).status_config || (response as any).status_config;
+        const statusConfig =
+          (trackerData as any).status_config || (response as any).status_config;
         setStatusConfig(statusConfig);
       } catch (err) {
         console.error("[Page.fetchTracker] Error fetching tracker:", err);
@@ -241,20 +256,20 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
   //   table data
   const data: DistributionReport[] = pr.distribution
-  ? pr.distribution.split(",").map((outlet, index) => ({
-      id: index + 1,
-      outlet: outlet.trim(),
-      status: pr.status as "Published" | "Pending" | "Failed",
-      clicks: pr.metrics?.total_clicks || 0,
-      views: pr.metrics?.total_views
-        ? pr.metrics.total_views >= 1000
-          ? `${(pr.metrics.total_views / 1000).toFixed(1)}K Views`
-          : `${pr.metrics.total_views} Views`
-        : "0 Views",
-      // link: "www.link.here.com",
-      date: formatDate(pr.date_created),
-    }))
-  : [];
+    ? pr.distribution.split(",").map((outlet, index) => ({
+        id: index + 1,
+        outlet: outlet.trim(),
+        status: pr.status as "Published" | "Pending" | "Failed",
+        clicks: pr.metrics?.total_clicks || 0,
+        views: pr.metrics?.total_views
+          ? pr.metrics.total_views >= 1000
+            ? `${(pr.metrics.total_views / 1000).toFixed(1)}K Views`
+            : `${pr.metrics.total_views} Views`
+          : "0 Views",
+        // link: "www.link.here.com",
+        date: formatDate(pr.date_created),
+      }))
+    : [];
   // const data: DistributionReport[] = [
   //   {
   //     id: 1,
@@ -292,10 +307,18 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       <div className="flex justify-end mb-6">
         <button
           onClick={() => setIsProgressTrackerOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-md hover:shadow-lg"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-md hover:shadow-lg">
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+            />
           </svg>
           View Progress Tracker
         </button>
@@ -355,8 +378,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                   pr.status === "Published"
                     ? "bg-[#27AE60] text-white"
                     : "bg-yellow-200 text-[#B45309]"
-                }`}
-              >
+                }`}>
                 {pr.status}
               </span>
             </div>
@@ -370,7 +392,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           </h2>
           <p className="text-gray-700 text-sm leading-relaxed">
             {pr.content}
-            {/* <span className="text-sm text-[#233E97] cursor-pointer ml-4">
+            {/* <span className="text-sm text-[#F95417] cursor-pointer ml-4">
               View less
             </span> */}
           </p>

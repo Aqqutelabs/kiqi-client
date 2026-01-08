@@ -86,8 +86,6 @@ export default function PRCheckoutPage() {
 
   const completePayment = async () => {
     try {
-      
-
       // Get press_release_id from localStorage
       const pressReleaseId = localStorage.getItem("pr_id");
 
@@ -118,8 +116,7 @@ export default function PRCheckoutPage() {
 
   const handleRemoveFromCart = async (publisherId: string) => {
     try {
-      
-console.log("Deleting item:", publisherId);
+      console.log("Deleting item:", publisherId);
 
       await fetch(`${BASE_URL}/api/v1/press-releases/cart/${publisherId}`, {
         method: "DELETE",
@@ -151,7 +148,7 @@ console.log("Deleting item:", publisherId);
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
           {/* Header */}
           <div className="text-center mb-8 lg:mb-12">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-b from-[#233E97] to-[#1C3178] rounded-full mb-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-b from-[#F95417] to-[#1C3178] rounded-full mb-4">
               <ShoppingBag className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-2xl lg:text-3xl font-bold text-[#1B223C] mb-2">
@@ -209,8 +206,7 @@ console.log("Deleting item:", publisherId);
                                   (region, regionIndex) => (
                                     <span
                                       key={`${pub._id}-${regionIndex}`}
-                                      className="bg-white border border-[#E2E8F0] h-6 px-3 flex justify-center items-center rounded-md"
-                                    >
+                                      className="bg-white border border-[#E2E8F0] h-6 px-3 flex justify-center items-center rounded-md">
                                       {region}
                                     </span>
                                   )

@@ -39,7 +39,20 @@ const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
     }));
   };
 
-  const handleCreateContact = async (contactData: { firstName: string; lastName: string; company: string | undefined; jobTitle: string | undefined; phoneCountry: string | undefined; phoneNumber: any; emails: { address: string; isPrimary: boolean; }[] | { address: string; isPrimary: boolean; }[]; tags: string[] | undefined; notes: string | undefined; isArchived: boolean | undefined; }) => {
+  const handleCreateContact = async (contactData: {
+    firstName: string;
+    lastName: string;
+    company: string | undefined;
+    jobTitle: string | undefined;
+    phoneCountry: string | undefined;
+    phoneNumber: any;
+    emails:
+      | { address: string; isPrimary: boolean }[]
+      | { address: string; isPrimary: boolean }[];
+    tags: string[] | undefined;
+    notes: string | undefined;
+    isArchived: boolean | undefined;
+  }) => {
     try {
       const response = await createContact(contactData);
       toast.success("Contact created successfully!");
@@ -135,8 +148,7 @@ const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
             </p>
             <button
               onClick={handleSuccessClose}
-              className="w-fit px-6 py-3 bg-[#233E97] text-white rounded-lg hover:bg-[#1a2f73] transition-colors font-medium"
-            >
+              className="w-fit px-6 py-3 bg-[#F95417] text-white rounded-lg hover:bg-[#1a2f73] transition-colors font-medium">
               Done
             </button>
           </div>
@@ -153,8 +165,7 @@ const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
           <h2 className="text-xl font-semibold">Create New Contact</h2>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
+            className="text-gray-400 hover:text-gray-600 transition-colors">
             <X size={24} />
           </button>
         </div>
@@ -186,8 +197,7 @@ const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
                 <button
                   type="button"
                   onClick={addEmail}
-                  className="text-sm text-blue-600 hover:text-blue-700"
-                >
+                  className="text-sm text-blue-600 hover:text-blue-700">
                   + Add another
                 </button>
               </div>
@@ -228,8 +238,7 @@ const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
                 <button
                   type="button"
                   onClick={addPhone}
-                  className="text-sm text-blue-600 hover:text-blue-700"
-                >
+                  className="text-sm text-blue-600 hover:text-blue-700">
                   + Add another
                 </button>
               </div>

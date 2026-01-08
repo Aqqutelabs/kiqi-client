@@ -15,7 +15,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import BASE_URL from '@/lib/utils/baseUrl';
+import BASE_URL from "@/lib/utils/baseUrl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
@@ -25,7 +25,7 @@ import { Modal } from "@/components/ui/Modal";
 import { Pagination } from "@/components/ui/Pagination";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { selectCampaign } from '@/redux/selectors/campaignSelectors';
+import { selectCampaign } from "@/redux/selectors/campaignSelectors";
 import {
   createEmailListWithFiles,
   clearCreateEmailListStatus,
@@ -145,8 +145,8 @@ const EmailCampaignsListPage = () => {
   const handleStartCampaign = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedListId) return;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const result = await dispatch(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const result = await dispatch(
       startEmailCampaign({
         campaignName: campaignForm.campaignName,
         emailListId: selectedListId,
@@ -174,7 +174,9 @@ const EmailCampaignsListPage = () => {
             : null
           : null;
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || BASE_URL}/api/v1/campaigns/${campaignId}`,
+        `${
+          process.env.NEXT_PUBLIC_API_BASE_URL || BASE_URL
+        }/api/v1/campaigns/${campaignId}`,
         {
           method: "DELETE",
           headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -556,7 +558,7 @@ const EmailCampaignsListPage = () => {
                 onChange={handleStartCampaignChange}
                 placeholder="<h1>Hello!</h1><p>Thank you for subscribing...</p>"
                 required
-                className="w-full rounded-md border-0 bg-gray-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3366FF] min-h-[100px]"
+                className="w-full rounded-md border-0 bg-gray-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF5314] min-h-[100px]"
               />
             </div>
             <Button

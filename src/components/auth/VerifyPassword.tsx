@@ -26,7 +26,7 @@
 //             onComplete(newOtp.join(""));
 //         }
 //     };
-    
+
 //     // ... Add handleKeyDown for backspace etc. for better UX
 
 //     return (
@@ -39,23 +39,22 @@
 //                     maxLength={1}
 //                     value={data}
 //                     onChange={e => handleChange(e.target, index)}
-//                     className="w-10 h-10 sm:w-12 sm:h-12 text-center text-lg font-semibold bg-gray-100 rounded-md border-0 focus:ring-2 focus:ring-[#3366FF]"
+//                     className="w-10 h-10 sm:w-12 sm:h-12 text-center text-lg font-semibold bg-gray-100 rounded-md border-0 focus:ring-2 focus:ring-[#FF5314]"
 //                 />
 //             ))}
 //         </div>
 //     );
 // };
 
-
 // const VerifyOtpPage = () => {
 //     const router = useRouter();
-    
+
 //     const handleOtpComplete = (otp: string) => {
 //         console.log('OTP Entered:', otp);
 //         // You would typically verify the OTP here before proceeding
 //         router.push('/auth/reset-password/confirm');
 //     };
-    
+
 //     return (
 //         <AuthLayout>
 //             <Card>

@@ -121,8 +121,7 @@ export function ImportContactsModal({
           </div>
           <button
             onClick={handleCancel}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
+            className="text-gray-400 hover:text-gray-600 transition-colors">
             <X size={24} />
           </button>
         </div>
@@ -147,11 +146,10 @@ export function ImportContactsModal({
               isDragging
                 ? "border-blue-500 bg-blue-50"
                 : "border-gray-300 bg-gray-50"
-            }`}
-          >
+            }`}>
             <div className="flex flex-col items-center">
               <div className="w-12 h-12 bg-[#E8F2FF] rounded-full flex items-center justify-center mb-4">
-                <Upload className="w-6 h-6 text-[#233E97]" />
+                <Upload className="w-6 h-6 text-[#F95417]" />
               </div>
               <p className="text-sm text-gray-900 mb-1">
                 Drop your file here or click to browse
@@ -169,8 +167,7 @@ export function ImportContactsModal({
               />
               <Button
                 onClick={() => fileInputRef.current?.click()}
-                className="px-6 py-2"
-              >
+                className="px-6 py-2">
                 Select File
               </Button>
             </div>
@@ -183,12 +180,12 @@ export function ImportContactsModal({
                 <div key={file.id} className="bg-gray-50 rounded-lg p-4">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-3">
-                        <Image
-                          src={"/xls_svgrepo.com.svg"}
-                          alt="file"
-                          width={32}
-                          height={32}
-                        />
+                      <Image
+                        src={"/xls_svgrepo.com.svg"}
+                        alt="file"
+                        width={32}
+                        height={32}
+                      />
                       <div>
                         <p className="text-sm font-medium text-gray-900">
                           {file.name}
@@ -203,8 +200,7 @@ export function ImportContactsModal({
                     {file.status === "uploading" && (
                       <button
                         onClick={() => removeFile(file.id)}
-                        className="text-gray-400 hover:text-gray-600"
-                      >
+                        className="text-gray-400 hover:text-gray-600">
                         <X size={16} />
                       </button>
                     )}
@@ -249,8 +245,7 @@ export function ImportContactsModal({
         <div className="flex justify-end gap-3 p-6 border-t border-gray-200">
           <button
             onClick={handleCancel}
-            className="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
-          >
+            className="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium">
             Cancel
           </button>
           <button
@@ -260,10 +255,9 @@ export function ImportContactsModal({
             }
             className={`px-6 py-2 rounded-lg font-medium transition-colors ${
               files.length > 0 && files.every((f) => f.status === "complete")
-                ? "bg-[#233E97] text-white hover:bg-[#1a2f73]"
+                ? "bg-[#F95417] text-white hover:bg-[#1a2f73]"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
-            }`}
-          >
+            }`}>
             Import Contacts
           </button>
         </div>

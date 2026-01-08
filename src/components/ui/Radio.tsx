@@ -8,7 +8,13 @@ type RadioProps = {
   label?: string;
 };
 
-export default function RadioInput({ value, name, is_checked, onChange, label }: RadioProps) {
+export default function RadioInput({
+  value,
+  name,
+  is_checked,
+  onChange,
+  label,
+}: RadioProps) {
   return (
     <label key={value} className="flex items-center gap-1 cursor-pointer">
       <input
@@ -17,7 +23,7 @@ export default function RadioInput({ value, name, is_checked, onChange, label }:
         value={value}
         checked={is_checked}
         onChange={onChange}
-        className="h-4 w-4 [#233E97] border-gray-300 focus:ring-[#233E97] cursor-pointer"
+        className="h-4 w-4 [#F95417] border-gray-300 focus:ring-[#F95417] cursor-pointer"
       />
       <div className="text-sm font-medium text-[#8c98ad] capitalize">
         {label}

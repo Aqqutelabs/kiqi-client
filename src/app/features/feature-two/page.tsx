@@ -401,7 +401,7 @@ export default function FeatureTwoPage() {
             ${isBlue ? "lg:col-span-1" : "lg:col-span-2"} 
             ${
               isBlue
-                ? "bg-linear-to-b from-[#233E97] to-[#2BAAE2] text-white"
+                ? "bg-linear-to-b from-[#F95417] to-[#2BAAE2] text-white"
                 : "bg-white text-black"
             } 
             flex ${

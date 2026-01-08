@@ -63,11 +63,11 @@ export default function LandingNav() {
   }, [pathname]);
 
   return (
-    <nav className="flex justify-between items-center px-4 sm:px-6 md:px-8 lg:px-10 h-16 md:h-20 lg:h-[97px] relative md:sticky top-0 bg-white z-30">
+    <nav className="flex justify-between items-center px-4 sm:px-6 md:px-8 lg:px-10 h-16 md:h-20 lg:h-24.25 relative md:sticky top-0 bg-white z-30">
       {/* Logo */}
       <Link
         href="/"
-        className="relative h-12 w-32 md:h-16 md:w-40 lg:h-[90px] lg:w-[200px]">
+        className="relative h-12 w-32 md:h-16 md:w-40 lg:h-22.5 lg:w-50">
         <Image
           src="/xxing-logo-colored.svg"
           alt="Logo"
@@ -102,7 +102,7 @@ export default function LandingNav() {
 
                       {/* active gradient dot */}
                       {isActive && (
-                        <span className="ml-1 h-1.5 w-1.5 lg:h-2 lg:w-2 rounded-full bg-linear-to-b from-[#2BAAE2] to-[#233E97] absolute -bottom-2 lg:-bottom-3" />
+                        <span className="ml-1 h-1.5 w-1.5 lg:h-2 lg:w-2 rounded-full bg-linear-to-b from-[#FF5314] to-[#FF8C00] absolute -bottom-2 lg:-bottom-3" />
                       )}
                     </span>
                     <ChevronDown
@@ -122,7 +122,7 @@ export default function LandingNav() {
 
                     {/* active gradient dot */}
                     {isActive && (
-                      <span className="ml-1 h-1.5 w-1.5 lg:h-2 lg:w-2 rounded-full bg-linear-to-b from-[#2BAAE2] to-[#233E97] absolute -bottom-2 lg:-bottom-3" />
+                      <span className="ml-1 h-1.5 w-1.5 lg:h-2 lg:w-2 rounded-full bg-linear-to-b from-[#FF5314] to-[#FF8C00] absolute -bottom-2 lg:-bottom-3" />
                     )}
                   </Link>
                 )}
@@ -165,12 +165,12 @@ export default function LandingNav() {
       {/* Desktop Buttons */}
       <div className="hidden lg:flex items-center gap-3 xl:gap-4 text-sm font-medium">
         <Link href="/login">
-          <button className="w-24 xl:w-[108px] h-10 xl:h-11 rounded-lg flex justify-center items-center border-[1.5px] xl:border-[2.5px] border-[#0C31A1] text-[#0C31A1] hover:bg-[#0C31A1] hover:text-white transition-colors">
+          <button className="w-24 xl:w-27 h-10 xl:h-11 rounded-lg flex justify-center items-center border-[1.5px] xl:border-[2.5px] border-[#FF5314] text-[#FF5314] hover:bg-[#FF5314] hover:text-white transition-colors">
             Sign In
           </button>
         </Link>
         <Link href={"/signup"}>
-          <button className="w-24 xl:w-[108px] h-10 xl:h-11 rounded-lg flex justify-center items-center bg-black text-white hover:bg-gray-800 transition-colors">
+          <button className="w-24 xl:w-27 h-10 xl:h-11 rounded-lg flex justify-center items-center bg-black text-white hover:bg-gray-800 transition-colors">
             Get Started
           </button>
         </Link>
@@ -250,7 +250,7 @@ export default function LandingNav() {
                               )
                             }
                             className={`flex items-center justify-between w-full text-left py-2 ${
-                              isActive ? "font-semibold text-[#0C31A1]" : ""
+                              isActive ? "font-semibold text-[#FF5314]" : ""
                             }`}>
                             <span>{link.name}</span>
                             <ChevronDown
@@ -282,8 +282,8 @@ export default function LandingNav() {
                                         }}
                                         className={`block py-2 text-sm ${
                                           childActive
-                                            ? "font-semibold text-[#0C31A1]"
-                                            : "hover:text-[#0C31A1]"
+                                            ? "font-semibold text-[#FF5314]"
+                                            : "hover:text-[#FF5314]"
                                         }`}>
                                         {child.name}
                                       </Link>
@@ -300,8 +300,8 @@ export default function LandingNav() {
                           onClick={() => setIsMobileMenuOpen(false)}
                           className={`block py-3 ${
                             isActive
-                              ? "font-semibold text-[#0C31A1]"
-                              : "hover:text-[#0C31A1]"
+                              ? "font-semibold text-[#FF5314]"
+                              : "hover:text-[#FF5314]"
                           }`}>
                           {link.name}
                         </Link>
@@ -315,7 +315,7 @@ export default function LandingNav() {
               <div className="p-4 border-t space-y-3">
                 <Link href="/login">
                   <button
-                    className="w-full h-11 rounded-lg flex justify-center items-center border-[2px] border-[#0C31A1] text-[#0C31A1] hover:bg-[#0C31A1] hover:text-white transition-colors"
+                    className="w-full h-11 rounded-lg flex justify-center items-center border-2 border-[#FF5314] text-[#FF5314] hover:bg-[#FF5314] hover:text-white transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}>
                     Sign In
                   </button>

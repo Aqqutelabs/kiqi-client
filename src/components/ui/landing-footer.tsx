@@ -48,7 +48,7 @@ const FAQFooter: React.FC = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* FAQ Section */}
       <div className="flex-1 px-4 sm:px-6 md:px-8 lg:px-6 py-8 sm:py-12 md:py-16 max-w-4xl mx-auto w-full">
-        <h2 className="bg-linear-to-b from-[#2BAAE2] to-[#233E97] text-transparent bg-clip-text font-bold text-2xl sm:text-3xl md:text-4xl lg:text-[47px]">
+        <h2 className="bg-linear-to-b from-[#2BAAE2] to-[#F95417] text-transparent bg-clip-text font-bold text-2xl sm:text-3xl md:text-4xl lg:text-[47px]">
           FAQ
         </h2>
 
@@ -152,7 +152,8 @@ const FAQFooter: React.FC = () => {
             <h3 className="text-sm sm:text-base font-medium mb-3 sm:mb-4">
               Stay Up To Date
             </h3>
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-0 sm:flex-1 bg-transparent md:border border-gray-600 rounded-full sm:rounded-full text-xs sm:text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-600 transition-colors h-auto sm:h-12.5
+            <div
+              className="flex flex-col sm:flex-row gap-2 sm:gap-0 sm:flex-1 bg-transparent md:border border-gray-600 rounded-full sm:rounded-full text-xs sm:text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-600 transition-colors h-auto sm:h-12.5
              md:h-15">
               <input
                 type="email"

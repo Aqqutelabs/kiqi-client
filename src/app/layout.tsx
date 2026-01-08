@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   description: "Streamline your business with XXING.",
   icons: {
     icon: "/xxing-logo-colored.svg",
-    shortcut: "/favicon.svg",
+    shortcut: "/ .svg",
   },
 };
 

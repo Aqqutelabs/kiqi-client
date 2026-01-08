@@ -182,7 +182,7 @@ export default function ConnectWalletModal({
                 key={wallet.id}
                 className={`border ${
                   isActive
-                    ? "border-[var(--primary)] shadow bg-blue-50"
+                    ? "border-(--primary) shadow bg-orange-50"
                     : "border-[#E2E8F0]"
                 } py-3 px-4 rounded-xl flex items-center gap-2 h-16 w-full cursor-pointer`}>
                 <img src={wallet.img} alt={wallet.name} className="size-8" />
@@ -225,14 +225,14 @@ export default function ConnectWalletModal({
 
         {/* Wallet Connect Button */}
         <div className="flex justify-center">
-          <WalletMultiButton className="!bg-blue-500 hover:!bg-blue-600 !text-white !font-medium !py-2 !px-4 !rounded-lg !transition-colors" />
+          <WalletMultiButton className="bg-orange-500! hover:bg-orange-600! text-white! font-medium! py-2! px-4! rounded-lg! transition-colors!" />
         </div>
 
         {/* Loading state */}
         {(connecting || loading) && (
           <div className="text-center p-4">
             <div className="flex items-center justify-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
+              <Loader2 className="h-4 w-4 animate-spin text-orange-500" />
               <p className="text-sm text-gray-600">
                 {loading ? "Processing..." : "Connecting to wallet..."}
               </p>
@@ -285,18 +285,18 @@ export default function ConnectWalletModal({
 
         {/* Instructions */}
         {!connected && !connecting && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-blue-800 font-medium mb-2">
+          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+            <p className="text-sm text-orange-800 font-medium mb-2">
               Don't have a Solana wallet?
             </p>
-            <ul className="text-xs text-blue-700 space-y-1 ml-4 list-disc">
+            <ul className="text-xs text-orange-700 space-y-1 ml-4 list-disc">
               <li>
                 Install{" "}
                 <a
                   href="https://phantom.app/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="underline hover:text-blue-900 font-medium">
+                  className="underline hover:text-orange-900 font-medium">
                   Phantom
                 </a>{" "}
                 or{" "}
@@ -304,7 +304,7 @@ export default function ConnectWalletModal({
                   href="https://solflare.com/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="underline hover:text-blue-900 font-medium">
+                  className="underline hover:text-orange-900 font-medium">
                   Solflare
                 </a>
               </li>
@@ -312,8 +312,8 @@ export default function ConnectWalletModal({
               <li>Click the connect button above</li>
               <li>Approve the connection in your wallet extension</li>
             </ul>
-            <div className="mt-3 pt-3 border-t border-blue-200">
-              <p className="text-xs text-blue-600">
+            <div className="mt-3 pt-3 border-t border-orange-200">
+              <p className="text-xs text-orange-600">
                 <span className="font-medium">Note:</span> You'll need to sign a
                 message to verify ownership of the wallet.
               </p>
