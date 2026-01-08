@@ -1,5 +1,5 @@
 // Contacts API Service
-import api from "@/lib/api";
+import api, { publicApi } from "@/lib/api";
 import { Contact, ContactsResponse, ContactsApiParams } from "@/types/contacts";
 
 /**
@@ -473,3 +473,75 @@ export const importContactsFromCSV = async (
     throw error;
   }
 };
+
+/**
+ * Fetch a public form by ID or slug (no authentication required)
+ * @param formIdentifier - The ID or slug of the form to fetch
+ */
+export const fetchPublicForm = async (formIdentifier: string) => {
+  try {
+    // Try slug-based endpoint first (new way), fallback to ID-based (legacy)
+    let response;
+    try {
+      response = await publicApi.get(`/forms/s/${formIdentifier}`);
+    } catch (error: any) {
+      // If slug fails (404), try legacy ID-based endpoint
+      if (error.response?.status === 404) {
+        console.log("Slug not found, trying legacy ID endpoint...");
+        response = await publicApi.get(`/forms/public/${formIdentifier}`);
+      } else {
+        throw error;
+      }
+    }
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching public form:", error);
+    throw error;
+  }
+};
+
+/**
+ * Submit a public form (no authentication required)
+ * @param formIdentifier - The ID or slug of the form to submit
+ * @param submissionData - The form data to submit
+ */
+export const submitPublicForm = async (
+  formIdentifier: string,
+  submissionData: Record<string, any>
+): Promise<{ success?: boolean; error?: boolean; message: string; submissionId?: string }> => {
+  try {
+    console.log("=== Submitting Form ===");
+    console.log("Form Identifier:", formIdentifier);
+    console.log("Submission Data:", JSON.stringify(submissionData, null, 2));
+    
+    // Try slug-based endpoint first (new way), fallback to ID-based (legacy)
+    let response;
+    try {
+      response = await publicApi.post(`/forms/s/${formIdentifier}/submit`, {
+        submissionData,
+      });
+    } catch (error: any) {
+      // If slug fails (404), try legacy ID-based endpoint
+      if (error.response?.status === 404) {
+        console.log("Slug endpoint not found, trying legacy ID endpoint...");
+        response = await publicApi.post(`/forms/public/${formIdentifier}/submit`, {
+          submissionData,
+        });
+      } else {
+        throw error;
+      }
+    }
+    
+    console.log("=== Form Submission Response ===");
+    console.log("Status:", response.status);
+    console.log("Response Data:", JSON.stringify(response.data, null, 2));
+    
+    return response.data;
+  } catch (error: any) {
+    console.error("=== Form Submission Error ===");
+    console.error("Error:", error);
+    console.error("Response:", error.response?.data);
+    throw error;
+  }
+};
+

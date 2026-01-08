@@ -350,14 +350,21 @@ export default function ContactsMainContent() {
 
   // Transform API contact to UI contact
   const transformContact = (apiContact: ApiContact): Contact => {
-    const initials = `${apiContact.firstName[0]}${apiContact.lastName[0]}`.toUpperCase();
+    // Handle missing firstName/lastName gracefully
+    const firstName = apiContact.firstName || '';
+    const lastName = apiContact.lastName || '';
+    
+    const initials = firstName && lastName 
+      ? `${firstName[0]}${lastName[0]}`.toUpperCase()
+      : (firstName[0] || lastName[0] || '?').toUpperCase();
+    
     const emailAddresses = apiContact.emails.map((e) => e.address);
     const phoneNumbers = apiContact.phones.map((p) => p.number);
     const lastUpdated = new Date(apiContact.updatedAt).toLocaleDateString();
 
     return {
       id: apiContact._id,
-      name: `${apiContact.firstName} ${apiContact.lastName}`,
+      name: `${firstName} ${lastName}`.trim() || 'New Lead',
       initials,
       title: apiContact.jobTitle,
       emails: emailAddresses,
@@ -389,9 +396,10 @@ export default function ContactsMainContent() {
         console.log("Response received:", response);
         console.log("Contacts array length:", response.contacts?.length);
 
-        const transformedContacts = response.contacts.map((contact) =>
-          transformContact(contact)
-        );
+        const transformedContacts = response.contacts.map((contact) => {
+          console.log("Transforming contact:", contact);
+          return transformContact(contact);
+        });
         console.log("Transformed contacts:", transformedContacts);
         
         setContacts(transformedContacts);
