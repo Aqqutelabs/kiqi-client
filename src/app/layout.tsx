@@ -22,10 +22,10 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "KiKi",
-  description: "Streamline your business with KiKi.",
+  title: "XXING",
+  description: "Streamline your business with XXING.",
   icons: {
-    icon: "/favicon.svg",
+    icon: "/xxing-logo-colored.svg",
     shortcut: "/favicon.svg",
   },
 };
