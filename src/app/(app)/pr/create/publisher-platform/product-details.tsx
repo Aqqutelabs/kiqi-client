@@ -45,8 +45,8 @@ function Overview({ product }: { product: Products }) {
         <h2 className="font-bold text-gray-900 mb-4">Key Features</h2>
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-gray-50 rounded-lg p-4">
-            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
-              <Award className="w-4 h-4 text-blue-600" />
+            <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center mb-3">
+              <Award className="w-4 h-4 text-orange-600" />
             </div>
             <div className="text-xs text-gray-600 mb-1">Premium Quality</div>
             <div className="font-semibold text-sm text-gray-900">
@@ -55,16 +55,16 @@ function Overview({ product }: { product: Products }) {
           </div>
 
           <div className="bg-gray-50 rounded-lg p-4">
-            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
-              <Target className="w-4 h-4 text-blue-600" />
+            <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center mb-3">
+              <Target className="w-4 h-4 text-orange-600" />
             </div>
             <div className="text-xs text-gray-600 mb-1">High Engagement</div>
             <div className="font-semibold text-sm text-gray-900">85% CTR</div>
           </div>
 
           <div className="bg-gray-50 rounded-lg p-4">
-            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
-              <Clock className="w-4 h-4 text-blue-600" />
+            <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center mb-3">
+              <Clock className="w-4 h-4 text-orange-600" />
             </div>
             <div className="text-xs text-gray-600 mb-1">Fast Delivery</div>
             <div className="font-semibold text-sm text-gray-900">
@@ -73,8 +73,8 @@ function Overview({ product }: { product: Products }) {
           </div>
 
           <div className="bg-gray-50 rounded-lg p-4">
-            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
-              <Globe className="w-4 h-4 text-blue-600" />
+            <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center mb-3">
+              <Globe className="w-4 h-4 text-orange-600" />
             </div>
             <div className="text-xs text-gray-600 mb-1">Global Coverage</div>
             <div className="font-semibold text-sm text-gray-900">

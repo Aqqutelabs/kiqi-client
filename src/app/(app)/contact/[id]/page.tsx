@@ -20,7 +20,7 @@ export default function ContactDetails() {
       <div className="bg-white rounded-xl border border-gray-200 p-6 flex justify-between items-start">
         <div className="flex gap-4">
           {/* Avatar */}
-          <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold">
+          <div className="w-12 h-12 rounded-full bg-orange-600 flex items-center justify-center text-white font-semibold">
             DK
           </div>
 
@@ -30,7 +30,7 @@ export default function ContactDetails() {
             <p className="text-sm text-gray-500">KiQI Contact ID: 4</p>
 
             <div className="flex gap-2 mt-2">
-              <span className="px-2 py-1 text-xs rounded-[12px] bg-blue-50 text-blue-600">
+              <span className="px-2 py-1 text-xs rounded-[12px] bg-orange-50 text-orange-600">
                 Enterprise
               </span>
               <span className="px-2 py-1 text-xs rounded-[12px] bg-indigo-50 text-indigo-600">
@@ -81,9 +81,9 @@ export default function ContactDetails() {
               {/* Emails */}
               <div>
                 <label className="flex items-center gap-2 text-sm font-medium text-[#4A5565] mb-2">
-                    <Mail className="w-4 h-4" />
-                <div className="text-sm font-medium">Email</div>
-                </label>                
+                  <Mail className="w-4 h-4" />
+                  <div className="text-sm font-medium">Email</div>
+                </label>
                 <ContactRow value="sarah.johnson@techcorp.com" primary />
                 <ContactRow value="sarah.k@gmail.com" />
               </div>
@@ -91,9 +91,9 @@ export default function ContactDetails() {
               {/* Phones */}
               <div>
                 <label className="flex items-center gap-2 text-sm font-medium text-[#4A5565] mb-2">
-                    <Phone className="w-4 h-4" />
-                <div className="text-sm font-medium">Phone</div>
-                </label> 
+                  <Phone className="w-4 h-4" />
+                  <div className="text-sm font-medium">Phone</div>
+                </label>
                 <ContactRow value="+1 (555) 123-4567" primary />
                 <ContactRow value="+1 (555) 987-6543" />
               </div>
@@ -114,11 +114,10 @@ export default function ContactDetails() {
           <Card
             title="Lists"
             action={
-              <button className="text-sm text-blue-600 hover:underline flex items-center gap-1">
+              <button className="text-sm text-orange-600 hover:underline flex items-center gap-1">
                 <Plus size={14} /> Add to List
               </button>
-            }
-          >
+            }>
             <ListItem label="Enterprise Clients" />
             <ListItem label="Q4 2024 Leads" />
           </Card>
@@ -127,7 +126,7 @@ export default function ContactDetails() {
           {/* <Card
             title="Custom Fields"
             action={
-              <button className="text-sm text-blue-600 hover:underline flex items-center gap-1">
+              <button className="text-sm text-orange-600 hover:underline flex items-center gap-1">
                 <Plus size={14} /> Add Field
               </button>
             }
@@ -141,11 +140,10 @@ export default function ContactDetails() {
           <Card
             title="Notes"
             action={
-              <button className="text-sm text-blue-600 hover:underline">
+              <button className="text-sm text-orange-600 hover:underline">
                 Edit
               </button>
-            }
-          >
+            }>
             <p className="text-sm text-[#364153]">
               Negotiating annual contract renewal.
             </p>
@@ -155,8 +153,6 @@ export default function ContactDetails() {
     </main>
   );
 }
-
-
 
 function Card({
   title,
@@ -187,13 +183,7 @@ function Info({ label, value }: { label: string; value: any }) {
   );
 }
 
-function ContactRow({
-  value,
-  primary,
-}: {
-  value: string;
-  primary?: boolean;
-}) {
+function ContactRow({ value, primary }: { value: string; primary?: boolean }) {
   return (
     <div className="flex justify-between items-center bg-gray-50 rounded-lg px-4 py-2 mb-2">
       <span className="text-sm text-[#101828]">{value}</span>
@@ -224,13 +214,7 @@ function ListItem({ label }: { label: string }) {
   );
 }
 
-function ActionButton({
-  icon: Icon,
-  label,
-}: {
-  icon: any;
-  label: string;
-}) {
+function ActionButton({ icon: Icon, label }: { icon: any; label: string }) {
   return (
     <button className="flex items-center gap-2 px-3 py-2 rounded-lg border border-[#D1D5DC] text-sm text-[#364153] hover:bg-gray-50">
       <Icon size={16} />

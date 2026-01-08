@@ -105,7 +105,7 @@ export default function ContactLeadForms() {
         <div className="w-full">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-[#E2E8F0] bg-[#D1DAF4] h-14 font-medium">
+              <tr className="border-b border-[#E2E8F0] bg-[#f4e1d1] h-14 font-medium">
                 <th className="text-left py-3 px-4 text-sm font-medium text-[#4A5565]">
                   Form Name
                 </th>

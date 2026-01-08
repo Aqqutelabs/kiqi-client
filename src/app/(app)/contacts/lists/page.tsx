@@ -62,7 +62,7 @@ export default function ContactListsPage() {
           {/* Table */}
           <div className="relative overflow-x-auto">
             <table className="min-w-full">
-              <thead className="bg-[#D1DAF4] h-16.5">
+              <thead className="bg-[#f4e1d1] h-16.5">
                 <tr className="border-b border-gray-200">
                   <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
                     List Name

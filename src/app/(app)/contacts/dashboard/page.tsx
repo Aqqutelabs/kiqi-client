@@ -219,7 +219,7 @@ export function ContactDetailsModal({
                 {contact.tags.map((tag: string, index: number) => (
                   <span
                     key={index}
-                    className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-xl">
+                    className="px-3 py-1 bg-orange-50 text-orange-700 text-xs font-medium rounded-xl">
                     {tag}
                   </span>
                 ))}
@@ -302,7 +302,7 @@ export function ContactDetailsModal({
             <Eye className="w-4 h-4" />
             View Full Profile
           </button>
-          <button className="w-full px-4 py-3 bg-white text-[#F95417] border border-[#F95417] rounded-lg hover:bg-blue-50 transition-colors font-medium">
+          <button className="w-full px-4 py-3 bg-white text-[#F95417] border border-[#F95417] rounded-lg hover:bg-orange-50 transition-colors font-medium">
             + Add to List
           </button>
         </div>
@@ -702,7 +702,7 @@ export default function ContactsMainContent() {
             </div>
           ) : (
             <table className="min-w-full">
-              <thead className="bg-[#D1DAF4] h-16.5">
+              <thead className="bg-[#f4e1d1] h-16.5">
                 <tr>
                   <th className="px-4">
                     <input

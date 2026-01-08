@@ -144,7 +144,7 @@ export function ImportContactsModal({
             onDrop={handleDrop}
             className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors ${
               isDragging
-                ? "border-blue-500 bg-blue-50"
+                ? "border-orange-500 bg-orange-50"
                 : "border-gray-300 bg-gray-50"
             }`}>
             <div className="flex flex-col items-center">

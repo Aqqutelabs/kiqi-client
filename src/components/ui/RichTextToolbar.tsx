@@ -20,8 +20,8 @@ const ToolbarButton = ({
 }) => (
   <button
     type="button"
-    className={`p-2 rounded transition-colors duration-150 hover:bg-cyan-100 text-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-400 ${
-      active ? "bg-cyan-200" : ""
+    className={`p-2 rounded transition-colors duration-150 hover:bg-orange-100 text-gray-600 focus:outline-none focus:ring-2 focus:ring-orange-400 ${
+      active ? "bg-orange-200" : ""
     }`}
     onMouseDown={(e) => e.preventDefault()}
     onClick={onClick}

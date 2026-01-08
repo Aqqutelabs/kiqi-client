@@ -97,7 +97,6 @@ export default function CreateLeadForm() {
   const [formName, setFormName] = useState<string>("");
   const [fields, setFields] = useState<Field[]>([]);
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
-  const [draggedType, setDraggedType] = useState<string | null>(null);
   const fieldIdCounter = useRef<number>(0);
   const [formNameError, setFormNameError] = useState("");
   const [fieldError, setFieldError] = useState("");
@@ -111,34 +110,25 @@ export default function CreateLeadForm() {
     | Field
     | undefined;
 
-  const handleDragStart = (type: string) => {
-    setDraggedType(type);
-  };
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-  };
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    if (draggedType) {
-      const fieldType = FIELD_TYPES.find((ft) => ft.id === draggedType);
-      if (!fieldType) return;
-      const newField: Field = {
-        id: `field_${fieldIdCounter.current++}`,
-        type: draggedType,
-        label: fieldType.defaultLabel,
-        placeholder: fieldType.defaultPlaceholder,
-        required: false,
-        options: ["dropdown", "multiselect"].includes(draggedType)
-          ? ["Option 1", "Option 2"]
-          : undefined,
-      };
-      setFields((prev) => [...prev, newField]);
-      setSelectedFieldId(newField.id);
-      setDraggedType(null);
-      setFieldError("");
-    }
+  // New function to handle field type click
+  const handleFieldTypeClick = (fieldTypeId: string) => {
+    const fieldType = FIELD_TYPES.find((ft) => ft.id === fieldTypeId);
+    if (!fieldType) return;
+    
+    const newField: Field = {
+      id: `field_${fieldIdCounter.current++}`,
+      type: fieldTypeId,
+      label: fieldType.defaultLabel,
+      placeholder: fieldType.defaultPlaceholder,
+      required: false,
+      options: ["dropdown", "multiselect"].includes(fieldTypeId)
+        ? ["Option 1", "Option 2"]
+        : undefined,
+    };
+    
+    setFields((prev) => [...prev, newField]);
+    setSelectedFieldId(newField.id);
+    setFieldError("");
   };
 
   const handleFieldClick = (fieldId: string) => {
@@ -146,15 +136,14 @@ export default function CreateLeadForm() {
   };
 
   const handleDeleteField = (fieldId: string) => {
-  setFields((prev) => prev.filter((f) => f.id !== fieldId));
-  if (selectedFieldId === fieldId) {
-    setSelectedFieldId(null);
-  }
-  // If no fields left, set field error if trying to preview
-  if (fields.length === 1) { // About to delete the last field
-    setFieldError("");
-  }
-};
+    setFields((prev) => prev.filter((f) => f.id !== fieldId));
+    if (selectedFieldId === fieldId) {
+      setSelectedFieldId(null);
+    }
+    if (fields.length === 1) {
+      setFieldError("");
+    }
+  };
 
   const updateSelectedField = (updates: Partial<Field>) => {
     if (!selectedFieldId) return;
@@ -212,22 +201,22 @@ export default function CreateLeadForm() {
   };
 
   const handlePreview = () => {
-  if (!formName) {
-    setFormNameError("Form name cannot be empty!");
-  } else if (fields.length === 0) { 
-    setFieldError("Form must have at least one field included");
-  } else {
-    setFormNameError("");
-    setFieldError("");
-    
-    const previewData = {
-      name: formName || "New Form",
-      fields: fields,
-    };
-    localStorage.setItem("form_preview", JSON.stringify(previewData));
-    window.open("/contacts/forms/preview", "_blank");
-  }
-};
+    if (!formName) {
+      setFormNameError("Form name cannot be empty!");
+    } else if (fields.length === 0) {
+      setFieldError("Form must have at least one field included");
+    } else {
+      setFormNameError("");
+      setFieldError("");
+
+      const previewData = {
+        name: formName || "New Form",
+        fields: fields,
+      };
+      localStorage.setItem("form_preview", JSON.stringify(previewData));
+      window.open("/contacts/forms/preview", "_blank");
+    }
+  };
 
   const handlePublish = async () => {
     if (!formName) {
@@ -244,7 +233,6 @@ export default function CreateLeadForm() {
         );
         setPublicLink(response.publicLink);
         setIsModalOpen(true);
-        // setConfirmPublish(true);
       } catch (error) {
         console.error("Failed to create form:", error);
       }
@@ -281,9 +269,8 @@ export default function CreateLeadForm() {
               return (
                 <div
                   key={fieldType.id}
-                  draggable
-                  onDragStart={() => handleDragStart(fieldType.id)}
-                  className="flex items-center gap-3 p-3 border border-[#E5E7EB] rounded-[10px] cursor-move hover:bg-gray-50 transition-colors">
+                  onClick={() => handleFieldTypeClick(fieldType.id)}
+                  className="flex items-center gap-3 p-3 border border-[#E5E7EB] rounded-[10px] cursor-pointer hover:bg-gray-50 hover:border-[#FF5314] transition-colors">
                   <Icon size={18} className="text-[#4A5565]" />
                   <span className="text-sm text-[#364153]">
                     {fieldType.label}
@@ -295,10 +282,7 @@ export default function CreateLeadForm() {
         </div>
 
         {/* Center - Form Builder */}
-        <div
-          className="flex-1 p-6 overflow-y-scroll scrollbar-hide"
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}>
+        <div className="flex-1 p-6 overflow-y-scroll scrollbar-hide">
           {/* Form Name Input */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-[#42526D] mb-2">
@@ -375,7 +359,7 @@ export default function CreateLeadForm() {
                     {field.type === "paragraph" ? (
                       <textarea
                         placeholder={field.placeholder}
-                        className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none"
+                        className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm resize-none"
                         rows={4}
                         disabled
                       />
@@ -394,7 +378,7 @@ export default function CreateLeadForm() {
                       <div className="relative">
                         <select
                           disabled
-                          className="w-full px-4 py-2 pr-10 border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm appearance-none text-[#718096]">
+                          className="w-full px-4 py-2 pr-10 border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm appearance-none text-[#718096]">
                           <option>{field.placeholder}</option>
                           {field.options?.map((option, idx) => (
                             <option key={idx} className="text-[#364153]">
@@ -431,7 +415,7 @@ export default function CreateLeadForm() {
                             : "text"
                         }
                         placeholder={field.placeholder}
-                        className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                        className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
                         disabled
                       />
                     )}
@@ -480,7 +464,7 @@ export default function CreateLeadForm() {
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     updateSelectedField({ label: e.target.value })
                   }
-                  className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-[#364153] text-sm"
+                  className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-[#364153] text-sm"
                 />
               </div>
 
@@ -510,7 +494,7 @@ export default function CreateLeadForm() {
                             onChange={(
                               e: React.ChangeEvent<HTMLInputElement>
                             ) => updateOption(index, e.target.value)}
-                            className="w-full px-3 py-2 pr-8 border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-[#364153] text-sm"
+                            className="w-full px-3 py-2 pr-8 border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-[#364153] text-sm"
                             placeholder={`Option ${index + 1}`}
                           />
                           {selectedField.options &&
@@ -526,7 +510,7 @@ export default function CreateLeadForm() {
                     </div>
                     <button
                       onClick={addOption}
-                      className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1">
+                      className="text-sm text-orange-600 hover:text-orange-700 font-medium flex items-center gap-1">
                       <Plus size={16} />
                       Add option
                     </button>
@@ -545,7 +529,7 @@ export default function CreateLeadForm() {
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       updateSelectedField({ placeholder: e.target.value })
                     }
-                    className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-[#364153] text-sm"
+                    className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-[#364153] text-sm"
                   />
                 </div>
               )}
@@ -553,52 +537,6 @@ export default function CreateLeadForm() {
           </div>
         )}
       </div>
-
-      {/* <Modal isOpen={confirmPublish} onClose={() => setConfirmPublish(false)} width="500px">
-        <Heading heading={`${formName} Published!`} />
-        <hr className="text-gray-200 my-4" />
-
-        <div className="space-y-2 text-sm text-[#364153] my-6">
-          <p>Hosted Form Link</p>
-          <div className="flex flex-col md:flex-row items-center gap-2">
-            <input 
-              type="text" 
-              value={publicLink}
-              readOnly
-              className="outline-none border border-[#D1D5DC] bg-[#F9FAFB] px-4 py-2 rounded-lg h-10.5 w-4/5" 
-            />
-            <button 
-              onClick={() => navigator.clipboard.writeText(publicLink)}
-              className="border border-[#D1D5DC] h-10.5 rounded-lg w-1/5 text-sm cursor-pointer hover:bg-gray-50">
-              Copy
-            </button>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <p className="text-sm text-[#364153]">Embed Code</p>
-          <div className="min-h-37.5 w-full rounded-lg relative bg-[#101828] p-6">
-            <button 
-              onClick={() => navigator.clipboard.writeText(`<iframe src=\"${publicLink}\" width=\"100%\" height=\"600\" frameborder=\"0\"></iframe>`)}
-              className="absolute top-3 right-3 border border-gray-600 bg-[#1F2937] text-white px-3 py-1.5 rounded-lg text-xs cursor-pointer hover:bg-[#374151]"
-            >
-              Copy
-            </button>
-            <pre className="text-sm overflow-x-auto">
-              <code className="text-green-400">
-                {`<iframe 
-src="${publicLink}"
-width="100%"
-height="600"
-frameborder="0"
-></iframe>`}
-              </code>
-            </pre>
-          </div>
-        </div>
-
-        <Button variant={"tertiary"} className="mt-4 w-full cursor-pointer">Close</Button>
-      </Modal> */}
 
       {/* Modal to display public link */}
       <Modal

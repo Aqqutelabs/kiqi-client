@@ -166,7 +166,7 @@ export default function PreviewForm() {
                           onChange={() =>
                             handleCheckboxChange(field.id, option)
                           }
-                          className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-[#FF5314]"
+                          className="w-4 h-4 rounded border-gray-300 text-orange-600 focus:ring-[#FF5314]"
                         />
                         <label
                           htmlFor={`${field.id}-${idx}`}
@@ -188,7 +188,7 @@ export default function PreviewForm() {
                       onChange={(e) =>
                         handleInputChange(field.id, e.target.checked)
                       }
-                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-[#FF5314]"
+                      className="w-4 h-4 rounded border-gray-300 text-orange-600 focus:ring-[#FF5314]"
                     />
                     <label
                       htmlFor={field.id}

@@ -2,7 +2,13 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Loader2, AlertCircle, ChevronLeft, ChevronRight, Eye } from "lucide-react";
+import {
+  Loader2,
+  AlertCircle,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+} from "lucide-react";
 import toast from "react-hot-toast";
 import { fetchPayments } from "@/lib/admin-api";
 import { Payment } from "@/types/admin";
@@ -52,7 +58,7 @@ export default function PaymentsSection() {
   const parseCurrencyString = (value: string | number): number => {
     if (typeof value === "number") return value;
     if (typeof value !== "string") return 0;
-    
+
     // Remove currency symbols and non-numeric characters (except decimals)
     const cleaned = value.replace(/[₦$€£,\s]/g, "").trim();
     const parsed = parseFloat(cleaned);
@@ -83,19 +89,15 @@ export default function PaymentsSection() {
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-900">
-              Payments
-            </h3>
-            <div className="text-sm text-gray-600">
-              Total: {total} payments
-            </div>
+            <h3 className="text-lg font-semibold text-gray-900">Payments</h3>
+            <div className="text-sm text-gray-600">Total: {total} payments</div>
           </div>
         </div>
 
         {/* Table */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 size={32} className="text-blue-600 animate-spin" />
+            <Loader2 size={32} className="text-orange-600 animate-spin" />
           </div>
         ) : payments.length === 0 ? (
           <div className="flex items-center justify-center py-12">
@@ -134,11 +136,11 @@ export default function PaymentsSection() {
                 {payments.map((payment) => (
                   <tr
                     key={payment._id}
-                    className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
-                  >
+                    className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="text-sm text-gray-900 font-medium">
-                        {payment.user?.firstName} {payment.user?.lastName ||
+                        {payment.user?.firstName}{" "}
+                        {payment.user?.lastName ||
                           (typeof payment.user_id === "object"
                             ? `${payment.user_id?.firstName} ${payment.user_id?.lastName}`
                             : "Unknown")}
@@ -157,29 +159,38 @@ export default function PaymentsSection() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm font-medium text-gray-900">
-                        {formatCurrency(payment.order_summary?.subtotal || "₦0")}
+                        {formatCurrency(
+                          payment.order_summary?.subtotal || "₦0"
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm font-medium text-gray-900">
-                        {formatCurrency(payment.order_summary?.vat_amount || "₦0")}
+                        {formatCurrency(
+                          payment.order_summary?.vat_amount || "₦0"
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm font-bold text-gray-900">
-                        {formatCurrency(payment.order_summary?.total_amount || "₦0")}
+                        {formatCurrency(
+                          payment.order_summary?.total_amount || "₦0"
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <StatusBadge variant={getPaymentStatus(payment)?.toLowerCase() as any} />
+                      <StatusBadge
+                        variant={
+                          getPaymentStatus(payment)?.toLowerCase() as any
+                        }
+                      />
                     </td>
                     <td className="px-6 py-4">
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={() => handleViewDetails(payment)}
-                        className="gap-2"
-                      >
+                        className="gap-2">
                         <Eye size={16} />
                         Details
                       </Button>
@@ -203,8 +214,7 @@ export default function PaymentsSection() {
                 variant="outline"
                 onClick={() => setPage(Math.max(1, page - 1))}
                 disabled={page === 1}
-                className="gap-2"
-              >
+                className="gap-2">
                 <ChevronLeft size={16} />
                 Previous
               </Button>
@@ -213,8 +223,7 @@ export default function PaymentsSection() {
                 variant="outline"
                 onClick={() => setPage(Math.min(totalPages, page + 1))}
                 disabled={page === totalPages}
-                className="gap-2"
-              >
+                className="gap-2">
                 Next
                 <ChevronRight size={16} />
               </Button>

@@ -80,7 +80,7 @@ export default function FeatureOnePage() {
       <LandingNav />
 
       {/* hero section */}
-      <div className="min-h-screen bg-linear-to-r from-[#0B5ED8] via-blue-500 to-white flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-14">
+      <div className="min-h-screen bg-linear-to-r from-[#0B5ED8] via-orange-500 to-white flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-14">
         {/* Left Content */}
         <div className="flex-1 space-y-6 lg:space-y-8 px-4 sm:px-6 lg:px-0">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight text-center lg:text-left">

@@ -168,7 +168,7 @@ export default function PRCheckoutPage() {
                   <h2 className="text-lg font-bold text-gray-900">
                     Your Publications
                   </h2>
-                  <span className="bg-blue-50 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full">
+                  <span className="bg-orange-50 text-orange-700 text-xs font-semibold px-3 py-1 rounded-full">
                     {cartData ? cartData.items.length : 0}{" "}
                     {cartData?.items.length === 1 ? "Item" : "Items"}
                   </span>
@@ -239,7 +239,7 @@ export default function PRCheckoutPage() {
                     onClick={() => setSelectedPayment("paystack")}
                     className={`relative flex items-start p-4 border-2 rounded-xl transition-all ${
                       selectedPayment === "paystack"
-                        ? "border-blue-600 bg-blue-50"
+                        ? "border-orange-600 bg-orange-50"
                         : "border-gray-200 hover:border-gray-300"
                     }`}>
                     <div className="flex items-start gap-3 flex-1 text-left">
@@ -256,7 +256,7 @@ export default function PRCheckoutPage() {
                       </div>
                     </div>
                     {selectedPayment === "paystack" && (
-                      <div className="absolute top-3 right-3 w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+                      <div className="absolute top-3 right-3 w-6 h-6 bg-orange-600 rounded-full flex items-center justify-center">
                         <div className="w-2 h-2 bg-white rounded-full"></div>
                       </div>
                     )}
@@ -267,7 +267,7 @@ export default function PRCheckoutPage() {
                     onClick={() => setSelectedPayment("crypto")}
                     className={`relative flex items-start p-4 border-2 rounded-xl transition-all ${
                       selectedPayment === "crypto"
-                        ? "border-blue-600 bg-blue-50"
+                        ? "border-orange-600 bg-orange-50"
                         : "border-gray-200 hover:border-gray-300"
                     }`}>
                     <div className="flex items-start gap-3 flex-1 text-left">
@@ -284,7 +284,7 @@ export default function PRCheckoutPage() {
                       </div>
                     </div>
                     {selectedPayment === "crypto" && (
-                      <div className="absolute top-3 right-3 w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+                      <div className="absolute top-3 right-3 w-6 h-6 bg-orange-600 rounded-full flex items-center justify-center">
                         <div className="w-2 h-2 bg-white rounded-full"></div>
                       </div>
                     )}
@@ -295,12 +295,12 @@ export default function PRCheckoutPage() {
                     onClick={() => setSelectedPayment("go-credit")}
                     className={`relative flex flex-col items-start p-4 border-2 rounded-xl transition-all duration-300 ${
                       selectedPayment === "go-credit"
-                        ? "border-blue-600 bg-blue-50"
+                        ? "border-orange-600 bg-orange-50"
                         : "border-gray-200 hover:border-gray-300"
                     }`}>
                     <div className="flex items-start gap-3 flex-1 text-left">
                       <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center shrink-0">
-                        <div className="w-8 h-8 bg-blue-600 rounded-md flex items-center justify-center">
+                        <div className="w-8 h-8 bg-orange-600 rounded-md flex items-center justify-center">
                           <Wallet size={20} color="white" />
                         </div>
                       </div>
@@ -314,13 +314,13 @@ export default function PRCheckoutPage() {
                       </div>
                     </div>
                     {selectedPayment === "go-credit" && (
-                      <div className="absolute top-3 right-3 w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+                      <div className="absolute top-3 right-3 w-6 h-6 bg-orange-600 rounded-full flex items-center justify-center">
                         <div className="w-2 h-2 bg-white rounded-full"></div>
                       </div>
                     )}
                     {selectedPayment === "go-credit" && (
                       <div className="flex justify-between items-center w-full mt-6">
-                        <button className="bg-blue-700 h-6 w-16 text-white text-xs rounded-md cursor-pointer">
+                        <button className="bg-orange-700 h-6 w-16 text-white text-xs rounded-md cursor-pointer">
                           Top Up
                         </button>
                         <p className="text-[10px] text-gray-600">
@@ -359,7 +359,7 @@ export default function PRCheckoutPage() {
                   <div className="border-t border-gray-200 pt-4">
                     <div className="flex justify-between">
                       <span className="font-semibold text-gray-900">Total</span>
-                      <span className="text-2xl font-bold text-blue-600">
+                      <span className="text-2xl font-bold text-orange-600">
                         ₦{total.toLocaleString()}
                       </span>
                     </div>

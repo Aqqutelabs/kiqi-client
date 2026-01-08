@@ -307,7 +307,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       <div className="flex justify-end mb-6">
         <button
           onClick={() => setIsProgressTrackerOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-all duration-200 shadow-md hover:shadow-lg">
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-orange-600 text-white text-sm font-semibold rounded-lg hover:bg-orange-700 transition-all duration-200 shadow-md hover:shadow-lg">
           <svg
             className="w-5 h-5"
             fill="none"

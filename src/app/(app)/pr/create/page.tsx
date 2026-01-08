@@ -16,7 +16,13 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/Input";
 import toast from "react-hot-toast";
-import { CheckCircle2, AlertCircle, Eye, EyeOff, Maximize2 } from "lucide-react";
+import {
+  CheckCircle2,
+  AlertCircle,
+  Eye,
+  EyeOff,
+  Maximize2,
+} from "lucide-react";
 
 export default function CreatePressRelease() {
   const router = useRouter();
@@ -32,35 +38,34 @@ export default function CreatePressRelease() {
 
   // Initialize state from localStorage to preserve data on navigation
   useEffect(() => {
-  // Clear old data ONCE
-  try {
-    localStorage.removeItem("pr_step_one");
-    localStorage.removeItem("pr_step_one_image");
-    localStorage.removeItem("cart");
-    localStorage.removeItem("pr_id");
-  } catch (e) {
-    console.warn("Failed to clear localStorage:", e);
-  }
-
-  // Restore saved draft
-  const savedDraft = localStorage.getItem("pr_step_one");
-  if (!savedDraft) return;
-
-  try {
-    const draft = JSON.parse(savedDraft);
-
-    if (title.current && draft.title) {
-      title.current.value = draft.title;
+    // Clear old data ONCE
+    try {
+      localStorage.removeItem("pr_step_one");
+      localStorage.removeItem("pr_step_one_image");
+      localStorage.removeItem("cart");
+      localStorage.removeItem("pr_id");
+    } catch (e) {
+      console.warn("Failed to clear localStorage:", e);
     }
 
-    if (draft.pr_content) {
-      setPrContent(draft.pr_content);
-    }
-  } catch (err) {
-    console.error("Failed to restore draft:", err);
-  }
-}, []);
+    // Restore saved draft
+    const savedDraft = localStorage.getItem("pr_step_one");
+    if (!savedDraft) return;
 
+    try {
+      const draft = JSON.parse(savedDraft);
+
+      if (title.current && draft.title) {
+        title.current.value = draft.title;
+      }
+
+      if (draft.pr_content) {
+        setPrContent(draft.pr_content);
+      }
+    } catch (err) {
+      console.error("Failed to restore draft:", err);
+    }
+  }, []);
 
   //   const clearOldData = () => {
   //     try {
@@ -155,7 +160,10 @@ export default function CreatePressRelease() {
       try {
         localStorage.setItem("pr_step_one", JSON.stringify(draft));
       } catch (storageError) {
-        if (storageError instanceof Error && storageError.name === "QuotaExceededError") {
+        if (
+          storageError instanceof Error &&
+          storageError.name === "QuotaExceededError"
+        ) {
           toast.error("Storage quota exceeded. Please clear some data.");
           setLoading(false);
           return;
@@ -170,7 +178,9 @@ export default function CreatePressRelease() {
           localStorage.setItem("pr_step_one_image", imageBase64);
         } catch (imageError) {
           console.warn("Failed to save image:", imageError);
-          toast.error("Image could not be saved, but PR content will be saved.");
+          toast.error(
+            "Image could not be saved, but PR content will be saved."
+          );
         }
       }
 
@@ -178,7 +188,9 @@ export default function CreatePressRelease() {
       router.push("/pr/create/publisher-platform");
     } catch (error) {
       console.error("Failed to save Step 1 data:", error);
-      toast.error("An error occurred while saving the PR draft. Please try again.");
+      toast.error(
+        "An error occurred while saving the PR draft. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -189,8 +201,7 @@ export default function CreatePressRelease() {
       className="flex-1 overflow-y-auto space-y-6"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
+      transition={{ duration: 0.5 }}>
       <PageHeader title="Create a Press Release" backLink="/pr/dashboard" />
 
       {/* Step 1: Title and Image */}
@@ -208,11 +219,7 @@ export default function CreatePressRelease() {
             className="mb-2"
             sm
           />
-          <Input
-            name="title"
-            ref={title}
-            placeholder="Enter a title"
-          />
+          <Input name="title" ref={title} placeholder="Enter a title" />
         </div>
       </Card>
 
@@ -244,8 +251,7 @@ export default function CreatePressRelease() {
                 <motion.div
                   className="flex items-center gap-2 px-3 py-1 bg-green-50 text-green-700 rounded-lg text-xs font-medium"
                   initial={{ opacity: 0, x: 10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                >
+                  animate={{ opacity: 1, x: 0 }}>
                   <CheckCircle2 size={14} />
                   Auto-saved
                 </motion.div>
@@ -261,7 +267,11 @@ export default function CreatePressRelease() {
             />
             <div className="mt-4 flex gap-2 text-xs text-gray-500">
               <AlertCircle size={14} className="flex-shrink-0 mt-0.5" />
-              <span>Pro Tip: Content auto-saves every 30 seconds. Use the toolbar for professional formatting with colors, highlighting, tables, and more.</span>
+              <span>
+                Pro Tip: Content auto-saves every 30 seconds. Use the toolbar
+                for professional formatting with colors, highlighting, tables,
+                and more.
+              </span>
             </div>
           </Card>
         </div>
@@ -286,8 +296,7 @@ export default function CreatePressRelease() {
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-      >
+        transition={{ duration: 0.3 }}>
         <Card>
           <div className="flex items-center justify-between mb-4">
             <Heading
@@ -299,8 +308,7 @@ export default function CreatePressRelease() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowPreview(!showPreview)}
-                className="flex items-center gap-1.5 px-3 py-2 text-sm bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors font-medium"
-              >
+                className="flex items-center gap-1.5 px-3 py-2 text-sm bg-orange-50 text-orange-700 rounded-lg hover:bg-orange-100 transition-colors font-medium">
                 {showPreview ? (
                   <>
                     <EyeOff size={16} />
@@ -316,8 +324,7 @@ export default function CreatePressRelease() {
               {showPreview && (
                 <button
                   onClick={() => setFullscreenPreview(true)}
-                  className="flex items-center gap-1.5 px-3 py-2 text-sm bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors font-medium"
-                >
+                  className="flex items-center gap-1.5 px-3 py-2 text-sm bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors font-medium">
                   <Maximize2 size={16} />
                   Fullscreen
                 </button>
@@ -331,8 +338,7 @@ export default function CreatePressRelease() {
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.2 }}
-              className="rounded-lg border border-gray-200 overflow-hidden shadow-inner"
-            >
+              className="rounded-lg border border-gray-200 overflow-hidden shadow-inner">
               {prContent ? (
                 <EditorPreview
                   content={prContent}
@@ -341,7 +347,10 @@ export default function CreatePressRelease() {
               ) : (
                 <div className="flex items-center justify-center p-12 text-gray-400">
                   <div className="text-center">
-                    <AlertCircle size={40} className="mx-auto mb-2 opacity-30" />
+                    <AlertCircle
+                      size={40}
+                      className="mx-auto mb-2 opacity-30"
+                    />
                     <p className="text-sm">Your content will appear here</p>
                   </div>
                 </div>
@@ -358,42 +367,46 @@ export default function CreatePressRelease() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-          onClick={() => setFullscreenPreview(false)}
-        >
+          onClick={() => setFullscreenPreview(false)}>
           <motion.div
             initial={{ scale: 0.95 }}
             animate={{ scale: 1 }}
             exit={{ scale: 0.95 }}
             className="bg-white rounded-xl w-full h-full max-w-5xl max-h-[90vh] shadow-2xl flex flex-col"
-            onClick={(e) => e.stopPropagation()}
-          >
+            onClick={(e) => e.stopPropagation()}>
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-              <h2 className="text-lg font-semibold text-gray-900">Full Screen Preview</h2>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-orange-50 to-indigo-50">
+              <h2 className="text-lg font-semibold text-gray-900">
+                Full Screen Preview
+              </h2>
               <button
                 onClick={() => setFullscreenPreview(false)}
-                className="text-gray-500 hover:text-gray-700 transition-colors"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                className="text-gray-500 hover:text-gray-700 transition-colors">
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
 
             {/* Modal Content */}
             <div className="flex-1 overflow-hidden">
-              <EditorPreview
-                content={prContent}
-                className="h-full"
-              />
+              <EditorPreview content={prContent} className="h-full" />
             </div>
 
             {/* Modal Footer */}
             <div className="px-6 py-3 border-t border-gray-200 bg-gray-50 flex justify-end">
               <button
                 onClick={() => setFullscreenPreview(false)}
-                className="px-4 py-2 text-sm font-medium bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
-              >
+                className="px-4 py-2 text-sm font-medium bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">
                 Close
               </button>
             </div>
@@ -406,14 +419,12 @@ export default function CreatePressRelease() {
         <div className="flex gap-2">
           <button
             onClick={handleClearContent}
-            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm"
-          >
+            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm">
             Clear Content
           </button>
           <button
             onClick={saveDraft}
-            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700"
-          >
+            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700">
             Save Draft
           </button>
         </div>

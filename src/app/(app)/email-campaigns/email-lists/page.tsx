@@ -7,11 +7,11 @@ import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { selectCampaign } from '@/redux/selectors/campaignSelectors';
-import { 
-  fetchUserEmailLists, 
+import { selectCampaign } from "@/redux/selectors/campaignSelectors";
+import {
+  fetchUserEmailLists,
   createEmailListWithFiles,
-  clearCreateEmailListStatus 
+  clearCreateEmailListStatus,
 } from "@/redux/slices/campaignSlice";
 import { toast } from "react-hot-toast";
 
@@ -29,18 +29,20 @@ const ManageEmailListPage = () => {
     status,
     error,
   } = useAppSelector(selectCampaign);
-  
+
   const [form, setForm] = useState({
     email_listName: "",
   });
-  
-  const [audienceOption, setAudienceOption] = useState<"manual" | "csv">("manual");
+
+  const [audienceOption, setAudienceOption] = useState<"manual" | "csv">(
+    "manual"
+  );
   const [contactChips, setContactChips] = useState<ContactChip[]>([]);
-  const [manualContacts, setManualContacts] = useState<string>('');
+  const [manualContacts, setManualContacts] = useState<string>("");
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isProcessingCsv, setIsProcessingCsv] = useState(false);
-  
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -54,14 +56,14 @@ const ManageEmailListPage = () => {
       setForm({ email_listName: "" });
       setContactChips([]);
       setCsvFile(null);
-      setManualContacts('');
+      setManualContacts("");
       if (fileInputRef.current) fileInputRef.current.value = "";
-      
+
       // Refresh the email lists
       dispatch(fetchUserEmailLists());
       dispatch(clearCreateEmailListStatus());
     }
-    
+
     if (createEmailListStatus === "failed" && createEmailListError) {
       toast.error(createEmailListError);
       dispatch(clearCreateEmailListStatus());
@@ -75,13 +77,13 @@ const ManageEmailListPage = () => {
 
   const handleManualContactsChange = (value: string) => {
     setManualContacts(value);
-    
+
     // Process on comma to create chips
-    if (value.endsWith(',')) {
+    if (value.endsWith(",")) {
       const email = value.slice(0, -1).trim();
       if (email && isValidEmail(email)) {
         addContactChip(email);
-        setManualContacts('');
+        setManualContacts("");
       }
     }
   };
@@ -91,20 +93,23 @@ const ManageEmailListPage = () => {
       toast.error("Please enter a valid email address");
       return;
     }
-    
-    if (contactChips.some(chip => chip.email === email)) {
+
+    if (contactChips.some((chip) => chip.email === email)) {
       toast.error("Email already added");
       return;
     }
-    
-    setContactChips(prev => [...prev, {
-      id: Date.now().toString() + Math.random(),
-      email: email.trim()
-    }]);
+
+    setContactChips((prev) => [
+      ...prev,
+      {
+        id: Date.now().toString() + Math.random(),
+        email: email.trim(),
+      },
+    ]);
   };
 
   const removeContactChip = (id: string) => {
-    setContactChips(prev => prev.filter(chip => chip.id !== id));
+    setContactChips((prev) => prev.filter((chip) => chip.id !== id));
   };
 
   const handleCsvUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -116,27 +121,34 @@ const ManageEmailListPage = () => {
 
     try {
       const text = await file.text();
-      const lines = text.split('\n').filter(line => line.trim());
-      
+      const lines = text.split("\n").filter((line) => line.trim());
+
       // Parse CSV - handle both simple (email only) and complex (email, name) formats
       const emails: ContactChip[] = [];
-      
+
       lines.forEach((line, index) => {
         // Skip header row if it looks like a header
-        if (index === 0 && (line.toLowerCase().includes('email') || line.toLowerCase().includes('name'))) {
+        if (
+          index === 0 &&
+          (line.toLowerCase().includes("email") ||
+            line.toLowerCase().includes("name"))
+        ) {
           return;
         }
-        
+
         // Split by comma and get the first field (email)
-        const parts = line.split(',').map(p => p.trim().replace(/['"]/g, ''));
+        const parts = line.split(",").map((p) => p.trim().replace(/['"]/g, ""));
         const email = parts[0];
-        
+
         if (email && isValidEmail(email)) {
           // Check for duplicates
-          if (!emails.some(e => e.email === email) && !contactChips.some(c => c.email === email)) {
+          if (
+            !emails.some((e) => e.email === email) &&
+            !contactChips.some((c) => c.email === email)
+          ) {
             emails.push({
               id: Date.now().toString() + Math.random() + index,
-              email: email
+              email: email,
             });
           }
         }
@@ -149,9 +161,8 @@ const ManageEmailListPage = () => {
         return;
       }
 
-      setContactChips(prev => [...prev, ...emails]);
+      setContactChips((prev) => [...prev, ...emails]);
       toast.success(`${emails.length} email(s) loaded from CSV`);
-      
     } catch (err) {
       toast.error("Failed to process CSV file");
       setCsvFile(null);
@@ -186,10 +197,10 @@ const ManageEmailListPage = () => {
     }
 
     setIsSubmitting(true);
-    
+
     try {
       // Convert chips to API format - using the exact structure from your slice
-      const emailsArr = contactChips.map(chip => ({
+      const emailsArr = contactChips.map((chip) => ({
         email: chip.email,
       }));
 
@@ -203,7 +214,6 @@ const ManageEmailListPage = () => {
       );
 
       // The success/failure is handled in the useEffect above
-      
     } catch (err) {
       toast.error("An unexpected error occurred.");
     } finally {
@@ -214,14 +224,14 @@ const ManageEmailListPage = () => {
   const handleDelete = async (id: string) => {
     if (!window.confirm("Are you sure you want to delete this email list?"))
       return;
-    
+
     try {
-      const result = await dispatch({ 
-        type: "campaign/deleteEmailList", 
-        payload: id 
+      const result = await dispatch({
+        type: "campaign/deleteEmailList",
+        payload: id,
       });
-      
-      if (result.type === 'fulfilled') {
+
+      if (result.type === "fulfilled") {
         toast.success("Email list deleted successfully!");
         dispatch(fetchUserEmailLists());
       } else {
@@ -248,7 +258,7 @@ const ManageEmailListPage = () => {
         <h3 className="text-lg font-semibold mb-4 text-gray-800">
           Create Email List
         </h3>
-        
+
         <div className="space-y-6">
           {/* List Name Input */}
           <div>
@@ -264,24 +274,26 @@ const ManageEmailListPage = () => {
 
           {/* Audience Option Tabs */}
           <div>
-            <label className="block text-sm font-medium mb-2">Add Email Addresses</label>
+            <label className="block text-sm font-medium mb-2">
+              Add Email Addresses
+            </label>
             <div className="flex gap-2 mb-4">
               <button
-                onClick={() => setAudienceOption('manual')}
+                onClick={() => setAudienceOption("manual")}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  audienceOption === 'manual'
-                    ? 'bg-blue-50 text-blue-600 border border-blue-200'
-                    : 'text-gray-600 hover:bg-gray-50 border border-gray-200'
+                  audienceOption === "manual"
+                    ? "bg-orange-50 text-orange-600 border border-orange-200"
+                    : "text-gray-600 hover:bg-gray-50 border border-gray-200"
                 }`}>
                 <FileText size={16} className="inline mr-2" />
                 Manual Input
               </button>
               <button
-                onClick={() => setAudienceOption('csv')}
+                onClick={() => setAudienceOption("csv")}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  audienceOption === 'csv'
-                    ? 'bg-blue-50 text-blue-600 border border-blue-200'
-                    : 'text-gray-600 hover:bg-gray-50 border border-gray-200'
+                  audienceOption === "csv"
+                    ? "bg-orange-50 text-orange-600 border border-orange-200"
+                    : "text-gray-600 hover:bg-gray-50 border border-gray-200"
                 }`}>
                 <Upload size={16} className="inline mr-2" />
                 Upload CSV
@@ -289,20 +301,20 @@ const ManageEmailListPage = () => {
             </div>
 
             {/* Manual Input Option */}
-            {audienceOption === 'manual' && (
+            {audienceOption === "manual" && (
               <div className="space-y-3">
                 <div className="relative">
                   <textarea
                     value={manualContacts}
                     onChange={(e) => handleManualContactsChange(e.target.value)}
                     placeholder="Enter email addresses separated by commas. Press comma or enter after each email."
-                    className="w-full bg-[#00000014] rounded-md p-3 min-h-[100px] resize-none border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-sm"
+                    className="w-full bg-[#00000014] rounded-md p-3 min-h-25 resize-none border border-gray-300 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none text-sm"
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
+                      if (e.key === "Enter") {
                         e.preventDefault();
                         if (manualContacts.trim()) {
                           addContactChip(manualContacts);
-                          setManualContacts('');
+                          setManualContacts("");
                         }
                       }
                     }}
@@ -315,9 +327,9 @@ const ManageEmailListPage = () => {
             )}
 
             {/* CSV Upload Option */}
-            {audienceOption === 'csv' && (
+            {audienceOption === "csv" && (
               <div className="space-y-4">
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-orange-400 transition-colors">
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -330,14 +342,16 @@ const ManageEmailListPage = () => {
                   <label htmlFor="csv-upload" className="cursor-pointer">
                     <Upload size={40} className="mx-auto text-gray-400 mb-3" />
                     <p className="text-gray-600 font-medium">
-                      {isProcessingCsv ? "Processing CSV..." : "Click to upload CSV file"}
+                      {isProcessingCsv
+                        ? "Processing CSV..."
+                        : "Click to upload CSV file"}
                     </p>
                     <p className="text-gray-500 text-sm mt-1">
                       Upload a CSV file containing email addresses
                     </p>
                   </label>
                 </div>
-                
+
                 {csvFile && (
                   <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
                     <div className="flex items-center gap-2">
@@ -365,15 +379,15 @@ const ManageEmailListPage = () => {
                 <p className="text-sm font-medium text-gray-700">
                   Added Contacts ({contactChips.length}):
                 </p>
-                <div className="flex flex-wrap gap-2 min-h-[60px] p-3 rounded-lg bg-gray-50">
+                <div className="flex flex-wrap gap-2 min-h-15 p-3 rounded-lg bg-gray-50">
                   {contactChips.slice(0, 50).map((chip) => (
                     <div
                       key={chip.id}
-                      className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-sm">
+                      className="inline-flex items-center gap-1 bg-orange-100 text-orange-800 px-3 py-1.5 rounded-full text-sm">
                       <span>{chip.email}</span>
                       <button
                         onClick={() => removeContactChip(chip.id)}
-                        className="ml-1 hover:bg-blue-200 rounded-full p-0.5 transition-colors">
+                        className="ml-1 hover:bg-orange-200 rounded-full p-0.5 transition-colors">
                         <X size={14} />
                       </button>
                     </div>
@@ -392,8 +406,12 @@ const ManageEmailListPage = () => {
           <div className="flex justify-end pt-4">
             <Button
               onClick={handleSubmit}
-              disabled={isSubmitting || !form.email_listName.trim() || contactChips.length === 0}
-              className="!bg-blue-600 hover:!bg-blue-700 text-white px-6">
+              disabled={
+                isSubmitting ||
+                !form.email_listName.trim() ||
+                contactChips.length === 0
+              }
+              className="bg-orange-600! hover:bg-orange-700! text-white px-6">
               {isSubmitting ? "Creating..." : "Create Email List"}
             </Button>
           </div>
@@ -458,14 +476,14 @@ const ManageEmailListPage = () => {
                           className="block w-2/4">
                           <Button
                             size="sm"
-                            className="!bg-cyan-500 hover:!bg-cyan-600 text-white w-full">
+                            className="bg-orange-500! hover:bg-orange-600! text-white w-full">
                             View List
                           </Button>
                         </Link>
                         <Button
                           variant="destructive"
                           size="sm"
-                          className="!p-2 w-2/4"
+                          className="p-2! w-2/4"
                           onClick={() => handleDelete(list._id)}>
                           <Trash2 size={16} />
                         </Button>

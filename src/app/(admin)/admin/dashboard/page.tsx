@@ -63,11 +63,7 @@ export default function AdminDashboard() {
   }) => (
     <Card className="p-6 flex flex-col">
       <div className="flex items-start justify-between mb-4">
-        <div
-          className={`p-3 rounded-lg ${backgroundColor}`}
-        >
-          {Icon}
-        </div>
+        <div className={`p-3 rounded-lg ${backgroundColor}`}>{Icon}</div>
         {trend && (
           <div className="flex items-center gap-1 text-green-600 text-sm font-medium">
             <TrendingUp size={16} />
@@ -97,8 +93,7 @@ export default function AdminDashboard() {
             <Button
               onClick={loadOverviewData}
               disabled={loading}
-              className="gap-2"
-            >
+              className="gap-2">
               <span>Refresh</span>
             </Button>
           </div>
@@ -117,10 +112,9 @@ export default function AdminDashboard() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`px-4 py-3 font-medium text-sm border-b-2 transition-colors ${
                   activeTab === tab.id
-                    ? "border-blue-600 text-blue-600"
+                    ? "border-orange-600 text-orange-600"
                     : "border-transparent text-gray-600 hover:text-gray-900"
-                }`}
-              >
+                }`}>
                 {tab.label}
               </button>
             ))}
@@ -135,10 +129,10 @@ export default function AdminDashboard() {
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
               <StatCard
-                icon={<Users size={24} className="text-blue-600" />}
+                icon={<Users size={24} className="text-orange-600" />}
                 label="Total Users"
                 value={loading ? "-" : overviewData?.users || 0}
-                backgroundColor="bg-blue-100"
+                backgroundColor="bg-orange-100"
               />
               <StatCard
                 icon={<BookOpen size={24} className="text-purple-600" />}
@@ -191,9 +185,11 @@ export default function AdminDashboard() {
                   <div className="space-y-4">
                     {overviewData.campaignsByStatus.map((status, index) => {
                       const total = overviewData.campaigns || 1;
-                      const percentage = Math.round((status.count / total) * 100);
+                      const percentage = Math.round(
+                        (status.count / total) * 100
+                      );
                       const colors = [
-                        "bg-blue-500",
+                        "bg-orange-500",
                         "bg-green-500",
                         "bg-purple-500",
                       ];
@@ -212,8 +208,7 @@ export default function AdminDashboard() {
                               className={`h-2 rounded-full transition-all ${
                                 colors[index % colors.length]
                               }`}
-                              style={{ width: `${percentage}%` }}
-                            ></div>
+                              style={{ width: `${percentage}%` }}></div>
                           </div>
                         </div>
                       );
@@ -240,7 +235,9 @@ export default function AdminDashboard() {
                   <div className="space-y-4">
                     {overviewData.ordersByPaymentStatus.map((status, index) => {
                       const total = overviewData.orders || 1;
-                      const percentage = Math.round((status.count / total) * 100);
+                      const percentage = Math.round(
+                        (status.count / total) * 100
+                      );
                       const colors = [
                         "bg-green-500",
                         "bg-yellow-500",
@@ -261,8 +258,7 @@ export default function AdminDashboard() {
                               className={`h-2 rounded-full transition-all ${
                                 colors[index % colors.length]
                               }`}
-                              style={{ width: `${percentage}%` }}
-                            ></div>
+                              style={{ width: `${percentage}%` }}></div>
                           </div>
                         </div>
                       );

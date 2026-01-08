@@ -442,7 +442,7 @@ export default function FeatureThreePage() {
       </div>
 
       {/* last cta section */}
-      <div className="bg-linear-to-b from-blue-900 via-blue-800 to-cyan-400 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12 xl:gap-20 px-4 sm:px-6 lg:px-8 xl:px-16 pt-8 sm:pt-10 lg:pt-16 xl:pt-20 w-[95%] rounded-xl sm:rounded-2xl mx-auto my-10 sm:my-14 lg:my-20">
+      <div className="bg-linear-to-b from-orange-900 via-orange-800 to-cyan-400 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12 xl:gap-20 px-4 sm:px-6 lg:px-8 xl:px-16 pt-8 sm:pt-10 lg:pt-16 xl:pt-20 w-[95%] rounded-xl sm:rounded-2xl mx-auto my-10 sm:my-14 lg:my-20">
         {/* left corner */}
         <div className="max-w-2xl space-y-4 sm:space-y-6 lg:space-y-8 w-full lg:w-1/2">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight text-center lg:text-left">

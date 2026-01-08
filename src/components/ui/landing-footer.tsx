@@ -60,7 +60,7 @@ const FAQFooter: React.FC = () => {
                 className="w-full pt-4 sm:pt-5 md:pt-6 pb-2 sm:pb-3 flex items-center justify-between text-left group">
                 <span
                   className={`text-xs sm:text-sm font-medium pr-4 sm:pr-6 md:pr-8 ${
-                    openIndex === index ? "text-blue-700" : "text-gray-900"
+                    openIndex === index ? "text-orange-700" : "text-gray-900"
                   }`}>
                   {faq.question}
                 </span>
@@ -153,14 +153,14 @@ const FAQFooter: React.FC = () => {
               Stay Up To Date
             </h3>
             <div
-              className="flex flex-col sm:flex-row gap-2 sm:gap-0 sm:flex-1 bg-transparent md:border border-gray-600 rounded-full sm:rounded-full text-xs sm:text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-600 transition-colors h-auto sm:h-12.5
+              className="flex flex-col sm:flex-row gap-2 sm:gap-0 sm:flex-1 bg-transparent md:border border-gray-600 rounded-full sm:rounded-full text-xs sm:text-sm text-white placeholder-gray-500 focus:outline-none focus:border-orange-600 transition-colors h-auto sm:h-12.5
              md:h-15">
               <input
                 type="email"
                 placeholder="Enter Your Email"
                 className="outline-none bg-transparent flex-1 px-4 py-3 sm:ml-4 sm:py-0 placeholder-gray-500 rounded-full sm:rounded-none border border-gray-600 sm:border-0"
               />
-              <button className="px-6 py-3 sm:px-8 md:px-10 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-medium rounded-full transition-colors -mt-px sm:-ml-px">
+              <button className="px-6 py-3 sm:px-8 md:px-10 sm:py-3 bg-orange-600 hover:bg-orange-700 text-white text-xs sm:text-sm font-medium rounded-full transition-colors -mt-px sm:-ml-px">
                 Subscribe
               </button>
             </div>

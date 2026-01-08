@@ -48,7 +48,7 @@ const AudiencePage = () => {
             </Select>
             <Button
               variant="tertiary"
-              className="!bg-blue-50 border border-blue-200 !text-blue-600">
+              className="!bg-orange-50 border border-orange-200 !text-orange-600">
               <Plus size={16} /> New List
             </Button>
           </div>

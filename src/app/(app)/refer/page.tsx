@@ -90,7 +90,7 @@ function ReferralLinkCard() {
           {socials.map((social, idx) => (
             <div
               key={idx}
-              className="flex flex-col items-center justify-center gap-2 cursor-pointer bg-white border border-[#CAD5E2] hover:bg-blue-50 rounded-lg h-[66px] w-full transition-all duration-300">
+              className="flex flex-col items-center justify-center gap-2 cursor-pointer bg-white border border-[#CAD5E2] hover:bg-orange-50 rounded-lg h-[66px] w-full transition-all duration-300">
               <img src={social.icon} alt={social.name} className="size-4" />
               <p className="text-xs text-[#45556C] font-medium">
                 {social.name}

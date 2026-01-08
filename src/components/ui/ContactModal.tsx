@@ -184,7 +184,7 @@ const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
                 value={formData.firstName}
                 onChange={handleInputChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
             </div>
 
@@ -197,7 +197,7 @@ const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
                 <button
                   type="button"
                   onClick={addEmail}
-                  className="text-sm text-blue-600 hover:text-blue-700">
+                  className="text-sm text-orange-600 hover:text-orange-700">
                   + Add another
                 </button>
               </div>
@@ -209,7 +209,7 @@ const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
                   onChange={(e) => updateEmail(index, e.target.value)}
                   placeholder="email@example.com"
                   required={index === 0}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 mb-2"
                 />
               ))}
             </div>
@@ -225,7 +225,7 @@ const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
                 value={formData.lastName}
                 onChange={handleInputChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
             </div>
 
@@ -238,7 +238,7 @@ const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
                 <button
                   type="button"
                   onClick={addPhone}
-                  className="text-sm text-blue-600 hover:text-blue-700">
+                  className="text-sm text-orange-600 hover:text-orange-700">
                   + Add another
                 </button>
               </div>
@@ -249,7 +249,7 @@ const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
                   value={phone}
                   onChange={(e) => updatePhone(index, e.target.value)}
                   placeholder="+1 (555) 123-4567"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 mb-2"
                 />
               ))}
             </div>
@@ -265,7 +265,7 @@ const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
                 value={formData.company}
                 onChange={handleInputChange}
                 placeholder="Search or create new system"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
             </div>
 
@@ -280,7 +280,7 @@ const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
                 value={formData.tags}
                 onChange={handleInputChange}
                 placeholder="Separate tags with commas"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
               <p className="text-xs text-gray-500 mt-1">
                 e.g., VIP, Decision Maker, Enterprise
@@ -297,7 +297,7 @@ const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
                 name="jobTitle"
                 value={formData.jobTitle}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
             </div>
 
@@ -312,7 +312,7 @@ const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
                 onChange={handleInputChange}
                 placeholder="Add any additional notes..."
                 rows={6}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
               />
             </div>
 
@@ -327,7 +327,7 @@ const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
                 value={formData.location}
                 onChange={handleInputChange}
                 placeholder="City, State/Country"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
             </div>
           </div>

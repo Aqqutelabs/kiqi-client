@@ -140,7 +140,7 @@ export default function Home() {
       <LandingNav />
 
       {/* hero section */}
-      <div className="min-h-screen w-[95%] lg:w-full max-w-[95%] bg-linear-to-b from-blue-900 via-blue-800 to-cyan-400 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-10 mx-auto rounded-2xl">
+      <div className="min-h-screen w-[95%] lg:w-full max-w-[95%] bg-linear-to-b from-orange-900 via-orange-800 to-cyan-400 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-10 mx-auto rounded-2xl">
         <div className="max-w-7xl w-full flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12">
           {/* Left Content */}
           <div className="flex-1 space-y-6 lg:space-y-8 px-4 sm:px-6 lg:px-0">
@@ -316,7 +316,7 @@ export default function Home() {
           <span className="text-[#2BAAE2]">Demo Video</span> Below
         </h2>
         <img
-          src="/blue-arrow.svg"
+          src="/orange-arrow.svg"
           className="absolute left-[65%] sm:left-[70%] top-6 md:top-9 w-16 md:w-auto hidden sm:block"
         />
         <img
