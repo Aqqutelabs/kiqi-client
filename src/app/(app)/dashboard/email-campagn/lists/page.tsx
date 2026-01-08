@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -9,6 +10,7 @@ import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { Textarea } from "@/components/ui/Textarea";
+import { createList, fetchLists } from "@/lib/contacts-api";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -21,6 +23,8 @@ interface EmailList {
 
 const ManageEmailListPage = () => {
   const [emailLists, setEmailLists] = useState<EmailList[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -45,7 +49,19 @@ const ManageEmailListPage = () => {
           });
       }
     }
+    
   }, []);
+
+  const handleCreateList = async (listData: { name: string; description: string; }) => {
+    try {
+      const response = await createList(listData);
+      toast.success("List created successfully!");
+      setEmailLists((prevLists) => [...prevLists, response.list]);
+    } catch (error) {
+      toast.error("Failed to create list. Please try again.");
+      console.error("Error creating list:", error);
+    }
+  };
 
   return (
     <>
@@ -56,14 +72,32 @@ const ManageEmailListPage = () => {
 
       <Card className="mb-8">
         <h3 className="text-lg font-semibold mb-4">Create Email List</h3>
-        <form className="space-y-4">
+        <form
+          className="space-y-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target as HTMLFormElement);
+            const name = formData.get("name")?.toString();
+            const description = formData.get("description")?.toString();
+            if (!name || !description) {
+              toast.error("Name and description are required.");
+              return;
+            }
+            const listData = {
+              name,
+              description,
+            };
+            handleCreateList(listData);
+          }}
+        >
           <div>
             <label className="label">Name of List</label>
-            <Input placeholder="Enter a name for this list" />
+            <Input name="name" placeholder="Enter a name for this list" />
           </div>
           <div>
             <label className="label">Add Email Address (Option 1)</label>
             <Textarea
+              name="description"
               placeholder="Separate each Email with a comma..."
               rows={4}
             />
@@ -79,6 +113,8 @@ const ManageEmailListPage = () => {
             Total Lists: {emailLists.length}
           </span>
         </div>
+        {isLoading && <p>Loading...</p>}
+        {error && <p style={{ color: "red" }}>{error}</p>}
         <div className="w-full overflow-x-auto">
           <table className="min-w-full bg-white">
             <thead> ... </thead>

@@ -3,6 +3,8 @@
 import { X, Info, Check } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
+import { createContact } from "@/lib/contacts-api";
+import { toast } from "react-toastify";
 
 interface ContactModalProps {
   isOpen: boolean;
@@ -10,7 +12,7 @@ interface ContactModalProps {
 }
 
 const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
-    const [showSuccess, setShowSuccess] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -21,6 +23,9 @@ const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
     location: "",
     tags: "",
     notes: "",
+    phoneCountry: "+1", // Default country code
+    phoneNumber: "", // Default phone number
+    isArchived: false, // Default value for isArchived
   });
 
   const [emails, setEmails] = useState([""]);
@@ -34,9 +39,39 @@ const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
     }));
   };
 
+  const handleCreateContact = async (contactData: { firstName: string; lastName: string; company: string | undefined; jobTitle: string | undefined; phoneCountry: string | undefined; phoneNumber: any; emails: { address: string; isPrimary: boolean; }[] | { address: string; isPrimary: boolean; }[]; tags: string[] | undefined; notes: string | undefined; isArchived: boolean | undefined; }) => {
+    try {
+      const response = await createContact(contactData);
+      toast.success("Contact created successfully!");
+      console.log("Created contact:", response.contact);
+      onClose(); // Close the modal after success
+    } catch (error) {
+      toast.error("Failed to create contact. Please try again.");
+      console.error("Error creating contact:", error);
+    }
+  };
+
   const handleSubmit = (e: any) => {
     e.preventDefault();
     setShowSuccess(true);
+
+    const contactData = {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      company: formData.company,
+      jobTitle: formData.jobTitle,
+      phoneCountry: formData.phoneCountry,
+      phoneNumber: formData.phoneNumber,
+      emails: emails.map((email, index) => ({
+        address: email,
+        isPrimary: index === 0, // Mark the first email as primary
+      })),
+      tags: formData.tags.split(",").map((tag) => tag.trim()), // Split tags into an array
+      notes: formData.notes,
+      isArchived: formData.isArchived,
+    };
+
+    handleCreateContact(contactData);
   };
 
   const handleSuccessClose = () => {
@@ -55,6 +90,9 @@ const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
       location: "",
       tags: "",
       notes: "",
+      phoneCountry: "+1", // Default country code
+      phoneNumber: "", // Default phone number
+      isArchived: false, // Default value for isArchived
     });
     setEmails([""]);
     setPhones([""]);
@@ -217,7 +255,7 @@ const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
                 name="company"
                 value={formData.company}
                 onChange={handleInputChange}
-                placeholder="Search or create new system"
+                placeholder=""
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>

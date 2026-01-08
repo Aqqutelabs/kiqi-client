@@ -59,11 +59,11 @@ const quickActions = [
     desc: "Launch targeted advertising campaigns",
     icon: "/dashboard/megaphone.svg",
   },
-  {
-    title: "Add Email Identity",
-    desc: "Expand your reach with new platforms",
-    icon: "/dashboard/mail.svg",
-  },
+  // {
+  //   title: "Add Email Identity",
+  //   desc: "Expand your reach with new platforms",
+  //   icon: "/dashboard/mail.svg",
+  // },
 ];
 
 const recentActivities = [

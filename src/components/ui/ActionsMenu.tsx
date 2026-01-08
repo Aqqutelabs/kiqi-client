@@ -83,7 +83,8 @@ export default function ActionsMenu({ isOpen, onOpen, onClose }: Props) {
             }}
             className="z-[9999] w-48 rounded-md border border-gray-200 bg-white shadow-lg"
           >
-            <button className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-50">
+            <button className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-50"
+            onClick={() => (window.location.href = `/contacts/lists/[id]}`)}>
               View Contacts
             </button>
             <button className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-50">

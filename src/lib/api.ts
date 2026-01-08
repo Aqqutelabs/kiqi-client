@@ -4,7 +4,8 @@ import axios from 'axios';
 import { getAuthToken } from './auth';
 
 const api = axios.create({
-  baseURL: 'https://kiqi-server-pqqr.onrender.com/api/v1',
+  baseURL: 'https://kiqi-server-pqqr.onrender.com',
+  // baseURL: 'http://localhost:8000/api/v1',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -14,9 +15,14 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = getAuthToken();
+    console.log("API Request Token:", token);
+    console.log("API Request URL:", config.url);
     
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log("Authorization header set");
+    } else {
+      console.warn("No token found for request");
     }
     
     return config;
