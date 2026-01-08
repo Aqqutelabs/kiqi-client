@@ -10,12 +10,14 @@ interface EditContactModalProps {
   isOpen: boolean;
   onClose: () => void;
   contact: any;
+  onUpdated: () => void;
 }
 
 const EditContactModal = ({
   isOpen,
   onClose,
   contact,
+  onUpdated
 }: EditContactModalProps) => {
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -36,27 +38,31 @@ const EditContactModal = ({
   useEffect(() => {
     if (contact) {
       setFormData({
-        firstName: contact.firstName || "",
-        lastName: contact.lastName || "",
-        company: contact.company || "",
-        jobTitle: contact.jobTitle || "",
-        location: contact.location || "",
-        notes: contact.notes || "",
-        tags: contact.tags?.join(", ") || "",
-        isArchived: contact.isArchived ?? false,
-      });
+    firstName: contact.firstName ?? contact.name?.split(" ")[0] ?? "",
+    lastName: contact.lastName ?? contact.name?.split(" ").slice(1).join(" ") ?? "",
+    company: contact.company ?? "",
+    jobTitle: contact.jobTitle ?? contact.title ?? "",
+    location: contact.location ?? "",
+    notes: contact.notes ?? "",
+    tags: Array.isArray(contact.tags) ? contact.tags.join(", ") : "",
+    isArchived: contact.isArchived ?? false,
+  });
 
       setEmails(
-        contact.emails?.length
-          ? contact.emails.map((e: any) => e.address)
-          : [""]
-      );
+    Array.isArray(contact.emails) && contact.emails.length
+      ? typeof contact.emails[0] === "string"
+        ? contact.emails
+        : contact.emails.map((e: any) => e.address)
+      : [""]
+  );
 
-      setPhones(
-        contact.phones?.length
-          ? contact.phones.map((p: any) => p.number)
-          : [""]
-      );
+  setPhones(
+    Array.isArray(contact.phones) && contact.phones.length
+      ? typeof contact.phones[0] === "string"
+        ? contact.phones
+        : contact.phones.map((p: any) => p.number)
+      : [""]
+  );
     }
   }, [contact]);
 
@@ -112,7 +118,8 @@ const EditContactModal = ({
     };
 
     try {
-      await updateContact(contact.id, payload);
+      console.log("Updating contact:", contact._id, payload);
+      await updateContact(contact._id, payload);
       toast.success("Contact updated successfully");
       setShowSuccess(true);
     } catch (err) {
@@ -124,9 +131,10 @@ const EditContactModal = ({
   const handleSuccessClose = () => {
     setShowSuccess(false);
     onClose();
+    onUpdated();
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !contact) return null;
 
   if (showSuccess) {
     return (
@@ -152,166 +160,182 @@ const EditContactModal = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6">
-          <h2 className="text-xl font-semibold">Edit Contact</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-            <X size={24} />
-          </button>
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+    <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between p-6">
+        <h2 className="text-xl font-semibold">Edit Contact</h2>
+        <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <X size={24} />
+        </button>
+      </div>
+
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="p-6">
+        <div className="grid grid-cols-2 gap-6">
+
+          {/* First Name */}
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              First Name *
+            </label>
+            <input
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleInputChange}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white
+           focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+            />
+          </div>
+
+          {/* Last Name */}
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Last Name *
+            </label>
+            <input
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleInputChange}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white
+           focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+            />
+          </div>
+
+          {/* Emails – FULL WIDTH */}
+          <div className="col-span-2">
+            <div className="flex justify-between mb-2">
+              <label className="text-sm font-medium">Email *</label>
+              <button
+                type="button"
+                onClick={addEmail}
+                className="text-sm text-blue-600"
+              >
+                + Add another
+              </button>
+            </div>
+
+            {emails.map((email, i) => (
+              <input
+                key={i}
+                value={email ?? ""}
+                onChange={(e) => updateEmail(i, e.target.value)}
+                required={i === 0}
+                placeholder=""
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white
+           focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+              />
+            ))}
+          </div>
+
+          {/* Phones – FULL WIDTH */}
+          <div className="col-span-2">
+            <div className="flex justify-between mb-2">
+              <label className="text-sm font-medium">Phone</label>
+              <button
+                type="button"
+                onClick={addPhone}
+                className="text-sm text-blue-600"
+              >
+                + Add another
+              </button>
+            </div>
+
+            {phones.map((phone, i) => (
+              <input
+                key={i}
+                value={phone ?? ""}
+                onChange={(e) => updatePhone(i, e.target.value)}
+                placeholder=""
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white
+           focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+              />
+            ))}
+          </div>
+
+          {/* Company */}
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Company
+            </label>
+            <input
+              name="company"
+              value={formData.company}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white
+           focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+            />
+          </div>
+
+          {/* Job Title */}
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Job Title
+            </label>
+            <input
+              name="jobTitle"
+              value={formData.jobTitle}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white
+           focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+           />
+          </div>
+
+          {/* Tags – FULL WIDTH */}
+          <div className="col-span-2">
+            <label className="block text-sm font-medium mb-2">Tags</label>
+            <input
+              name="tags"
+              value={formData.tags}
+              onChange={handleInputChange}
+              placeholder="lead, enterprise, sales"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white
+           focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+            />
+          </div>
+
+          {/* Notes – FULL WIDTH */}
+          <div className="col-span-2">
+            <label className="block text-sm font-medium mb-2">Notes</label>
+            <textarea
+              name="notes"
+              value={formData.notes}
+              onChange={handleInputChange}
+              rows={5}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white resize-none
+           focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+            />
+          </div>
+
+          {/* Location */}
+          <div className="col-span-2">
+            <label className="block text-sm font-medium mb-2">
+              Location
+            </label>
+            <input
+              name="location"
+              value={formData.location}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white
+           focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
+            />
+          </div>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6">
-          <div className="grid grid-cols-2 gap-6">
-            {/* First Name */}
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                First Name *
-              </label>
-              <input
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleInputChange}
-                required
-                className="input"
-              />
-            </div>
-
-            {/* Emails */}
-            <div>
-              <div className="flex justify-between mb-2">
-                <label className="text-sm font-medium">Email *</label>
-                <button
-                  type="button"
-                  onClick={addEmail}
-                  className="text-sm text-blue-600"
-                >
-                  + Add another
-                </button>
-              </div>
-              {emails.map((email, i) => (
-                <input
-                  key={i}
-                  value={email}
-                  onChange={(e) => updateEmail(i, e.target.value)}
-                  required={i === 0}
-                  className="input mb-2"
-                />
-              ))}
-            </div>
-
-            {/* Last Name */}
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Last Name *
-              </label>
-              <input
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleInputChange}
-                required
-                className="input"
-              />
-            </div>
-
-            {/* Phones */}
-            <div>
-              <div className="flex justify-between mb-2">
-                <label className="text-sm font-medium">Phone</label>
-                <button
-                  type="button"
-                  onClick={addPhone}
-                  className="text-sm text-blue-600"
-                >
-                  + Add another
-                </button>
-              </div>
-              {phones.map((phone, i) => (
-                <input
-                  key={i}
-                  value={phone}
-                  onChange={(e) => updatePhone(i, e.target.value)}
-                  className="input mb-2"
-                />
-              ))}
-            </div>
-
-            {/* Company */}
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Company
-              </label>
-              <input
-                name="company"
-                value={formData.company}
-                onChange={handleInputChange}
-                className="input"
-              />
-            </div>
-
-            {/* Tags */}
-            <div>
-              <label className="block text-sm font-medium mb-2">Tags</label>
-              <input
-                name="tags"
-                value={formData.tags}
-                onChange={handleInputChange}
-                className="input"
-              />
-            </div>
-
-            {/* Job Title */}
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Job Title
-              </label>
-              <input
-                name="jobTitle"
-                value={formData.jobTitle}
-                onChange={handleInputChange}
-                className="input"
-              />
-            </div>
-
-            {/* Notes */}
-            <div className="row-span-2">
-              <label className="block text-sm font-medium mb-2">Notes</label>
-              <textarea
-                name="notes"
-                value={formData.notes}
-                onChange={handleInputChange}
-                rows={6}
-                className="input resize-none"
-              />
-            </div>
-
-            {/* Location */}
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Location
-              </label>
-              <input
-                name="location"
-                value={formData.location}
-                onChange={handleInputChange}
-                className="input"
-              />
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div className="flex justify-end gap-3 mt-6 pt-6">
-            <Button variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit">Update Contact</Button>
-          </div>
-        </form>
-      </div>
+        {/* Footer */}
+        <div className="flex justify-end gap-3 mt-8 pt-6 ">
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit">Update Contact</Button>
+        </div>
+      </form>
     </div>
-  );
+  </div>
+);
+
 };
 
 export default EditContactModal;

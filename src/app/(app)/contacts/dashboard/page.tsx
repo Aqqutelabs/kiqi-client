@@ -38,6 +38,7 @@ import {
   getContactsPaginated,
   createList,
   fetchContactDetails,
+  bulkDeleteContacts,
 } from "@/lib/contacts-api";
 import { Contact as ApiContact } from "@/types/contacts";
 import { redirect } from "next/navigation";
@@ -45,14 +46,43 @@ import { useClickOutside } from "@/hooks/useClickOutside";
 import SelectListModal from "@/components/ui/SelectListModal";
 import { ImportContactsModal } from "@/components/ui/ImportContactsModal";
 import EditContactModal from "@/components/ui/EditContactModal";
+import { DeleteModal } from "@/components/ui/DeleteModal";
+
+interface Email {
+  address: string;
+  isPrimary: boolean;
+  _id: string;
+}
+
+interface Phone {
+  number: string;
+  isPrimary: boolean;
+  _id: string;
+}
 
 interface Contact {
+  _id: string;
   id: number;
   name: string;
   initials: string;
   title?: string;
   emails: string[];
   phones: string[];
+  company?: string;
+  tags?: string[];
+  notes?: string;
+  lastUpdated: string;
+}
+
+export interface ContactDetails {
+  _id: string;
+  //name: string;
+  firstName: string;
+  lastName: string;
+  initials: string;
+  title?: string;
+  emails: Email[];
+  phones: Phone[];
   company?: string;
   tags?: string[];
   notes?: string;
@@ -182,22 +212,38 @@ export function ContactDetailsModal({
   onClose,
   contact,
 }: ContactDetailsModalProps) {
-  const [details, setDetails] = useState<Contact | null>(null);
+  const [details, setDetails] = useState<ContactDetails | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!isOpen || !contact) return;
+    if (!isOpen || !contact?._id) return;
 
     const loadDetails = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        const response = await fetchContactDetails(String(contact.id));
+        const response = await fetchContactDetails(contact._id);
 
-        setDetails(response.contact);
+        const c = response.contact;
+        const transformed: ContactDetails = {
+          _id: c._id,
+          firstName: c.firstName,
+          lastName: c.lastName,
+          initials: `${c.firstName[0]}${c.lastName[0]}`.toUpperCase(),
+          title: c.jobTitle,
+          emails: c.emails,
+          phones: c.phones,
+          company: c.company,
+          tags: c.tags,
+          notes: c.notes,
+          lastUpdated: new Date(c.updatedAt).toLocaleDateString(),
+        };
+
+        setDetails(transformed);
       } catch (err) {
+        console.error(err);
         setError("Failed to load contact details");
       } finally {
         setLoading(false);
@@ -209,16 +255,19 @@ export function ContactDetailsModal({
 
   if (!isOpen) return null;
 
+  if (!details && !loading) return null;
+
   return (
     <>
+      {/* Loading overlay */}
       {loading && (
-        <div className="flex items-center justify-center h-full">
+        <div className="flex items-center justify-center h-full absolute inset-0 bg-white/70 z-50">
           <p className="text-gray-500">Loading contact details...</p>
         </div>
       )}
 
       {/* Backdrop */}
-      <div className="fixed inset-0 bg-black/30" onClick={onClose} />
+      <div className="fixed inset-0 z-50 bg-black/30" onClick={onClose} />
 
       {/* Modal */}
       <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-50 overflow-y-auto">
@@ -236,122 +285,136 @@ export function ContactDetailsModal({
         </div>
 
         {/* Content */}
-        <div className="px-6 py-2 space-y-6">
-          {/* Profile Section */}
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-[#233E97] rounded-full flex items-center justify-center text-white font-semibold text-lg shrink-0">
-              {details?.initials}
+        {details && (
+          <div className="px-6 py-2 space-y-6">
+            {/* Profile */}
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-[#233E97] rounded-full flex items-center justify-center text-white font-semibold text-lg shrink-0">
+                {details.initials}
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-[#1B223C]">
+                  {details.firstName} {details.lastName}
+                </h3>
+                <p className="text-sm text-gray-600">{details.title}</p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-lg font-semibold text-[#1B223C]">
-                {details?.name}
-              </h3>
-              <p className="text-sm text-gray-600">{details?.title}</p>
-            </div>
-          </div>
 
-          {/* Tags */}
-          {details?.tags && details?.tags.length > 0 && (
+            {/* Tags */}
+            {(details.tags ?? []).length > 0 && (
+              <div>
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                  <Tag className="w-4 h-4" />
+                  Tags
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {(details.tags ?? []).map((tag, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-[12px]"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Emails */}
             <div>
-              <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                <Tag className="w-4 h-4" />
-                Tags
+              <label className="flex items-center gap-2 text-sm font-medium text-[#4A5565] mb-3">
+                <Mail className="w-4 h-4" />
+                Email
               </label>
-              <div className="flex flex-wrap gap-2">
-                {details?.tags.map((tag: string, index: number) => (
-                  <span
-                    key={index}
-                    className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-[12px]"
+              <div className="space-y-2">
+                {details.emails.map((email) => (
+                  <div
+                    key={email._id}
+                    className="flex items-center justify-between bg-gray-50 rounded-lg px-4 py-2 mb-2"
                   >
-                    {tag}
-                  </span>
+                    <span className="text-sm text-[#4A5565]">
+                      {email.address}
+                    </span>
+                    {email.isPrimary && (
+                      <span className="px-2 py-1 bg-[#233E97] text-white text-xs rounded">
+                        Primary
+                      </span>
+                    )}
+                  </div>
                 ))}
               </div>
             </div>
-          )}
 
-          {/* Email Section */}
-          <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-[#4A5565] mb-3">
-              <Mail className="w-4 h-4" />
-              Email
-            </label>
-            <div className="space-y-2">
-              {details?.emails.map((email: string, index: number) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between bg-gray-50 rounded-lg px-4 py-2 mb-2"
-                >
-                  <span className="text-sm text-[#4A5565]">{email}</span>
-                  <span className="px-2 py-1 bg-[#233E97] text-white text-xs rounded">
-                    Primary
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Phone Section */}
-          <div>
-            <label className="flex items-center gap-2 text-sm font-medium text-[#4A5565] mb-3">
-              <Phone className="w-4 h-4" />
-              Phone
-            </label>
-            <div className="space-y-2">
-              {details?.phones.map((phone: string, index: number) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between bg-gray-50 rounded-lg px-4 py-2 mb-2"
-                >
-                  <span className="text-sm text-[#4A5565]">{phone}</span>
-                  <span className="px-2 py-1 bg-[#233E97] text-white text-xs rounded">
-                    Primary
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Company Section */}
-          {details?.company && (
+            {/* Phones */}
             <div>
-              <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
-                <Building className="w-4 h-4" />
-                Company
+              <label className="flex items-center gap-2 text-sm font-medium text-[#4A5565] mb-3">
+                <Phone className="w-4 h-4" />
+                Phone
               </label>
-              <p className="text-sm text-[#4A5565]">{details?.company}</p>
+              <div className="space-y-2">
+                {details.phones.map((phone) => (
+                  <div
+                    key={phone._id}
+                    className="flex items-center justify-between bg-gray-50 rounded-lg px-4 py-2 mb-2"
+                  >
+                    <span className="text-sm text-[#4A5565]">
+                      {phone.number}
+                    </span>
+                    {phone.isPrimary && (
+                      <span className="px-2 py-1 bg-[#233E97] text-white text-xs rounded">
+                        Primary
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
-          )}
 
-          {/* Notes Section */}
-          {details?.notes && (
-            <div>
-              <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
-                <FileText className="w-4 h-4" />
-                Notes
-              </label>
-              <p className="text-sm text-gray-700">{details?.notes}</p>
-            </div>
-          )}
-        </div>
+            {/* Company */}
+            {details.company && (
+              <div>
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
+                  <Building className="w-4 h-4" />
+                  Company
+                </label>
+                <p className="text-sm text-[#4A5565]">{details.company}</p>
+              </div>
+            )}
 
-        {/* Footer Actions */}
-        <div className="p-6 space-y-3 border-t border-gray-200">
-          <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#233E97] text-white rounded-lg hover:bg-[#1a2f73] transition-colors font-medium">
-            <MessageSquare className="w-4 h-4" />
-            Send Message
-          </button>
-          <button
-            onClick={() => redirect("/contact/[id]")}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
-          >
-            <Eye className="w-4 h-4" />
-            View Full Profile
-          </button>
-          <button className="w-full px-4 py-3 bg-white text-[#233E97] border border-[#233E97] rounded-lg hover:bg-blue-50 transition-colors font-medium">
-            + Add to List
-          </button>
-        </div>
+            {/* Notes */}
+            {details.notes && (
+              <div>
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
+                  <FileText className="w-4 h-4" />
+                  Notes
+                </label>
+                <p className="text-sm text-gray-700">{details.notes}</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Footer */}
+        {details && (
+          <div className="p-6 space-y-3 border-t border-gray-200">
+            <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#233E97] text-white rounded-lg hover:bg-[#1a2f73] transition-colors font-medium">
+              <MessageSquare className="w-4 h-4" />
+              Send Message
+            </button>
+            <button
+              onClick={() =>
+                (window.location.href = `/contacts/${details?._id}`)
+              }
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+            >
+              <Eye className="w-4 h-4" />
+              View Full Profile
+            </button>
+            <button className="w-full px-4 py-3 bg-white text-[#233E97] border border-[#233E97] rounded-lg hover:bg-blue-50 transition-colors font-medium">
+              + Add to List
+            </button>
+          </div>
+        )}
       </div>
     </>
   );
@@ -368,6 +431,8 @@ export default function ContactsMainContent() {
   const [showCreateList, setShowCreateList] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [idsToDelete, setIdsToDelete] = useState<number[]>([]);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -387,6 +452,7 @@ export default function ContactsMainContent() {
 
     return {
       id: index,
+      _id: apiContact._id,
       name: `${apiContact.firstName} ${apiContact.lastName}`,
       initials,
       title: apiContact.jobTitle,
@@ -572,6 +638,24 @@ export default function ContactsMainContent() {
     }
   };
 
+  const handleConfirmDelete = async () => {
+    if (!idsToDelete.length) return;
+
+    try {
+      await bulkDeleteContacts(idsToDelete);
+
+      setSelectedIds((prev) => prev.filter((id) => !idsToDelete.includes(id)));
+
+      // Refresh or optimistically update
+      fetchContacts();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIdsToDelete([]);
+      setIsDeleteModalOpen(false);
+    }
+  };
+
   const sortedData = useMemo(() => {
     if (!sortBy) return data;
 
@@ -635,6 +719,13 @@ export default function ContactsMainContent() {
           setSelectedContact(null);
         }}
         contact={selectedContact}
+        onUpdated={fetchContacts}
+      />
+
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
       />
 
       <PageHeader title="Contacts" />
@@ -778,7 +869,16 @@ export default function ContactsMainContent() {
                     Send SMS
                   </DropdownItem>
                   <DropdownItem icon={Archive}>Archive</DropdownItem>
-                  <DropdownItem icon={Trash2} iconColor="text-[#E7000B]" danger>
+                  <DropdownItem
+                    icon={Trash2}
+                    iconColor="text-[#E7000B]"
+                    onClick={() => {
+                      if (!selectedIds.length) return;
+                      setIdsToDelete(selectedIds);
+                      setIsDeleteModalOpen(true);
+                    }}
+                    danger
+                  >
                     Delete
                   </DropdownItem>
                 </Dropdown>
@@ -834,6 +934,7 @@ export default function ContactsMainContent() {
                             e.target.checked ? data.map((d) => d.id) : []
                           )
                         }
+                        className="accent-[#059459]"
                       />
                     </th>
                     {columns.map((col) => (
@@ -857,6 +958,7 @@ export default function ContactsMainContent() {
                           type="checkbox"
                           checked={selectedIds.includes(row.id)}
                           onChange={() => toggleSelect(row.id)}
+                          className="accent-[#059459]"
                         />
                       </td>
                       {columns.map((col) => (
@@ -906,7 +1008,14 @@ export default function ContactsMainContent() {
                               >
                                 Add to List
                               </button>
-                              <button className="w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50">
+                              <button
+                                className="w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50"
+                                onClick={() => {
+                                  setIdsToDelete([row.id]);
+                                  setIsDeleteModalOpen(true);
+                                  setOpenMenuId(null);
+                                }}
+                              >
                                 Delete Contact
                               </button>
                             </div>

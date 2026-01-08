@@ -307,7 +307,7 @@ export function ImportContactsModal({
               >
                 Cancel
               </button>
-              <button
+              {/* <button
                 onClick={handleImport}
                 disabled={
                   files.length === 0 ||
@@ -321,7 +321,7 @@ export function ImportContactsModal({
                 }`}
               >
                 Import Contacts
-              </button>
+              </button> */}
             </div>
           </div>
         </div>

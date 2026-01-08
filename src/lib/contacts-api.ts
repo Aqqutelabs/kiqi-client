@@ -18,7 +18,7 @@ export const fetchContacts = async (params?: ContactsApiParams): Promise<Contact
     if (params?.sortBy) queryParams.append("sortBy", params.sortBy);
 
     const queryString = queryParams.toString();
-    const url = `/contacts${queryString ? `?${queryString}` : ""}`;
+    const url = `api/v1/contacts${queryString ? `?${queryString}` : ""}`;
     
     console.log("Fetching contacts from:", url);
     
@@ -95,7 +95,7 @@ export const createContact = async (contactData: {
 }): Promise<{ error: boolean; contact: Contact }> => {
   try {
     const response = await api.post<{ error: boolean; contact: Contact }>(
-      "/contacts",
+      "api/v1/contacts",
       contactData
     );
 
@@ -116,7 +116,7 @@ export const fetchContactDetails = async (
   
 ): Promise<{ error: boolean; contact: any }> => {
   try {
-    const response = await api.get(`/contacts/${contactId}`);
+    const response = await api.get(`api/v1/contacts/${contactId}`);
 
     if (response.data.error) {
       throw new Error("Failed to fetch contact details");
@@ -131,7 +131,7 @@ export const fetchContactDetails = async (
 
 // Update Contact
 export const updateContact = async (
-  contactId: string,
+  id: string,
   payload: {
     firstName: string;
     lastName: string;
@@ -151,10 +151,35 @@ export const updateContact = async (
     }[];
   }
 ) => {
-  const response = await api.put(`/contacts/${contactId}`, payload);
+  const response = await api.put(`api/v1/contacts/${id}`, payload);
 
   return response.data;
 };
+
+// Bulk Delete
+export const bulkDeleteContacts = async (
+  contactIds: number[]
+): Promise<{ error: boolean; message: string }> => {
+  try {
+    const ids = contactIds.join(",");
+
+    const response = await api.get(
+      `api/v1/contacts/bulk-delete?ids=${ids}`
+    );
+
+    if (response.data.error) {
+      throw new Error("Failed to delete contacts");
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting contacts:", error);
+    throw error;
+  }
+};
+
+
+
 
 /**
  * Create a new list
@@ -166,7 +191,7 @@ export const createList = async (listData: {
 }): Promise<{ error: boolean; list: any }> => {
   try {
     const response = await api.post<{ error: boolean; list: any }>(
-      "/contacts/lists",
+      "api/v1/contacts/lists",
       listData
     );
 
