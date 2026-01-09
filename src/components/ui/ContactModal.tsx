@@ -9,9 +9,10 @@ import { toast } from "react-toastify";
 interface ContactModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onContactCreated?: () => void;
 }
 
-const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
+const ContactModal = ({ isOpen, onClose, onContactCreated }: ContactModalProps) => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -44,6 +45,9 @@ const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
       const response = await createContact(contactData);
       toast.success("Contact created successfully!");
       console.log("Created contact:", response.contact);
+      console.log("Calling onContactCreated callback...");
+      console.log("ContactModal: onContactCreated callback invoked"); // Log callback invocation
+      onContactCreated?.(); // Notify parent to refresh contacts
       onClose(); // Close the modal after success
     } catch (error) {
       toast.error("Failed to create contact. Please try again.");
@@ -51,9 +55,8 @@ const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
     }
   };
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
-    setShowSuccess(true);
 
     const contactData = {
       firstName: formData.firstName,
@@ -71,7 +74,7 @@ const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
       isArchived: formData.isArchived,
     };
 
-    handleCreateContact(contactData);
+    await handleCreateContact(contactData);
   };
 
   const handleSuccessClose = () => {

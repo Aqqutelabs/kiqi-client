@@ -419,6 +419,25 @@ export default function ContactsMainContent() {
     loadContacts();
   }, [searchTerm, currentPage]);
 
+  // Function to refresh contacts after creation
+  const handleContactCreated = async () => {
+    console.log("Dashboard: handleContactCreated called"); // Log function call
+    try {
+      setIsLoading(true);
+      console.log("Dashboard: Fetching updated contacts..."); // Log before fetching
+      const response = await getContactsPaginated(currentPage, itemsPerPage);
+      const transformedContacts = response.contacts.map((contact) => transformContact(contact));
+      setContacts(transformedContacts);
+      setTotalPages(response.totalPages);
+      setTotalContacts(response.totalContacts);
+      console.log("Dashboard: Updated contacts fetched", transformedContacts); // Log after fetching
+    } catch (err) {
+      console.error("Failed to refresh contacts:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const data: Contact[] = useMemo(() => contacts, [contacts]);
   const [isSelectListOpen, setIsSelectListOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
@@ -630,6 +649,7 @@ export default function ContactsMainContent() {
       <ContactModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onContactCreated={handleContactCreated}
       />
       {/* Edit Contact Modal */}
       {editContact && (
