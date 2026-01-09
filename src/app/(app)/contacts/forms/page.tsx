@@ -10,10 +10,12 @@ import { fetchForms, deleteForm } from "@/lib/contacts-api";
 import { useSelector } from "react-redux";
 import { selectToken } from "@/redux/selectors/authSelectors";
 import { Modal } from "@/components/ui/Modal";
+import toast from "react-hot-toast";
 
 interface Form {
   _id: string;
   name: string;
+  slug?: string;
   fields: any[];
   submissionCount: number;
   createdAt: string;
@@ -66,14 +68,35 @@ export default function ContactLeadForms() {
 
     try {
       await deleteForm(formToDelete, accessToken);
-      setForms((prevForms) =>
-        prevForms.filter((form) => form._id !== formToDelete)
-      );
+      setForms((prevForms) => prevForms.filter((form) => form._id !== formToDelete));
+      toast.success("Form deleted successfully");
     } catch (error) {
       console.error("Failed to delete form:", error);
+      toast.error("Failed to delete form");
     } finally {
       closeDeleteModal();
     }
+  };
+
+  const copyFormLink = (form: Form) => {
+    // Use slug if available, fallback to ID for backward compatibility
+    const formIdentifier = form.slug || form._id;
+    const formUrl = `${window.location.origin}/forms/${formIdentifier}`;
+    navigator.clipboard.writeText(formUrl).then(
+      () => {
+        toast.success("Form link copied to clipboard!");
+      },
+      (err) => {
+        console.error("Failed to copy:", err);
+        toast.error("Failed to copy link");
+      }
+    );
+  };
+
+  const previewForm = (form: Form) => {
+    // Use slug if available, fallback to ID for backward compatibility
+    const formIdentifier = form.slug || form._id;
+    window.open(`/forms/${formIdentifier}`, "_blank");
   };
 
   return (
@@ -166,9 +189,8 @@ export default function ContactLeadForms() {
                       </div>
                     </td>
                     <td className="py-4 px-4">
-                      <Link
-                        href={"/contacts/forms/submissions"}
-                        className="text-sm text-[#F95417] font-medium block hover:underline cursor-pointer">
+                     
+                      <Link href={`/contacts/forms/submissions/${form._id}`} className="text-sm text-[#F95417] font-medium block hover:underline cursor-pointer">
                         {form.submissionCount} submissions
                       </Link>
                     </td>
@@ -179,21 +201,25 @@ export default function ContactLeadForms() {
                     </td>
                     <td className="py-4 px-4">
                       <div className="flex items-center gap-2">
-                        <button className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded">
-                          <Edit className="w-4 h-4 text-[#718096]" />
-                        </button>
-                        <button className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded">
+                        <button
+                          onClick={() => copyFormLink(form)}
+                          className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded"
+                          title="Copy form link"
+                        >
                           <Copy className="w-4 h-4 text-[#718096]" />
                         </button>
-                        <button className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded">
-                          <Code className="w-4 h-4 text-[#718096]" />
-                        </button>
-                        <button className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded">
+                        <button
+                          onClick={() => previewForm(form)}
+                          className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded"
+                          title="Preview form"
+                        >
                           <Eye className="w-4 h-4 text-[#718096]" />
                         </button>
                         <button
                           onClick={() => openDeleteModal(form._id)}
-                          className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded">
+                          className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded"
+                          title="Delete form"
+                        >
                           <Trash2 className="w-4 h-4 text-[#F56565]" />
                         </button>
                       </div>

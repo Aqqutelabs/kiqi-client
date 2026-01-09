@@ -1,3 +1,7 @@
+"use client";
+
+import { useParams } from "next/navigation";
+import { useState, useEffect } from "react";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import {
   Mail,
@@ -9,34 +13,110 @@ import {
   Trash2,
   Edit,
 } from "lucide-react";
+import { fetchContactById } from "@/lib/contacts-api";
+import { Contact } from "@/types/contacts";
+import EditContactModal from "@/components/ui/EditContactModal";
+import toast from "react-hot-toast";
 
 export default function ContactDetails() {
+  const params = useParams();
+  const contactId = params.id as string;
+  
+  const [contact, setContact] = useState<Contact | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  useEffect(() => {
+    const loadContact = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetchContactById(contactId);
+        setContact(response.contact);
+      } catch (error) {
+        console.error("Failed to fetch contact:", error);
+        toast.error("Failed to load contact details");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (contactId) {
+      loadContact();
+    }
+  }, [contactId]);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
+
+  const handleContactUpdated = (updated: Contact) => {
+    setContact(updated);
+    setIsEditModalOpen(false);
+  };
+
+  const getInitials = (firstName: string, lastName: string) => {
+    return `${firstName[0] || ""}${lastName[0] || ""}`.toUpperCase();
+  };
+
+  if (isLoading) {
+    return (
+      <main className="flex-1 overflow-y-auto space-y-6">
+        <PageHeader title="Contact Details" backLink="/contacts/dashboard" />
+        <div className="flex items-center justify-center py-12">
+          <span className="text-gray-500">Loading...</span>
+        </div>
+      </main>
+    );
+  }
+
+  if (!contact) {
+    return (
+      <main className="flex-1 overflow-y-auto space-y-6">
+        <PageHeader title="Contact Details" backLink="/contacts/dashboard" />
+        <div className="flex items-center justify-center py-12">
+          <span className="text-gray-500">Contact not found</span>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="flex-1 overflow-y-auto space-y-6">
       {/* Page title */}
-      <PageHeader title="Contact Details" backLink="/contact/dashboard" />
+      <PageHeader title="Contact Details" backLink="/contacts/dashboard" />
 
       {/* Header card */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 flex justify-between items-start">
         <div className="flex gap-4">
           {/* Avatar */}
           <div className="w-12 h-12 rounded-full bg-orange-600 flex items-center justify-center text-white font-semibold">
-            DK
+            {getInitials(contact.firstName, contact.lastName)}
           </div>
 
           {/* Name & tags */}
           <div>
-            <h2 className="text-lg font-semibold text-[#101828]">David Kim</h2>
-            <p className="text-sm text-gray-500">KiQI Contact ID: 4</p>
+            <h2 className="text-lg font-semibold text-[#101828]">
+              {contact.firstName} {contact.lastName}
+            </h2>
+            <p className="text-sm text-gray-500">KiQI Contact ID: {contact._id.slice(-6)}</p>
 
-            <div className="flex gap-2 mt-2">
-              <span className="px-2 py-1 text-xs rounded-[12px] bg-orange-50 text-orange-600">
-                Enterprise
-              </span>
-              <span className="px-2 py-1 text-xs rounded-[12px] bg-indigo-50 text-indigo-600">
-                Sales
-              </span>
-            </div>
+             {contact.tags && contact.tags.length > 0 && (
+              <div className="flex gap-2 mt-2">
+                {contact.tags.map((tag, index) => (
+                  <span
+                    key={index}
+                    className="px-2 py-1 text-xs rounded-xl bg-orange-50 text-orange-600"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -44,7 +124,10 @@ export default function ContactDetails() {
         <div className="flex gap-2">
           <ActionButton icon={Mail} label="Email" />
           <ActionButton icon={MessageSquare} label="SMS" />
-          <button className="p-2 rounded-lg border border-[#D1D5DC] text-[#364153] hover:bg-gray-50">
+          <button
+            onClick={() => setIsEditModalOpen(true)}
+            className="p-2 rounded-lg border border-[#D1D5DC] text-[#364153] hover:bg-gray-50"
+          >
             <Edit size={16} />
           </button>
           <button className="p-2 rounded-lg border border-red-200 text-red-600 hover:bg-red-50">
@@ -60,18 +143,10 @@ export default function ContactDetails() {
           {/* Basic Information */}
           <Card title="Basic Information">
             <div className="grid grid-cols-2 gap-6 text-sm">
-              <Info label="First Name" value="David" />
-              <Info label="Last Name" value="Kim" />
-              <Info label="Company" value="Enterprise Solutions LLC" />
-              <Info label="Job Title" value="VP of Sales" />
-              <Info
-                label="Location"
-                value={
-                  <span className="flex items-center gap-1">
-                    <MapPin size={14} /> Seattle, WA
-                  </span>
-                }
-              />
+              <Info label="First Name" value={contact.firstName} />
+              <Info label="Last Name" value={contact.lastName} />
+              <Info label="Company" value={contact.company || "-"} />
+              <Info label="Job Title" value={contact.jobTitle || "-"} />
             </div>
           </Card>
 
@@ -84,8 +159,17 @@ export default function ContactDetails() {
                   <Mail className="w-4 h-4" />
                   <div className="text-sm font-medium">Email</div>
                 </label>
-                <ContactRow value="sarah.johnson@techcorp.com" primary />
-                <ContactRow value="sarah.k@gmail.com" />
+                {contact.emails.length > 0 ? (
+                  contact.emails.map((email, index) => (
+                    <ContactRow
+                      key={email._id || index}
+                      value={email.address}
+                      primary={email.isPrimary}
+                    />
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-500">No emails added</p>
+                )}
               </div>
 
               {/* Phones */}
@@ -94,8 +178,17 @@ export default function ContactDetails() {
                   <Phone className="w-4 h-4" />
                   <div className="text-sm font-medium">Phone</div>
                 </label>
-                <ContactRow value="+1 (555) 123-4567" primary />
-                <ContactRow value="+1 (555) 987-6543" />
+                {contact.phones.length > 0 ? (
+                  contact.phones.map((phone, index) => (
+                    <ContactRow
+                      key={phone._id || index}
+                      value={phone.number}
+                      primary={phone.isPrimary}
+                    />
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-500">No phones added</p>
+                )}
               </div>
             </div>
           </Card>
@@ -105,9 +198,9 @@ export default function ContactDetails() {
         <div className="space-y-6">
           {/* Quick Stats */}
           <Card title="Quick Stats">
-            <Stat label="Created" value="10/10/2024" />
-            <Stat label="Last Updated" value="09/12/2024" />
-            <Stat label="Tags" value="2" />
+            <Stat label="Created" value={formatDate(contact.createdAt)} />
+            <Stat label="Last Updated" value={formatDate(contact.updatedAt)} />
+            <Stat label="Tags" value={String(contact.tags?.length || 0)} />
           </Card>
 
           {/* Lists */}
@@ -117,24 +210,10 @@ export default function ContactDetails() {
               <button className="text-sm text-orange-600 hover:underline flex items-center gap-1">
                 <Plus size={14} /> Add to List
               </button>
-            }>
-            <ListItem label="Enterprise Clients" />
-            <ListItem label="Q4 2024 Leads" />
-          </Card>
-
-          {/* Custom Fields */}
-          {/* <Card
-            title="Custom Fields"
-            action={
-              <button className="text-sm text-orange-600 hover:underline flex items-center gap-1">
-                <Plus size={14} /> Add Field
-              </button>
             }
           >
-            <p className="text-sm text-[#6A7282]">
-              No custom fields added yet
-            </p>
-          </Card> */}
+            <p className="text-sm text-[#6A7282]">No lists assigned</p>
+          </Card>
 
           {/* Notes */}
           <Card
@@ -145,11 +224,21 @@ export default function ContactDetails() {
               </button>
             }>
             <p className="text-sm text-[#364153]">
-              Negotiating annual contract renewal.
+              {contact.notes || "No notes added yet."}
             </p>
           </Card>
         </div>
       </div>
+
+      {/* Edit Contact Modal */}
+      {contact && (
+        <EditContactModal
+          isOpen={isEditModalOpen}
+          contact={contact}
+          onClose={() => setIsEditModalOpen(false)}
+          onContactUpdated={handleContactUpdated}
+        />
+      )}
     </main>
   );
 }
@@ -205,16 +294,13 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
-function ListItem({ label }: { label: string }) {
-  return (
-    <div className="flex justify-between items-center text-sm mb-2 bg-gray-50 rounded-lg px-4 py-2">
-      <span className="text-[#101828]">{label}</span>
-      <button className="text-red-500 hover:text-red-600">×</button>
-    </div>
-  );
-}
-
-function ActionButton({ icon: Icon, label }: { icon: any; label: string }) {
+function ActionButton({
+  icon: Icon,
+  label,
+}: {
+  icon: any;
+  label: string;
+}) {
   return (
     <button className="flex items-center gap-2 px-3 py-2 rounded-lg border border-[#D1D5DC] text-sm text-[#364153] hover:bg-gray-50">
       <Icon size={16} />

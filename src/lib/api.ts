@@ -2,9 +2,10 @@
 
 import axios from 'axios';
 import { getAuthToken } from './auth';
+import BASE_URL from './utils/baseUrl';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api/v1',
+  baseURL: `${BASE_URL}/api/v1`,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -51,5 +52,13 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// Public API instance without authentication
+export const publicApi = axios.create({
+  baseURL: `${BASE_URL}/api/v1`,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
 export default api;
