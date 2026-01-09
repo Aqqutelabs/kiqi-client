@@ -232,7 +232,7 @@ export default function PreviewForm() {
             <p className="text-xs text-gray-500">
               Powered by{" "}
               <span className="text-[#F95417] font-medium cursor-pointer">
-                KiQi CRM
+                XINNG CRM
               </span>
             </p>
           </div>

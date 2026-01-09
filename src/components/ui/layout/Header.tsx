@@ -37,7 +37,7 @@ const Header = () => {
       <div className="relative md:hidden">
         <Image
           src="/main-logo.svg"
-          alt="KiQi 2025"
+          alt="XINNG 2025"
           height={24}
           width={60}
           className="h-10 w-auto"

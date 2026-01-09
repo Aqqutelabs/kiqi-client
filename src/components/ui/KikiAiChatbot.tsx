@@ -290,7 +290,7 @@ export const KikiAiChatbot: React.FC<KikiAiChatbotProps> = ({
       <div className="flex justify-between items-center shrink-0 mb-5">
         <div className="flex gap-3 items-center">
           <Sparkles color="#1B223C" size={20} />
-          <Heading heading="KiKi AI" />
+          <Heading heading="XINNG AI" />
         </div>
         <button
           onClick={startNewChat}

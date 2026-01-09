@@ -358,7 +358,7 @@ export default function AIGeneratedEmail() {
           <div className="flex justify-between items-center shrink-0 mb-5">
             <div className="flex gap-3 items-center">
               <Sparkles color="#1B223C" size={20} />
-              <Heading heading="KiKi Ai" />
+              <Heading heading="XINNG Ai" />
             </div>
             <div className="flex gap-2">
               <button

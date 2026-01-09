@@ -32,12 +32,12 @@ const SuccessPage = () => {
             <div className="size-10 shrink-0 rounded-lg bg-primary/10 flex items-center justify-center">
               <img
                 src="https://res.cloudinary.com/dygn4o3nv/image/upload/v1763143061/favicon_i3fvkg.svg"
-                alt="KiKi Logo"
+                alt="XINNG Logo"
                 className="w-6 h-6"
               />
             </div>
             <h2 className="text-slate-900 dark:text-white text-lg font-bold">
-              KiKi
+              XINNG
             </h2>
           </div>
         </div>
@@ -65,7 +65,7 @@ const SuccessPage = () => {
           </h1>
 
           <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400 mb-8 max-w-lg mx-auto">
-            Welcome to the KiKi waitlist! We're excited to have you on board.
+            Welcome to the XINNG waitlist! We're excited to have you on board.
             You'll be among the first to experience what we're building.
           </p>
 
@@ -138,7 +138,7 @@ const SuccessPage = () => {
                   3
                 </span>
                 <span className="text-slate-700 dark:text-slate-300">
-                  Get ready to be among the first to try KiKi
+                  Get ready to be among the first to try XINNG
                 </span>
               </li>
             </ol>
@@ -153,7 +153,7 @@ const SuccessPage = () => {
 
       {/* Footer Text */}
       <div className="py-8 text-center text-xs text-slate-500 dark:text-slate-400">
-        <p>© 2025 KiKi. All rights reserved.</p>
+        <p>© 2025 XINNG. All rights reserved.</p>
       </div>
     </div>
   );

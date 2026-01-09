@@ -77,7 +77,7 @@ export default function AdminDashboardLayout({ children }: Props) {
           <div className="flex items-center gap-2 h-16 px-6 border-b border-gray-200">
             <Image
               src="/xxing-logo-colored.svg"
-              alt="KiQi 2025"
+              alt="XXING 2025"
               height={24}
               width={60}
               className="h-10 md:h-14 w-auto"

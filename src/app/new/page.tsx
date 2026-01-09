@@ -474,7 +474,7 @@ export default function Home() {
                 </h3>
                 <span className="vline"></span>
                 <div className="brand-badge">
-                  <img src="/assets/img/logo.png" alt="KiKi" />
+                  <img src="/assets/img/logo.png" alt="XINNG" />
                 </div>
               </div>
               <div className="blog-media">
@@ -490,7 +490,7 @@ export default function Home() {
                 </h3>
                 <span className="vline dark"></span>
                 <div className="brand-badge">
-                  <img src="/assets/img/logo.png" alt="KiKi" />
+                  <img src="/assets/img/logo.png" alt="XINNG" />
                 </div>
               </div>
               <div className="blog-media">
@@ -506,7 +506,7 @@ export default function Home() {
                 </h3>
                 <span className="vline"></span>
                 <div className="brand-badge">
-                  <img src="/assets/img/logo.png" alt="KiKi" />
+                  <img src="/assets/img/logo.png" alt="XINNG" />
                 </div>
               </div>
               <div className="blog-media">
@@ -521,7 +521,7 @@ export default function Home() {
                 </h3>
                 <span className="vline"></span>
                 <div className="brand-badge">
-                  <img src="/assets/img/logo.png" alt="KiKi" />
+                  <img src="/assets/img/logo.png" alt="XINNG" />
                 </div>
               </div>
               <div className="blog-media">

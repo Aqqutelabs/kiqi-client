@@ -30,7 +30,7 @@ export default function EmailCampaignAIPage() {
   return (
     <Card>
       <div className="flex justify-between items-center">
-        <PageHeader title="KiKi Ai" backLink="/email-campaigns/dashboard" />
+        <PageHeader title="XINNG Ai" backLink="/email-campaigns/dashboard" />
         <Link href="/subscriptions">
           <Button size={"lg"}>
             <Sparkles size={16} className="mr-1.5" />
@@ -42,7 +42,7 @@ export default function EmailCampaignAIPage() {
         <span className="text-[#1B223C]">
           Supercharge your campaigns <br /> with
         </span>
-        <span className="text-(--primary)">KiKi Ai</span>
+        <span className="text-(--primary)">XINNG Ai</span>
       </h1>
 
       {/* custom ai text area */}

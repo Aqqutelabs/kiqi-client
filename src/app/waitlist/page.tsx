@@ -138,12 +138,12 @@ const WaitlistPage = () => {
             <div className="size-10 shrink-0 rounded-lg bg-primary/10 flex items-center justify-center">
               <img
                 src="https://res.cloudinary.com/dygn4o3nv/image/upload/v1763143061/favicon_i3fvkg.svg"
-                alt="KiKi Logo"
+                alt="XINNG Logo"
                 className="w-6 h-6"
               />
             </div>
             <h2 className="text-slate-900 dark:text-white text-lg font-bold">
-              KiKi Waitlist
+              XINNG Waitlist
             </h2>
           </div>
         </div>
@@ -155,7 +155,7 @@ const WaitlistPage = () => {
           {/* Headline Section */}
           <div className="text-center mb-8 sm:mb-12">
             <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight">
-              Get Early Access to KiKi.
+              Get Early Access to XINNG.
             </h1>
             <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-400">
               Join the waitlist and be the first to know when we launch.
@@ -280,7 +280,7 @@ const WaitlistPage = () => {
                   className="px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white transition-all focus:outline-none focus:ring-2 focus:ring-primary/50">
                   <option>Social Media</option>
                   <option>Friend/Colleague</option>
-                  <option>From KiKi</option>
+                  <option>From XINNG</option>
                   <option>Article/Blog</option>
                   <option>Search Engine</option>
                   <option>Other</option>
@@ -307,7 +307,7 @@ const WaitlistPage = () => {
                 <label
                   htmlFor="terms"
                   className="text-sm text-slate-600 dark:text-slate-400">
-                  I agree to be contacted about KiKi and accept the{" "}
+                  I agree to be contacted about XINNG and accept the{" "}
                   <a
                     href="#"
                     className="font-medium text-primary hover:underline">
@@ -357,7 +357,7 @@ const WaitlistPage = () => {
               You're on the list!
             </h3>
             <p className="text-slate-600 dark:text-slate-400 text-center text-sm">
-              Thanks for joining! We'll notify you as soon as KiKi launches.
+              Thanks for joining! We'll notify you as soon as XINNG launches.
               Redirecting you now...
             </p>
           </div>
