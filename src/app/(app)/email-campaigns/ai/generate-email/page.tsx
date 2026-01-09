@@ -387,7 +387,7 @@ export default function AIGeneratedEmail() {
                     ) : (
                       <div className="flex justify-center items-center bg-white p-2 rounded-full min-w-8 h-8 mt-2">
                         <img
-                          src="/favicon.svg"
+                          src="/xxing-logo-colored.svg"
                           alt="Icon"
                           className="size-11 object-cover"
                         />
@@ -436,7 +436,7 @@ export default function AIGeneratedEmail() {
                 animate={{ opacity: 1 }}
                 className="flex gap-2 items-start">
                 <div className="flex justify-center items-center bg-white p-2 rounded-full min-w-8 h-8">
-                  <img src="/favicon.svg" alt="Icon" className="size-11" />
+                  <img src="/xxing-logo-colored.svg" alt="Icon" className="size-11" />
                 </div>
                 <div className="mt-2 px-2.5 bg-[#F3F6F8] rounded-full p-2">
                   <div className="flex gap-1">
