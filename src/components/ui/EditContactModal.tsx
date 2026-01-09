@@ -1,222 +1,341 @@
-import React, { useState, useEffect } from "react";
-import toast from "react-hot-toast";
-import { Contact } from "../../types/contacts";
-import { updateContact } from "../../lib/contacts-api";
-import { Button } from "./Button";
+"use client";
+
+import { X, Check } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/Button";
+import { updateContact } from "@/lib/contacts-api";
+import { toast } from "react-toastify";
+import { Contact as ApiContact } from "@/types/contacts";
 
 interface EditContactModalProps {
-  contact: Contact;
   isOpen: boolean;
   onClose: () => void;
-  onContactUpdated: (contact: Contact) => void;
+  contact: any;
+  onUpdated: (updated: ApiContact) => void;
 }
 
-const EditContactModal: React.FC<EditContactModalProps> = ({
-  contact,
+const EditContactModal = ({
   isOpen,
   onClose,
-  onContactUpdated,
-}) => {
+  contact,
+  onUpdated
+}: EditContactModalProps) => {
+  const [showSuccess, setShowSuccess] = useState(false);
+
   const [formData, setFormData] = useState({
-    firstName: contact.firstName || "",
-    lastName: contact.lastName || "",
-    company: contact.company || "",
-    jobTitle: contact.jobTitle || "",
-    emails: contact.emails.map((e) => e.address) || [""],
-    phones: contact.phones.map((p) => p.number) || [""],
-    tags: contact.tags?.join(", ") || "",
-    notes: contact.notes || "",
+    firstName: "",
+    lastName: "",
+    company: "",
+    jobTitle: "",
+    location: "",
+    tags: "",
+    notes: "",
+    isArchived: false,
   });
 
-  // Update form data when contact changes
+  const [emails, setEmails] = useState<string[]>([""]);
+  const [phones, setPhones] = useState<string[]>([""]);
+
   useEffect(() => {
-    setFormData({
-      firstName: contact.firstName || "",
-      lastName: contact.lastName || "",
-      company: contact.company || "",
-      jobTitle: contact.jobTitle || "",
-      emails: contact.emails.map((e) => e.address) || [""],
-      phones: contact.phones.map((p) => p.number) || [""],
-      tags: contact.tags?.join(", ") || "",
-      notes: contact.notes || "",
-    });
+    if (contact) {
+      setFormData({
+    firstName: contact.firstName ?? contact.name?.split(" ")[0] ?? "",
+    lastName: contact.lastName ?? contact.name?.split(" ").slice(1).join(" ") ?? "",
+    company: contact.company ?? "",
+    jobTitle: contact.jobTitle ?? contact.title ?? "",
+    location: contact.location ?? "",
+    notes: contact.notes ?? "",
+    tags: Array.isArray(contact.tags) ? contact.tags.join(", ") : "",
+    isArchived: contact.isArchived ?? false,
+  });
+
+      setEmails(
+    Array.isArray(contact.emails) && contact.emails.length
+      ? typeof contact.emails[0] === "string"
+        ? contact.emails
+        : contact.emails.map((e: any) => e.address)
+      : [""]
+  );
+
+  setPhones(
+    Array.isArray(contact.phones) && contact.phones.length
+      ? typeof contact.phones[0] === "string"
+        ? contact.phones
+        : contact.phones.map((p: any) => p.number)
+      : [""]
+  );
+    }
   }, [contact]);
-  const [loading, setLoading] = useState(false);
 
-  if (!isOpen) return null;
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: any) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleEmailChange = (index: number, value: string) => {
-    setFormData((prev) => {
-      const emails = [...prev.emails];
-      emails[index] = value;
-      return { ...prev, emails };
-    });
+  const addEmail = () => setEmails([...emails, ""]);
+  const addPhone = () => setPhones([...phones, ""]);
+
+  const updateEmail = (index: number, value: string) => {
+    const copy = [...emails];
+    copy[index] = value;
+    setEmails(copy);
   };
 
-  const handlePhoneChange = (index: number, value: string) => {
-    setFormData((prev) => {
-      const phones = [...prev.phones];
-      phones[index] = value;
-      return { ...prev, phones };
-    });
+  const updatePhone = (index: number, value: string) => {
+    const copy = [...phones];
+    copy[index] = value;
+    setPhones(copy);
   };
 
-  const handleSubmit = async () => {
-    if (!formData.firstName || !formData.lastName || formData.emails.filter(e => e).length === 0) {
-      toast.error("First name, last name, and at least one email are required");
-      return;
-    }
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
 
-    setLoading(true);
+    const payload = {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      company: formData.company,
+      jobTitle: formData.jobTitle,
+      location: formData.location,
+      notes: formData.notes,
+      isArchived: formData.isArchived,
+
+      emails: emails
+        .filter(Boolean)
+        .map((email, index) => ({
+          address: email,
+          isPrimary: index === 0,
+        })),
+
+      phones: phones
+        .filter(Boolean)
+        .map((phone, index) => ({
+          number: phone,
+          isPrimary: index === 0,
+        })),
+
+      tags: formData.tags
+        ? formData.tags.split(",").map((t) => t.trim())
+        : [],
+    };
+
     try {
-      const updateData = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        company: formData.company,
-        jobTitle: formData.jobTitle,
-        emails: formData.emails
-          .filter(e => e && e.trim())
-          .map((address, i) => ({
-            address,
-            isPrimary: i === 0,
-          })),
-        phones: formData.phones
-          .filter(p => p && p.trim())
-          .map((number, i) => ({
-            number,
-            isPrimary: i === 0,
-          })),
-        tags: formData.tags
-          .split(",")
-          .map((t) => t.trim())
-          .filter(Boolean),
-        notes: formData.notes,
-      };
-
-      const res = await updateContact(contact._id, updateData as any);
-      if (!res.error) {
-        toast.success("Contact updated successfully");
-        onContactUpdated(res.contact);
-        onClose();
-      } else {
-        toast.error("Failed to update contact");
-      }
-    } catch (err: any) {
-      console.error("Error updating contact:", err);
-      const errorMessage = err?.response?.data?.message || err.message || "Error updating contact";
-      toast.error(errorMessage);
-    } finally {
-      setLoading(false);
+      console.log("Updating contact:", contact._id, payload);
+      await updateContact(contact._id, payload);
+      toast.success("Contact updated successfully");
+      setShowSuccess(true);
+    } catch (err) {
+      toast.error("Failed to update contact");
+      console.error(err);
     }
   };
+
+  const handleSuccessClose = () => {
+    setShowSuccess(false);
+    onClose();
+  };
+
+  if (!isOpen || !contact) return null;
+
+  if (showSuccess) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+        <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-8">
+          <div className="flex flex-col items-center text-center">
+            <div className="w-16 h-16 bg-[#009B54] rounded-full flex items-center justify-center mb-4">
+              <Check className="w-8 h-8 text-white" strokeWidth={3} />
+            </div>
+            <p className="text-gray-900 font-medium mb-6">
+              Contact updated successfully
+            </p>
+            <button
+              onClick={handleSuccessClose}
+              className="px-6 py-3 bg-[#F95417] text-white rounded-lg"
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl p-8 max-h-[90vh] overflow-y-auto">
-        <h2 className="text-xl font-bold mb-6">Edit Contact</h2>
-        <div className="grid grid-cols-2 gap-4">
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+    <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between p-6">
+        <h2 className="text-xl font-semibold">Edit Contact</h2>
+        <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <X size={24} />
+        </button>
+      </div>
+
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="p-6">
+        <div className="grid grid-cols-2 gap-6">
+
+          {/* First Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              First Name *
+            </label>
             <input
-              type="text"
               name="firstName"
               value={formData.firstName}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white
+           focus:outline-none focus:border-orange-600 focus:ring-1 focus:ring-orange-600"
             />
           </div>
+
+          {/* Last Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Last Name *
+            </label>
             <input
-              type="text"
               name="lastName"
               value={formData.lastName}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white
+           focus:outline-none focus:border-orange-600 focus:ring-1 focus:ring-orange-600"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Emails</label>
-            {formData.emails.map((email, idx) => (
+
+          {/* Emails – FULL WIDTH */}
+          <div className="col-span-2">
+            <div className="flex justify-between mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+              <button
+                type="button"
+                onClick={addEmail}
+                className="text-sm text-orange-600"
+              >
+                + Add another
+              </button>
+            </div>
+
+            {emails.map((email, i) => (
               <input
-                key={idx}
-                type="email"
-                value={email}
-                onChange={(e) => handleEmailChange(idx, e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 mb-2"
+                key={i}
+                value={email ?? ""}
+                onChange={(e) => updateEmail(i, e.target.value)}
+                required={i === 0}
+                placeholder=""
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white
+           focus:outline-none focus:border-orange-600 focus:ring-1 focus:ring-orange-600"
               />
             ))}
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Phones</label>
-            {formData.phones.map((phone, idx) => (
+
+          {/* Phones – FULL WIDTH */}
+          <div className="col-span-2">
+            <div className="flex justify-between mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+              <button
+                type="button"
+                onClick={addPhone}
+                className="text-sm text-orange-600"
+              >
+                + Add another
+              </button>
+            </div>
+
+            {phones.map((phone, i) => (
               <input
-                key={idx}
-                type="text"
-                value={phone}
-                onChange={(e) => handlePhoneChange(idx, e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 mb-2"
+                key={i}
+                value={phone ?? ""}
+                onChange={(e) => updatePhone(i, e.target.value)}
+                placeholder=""
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white
+           focus:outline-none focus:border-orange-600 focus:ring-1 focus:ring-orange-600"
               />
             ))}
           </div>
+
+          {/* Company */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Company</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Company
+            </label>
             <input
-              type="text"
               name="company"
               value={formData.company}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white
+           focus:outline-none focus:border-orange-600 focus:ring-1 focus:ring-orange-600"
             />
           </div>
+
+          {/* Job Title */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Job Title</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Job Title
+            </label>
             <input
-              type="text"
               name="jobTitle"
               value={formData.jobTitle}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-            />
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white
+           focus:outline-none focus:border-orange-600 focus:ring-1 focus:ring-orange-600"
+           />
           </div>
-          <div>
+
+          {/* Tags – FULL WIDTH */}
+          <div className="col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">Tags</label>
             <input
-              type="text"
               name="tags"
               value={formData.tags}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+              placeholder="lead, enterprise, sales"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white
+           focus:outline-none focus:border-orange-600 focus:ring-1 focus:ring-orange-600"
             />
-            <p className="text-xs text-gray-500 mt-1">e.g., VIP, Decision Maker, Enterprise</p>
           </div>
-          <div>
+
+          {/* Notes – FULL WIDTH */}
+          <div className="col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
             <textarea
               name="notes"
               value={formData.notes}
               onChange={handleInputChange}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+              rows={5}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white resize-none
+           focus:outline-none focus:border-orange-600 focus:ring-1 focus:ring-orange-600"
+            />
+          </div>
+
+          {/* Location */}
+          <div className="col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Location
+            </label>
+            <input
+              name="location"
+              value={formData.location}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white
+           focus:outline-none focus:border-orange-600 focus:ring-1 focus:ring-orange-600"
             />
           </div>
         </div>
-        <div className="flex justify-end gap-3 mt-6 pt-6">
-          <Button variant="outline" onClick={onClose} disabled={loading}>
+
+        {/* Footer */}
+        <div className="flex justify-end gap-3 mt-8 pt-6 ">
+          <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit} disabled={loading}>
-            {loading ? "Saving..." : "Save Changes"}
-          </Button>
+          <Button type="submit">Update Contact</Button>
         </div>
-      </div>
+      </form>
     </div>
-  );
+  </div>
+);
+
 };
 
 export default EditContactModal;

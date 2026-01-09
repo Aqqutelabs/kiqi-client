@@ -298,7 +298,7 @@ export function ContactDetailsModal({
 
         {/* Footer Actions */}
         <div className="p-6 space-y-3 border-t border-gray-200">
-          <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#F95417] text-white rounded-lg hover:bg-[#1a2f73] transition-colors font-medium">
+          <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#F95417] text-white rounded-lg hover:bg-[#c74313] transition-colors font-medium">
             <MessageSquare className="w-4 h-4" />
             Send Message
           </button>
@@ -334,8 +334,6 @@ export default function ContactsMainContent() {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [showCreateList, setShowCreateList] = useState(false);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [idsToDelete, setIdsToDelete] = useState<number[]>([]);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -722,11 +720,12 @@ export default function ContactsMainContent() {
     isOpen={isDetailsOpen}
     onClose={() => setIsDetailsOpen(false)}
     contact={selectedContact}
-    onViewProfile={(contactId) => router.push(`/contacts/${contactId}`)}
+    onViewProfile={(contactId) => router.push(`/contact/${contactId}`)}
   />
   <ContactModal
     isOpen={isModalOpen}
     onClose={() => setIsModalOpen(false)}
+    onContactCreated={handleContactCreated}
   />
   {editContact && (
     <EditContactModal
@@ -736,7 +735,7 @@ export default function ContactsMainContent() {
         setIsEditModalOpen(false);
         setEditContact(null);
       }}
-      onUpdated={fetchContacts}
+      onUpdated={handleContactUpdated}
     />
   )}
   <SuccessModal
@@ -754,6 +753,16 @@ export default function ContactsMainContent() {
     isLoading={isAddingToList}
   />
   <ImportContactsModal isOpen={isImportOpen} onClose={closeImportModal} />
+  <DeleteModal
+    isOpen={isDeleteModalOpen}
+    onClose={() => {
+      setIsDeleteModalOpen(false);
+      setContactToDelete(null);
+    }}
+    onConfirm={handleDeleteContact}
+    title="You're about to delete this contact"
+    message="This action cannot be reversed. Are you sure you want to delete this contact?"
+  />
 
   <PageHeader title="Contacts" />
   <div className="flex flex-col gap-6">

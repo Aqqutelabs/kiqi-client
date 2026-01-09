@@ -8,9 +8,10 @@ interface Props {
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
+  onDelete: () => void;
 }
 
-export default function ActionsMenu({ isOpen, onOpen, onClose }: Props) {
+export default function ActionsMenu({ isOpen, onOpen, onClose, onDelete }: Props) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const [coords, setCoords] = useState<{ top: number; left: number } | null>(
@@ -96,7 +97,13 @@ export default function ActionsMenu({ isOpen, onOpen, onClose }: Props) {
             <button className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-50">
               Merge
             </button>
-            <button className="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50">
+            <button
+              onClick={() => {
+                onClose();
+                onDelete();
+              }}
+              className="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
+            >
               Delete List
             </button>
           </div>,

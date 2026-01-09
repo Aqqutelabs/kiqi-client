@@ -7,10 +7,11 @@ import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import SearchInput from "@/components/ui/Search";
 import ActionsMenu from "@/components/ui/ActionsMenu";
-import { fetchContactLists, ContactList, createList } from "@/lib/contacts-api";
+import { fetchContactLists, ContactList, createList, deleteContactList } from "@/lib/contacts-api";
 import toast from "react-hot-toast";
 import SuccessModal from "@/components/ui/SuccessModal";
 import CreateListModal from "@/components/ui/CreateListModal";
+import { DeleteModal } from "@/components/ui/DeleteModal";
 
 export default function ContactListsPage() {
   const router = useRouter();
@@ -20,6 +21,9 @@ export default function ContactListsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateListModalOpen, setIsCreateListModalOpen] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [listToDelete, setListToDelete] = useState<string | null>(null);
+    const [isDeleteListModalOpen, setIsDeleteListModalOpen] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const loadLists = async () => {
@@ -56,6 +60,7 @@ export default function ContactListsPage() {
   const handleCreateList = async (name: string, description: string) => {
     try {
       const response = await createList({ name, description });
+      setIsCreateListModalOpen(false);
       console.log("List created successfully:", response.list);
       setShowSuccess(true);
       // Refresh the lists after creating a new one
@@ -66,6 +71,39 @@ export default function ContactListsPage() {
       toast.error("Failed to create list");
     } finally {
       setIsCreateListModalOpen(false);
+    }
+  };
+
+   const handleDeleteList = async () => {
+    if (!listToDelete) return;
+  
+    try {
+      setIsDeleting(true);
+  
+      await deleteContactList(listToDelete);
+  
+      toast.success("List deleted successfully");
+  
+      // Update UI immediately
+      setLists((prev) => prev.filter((l) => l._id !== listToDelete));
+    } catch (error) {
+      console.error("Failed to delete list:", error);
+  
+      let errorMessage = "Failed to delete list";
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as {
+          response?: { data?: { message?: string } };
+        };
+        if (axiosError.response?.data?.message) {
+          errorMessage = axiosError.response.data.message;
+        }
+      }
+  
+      toast.error(errorMessage);
+    } finally {
+      setIsDeleting(false);
+      setIsDeleteListModalOpen(false);
+      setListToDelete(null);
     }
   };
 
@@ -101,7 +139,7 @@ export default function ContactListsPage() {
           {/* Table */}
           <div className="relative overflow-x-auto">
             <table className="min-w-full">
-              <thead className="bg-[#f4e1d1] h-16.5">
+              <thead className="bg-[#FF53140D]/50 h-16.5">
                 <tr className="border-b border-gray-200">
                   <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
                     List Name
@@ -172,6 +210,11 @@ export default function ContactListsPage() {
                           isOpen={openMenuId === list._id}
                           onOpen={() => setOpenMenuId(list._id)}
                           onClose={() => setOpenMenuId(null)}
+                          onDelete={() => {
+                            setListToDelete(list._id);
+                            setIsDeleteListModalOpen(true);
+                            setOpenMenuId(null);
+                          }}
                         />
                       </td>
                     </tr>
@@ -188,6 +231,17 @@ export default function ContactListsPage() {
         isOpen={isCreateListModalOpen}
         onClose={() => setIsCreateListModalOpen(false)}
         onSubmit={handleCreateList}
+      />
+      <DeleteModal
+        isOpen={isDeleteListModalOpen}
+        onClose={() => setIsDeleteListModalOpen(false)}
+        onConfirm={handleDeleteList}
+        title="Delete List"
+        message={
+          listToDelete
+            ? `Are you sure you want to delete "${lists.find(l => l._id === listToDelete)?.name}"? This action cannot be undone.`
+            : "Are you sure you want to delete this list?"
+        }
       />
       <SuccessModal
         isOpen={showSuccess}

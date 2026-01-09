@@ -13,82 +13,82 @@ import {
   Trash2,
   Edit,
 } from "lucide-react";
-import { fetchContactById } from "@/lib/contacts-api";
+import { fetchContactById, fetchContacts } from "@/lib/contacts-api";
 import { Contact } from "@/types/contacts";
 import EditContactModal from "@/components/ui/EditContactModal";
 import toast from "react-hot-toast";
 
 export default function ContactDetails() {
-//   const params = useParams();
-//   const contactId = params.id as string;
+  const params = useParams();
+  const contactId = params.id as string;
   
-//   const [contact, setContact] = useState<Contact | null>(null);
-//   const [isLoading, setIsLoading] = useState(true);
-//   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [contact, setContact] = useState<Contact | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-//   useEffect(() => {
-//     const loadContact = async () => {
-//       try {
-//         setIsLoading(true);
-//         const response = await fetchContactById(contactId);
-//         setContact(response.contact);
-//       } catch (error) {
-//         console.error("Failed to fetch contact:", error);
-//         toast.error("Failed to load contact details");
-//       } finally {
-//         setIsLoading(false);
-//       }
-//     };
+  useEffect(() => {
+    const loadContact = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetchContactById(contactId);
+        setContact(response.contact);
+      } catch (error) {
+        console.error("Failed to fetch contact:", error);
+        toast.error("Failed to load contact details");
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-//     if (contactId) {
-//       loadContact();
-//     }
-//   }, [contactId]);
+    if (contactId) {
+      loadContact();
+    }
+  }, [contactId]);
 
-//   const formatDate = (dateString: string) => {
-//     const date = new Date(dateString);
-//     return date.toLocaleDateString("en-GB", {
-//       day: "2-digit",
-//       month: "2-digit",
-//       year: "numeric",
-//     });
-//   };
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
 
-//   const handleContactUpdated = (updated: Contact) => {
-//     setContact(updated);
-//     setIsEditModalOpen(false);
-//   };
+  const handleContactUpdated = (updated: Contact) => {
+    setContact(updated);
+    setIsEditModalOpen(false);
+  };
 
-//   const getInitials = (firstName: string, lastName: string) => {
-//     return `${firstName[0] || ""}${lastName[0] || ""}`.toUpperCase();
-//   };
+  const getInitials = (firstName: string, lastName: string) => {
+    return `${firstName[0] || ""}${lastName[0] || ""}`.toUpperCase();
+  };
 
-//   if (isLoading) {
-//     return (
-//       <main className="flex-1 overflow-y-auto space-y-6">
-//         <PageHeader title="Contact Details" backLink="/contacts/dashboard" />
-//         <div className="flex items-center justify-center py-12">
-//           <span className="text-gray-500">Loading...</span>
-//         </div>
-//       </main>
-//     );
-//   }
+  if (isLoading) {
+    return (
+      <main className="flex-1 overflow-y-auto space-y-6">
+        <PageHeader title="Contact Details" backLink="/contacts/dashboard" />
+        <div className="flex items-center justify-center py-12">
+          <span className="text-gray-500">Loading...</span>
+        </div>
+      </main>
+    );
+  }
 
-//   if (!contact) {
-//     return (
-//       <main className="flex-1 overflow-y-auto space-y-6">
-//         <PageHeader title="Contact Details" backLink="/contacts/dashboard" />
-//         <div className="flex items-center justify-center py-12">
-//           <span className="text-gray-500">Contact not found</span>
-//         </div>
-//       </main>
-//     );
-//   }
+  if (!contact) {
+    return (
+      <main className="flex-1 overflow-y-auto space-y-6">
+        <PageHeader title="Contact Details" backLink="/contacts/dashboard" />
+        <div className="flex items-center justify-center py-12">
+          <span className="text-gray-500">Contact not found</span>
+        </div>
+      </main>
+    );
+  }
 
-//   return (
-//     <main className="flex-1 overflow-y-auto space-y-6">
-//       {/* Page title */}
-//       <PageHeader title="Contact Details" backLink="/contacts/dashboard" />
+  return (
+    <main className="flex-1 overflow-y-auto space-y-6">
+      {/* Page title */}
+      <PageHeader title="Contact Details" backLink="/contacts/dashboard" />
 
       {/* Header card */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 flex justify-between items-start">
@@ -98,12 +98,12 @@ export default function ContactDetails() {
             {getInitials(contact.firstName, contact.lastName)}
           </div>
 
-//           {/* Name & tags */}
-//           <div>
-//             <h2 className="text-lg font-semibold text-[#101828]">
-//               {contact.firstName} {contact.lastName}
-//             </h2>
-//             <p className="text-sm text-gray-500">KiQI Contact ID: {contact._id.slice(-6)}</p>
+          {/* Name & tags */}
+          <div>
+            <h2 className="text-lg font-semibold text-[#101828]">
+              {contact.firstName} {contact.lastName}
+            </h2>
+            <p className="text-sm text-gray-500">KiQI Contact ID: {contact._id.slice(-6)}</p>
 
              {contact.tags && contact.tags.length > 0 && (
               <div className="flex gap-2 mt-2">
@@ -120,88 +120,88 @@ export default function ContactDetails() {
           </div>
         </div>
 
-//         {/* Actions */}
-//         <div className="flex gap-2">
-//           <ActionButton icon={Mail} label="Email" />
-//           <ActionButton icon={MessageSquare} label="SMS" />
-//           <button
-//             onClick={() => setIsEditModalOpen(true)}
-//             className="p-2 rounded-lg border border-[#D1D5DC] text-[#364153] hover:bg-gray-50"
-//           >
-//             <Edit size={16} />
-//           </button>
-//           <button className="p-2 rounded-lg border border-red-200 text-red-600 hover:bg-red-50">
-//             <Trash2 size={16} />
-//           </button>
-//         </div>
-//       </div>
+        {/* Actions */}
+        <div className="flex gap-2">
+          <ActionButton icon={Mail} label="Email" />
+          <ActionButton icon={MessageSquare} label="SMS" />
+          <button
+            onClick={() => setIsEditModalOpen(true)}
+            className="p-2 rounded-lg border border-[#D1D5DC] text-[#364153] hover:bg-gray-50"
+          >
+            <Edit size={16} />
+          </button>
+          <button className="p-2 rounded-lg border border-red-200 text-red-600 hover:bg-red-50">
+            <Trash2 size={16} />
+          </button>
+        </div>
+      </div>
 
-//       {/* Main grid */}
-//       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-//         {/* LEFT COLUMN */}
-//         <div className="lg:col-span-2 space-y-6">
-//           {/* Basic Information */}
-//           <Card title="Basic Information">
-//             <div className="grid grid-cols-2 gap-6 text-sm">
-//               <Info label="First Name" value={contact.firstName} />
-//               <Info label="Last Name" value={contact.lastName} />
-//               <Info label="Company" value={contact.company || "-"} />
-//               <Info label="Job Title" value={contact.jobTitle || "-"} />
-//             </div>
-//           </Card>
+      {/* Main grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* LEFT COLUMN */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Basic Information */}
+          <Card title="Basic Information">
+            <div className="grid grid-cols-2 gap-6 text-sm">
+              <Info label="First Name" value={contact.firstName} />
+              <Info label="Last Name" value={contact.lastName} />
+              <Info label="Company" value={contact.company || "-"} />
+              <Info label="Job Title" value={contact.jobTitle || "-"} />
+            </div>
+          </Card>
 
-//           {/* Contact Details */}
-//           <Card title="Contact Details">
-//             <div className="space-y-4">
-//               {/* Emails */}
-//               <div>
-//                 <label className="flex items-center gap-2 text-sm font-medium text-[#4A5565] mb-2">
-//                   <Mail className="w-4 h-4" />
-//                   <div className="text-sm font-medium">Email</div>
-//                 </label>
-//                 {contact.emails.length > 0 ? (
-//                   contact.emails.map((email, index) => (
-//                     <ContactRow
-//                       key={email._id || index}
-//                       value={email.address}
-//                       primary={email.isPrimary}
-//                     />
-//                   ))
-//                 ) : (
-//                   <p className="text-sm text-gray-500">No emails added</p>
-//                 )}
-//               </div>
+          {/* Contact Details */}
+          <Card title="Contact Details">
+            <div className="space-y-4">
+              {/* Emails */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-medium text-[#4A5565] mb-2">
+                  <Mail className="w-4 h-4" />
+                  <div className="text-sm font-medium">Email</div>
+                </label>
+                {contact.emails.length > 0 ? (
+                  contact.emails.map((email, index) => (
+                    <ContactRow
+                      key={email._id || index}
+                      value={email.address}
+                      primary={email.isPrimary}
+                    />
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-500">No emails added</p>
+                )}
+              </div>
 
-//               {/* Phones */}
-//               <div>
-//                 <label className="flex items-center gap-2 text-sm font-medium text-[#4A5565] mb-2">
-//                   <Phone className="w-4 h-4" />
-//                   <div className="text-sm font-medium">Phone</div>
-//                 </label>
-//                 {contact.phones.length > 0 ? (
-//                   contact.phones.map((phone, index) => (
-//                     <ContactRow
-//                       key={phone._id || index}
-//                       value={phone.number}
-//                       primary={phone.isPrimary}
-//                     />
-//                   ))
-//                 ) : (
-//                   <p className="text-sm text-gray-500">No phones added</p>
-//                 )}
-//               </div>
-//             </div>
-//           </Card>
-//         </div>
+              {/* Phones */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-medium text-[#4A5565] mb-2">
+                  <Phone className="w-4 h-4" />
+                  <div className="text-sm font-medium">Phone</div>
+                </label>
+                {contact.phones.length > 0 ? (
+                  contact.phones.map((phone, index) => (
+                    <ContactRow
+                      key={phone._id || index}
+                      value={phone.number}
+                      primary={phone.isPrimary}
+                    />
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-500">No phones added</p>
+                )}
+              </div>
+            </div>
+          </Card>
+        </div>
 
-//         {/* RIGHT COLUMN */}
-//         <div className="space-y-6">
-//           {/* Quick Stats */}
-//           <Card title="Quick Stats">
-//             <Stat label="Created" value={formatDate(contact.createdAt)} />
-//             <Stat label="Last Updated" value={formatDate(contact.updatedAt)} />
-//             <Stat label="Tags" value={String(contact.tags?.length || 0)} />
-//           </Card>
+        {/* RIGHT COLUMN */}
+        <div className="space-y-6">
+          {/* Quick Stats */}
+          <Card title="Quick Stats">
+            <Stat label="Created" value={formatDate(contact.createdAt)} />
+            <Stat label="Last Updated" value={formatDate(contact.updatedAt)} />
+            <Stat label="Tags" value={String(contact.tags?.length || 0)} />
+          </Card>
 
           {/* Lists */}
           <Card
@@ -230,17 +230,17 @@ export default function ContactDetails() {
         </div>
       </div>
 
-//       {/* Edit Contact Modal */}
-//       {contact && (
-//         <EditContactModal
-//           isOpen={isEditModalOpen}
-//           contact={contact}
-//           onClose={() => setIsEditModalOpen(false)}
-//           onContactUpdated={handleContactUpdated}
-//         />
-//       )}
-//     </main>
-//   );
+      {/* Edit Contact Modal */}
+      {contact && (
+        <EditContactModal
+          isOpen={isEditModalOpen}
+          contact={contact}
+          onClose={() => setIsEditModalOpen(false)}
+          onUpdated={fetchContacts}
+        />
+      )}
+    </main>
+  );
 }
 
 function Card({

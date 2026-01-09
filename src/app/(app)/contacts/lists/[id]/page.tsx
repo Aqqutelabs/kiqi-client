@@ -161,7 +161,7 @@ export default function ContactListPage() {
         {/* Table */}
         <div className="overflow-hidden">
           <table className="min-w-full">
-            <thead className="bg-[#D1DAF4] h-[66px]">
+            <thead className="bg-[#FF53140D]/50 h-[66px]">
               <tr className="border-b border-gray-200">
                 <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">
                   Name
