@@ -634,7 +634,7 @@ export default function SendBulkSMS() {
                 ))}
               </Select>
             </div>
-            <div className="w-full md:w-[300px]">
+            <div className="w-full md:w-75">
               <Button
                 size={"lg"}
                 onClick={() => router.push("/sms/create-sender-id")}>
@@ -766,7 +766,7 @@ export default function SendBulkSMS() {
                         ))}
                       </Select>
                     </div>
-                    <div className="w-full md:w-[300px]">
+                    <div className="w-full md:w-75">
                       <Button
                         size={"lg"}
                         onClick={() =>
@@ -892,7 +892,7 @@ export default function SendBulkSMS() {
             </Button>
             <Button
               size={"lg"}
-              variant={"secondary"}
+              variant={"outline"}
               onClick={handleSaveAsDraft}
               disabled={isSavingDraft || totalNumbers === 0}>
               {isSavingDraft ? "Saving..." : "Save as Draft"}
