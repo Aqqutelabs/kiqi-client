@@ -55,7 +55,9 @@ const ContactModal = ({ isOpen, onClose, onContactCreated }: ContactModalProps) 
     isArchived: boolean | undefined;
   }) => {
     try {
+      console.log("ContactModal: Sending data to API:", JSON.stringify(contactData, null, 2));
       const response = await createContact(contactData);
+      console.log("ContactModal: API Response:", JSON.stringify(response, null, 2));
       toast.success("Contact created successfully!");
       console.log("Created contact:", response.contact);
       console.log("Calling onContactCreated callback...");
@@ -71,13 +73,22 @@ const ContactModal = ({ isOpen, onClose, onContactCreated }: ContactModalProps) 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
+    // Get the first phone number from the phones array
+    const firstPhone = phones[0] || "";
+    
+    // Determine if phone already has a country code (starts with +)
+    // If it does, don't add the country code; otherwise, use the selected country code
+    const phoneAlreadyHasCountryCode = firstPhone.startsWith("+");
+    const phoneCountry = phoneAlreadyHasCountryCode ? "" : formData.phoneCountry;
+    const phoneNumber = phoneAlreadyHasCountryCode ? firstPhone : firstPhone;
+    
     const contactData = {
       firstName: formData.firstName,
       lastName: formData.lastName,
       company: formData.company,
       jobTitle: formData.jobTitle,
-      phoneCountry: formData.phoneCountry,
-      phoneNumber: formData.phoneNumber,
+      phoneCountry: phoneCountry,
+      phoneNumber: phoneNumber,
       emails: emails.map((email, index) => ({
         address: email,
         isPrimary: index === 0, // Mark the first email as primary

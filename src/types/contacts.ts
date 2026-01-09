@@ -20,6 +20,8 @@ export interface Contact {
   company?: string;
   emails: EmailEntry[];
   phones: PhoneEntry[];
+  phoneCountry?: string;
+  phoneNumber?: string;
   tags?: string[];
   notes?: string;
   isArchived: boolean;
