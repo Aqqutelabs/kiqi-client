@@ -264,13 +264,8 @@ const ContactModal = ({ isOpen, onClose }: ContactModalProps) => {
                 name="company"
                 value={formData.company}
                 onChange={handleInputChange}
-<<<<<<< HEAD
                 placeholder=""
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-=======
-                placeholder="Search or create new system"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
->>>>>>> 93f19e8ac120b50e5b55b13028a4818d9a1d1b0a
               />
             </div>
 

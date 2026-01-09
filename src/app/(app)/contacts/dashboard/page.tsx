@@ -646,11 +646,7 @@ export default function ContactsMainContent() {
     isOpen={isDetailsOpen}
     onClose={() => setIsDetailsOpen(false)}
     contact={selectedContact}
-<<<<<<< HEAD
     onViewProfile={(contactId) => router.push(`/contacts/${contactId}`)}
-=======
-    onViewProfile={(contactId) => router.push(`/contact/${contactId}`)}
->>>>>>> 93f19e8ac120b50e5b55b13028a4818d9a1d1b0a
   />
   <ContactModal
     isOpen={isModalOpen}
@@ -664,11 +660,7 @@ export default function ContactsMainContent() {
         setIsEditModalOpen(false);
         setEditContact(null);
       }}
-<<<<<<< HEAD
       onUpdated={fetchContacts}
-=======
-      onContactUpdated={handleContactUpdated}
->>>>>>> 93f19e8ac120b50e5b55b13028a4818d9a1d1b0a
     />
   )}
   <SuccessModal
