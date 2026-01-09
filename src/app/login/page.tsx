@@ -242,10 +242,10 @@ const LoginPage = () => {
 
   return (
     <AuthLayout>
-      <Card className="w-full max-w-[600px] mx-4">
+      <Card className="w-full max-w-150 mx-4">
         {/* ... (rest of the component remains the same) */}
         <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">Login to KiKi</h2>
+          <h2 className="text-2xl font-bold text-gray-800">Login to XINNG</h2>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
@@ -275,9 +275,9 @@ const LoginPage = () => {
         </div>
 
         <div className="my-6 flex items-center">
-          <div className="flex-grow border-t border-gray-200"></div>
-          <span className="flex-shrink mx-4 text-xs text-gray-400">OR</span>
-          <div className="flex-grow border-t border-gray-200"></div>
+          <div className="grow border-t border-gray-200"></div>
+          <span className="shrink mx-4 text-xs text-gray-400">OR</span>
+          <div className="grow border-t border-gray-200"></div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -320,7 +320,7 @@ const LoginPage = () => {
             <label className="flex items-center cursor-pointer">
               <input
                 type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 text-(--primary) focus:ring-[#FF5314] focus:ring-2 transition-colors"
+                className="h-4 w-4 rounded border-gray-300 text-(--primary) accent-(--primary) transition-colors"
                 checked={rememberMe}
                 onChange={(e) => handleRememberMeChange(e.target.checked)}
                 disabled={isLoading || connecting}

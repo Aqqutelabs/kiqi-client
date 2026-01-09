@@ -445,7 +445,7 @@ export default function ReferralPage() {
     <section className="space-y-6">
       <PageHeader
         title="Invite & Earn"
-        subtitle="Share KiQi with friends and earn rewards together"
+        subtitle="Share XXING with friends and earn rewards together"
         backLink="/wallet"
       />
 

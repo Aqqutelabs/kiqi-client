@@ -34,17 +34,23 @@ interface EditSenderModalProps {
   isLoading: boolean;
 }
 
-function EditSenderModal({ isOpen, onClose, sender, onSave, isLoading }: EditSenderModalProps) {
+function EditSenderModal({
+  isOpen,
+  onClose,
+  sender,
+  onSave,
+  isLoading,
+}: EditSenderModalProps) {
   const [formData, setFormData] = useState<SenderFormData>({
     name: "",
-    sampleMessage: ""
+    sampleMessage: "",
   });
 
   useEffect(() => {
     if (sender) {
       setFormData({
         name: sender.name,
-        sampleMessage: sender.sampleMessage
+        sampleMessage: sender.sampleMessage,
       });
     }
   }, [sender]);
@@ -57,7 +63,7 @@ function EditSenderModal({ isOpen, onClose, sender, onSave, isLoading }: EditSen
   };
 
   const handleChange = (field: keyof SenderFormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -84,7 +90,11 @@ function EditSenderModal({ isOpen, onClose, sender, onSave, isLoading }: EditSen
           onChange={(e) => handleChange("sampleMessage", e.target.value)}
         />
         <div className="flex gap-3 pt-4">
-          <Button type="button" variant="outline" onClick={onClose} className="flex-1">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            className="flex-1">
             Cancel
           </Button>
           <Button type="submit" disabled={isLoading} className="flex-1">
@@ -118,28 +128,28 @@ function DeleteConfirmModal({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} width="400px">
-      <h4 className="text-lg font-medium text-gray-900 mb-3">Delete Sender ID</h4>
+      <h4 className="text-lg font-medium text-gray-900 mb-3">
+        Delete Sender ID
+      </h4>
       <p className="text-sm text-gray-600 mb-4">
-        Are you sure you want to delete the sender ID <strong>"{senderName}"</strong>? 
-        This action cannot be undone.
+        Are you sure you want to delete the sender ID{" "}
+        <strong>"{senderName}"</strong>? This action cannot be undone.
       </p>
       <div className="flex gap-3">
-        <Button 
-          type="button" 
-          variant="secondary" 
-          onClick={onClose} 
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={onClose}
           className="flex-1"
-          disabled={isLoading}
-        >
+          disabled={isLoading}>
           Cancel
         </Button>
-        <Button 
+        <Button
           type="button"
           variant="destructive"
-          onClick={handleConfirm} 
+          onClick={handleConfirm}
           className="flex-1"
-          disabled={isLoading}
-        >
+          disabled={isLoading}>
           {isLoading ? (
             <>
               <Loader className="size-4 animate-spin mr-2" />
@@ -156,11 +166,11 @@ function DeleteConfirmModal({
 
 export default function CreateSenderID() {
   const token = useAppSelector(selectToken);
-  
+
   // State
   const [formData, setFormData] = useState<SenderFormData>({
     name: "",
-    sampleMessage: ""
+    sampleMessage: "",
   });
   const [data, setData] = useState<Sender[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -212,12 +222,14 @@ export default function CreateSenderID() {
         return;
       }
 
-      const senderData: Sender[] = sendersArray.map((sender: SenderApiResponse) => ({
-        id: sender._id,
-        name: sender.name,
-        dateCreated: formatDate(sender.createdAt),
-        sampleMessage: sender.sampleMessage || "----------",
-      }));
+      const senderData: Sender[] = sendersArray.map(
+        (sender: SenderApiResponse) => ({
+          id: sender._id,
+          name: sender.name,
+          dateCreated: formatDate(sender.createdAt),
+          sampleMessage: sender.sampleMessage || "----------",
+        })
+      );
 
       setData(senderData);
     } catch (error: unknown) {
@@ -261,15 +273,12 @@ export default function CreateSenderID() {
       throw new Error("Authentication required");
     }
 
-    const response = await axios.delete(
-      `${BASE_URL}/api/v1/sms/sender/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    
+    const response = await axios.delete(`${BASE_URL}/api/v1/sms/sender/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
     return response.data;
   };
 
@@ -289,7 +298,7 @@ export default function CreateSenderID() {
     try {
       const newSender = await createSender({
         name: formData.name.trim(),
-        sampleMessage: formData.sampleMessage.trim() || "Hello from KiKi",
+        sampleMessage: formData.sampleMessage.trim() || "Hello from XINNG",
       });
 
       const sender: Sender = {
@@ -299,7 +308,7 @@ export default function CreateSenderID() {
         sampleMessage: newSender.sampleMessage || "----------",
       };
 
-      setData(prev => [sender, ...prev]);
+      setData((prev) => [sender, ...prev]);
       setFormData({ name: "", sampleMessage: "" });
       toast.success("Sender ID created successfully!");
     } catch (error: unknown) {
@@ -321,18 +330,20 @@ export default function CreateSenderID() {
     try {
       const updatedSender = await updateSender(id, {
         name: data.name.trim(),
-        sampleMessage: data.sampleMessage.trim() || "Hello from KiKi",
+        sampleMessage: data.sampleMessage.trim() || "Hello from XINNG",
       });
 
-      setData(prev => prev.map(item => 
-        item.id === id 
-          ? {
-              ...item,
-              name: updatedSender.name,
-              sampleMessage: updatedSender.sampleMessage || "----------",
-            }
-          : item
-      ));
+      setData((prev) =>
+        prev.map((item) =>
+          item.id === id
+            ? {
+                ...item,
+                name: updatedSender.name,
+                sampleMessage: updatedSender.sampleMessage || "----------",
+              }
+            : item
+        )
+      );
 
       setIsEditing(false);
       setEditingSender(null);
@@ -355,10 +366,10 @@ export default function CreateSenderID() {
     setIsDeleting(true);
     try {
       await deleteSender(deletingSender.id);
-      
+
       // Remove from local state
-      setData(prev => prev.filter(item => item.id !== deletingSender.id));
-      
+      setData((prev) => prev.filter((item) => item.id !== deletingSender.id));
+
       toast.success("Sender ID deleted successfully!");
       setShowDeleteModal(false);
       setDeletingSender(null);
@@ -370,7 +381,7 @@ export default function CreateSenderID() {
   };
 
   const handleFormChange = (field: keyof SenderFormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   // Utility Functions
@@ -390,7 +401,11 @@ export default function CreateSenderID() {
           toast.error("API endpoint not found.");
           break;
         case 400:
-          toast.error(data?.message ? `Validation error: ${data.message}` : "Invalid request.");
+          toast.error(
+            data?.message
+              ? `Validation error: ${data.message}`
+              : "Invalid request."
+          );
           break;
         case 500:
           toast.error("Server error. Please try again later.");
@@ -410,10 +425,9 @@ export default function CreateSenderID() {
       className="flex-1 overflow-y-auto space-y-6"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
+      transition={{ duration: 0.5 }}>
       <PageHeader title="Create a Sender ID" backLink="/sms/send-bulk-sms" />
-      
+
       {/* Create Sender Card */}
       <Card>
         <h3 className="font-medium text-[#1B223C] text-lg md:text-xl">
@@ -439,10 +453,7 @@ export default function CreateSenderID() {
             value={formData.sampleMessage}
             onChange={(e) => handleFormChange("sampleMessage", e.target.value)}
           />
-          <Button 
-            onClick={handleCreateSender} 
-            disabled={isLoading || !token}
-          >
+          <Button onClick={handleCreateSender} disabled={isLoading || !token}>
             {isLoading ? "Creating..." : "Submit sender ID"}
           </Button>
         </div>
@@ -457,9 +468,10 @@ export default function CreateSenderID() {
               variant="outline"
               size="sm"
               onClick={fetchSenderIDs}
-              disabled={isFetching}
-            >
-              <Loader className={`size-5 ${isFetching ? "animate-spin" : ""}`} />
+              disabled={isFetching}>
+              <Loader
+                className={`size-5 ${isFetching ? "animate-spin" : ""}`}
+              />
             </Button>
             <p className="text-xs md:text-sm">Total List: {data.length}</p>
           </div>

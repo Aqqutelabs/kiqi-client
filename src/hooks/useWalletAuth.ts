@@ -1,12 +1,12 @@
 // hooks/useWalletAuth.ts
 "use client";
 
-import { useWallet } from '@solana/wallet-adapter-react';
-import { useEffect, useState, useCallback } from 'react';
-import { useAppDispatch } from '@/redux/hooks';
-import { useRouter } from 'next/navigation';
+import { useWallet } from "@solana/wallet-adapter-react";
+import { useEffect, useState, useCallback } from "react";
+import { useAppDispatch } from "@/redux/hooks";
+import { useRouter } from "next/navigation";
 // import { web3Login } from '@/redux/slices/authSlice';
-import { toast } from 'react-hot-toast';
+import { toast } from "react-hot-toast";
 
 export function useWalletAuth() {
   const { publicKey, signMessage, connected, disconnect } = useWallet();
@@ -39,14 +39,14 @@ export function useWalletAuth() {
   //     // Create a unique message to sign
   //     const timestamp = Date.now();
   //     const nonce = Math.random().toString(36).substring(2, 15);
-  //     const message = `Welcome to KiKi! Please sign this message to authenticate.\n\nWallet: ${publicKey.toBase58()}\nTimestamp: ${timestamp}\nNonce: ${nonce}`;
-      
+  //     const message = `Welcome to XINNG! Please sign this message to authenticate.\n\nWallet: ${publicKey.toBase58()}\nTimestamp: ${timestamp}\nNonce: ${nonce}`;
+
   //     // Convert message to Uint8Array
   //     const encodedMessage = new TextEncoder().encode(message);
-      
+
   //     // Request signature from wallet
   //     const signature = await signMessage(encodedMessage);
-      
+
   //     // Convert signature to base58
   //     const signatureBase58 = Buffer.from(signature).toString('base64');
 
@@ -68,7 +68,7 @@ export function useWalletAuth() {
   //     }
   //   } catch (error: any) {
   //     console.error('Wallet authentication error:', error);
-      
+
   //     // Handle specific wallet errors
   //     if (error.name === 'WalletSignMessageError') {
   //       setError('Message signing was cancelled');
@@ -80,7 +80,7 @@ export function useWalletAuth() {
   //       setError(error.message || 'Authentication failed');
   //       toast.error(error.message || 'Authentication failed');
   //     }
-      
+
   //     throw error;
   //   } finally {
   //     setIsSigning(false);
@@ -91,7 +91,7 @@ export function useWalletAuth() {
   const handleDisconnect = useCallback(() => {
     disconnect();
     setError(null);
-    toast.success('Wallet disconnected');
+    toast.success("Wallet disconnected");
   }, [disconnect]);
 
   return {
@@ -100,6 +100,6 @@ export function useWalletAuth() {
     disconnect: handleDisconnect,
     // signInWithWallet,
     isSigning,
-    error
+    error,
   };
 }

@@ -105,7 +105,7 @@ export default function FormTwo({
           Let’s get you setup
         </h2>
         <p className="text-gray-500 text-sm mt-2">
-          Customize your KiKi chatbot
+          Customize your XINNG chatbot
         </p>
       </div>
       <Card className="w-[95%] space-y-10">

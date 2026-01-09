@@ -31,7 +31,7 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
           <img src="/xxing-logo-colored.svg" alt="Logo" className="w-25" />
           {/* Heading */}
           <h1 className="text-4xl lg:text-3xl font-medium text-[#1B223C] my-4">
-            Streamline your business with KiKi.
+            Streamline your business with XINNG.
           </h1>
           <p className="text-[#606062] flex items-start gap-2 mt-2 text-sm">
             <CircleCheck size={20} />

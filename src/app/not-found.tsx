@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "404 - KiKi",
+  title: "404 - XINNG",
   description:
     "Seems you've naviagted to the wrong page. Please click the button to head back to the site.",
 };
