@@ -343,6 +343,7 @@ export default function ContactsMainContent() {
   const [totalContacts, setTotalContacts] = useState(0);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [contactToDelete, setContactToDelete] = useState<string | null>(null);
+  const [formLeadsCount, setFormLeadsCount] = useState(0);
   const itemsPerPage = 5;
 
   // Transform API contact to UI contact
@@ -421,6 +422,7 @@ export default function ContactsMainContent() {
         setContacts(transformedContacts);
         setTotalPages(response.totalPages);
         setTotalContacts(response.totalContacts);
+        setFormLeadsCount(response.formLeads?.length || 0);
 
         console.log("State updated - totalContacts:", response.totalContacts);
       } catch (err) {
@@ -788,7 +790,7 @@ export default function ContactsMainContent() {
         value="3"
         subtitle="Email, Form, Import"
       />
-      <StatCard title="Form Leads" value="1,547" change="+8.2% this week" />
+      <StatCard title="Form Leads" value={formLeadsCount.toString()} change="+8.2% this week" />
     </div>
 
     {/* Quick actions */}
@@ -823,6 +825,7 @@ export default function ContactsMainContent() {
         subtitle="Build a lead capture form"
         iconBg="bg-[#05AA4A]/10"
         iconColor="text-[#05AA4A]"
+        onClick={() => router.push("/contacts/forms/create")}
       />
     </div>
 

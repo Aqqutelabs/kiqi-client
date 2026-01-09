@@ -30,7 +30,7 @@ const CreateListModal: React.FC<CreateListModalProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Create New List">
+    <Modal isOpen={isOpen} onClose={onClose} title="Create New List" width="400px">
       <div className="p-6 space-y-4">
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700">List Name</label>

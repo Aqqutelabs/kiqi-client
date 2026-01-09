@@ -36,6 +36,7 @@ export interface ContactsResponse {
   totalPages: number;
   currentPage: number | string;
   totalContacts: number;
+  formLeads?: Contact[];
 }
 
 export interface ContactsApiParams {
