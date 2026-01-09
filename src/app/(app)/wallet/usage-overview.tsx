@@ -110,37 +110,38 @@ export default function UsageOverview() {
       : null;
 
   useEffect(() => {
-  async function loadChart() {
-    try {
-      const res = await axios.get(`${BASE_URL}/api/v1/wallets/usage/overview`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+    async function loadChart() {
+      try {
+        const res = await axios.get(
+          `${BASE_URL}/api/v1/wallets/usage/overview`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
-      const raw = res.data.data.chartData;
+        const raw = res.data.data.chartData;
 
-      // Save summary for the cards
-      setSummary(res.data.data.summary);
+        // Save summary for the cards
+        setSummary(res.data.data.summary);
 
-      // Map months to short names
-      const formattedData = raw.monthlyDetails.map((item: MonthlyDetail) => ({
-        month: monthShortMap[item.month] ?? item.month,
-        credit: item.creditsSpent,
-        coin: item.coinsEarned,
-      }));
+        // Map months to short names
+        const formattedData = raw.monthlyDetails.map((item: MonthlyDetail) => ({
+          month: monthShortMap[item.month] ?? item.month,
+          credit: item.creditsSpent,
+          coin: item.coinsEarned,
+        }));
 
-      // Fill missing months if needed
-      const finalData = fillDummyMonths(formattedData);
+        // Fill missing months if needed
+        const finalData = fillDummyMonths(formattedData);
 
-      setAreaData(finalData);
-    } catch (error) {
-      console.log("Failed to load chart data:", error);
+        setAreaData(finalData);
+      } catch (error) {
+        console.log("Failed to load chart data:", error);
+      }
     }
-  }
 
-  loadChart();
-}, []);
-
-  
+    loadChart();
+  }, []);
 
   return (
     <div className="col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -159,10 +160,9 @@ export default function UsageOverview() {
               onClick={() => setActiveTab(period)}
               className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 activeTab === period
-                  ? "bg-[var(--primary)] text-white"
+                  ? "bg-(--primary) text-white"
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
-            >
+              }`}>
               {period}
             </button>
           ))}
@@ -174,8 +174,7 @@ export default function UsageOverview() {
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             data={finalData}
-            margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-          >
+            margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="colorCredit" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.15} />

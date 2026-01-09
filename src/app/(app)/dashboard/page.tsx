@@ -1,10 +1,9 @@
-"use client"; 
+"use client";
 
 import React, { useEffect } from "react";
 import { useAppSelector } from "@/redux/hooks";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/Card";
-
 
 const stats = [
   {
@@ -19,7 +18,7 @@ const stats = [
     info: "Last 30 days",
     icon: "/dashboard/sent.svg",
   },
- {
+  {
     title: "Campaigns Launched",
     amount: "23",
     info: "Last 30 days",
@@ -99,21 +98,21 @@ type CustomCard = {
   amount: string;
   info: string;
   icon: string;
-}
+};
 
 function CustomStatCard({ title, amount, info, icon }: CustomCard) {
   return (
-    <div className="border border-[#FDFDFD] shadow-sm py-3 px-8 space-y-5 h-[140px] rounded-xl flex justify-between items-center">
+    <div className="border border-[#FDFDFD] shadow-sm py-3 px-8 space-y-5 h-35 rounded-xl flex justify-between items-center">
       <div className="space-y-1.5">
         <h3 className="font-medium text-sm text-[#606062]">{title}</h3>
         <h2 className="font-medium text-[#1C2434] text-[31px]">{amount}</h2>
         <p className="text-xs text-[#606062] font-light">{info}</p>
       </div>
-      <div className="size-[50px] rounded-xl bg-[#F2F5FD] flex justify-center items-center">
+      <div className="size-12.5 rounded-xl bg-[#FF53140D] flex justify-center items-center">
         <img src={icon} alt="Icon" className="size-6 object-contain" />
       </div>
     </div>
-  )
+  );
 }
 
 const DashboardOverviewPage = () => {
@@ -124,13 +123,13 @@ const DashboardOverviewPage = () => {
   useEffect(() => {
     // Wait for authentication state to resolve before redirecting
     if (user === undefined || token === undefined) {
-      console.log('🔄 Waiting for authentication state to resolve...');
+      console.log("🔄 Waiting for authentication state to resolve...");
       return;
     }
 
     if (!user || !token) {
-      console.log('🔒 User not authenticated. Redirecting to login...');
-      router.replace('/login');
+      console.log("🔒 User not authenticated. Redirecting to login...");
+      router.replace("/login");
     }
   }, [user, token, router]);
 
@@ -140,11 +139,11 @@ const DashboardOverviewPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((card, idx) => (
           <CustomStatCard
-          key={idx}
-          title={card.title}
-          amount={card.amount}
-          info={card.info}
-          icon={card.icon}
+            key={idx}
+            title={card.title}
+            amount={card.amount}
+            info={card.info}
+            icon={card.icon}
           />
         ))}
       </div>
@@ -156,8 +155,8 @@ const DashboardOverviewPage = () => {
           {quickActions.map((action, idx) => (
             <div
               key={idx}
-              className="border border-[#233E971A] shadow-sm hover:shadow-md p-5 rounded-2xl space-y-2.5 md:space-y-4 md:h-[170px] cursor-pointer bg-white hover:bg-[#233E97] transition duration-300 group">
-              <div className="size-[50px] rounded-xl bg-[#F2F5FD] flex justify-center items-center mb-4">
+              className="border border-[#233E971A] shadow-sm hover:shadow-md p-5 rounded-2xl space-y-2.5 md:space-y-4 md:h-42.5 cursor-pointer bg-white hover:bg-[#F95417] transition duration-300 group">
+              <div className="size-12.5 rounded-xl bg-[#FF53140D] group-hover:bg-white flex justify-center items-center mb-4">
                 <img
                   src={action.icon}
                   alt="Icon"
@@ -177,24 +176,37 @@ const DashboardOverviewPage = () => {
         </div>
       </div>
 
-     {/* recent activities */}
-     <Card className="space-y-6 border border-[#E4E7EC]">
+      {/* recent activities */}
+      <Card className="space-y-6 border border-[#E4E7EC]">
         <h4 className="font-bold text-[#42526D] text-2xl">Recent Activities</h4>
         <div className="space-y-1">
           {recentActivities.map((activity, idx) => (
-            <div key={idx} className="flex flex-col md:flex-row justify-between items-end md:items-center md:h-[72px] border-b border-[#F0F1F7] py-4 px-3 md:px-6">
+            <div
+              key={idx}
+              className="flex flex-col md:flex-row justify-between items-end md:items-center md:h-18 border-b border-[#F0F1F7] py-4 px-3 md:px-6">
               <div className="flex items-center gap-3">
-                <input type="radio" checked readOnly className="size-6 rounded border border-[#0450B5] accent-[#0450B5] hidden md:block" /> 
+                <input
+                  type="radio"
+                  checked
+                  readOnly
+                  className="size-6 rounded border border-(--primary) accent-(--primary) hidden md:block"
+                />
                 <div className="space-y-1.5">
-                  <p className="font-medium text-sm text-[#101928]">{activity.title}</p>
-                  <span className="block text-xs font-medium text-[#344054]">{activity.description}</span>
-                </div> 
+                  <p className="font-medium text-sm text-[#101928]">
+                    {activity.title}
+                  </p>
+                  <span className="block text-xs font-medium text-[#344054]">
+                    {activity.description}
+                  </span>
+                </div>
               </div>
-              <p className="text-xs md:text-sm font-medium text-[#344054]">{activity.time}</p>
+              <p className="text-xs md:text-sm font-medium text-[#344054]">
+                {activity.time}
+              </p>
             </div>
           ))}
         </div>
-     </Card>
+      </Card>
     </main>
   );
 };

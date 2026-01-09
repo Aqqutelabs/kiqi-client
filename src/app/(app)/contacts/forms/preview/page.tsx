@@ -42,7 +42,7 @@ export default function PreviewForm() {
     const newValues = currentValues.includes(optionValue)
       ? currentValues.filter((v: string) => v !== optionValue)
       : [...currentValues, optionValue];
-    
+
     setFormValues((prev) => ({
       ...prev,
       [fieldId]: newValues,
@@ -81,7 +81,9 @@ export default function PreviewForm() {
                 {/* Field Label */}
                 <label className="block text-sm font-medium text-[#2D3748] mb-2">
                   {field.label}
-                  {field.required && <span className="text-red-500 ml-1">*</span>}
+                  {field.required && (
+                    <span className="text-red-500 ml-1">*</span>
+                  )}
                 </label>
 
                 {/* Field Input Based on Type */}
@@ -91,7 +93,9 @@ export default function PreviewForm() {
                     placeholder={field.placeholder}
                     required={field.required}
                     value={formValues[field.id] || ""}
-                    onChange={(e) => handleInputChange(field.id, e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange(field.id, e.target.value)
+                    }
                     className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF5314] text-sm"
                   />
                 )}
@@ -103,7 +107,9 @@ export default function PreviewForm() {
                       placeholder={field.placeholder}
                       required={field.required}
                       value={formValues[field.id] || ""}
-                      onChange={(e) => handleInputChange(field.id, e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange(field.id, e.target.value)
+                      }
                       className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF5314] text-sm"
                     />
                     {field.placeholder && (
@@ -120,7 +126,9 @@ export default function PreviewForm() {
                     placeholder={field.placeholder}
                     required={field.required}
                     value={formValues[field.id] || ""}
-                    onChange={(e) => handleInputChange(field.id, e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange(field.id, e.target.value)
+                    }
                     className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF5314] text-sm"
                   />
                 )}
@@ -130,9 +138,10 @@ export default function PreviewForm() {
                     <select
                       required={field.required}
                       value={formValues[field.id] || ""}
-                      onChange={(e) => handleInputChange(field.id, e.target.value)}
-                      className="w-full px-4 py-2 pr-10 border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF5314] text-sm appearance-none bg-white"
-                    >
+                      onChange={(e) =>
+                        handleInputChange(field.id, e.target.value)
+                      }
+                      className="w-full px-4 py-2 pr-10 border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF5314] text-sm appearance-none bg-white">
                       <option value="">{field.placeholder}</option>
                       {field.options?.map((option, idx) => (
                         <option key={idx} value={option}>
@@ -151,14 +160,17 @@ export default function PreviewForm() {
                         <input
                           type="checkbox"
                           id={`${field.id}-${idx}`}
-                          checked={(formValues[field.id] || []).includes(option)}
-                          onChange={() => handleCheckboxChange(field.id, option)}
-                          className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-[#FF5314]"
+                          checked={(formValues[field.id] || []).includes(
+                            option
+                          )}
+                          onChange={() =>
+                            handleCheckboxChange(field.id, option)
+                          }
+                          className="w-4 h-4 rounded border-gray-300 text-orange-600 focus:ring-[#FF5314]"
                         />
                         <label
                           htmlFor={`${field.id}-${idx}`}
-                          className="text-sm text-[#364153] cursor-pointer"
-                        >
+                          className="text-sm text-[#364153] cursor-pointer">
                           {option}
                         </label>
                       </div>
@@ -173,10 +185,14 @@ export default function PreviewForm() {
                       id={field.id}
                       required={field.required}
                       checked={formValues[field.id] || false}
-                      onChange={(e) => handleInputChange(field.id, e.target.checked)}
-                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-[#FF5314]"
+                      onChange={(e) =>
+                        handleInputChange(field.id, e.target.checked)
+                      }
+                      className="w-4 h-4 rounded border-gray-300 text-orange-600 focus:ring-[#FF5314]"
                     />
-                    <label htmlFor={field.id} className="text-sm text-[#718096] cursor-pointer">
+                    <label
+                      htmlFor={field.id}
+                      className="text-sm text-[#718096] cursor-pointer">
                       {field.placeholder || "I agree to the terms..."}
                     </label>
                   </div>
@@ -187,7 +203,9 @@ export default function PreviewForm() {
                     placeholder={field.placeholder}
                     required={field.required}
                     value={formValues[field.id] || ""}
-                    onChange={(e) => handleInputChange(field.id, e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange(field.id, e.target.value)
+                    }
                     rows={4}
                     className="w-full px-4 py-2 border border-[#E5E7EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF5314] text-sm resize-none"
                   />
@@ -196,17 +214,16 @@ export default function PreviewForm() {
             ))}
           </div>
 
-
           {/* Terms Text */}
           <p className="text-xs text-gray-500 mt-4">
-            By submitting this form, you agree to our Privacy Policy and Terms of Service.
+            By submitting this form, you agree to our Privacy Policy and Terms
+            of Service.
           </p>
 
           {/* Submit Button */}
           <Button
             onClick={handleSubmit}
-            className="w-full mt-6 bg-[#FF5314] hover:bg-[#E64A19] text-white rounded-lg py-3"
-          >
+            className="w-full mt-6 bg-[#FF5314] hover:bg-[#E64A19] text-white rounded-lg py-3">
             Submit
           </Button>
 
@@ -214,7 +231,7 @@ export default function PreviewForm() {
           <div className="text-center mt-6">
             <p className="text-xs text-gray-500">
               Powered by{" "}
-              <span className="text-[#233E97] font-medium cursor-pointer">
+              <span className="text-[#F95417] font-medium cursor-pointer">
                 KiQi CRM
               </span>
             </p>

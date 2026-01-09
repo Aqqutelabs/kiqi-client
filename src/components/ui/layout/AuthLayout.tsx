@@ -19,7 +19,7 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
       title: "Security you can trust",
       content:
         "Your data stays safe, and your team stays connected with confidence.",
-      icon: "shield-zap.svg",
+      icon: "/shield-zap.svg",
     },
   ];
   return (
@@ -28,14 +28,15 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
       <div className="w-full lg:w-[40%] bg-white p-8 lg:py-10 lg:px-14 hidden lg:flex flex-col justify-between">
         <div className="w-full">
           {/* Logo */}
-          <img src="/kiki-logo.svg" alt="Logo" className="w-[100px]" />
+          <img src="/xxing-logo-colored.svg" alt="Logo" className="w-25" />
           {/* Heading */}
           <h1 className="text-4xl lg:text-3xl font-medium text-[#1B223C] my-4">
             Streamline your business with KiKi.
           </h1>
           <p className="text-[#606062] flex items-start gap-2 mt-2 text-sm">
             <CircleCheck size={20} />
-            Manage your workflows, campaigns, and updates—all in one simple dashboard.
+            Manage your workflows, campaigns, and updates—all in one simple
+            dashboard.
           </p>
 
           {/* Features */}
@@ -82,7 +83,7 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
       </div>
 
       {/* Right Side - Auth Form Area */}
-      <div className="w-full lg:w-[60%] bg-[var(--primary)] p-4 lg:p-10 flex items-center justify-center">
+      <div className="w-full lg:w-[60%] bg-(--primary)/10 p-4 lg:p-10 flex items-center justify-center">
         {children}
       </div>
     </div>

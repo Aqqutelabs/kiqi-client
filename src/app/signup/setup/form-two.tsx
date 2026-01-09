@@ -78,7 +78,7 @@ export default function FormTwo({
     <section className="flex flex-col items-center h-screen">
       {/* logo and steps */}
       <div className="flex flex-col items-center justify-center gap-5 my-4">
-        <img src="/kiki-logo.svg" alt="Logo" />
+        <img src="/xxing-logo-colored.svg" alt="Logo" />
         {/* steps */}
         <div className="flex items-center gap-2">
           {tabs.map((tab, index) => {
@@ -87,12 +87,12 @@ export default function FormTwo({
                 {/* tab */}
                 <div
                   key={index}
-                  className="size-10 rounded-full flex justify-center items-center bg-[#233E97] text-white">
+                  className="size-10 rounded-full flex justify-center items-center bg-[#F95417] text-white">
                   {tab}
                 </div>
                 {/* hypen */}
                 {index < tabs.length - 1 && (
-                  <div className="w-16 h-0.5 bg-[#233E97]" />
+                  <div className="w-16 h-0.5 bg-[#F95417]" />
                 )}
               </>
             );
@@ -158,7 +158,7 @@ export default function FormTwo({
                       }`}
                       style={{ backgroundColor: theme }}>
                       {isActive && (
-                        <span className="size-5 rounded-full bg-[#233E97] flex justify-center items-center text-white absolute -top-1 -right-1">
+                        <span className="size-5 rounded-full bg-[#F95417] flex justify-center items-center text-white absolute -top-1 -right-1">
                           <Check size={15} />
                         </span>
                       )}

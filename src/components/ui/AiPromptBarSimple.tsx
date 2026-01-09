@@ -24,7 +24,7 @@ export default function AIPromptBar({
           />
           <div className="flex items-center gap-4 ml-4">
             {useAI && (
-              <div className="!text-[var(--primary)] whitespace-nowrap flex text-sm items-center cursor-pointer">
+              <div className="!text-(--primary) whitespace-nowrap flex text-sm items-center cursor-pointer">
                 <Sparkles size={16} className="mr-1.5" /> Use Ai
               </div>
             )}

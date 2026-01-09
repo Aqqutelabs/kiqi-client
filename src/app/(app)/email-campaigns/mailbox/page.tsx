@@ -19,7 +19,8 @@ export default function Mailbox() {
       id: 1,
       senderInitial: "K",
       subject: "Lorem ipsum dolor",
-      preview: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed...",
+      preview:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed...",
       time: "12:30pm",
       starred: true,
       type: "inbox",
@@ -110,38 +111,42 @@ export default function Mailbox() {
   useEffect(() => {
     const fetchThreads = async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/api/v1/inbox/threads`, 
-        token ? { headers: { Authorization: `Bearer ${token}` } } : {});
+        const response = await axios.get(
+          `${BASE_URL}/api/v1/inbox/threads`,
+          token ? { headers: { Authorization: `Bearer ${token}` } } : {}
+        );
         console.log(response.data.data);
-        toast.success(response.data.message)
+        toast.success(response.data.message);
       } catch (error) {
-        console.error(`Error found: ${error}`)
+        console.error(`Error found: ${error}`);
       }
-    }
+    };
 
     fetchThreads();
-  }, [])
+  }, []);
 
   // Toggle star status
   const toggleStar = (id: number) => {
-    setEmails(emails.map(email => 
-      email.id === id ? { ...email, starred: !email.starred } : email
-    ));
+    setEmails(
+      emails.map((email) =>
+        email.id === id ? { ...email, starred: !email.starred } : email
+      )
+    );
   };
 
   // Filter emails based on active tab
   const filteredEmails = useMemo(() => {
     switch (activeTab.toLowerCase()) {
       case "inbox":
-        return emails.filter(email => email.type === "inbox");
+        return emails.filter((email) => email.type === "inbox");
       case "sent":
-        return emails.filter(email => email.type === "sent");
+        return emails.filter((email) => email.type === "sent");
       case "drafts":
-        return emails.filter(email => email.type === "drafts");
+        return emails.filter((email) => email.type === "drafts");
       case "starred":
-        return emails.filter(email => email.starred);
+        return emails.filter((email) => email.starred);
       case "trash":
-        return emails.filter(email => email.type === "trash");
+        return emails.filter((email) => email.type === "trash");
       default:
         return emails;
     }
@@ -160,9 +165,8 @@ export default function Mailbox() {
             className={cn(
               "py-1 px-2 text-sm font-medium text-gray-500 transition-colors cursor-pointer",
               activeTab === tab &&
-                "bg-[#F79B2A] py-1 px-2 rounded flex justify-center items-center text-white"
-            )}
-          >
+                "bg-[#f89316] py-1 px-2 rounded flex justify-center items-center text-white"
+            )}>
             {tab}
           </button>
         ))}
@@ -173,38 +177,30 @@ export default function Mailbox() {
         {filteredEmails.map((email) => (
           <div
             key={email.id}
-            className="h-[92px] flex items-center justify-between py-3 border-b last:border-none border-[#E2E8F0] transition-colors cursor-pointer"
-          >
+            className="h-23 flex items-center justify-between py-3 border-b last:border-none border-[#E2E8F0] transition-colors cursor-pointer">
             <div className="flex items-center gap-3">
-              <Checkbox
-                onChange={() => {}}
-                isChecked={false}
-                name="checkbox"
-              />
-              <button 
+              <Checkbox onChange={() => {}} isChecked={false} name="checkbox" />
+              <button
                 onClick={() => toggleStar(email.id)}
-                className="text-gray-400 hover:text-yellow-500"
-              >
+                className="text-gray-400 hover:text-yellow-500">
                 {email.starred ? (
                   <Star className="w-4 h-4 fill-yellow-500 text-yellow-500" />
                 ) : (
                   <StarOff className="w-4 h-4" />
                 )}
               </button>
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-900 text-white text-sm font-medium">
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-orange-600 text-white text-sm font-medium">
                 {email.senderInitial}
               </div>
               <div className="space-y-2 text-[#42526D]">
-                <h3 className="font-medium">
-                  {email.subject}
-                </h3>
+                <h3 className="font-medium">{email.subject}</h3>
                 <p className="text-sm">{email.preview}</p>
               </div>
             </div>
             <span className="text-sm text-gray-500">{email.time}</span>
           </div>
         ))}
-        
+
         {filteredEmails.length === 0 && (
           <div className="py-8 text-center text-gray-500">
             No emails found in {activeTab}

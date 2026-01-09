@@ -401,7 +401,7 @@ export default function FeatureTwoPage() {
             ${isBlue ? "lg:col-span-1" : "lg:col-span-2"} 
             ${
               isBlue
-                ? "bg-linear-to-b from-[#233E97] to-[#2BAAE2] text-white"
+                ? "bg-linear-to-b from-[#F95417] to-[#2BAAE2] text-white"
                 : "bg-white text-black"
             } 
             flex ${
@@ -645,7 +645,7 @@ export default function FeatureTwoPage() {
       </div>
 
       {/* last cta section */}
-      <div className="bg-linear-to-b from-blue-900 via-blue-800 to-cyan-400 flex flex-col lg:flex-row items-center justify-between gap-6 sm:gap-8 lg:gap-12 xl:gap-20 px-4 sm:px-6 md:px-8 lg:px-10 xl:px-16 pt-6 sm:pt-8 md:pt-10 lg:pt-16 w-[95%] rounded-xl sm:rounded-2xl mx-auto my-8 sm:my-10 md:my-14 lg:my-20">
+      <div className="bg-linear-to-b from-orange-900 via-orange-800 to-cyan-400 flex flex-col lg:flex-row items-center justify-between gap-6 sm:gap-8 lg:gap-12 xl:gap-20 px-4 sm:px-6 md:px-8 lg:px-10 xl:px-16 pt-6 sm:pt-8 md:pt-10 lg:pt-16 w-[95%] rounded-xl sm:rounded-2xl mx-auto my-8 sm:my-10 md:my-14 lg:my-20">
         {/* left corner */}
         <div className="max-w-2xl space-y-3 sm:space-y-4 md:space-y-6 lg:space-y-8 w-full lg:w-1/2">
           <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white leading-tight text-center lg:text-left">

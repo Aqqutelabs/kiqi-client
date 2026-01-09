@@ -15,7 +15,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import BASE_URL from '@/lib/utils/baseUrl';
+import BASE_URL from "@/lib/utils/baseUrl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
@@ -25,7 +25,7 @@ import { Modal } from "@/components/ui/Modal";
 import { Pagination } from "@/components/ui/Pagination";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { selectCampaign } from '@/redux/selectors/campaignSelectors';
+import { selectCampaign } from "@/redux/selectors/campaignSelectors";
 import {
   createEmailListWithFiles,
   clearCreateEmailListStatus,
@@ -145,8 +145,8 @@ const EmailCampaignsListPage = () => {
   const handleStartCampaign = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedListId) return;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const result = await dispatch(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const result = await dispatch(
       startEmailCampaign({
         campaignName: campaignForm.campaignName,
         emailListId: selectedListId,
@@ -174,7 +174,9 @@ const EmailCampaignsListPage = () => {
             : null
           : null;
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || BASE_URL}/api/v1/campaigns/${campaignId}`,
+        `${
+          process.env.NEXT_PUBLIC_API_BASE_URL || BASE_URL
+        }/api/v1/campaigns/${campaignId}`,
         {
           method: "DELETE",
           headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -301,10 +303,10 @@ const EmailCampaignsListPage = () => {
                     return (
                       <React.Fragment key={campaign._id || i}>
                         <tr
-                          className="text-gray-700 bg-white cursor-pointer hover:bg-blue-50 transition-all"
+                          className="text-gray-700 bg-white cursor-pointer hover:bg-orange-50 transition-all"
                           onClick={() => handleCampaignRowClick(campaign._id)}>
                           <td className="p-3 font-medium flex items-center gap-2">
-                            <Mail className="text-blue-500" size={16} />
+                            <Mail className="text-orange-500" size={16} />
                             {campaign.campaignName}
                             <span className="ml-2">
                               {isExpanded ? (
@@ -338,7 +340,7 @@ const EmailCampaignsListPage = () => {
                         {isExpanded && (
                           <tr>
                             <td colSpan={5} className="bg-white border-t-0 p-0">
-                              <div className="transition-all duration-300 overflow-hidden rounded-b-xl border border-t-0 border-blue-200 shadow-lg p-6">
+                              <div className="transition-all duration-300 overflow-hidden rounded-b-xl border border-t-0 border-orange-200 shadow-lg p-6">
                                 {detailsLoading ? (
                                   <div className="flex items-center justify-center py-8">
                                     <Loader2 className="animate-spin mr-2" />{" "}
@@ -353,8 +355,8 @@ const EmailCampaignsListPage = () => {
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                       <h4 className="text-lg font-semibold mb-2 flex items-center gap-2">
-                                        <Users className="text-blue-500" /> List
-                                        Details
+                                        <Users className="text-orange-500" />{" "}
+                                        List Details
                                       </h4>
                                       <div className="mb-2">
                                         <span className="font-medium">
@@ -383,7 +385,7 @@ const EmailCampaignsListPage = () => {
                                                   href={f}
                                                   target="_blank"
                                                   rel="noopener noreferrer"
-                                                  className="text-blue-600 underline mr-2">
+                                                  className="text-orange-600 underline mr-2">
                                                   File {idx + 1}
                                                 </a>
                                               )
@@ -393,7 +395,7 @@ const EmailCampaignsListPage = () => {
                                     </div>
                                     <div>
                                       <h4 className="text-lg font-semibold mb-2 flex items-center gap-2">
-                                        <Mail className="text-blue-500" />{" "}
+                                        <Mail className="text-orange-500" />{" "}
                                         Emails
                                       </h4>
                                       <div className="max-h-40 overflow-y-auto bg-gray-50 rounded p-2 border border-gray-100">
@@ -444,7 +446,7 @@ const EmailCampaignsListPage = () => {
       <Modal isOpen={isModalOpen} onClose={closeModal}>
         <div className="text-center">
           <h3 className="text-xl font-semibold text-gray-800 mb-6 flex items-center justify-center gap-2">
-            <Users className="text-blue-500" /> Create Email List
+            <Users className="text-orange-500" /> Create Email List
           </h3>
           <form className="space-y-4 text-left" onSubmit={handleCreateList}>
             <div>
@@ -517,7 +519,7 @@ const EmailCampaignsListPage = () => {
         onClose={() => setIsStartModalOpen(false)}>
         <div className="text-center">
           <h3 className="text-xl font-semibold text-gray-800 mb-6 flex items-center justify-center gap-2">
-            <Wand2 className="text-blue-500" /> Start Email Campaign
+            <Wand2 className="text-orange-500" /> Start Email Campaign
           </h3>
           <form className="space-y-4 text-left" onSubmit={handleStartCampaign}>
             <div>
@@ -556,7 +558,7 @@ const EmailCampaignsListPage = () => {
                 onChange={handleStartCampaignChange}
                 placeholder="<h1>Hello!</h1><p>Thank you for subscribing...</p>"
                 required
-                className="w-full rounded-md border-0 bg-gray-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#3366FF] min-h-[100px]"
+                className="w-full rounded-md border-0 bg-gray-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF5314] min-h-[100px]"
               />
             </div>
             <Button

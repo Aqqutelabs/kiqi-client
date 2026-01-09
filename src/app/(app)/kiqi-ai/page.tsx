@@ -131,7 +131,7 @@ const KiQiAiPage = () => {
             <h3 className="text-xl font-semibold">Templates</h3>
             <Link
               href="#"
-              className="text-sm font-semibold text-[#3366FF] flex items-center gap-1">
+              className="text-sm font-semibold text-[#FF5314] flex items-center gap-1">
               View All <ArrowRight size={14} />
             </Link>
           </div>

@@ -11,7 +11,7 @@
 //     const [showPassword, setShowPassword] = useState(false);
 
 //     return (
-//         <main className="min-h-screen w-full flex items-center justify-center bg-gray-50 md:bg-[#3366FF]">
+//         <main className="min-h-screen w-full flex items-center justify-center bg-gray-50 md:bg-[#FF5314]">
 //             <div className="w-full max-w-4xl m-4 md:grid md:grid-cols-2 md:gap-10 items-center">
 //                 {/* Left Side Info Panel - Hidden on Mobile */}
 //                 <div className="hidden md:flex flex-col text-white space-y-8 p-4">
@@ -62,7 +62,7 @@
 //                     </form>
 
 //                      <p className="mt-6 text-center text-sm text-gray-500">
-//                         Already have an account? <Link href="/auth/login" className="font-medium text-[#3366FF] hover:underline">Log In</Link>
+//                         Already have an account? <Link href="/auth/login" className="font-medium text-[#FF5314] hover:underline">Log In</Link>
 //                     </p>
 //                 </Card>
 //             </div>

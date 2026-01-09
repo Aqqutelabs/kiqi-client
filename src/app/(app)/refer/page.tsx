@@ -90,7 +90,7 @@ function ReferralLinkCard() {
           {socials.map((social, idx) => (
             <div
               key={idx}
-              className="flex flex-col items-center justify-center gap-2 cursor-pointer bg-white border border-[#CAD5E2] hover:bg-blue-50 rounded-lg h-[66px] w-full transition-all duration-300">
+              className="flex flex-col items-center justify-center gap-2 cursor-pointer bg-white border border-[#CAD5E2] hover:bg-orange-50 rounded-lg h-[66px] w-full transition-all duration-300">
               <img src={social.icon} alt={social.name} className="size-4" />
               <p className="text-xs text-[#45556C] font-medium">
                 {social.name}
@@ -149,7 +149,7 @@ function TotalReferredCard() {
             {/* Left side - User info */}
             <div className="flex items-center gap-3 flex-1 min-w-0">
               {/* Avatar */}
-              <div className="w-10 h-10 rounded-full bg-[var(--primary)] flex items-center justify-center text-white font-medium text-sm shrink-0">
+              <div className="w-10 h-10 rounded-full bg-(--primary) flex items-center justify-center text-white font-medium text-sm shrink-0">
                 {referee.name
                   .split(" ")
                   .map((n) => n[0])
@@ -258,7 +258,7 @@ function ReferralTiers() {
                 <div className="size-9 flex justify-center items-center bg-[#E9EBFE] rounded-lg">
                   <tier.icon
                     size={20}
-                    color={selectedTier ? "#233E97" : "#62748E"}
+                    color={selectedTier ? "#F95417" : "#62748E"}
                   />
                 </div>
                 {/* text */}
@@ -276,7 +276,7 @@ function ReferralTiers() {
               {/* reward */}
               <p
                 className={`text-sm ${
-                  selectedTier ? "text-[#233E97]" : "text-[#45556C]"
+                  selectedTier ? "text-[#F95417]" : "text-[#45556C]"
                 }`}>
                 +{tier.reward}
               </p>
@@ -306,14 +306,14 @@ function NextMilestoneCard() {
     <div className="w-full max-w-md border border-[#E2E8F0] rounded-xl p-6 bg-white">
       {/* Header */}
       <div className="flex items-center gap-2 mb-6">
-        <Target size={24} color="#233E97" />
+        <Target size={24} color="#F95417" />
         <h3 className="text-lg font-semibold text-[#0F172A]">Next Milestone</h3>
       </div>
 
       {/* Icon Badge */}
       <div className="flex justify-center mb-4">
         <div className="w-20 h-20 rounded-full bg-[#E9F1FE] flex items-center justify-center">
-          <Award size={35} color="#233E97" />
+          <Award size={35} color="#F95417" />
         </div>
       </div>
 
@@ -337,7 +337,7 @@ function NextMilestoneCard() {
         {/* Progress Bar */}
         <div className="w-full h-2 bg-[#E2E8F0] rounded-full overflow-hidden">
           <div
-            className="h-full bg-[#233E97] rounded-full transition-all duration-300"
+            className="h-full bg-[#F95417] rounded-full transition-all duration-300"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -351,7 +351,7 @@ function NextMilestoneCard() {
       {/* Bonus Reward Card */}
       <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg p-4 mt-6">
         <p className="text-xs text-[#64748B] mb-1">Bonus Reward</p>
-        <p className="text-2xl font-bold text-[#233E97] mb-1">
+        <p className="text-2xl font-bold text-[#F95417] mb-1">
           +{milestoneData.bonusReward.toLocaleString()}
         </p>
         <p className="text-xs text-[#64748B]">GoCredits</p>

@@ -42,7 +42,7 @@ export default function EmailCampaignAIPage() {
         <span className="text-[#1B223C]">
           Supercharge your campaigns <br /> with
         </span>
-        <span className="text-[var(--primary)]">KiKi Ai</span>
+        <span className="text-(--primary)">KiKi Ai</span>
       </h1>
 
       {/* custom ai text area */}
@@ -68,8 +68,8 @@ export default function EmailCampaignAIPage() {
               {/* other tools */}
               <div className="flex gap-6 items-center text-sm">
                 <Mic size={18} color="#42526D" />
-                <div className="flex gap-2 text-[#233E97] cursor-pointer">
-                  <Sparkles size={18} color="#233E97" />
+                <div className="flex gap-2 text-[#F95417] cursor-pointer">
+                  <Sparkles size={18} color="#F95417" />
                   <span>Smart compose</span>
                 </div>
                 <Button
@@ -118,7 +118,7 @@ export default function EmailCampaignAIPage() {
           </div>
           <Link
             href={"/email-campaigns/templates"}
-            className="flex items-center gap-2 text-[#233E97] cursor-pointer text-sm">
+            className="flex items-center gap-2 text-[#F95417] cursor-pointer text-sm">
             <span>View All</span>
             <ChevronRight size={18} />
           </Link>

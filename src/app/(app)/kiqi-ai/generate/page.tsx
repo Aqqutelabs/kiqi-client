@@ -122,13 +122,13 @@ const AiGeneratePage = () => {
                 <div
                   className={`p-3 rounded-lg max-w-sm ${
                     msg.from === "user"
-                      ? "bg-blue-500 text-white"
+                      ? "bg-orange-500 text-white"
                       : "bg-white border"
                   }`}>
                   <p className="text-sm">{msg.text}</p>
                   <p
                     className={`text-xs mt-1 ${
-                      msg.from === "user" ? "text-blue-200" : "text-gray-400"
+                      msg.from === "user" ? "text-orange-200" : "text-gray-400"
                     } text-right`}>
                     {msg.time}
                   </p>
@@ -141,7 +141,7 @@ const AiGeneratePage = () => {
               <textarea
                 rows={1}
                 placeholder="Describe the changes you want to make"
-                className="w-full p-3 pr-24 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#3366FF] resize-none"
+                className="w-full p-3 pr-24 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#FF5314] resize-none"
               />
               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
                 <Button variant="tertiary" className="h-9 w-9 p-0 !bg-gray-100">

@@ -23,7 +23,7 @@ const SuccessPage = () => {
     <div className="relative flex min-h-screen w-full flex-col bg-linear-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl -z-10" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -z-10" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl -z-10" />
 
       {/* Top App Bar */}
       {/* <div className="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
@@ -50,10 +50,10 @@ const SuccessPage = () => {
           <div className="mb-8 flex justify-center">
             <div className="relative w-24 h-24 flex items-center justify-center">
               {/* Outer ring animation */}
-              <div className="absolute inset-0 bg-linear-to-r from-primary/30 to-blue-500/30 rounded-full animate-pulse" />
-              <div className="absolute inset-2 bg-linear-to-r from-primary/20 to-blue-500/20 rounded-full" />
+              <div className="absolute inset-0 bg-linear-to-r from-primary/30 to-orange-500/30 rounded-full animate-pulse" />
+              <div className="absolute inset-2 bg-linear-to-r from-primary/20 to-orange-500/20 rounded-full" />
               {/* Icon */}
-              <div className="relative z-10 bg-linear-to-br from-primary to-blue-600 rounded-full p-4">
+              <div className="relative z-10 bg-linear-to-br from-primary to-orange-600 rounded-full p-4">
                 <CheckCircle2 className="w-12 h-12 text-white" />
               </div>
             </div>
@@ -73,8 +73,8 @@ const SuccessPage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
             {/* Card 1 - Email Confirmation */}
             <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-4 mx-auto">
-                <Mail className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center mb-4 mx-auto">
+                <Mail className="w-6 h-6 text-orange-600 dark:text-orange-400" />
               </div>
               <h3 className="font-semibold text-slate-900 dark:text-white mb-2">
                 Check Your Email
@@ -112,7 +112,7 @@ const SuccessPage = () => {
           </div>
 
           {/* Next Steps */}
-          <div className="bg-linear-to-r from-primary/10 to-blue-500/10 dark:from-primary/20 dark:to-blue-500/20 rounded-xl p-8 mb-12 border border-primary/20 dark:border-primary/40">
+          <div className="bg-linear-to-r from-primary/10 to-orange-500/10 dark:from-primary/20 dark:to-orange-500/20 rounded-xl p-8 mb-12 border border-primary/20 dark:border-primary/40">
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
               What's Next?
             </h2>

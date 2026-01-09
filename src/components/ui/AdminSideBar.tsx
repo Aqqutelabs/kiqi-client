@@ -51,7 +51,7 @@ const navigationConfig: NavSection[] = [
     type: "section",
     title: "",
     items: [
-       {
+      {
         type: "link",
         href: "/admin/dashboard/users",
         label: "Users",
@@ -64,7 +64,7 @@ const navigationConfig: NavSection[] = [
     type: "section",
     title: "",
     items: [
-       {
+      {
         type: "link",
         href: "admin/",
         label: "Wallet",
@@ -83,28 +83,27 @@ export const Sidebar: React.FC = () => {
   ]);
 
   // Logout handler
-    const handleLogout = () => {
+  const handleLogout = () => {
     // Remove token from localStorage
     localStorage.removeItem("adminToken");
-  
+
     fetch("http://localhost:8000/api/v1/admin/logout", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("adminToken") || ""}`,
       },
-    }).catch(() => {}); 
-  
+    }).catch(() => {});
+
     router.push("/admin/login");
   };
-  
-  
-    // Check for token; if not present, redirect
-    React.useEffect(() => {
-      const token = localStorage.getItem("adminToken");
-      if (!token) {
-        router.push("/admin/login");
-      }
-    }, [router]);
+
+  // Check for token; if not present, redirect
+  React.useEffect(() => {
+    const token = localStorage.getItem("adminToken");
+    if (!token) {
+      router.push("/admin/login");
+    }
+  }, [router]);
 
   const isLinkActive = (href: string): boolean => {
     if (href === "/dashboard") {
@@ -147,7 +146,7 @@ export const Sidebar: React.FC = () => {
         {/* Header */}
         <div className="h-16 flex-shrink-0 flex items-center px-5 border-b border-gray-200">
           <Image
-            src="/kiki-logo.svg"
+            src="/xxing-logo-colored.svg"
             alt="KiQi 2025"
             height={24}
             width={60}
@@ -183,8 +182,8 @@ export const Sidebar: React.FC = () => {
                           className={clsx(
                             "w-full h-[50px] flex items-center justify-between px-5 py-2 text-xs sm:text-sm font-normal transition-colors",
                             {
-                              "text-[var(--primary)]": hasActiveChild,
-                              "text-[#42526D] hover:text-[var(--primary)]":
+                              "text-(--primary)": hasActiveChild,
+                              "text-[#42526D] hover:text-(--primary)":
                                 !hasActiveChild,
                             }
                           )}>
@@ -218,15 +217,15 @@ export const Sidebar: React.FC = () => {
                                     className={clsx(
                                       "flex items-center gap-1.5 pl-8 py-2 text-[10px] md:text-[13px] font-normal transition-colors relative",
                                       {
-                                        "text-[var(--primary)] bg-gradient-to-r from-[#233E9726] via-white to-[##C4C4C400]":
+                                        "text-(--primary) bg-gradient-to-r from-[#233E9726] via-white to-[##C4C4C400]":
                                           isActive,
-                                        "text-[#42526D] hover:text-[var(--primary)]":
+                                        "text-[#42526D] hover:text-(--primary)":
                                           !isActive,
                                       }
                                     )}>
                                     {/* Active indicator - left border */}
                                     {isActive && (
-                                      <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[var(--primary)] rounded-r" />
+                                      <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-(--primary) rounded-r" />
                                     )}
                                     <img
                                       src="/sidebar-icons/arrow-right.svg"
@@ -254,15 +253,14 @@ export const Sidebar: React.FC = () => {
                         className={clsx(
                           "flex items-center gap-2.5 px-5 py-2 text-xs sm:text-sm font-normal h-[50px] transition-colors relative",
                           {
-                            "text-[var(--primary)] bg-gradient-to-r from-[#233E9726] via-white to-[##C4C4C400]":
+                            "text-(--primary) bg-gradient-to-r from-[#233E9726] via-white to-[##C4C4C400]":
                               isActive,
-                            "text-[#42526D] hover:text-[var(--primary)]":
-                              !isActive,
+                            "text-[#42526D] hover:text-(--primary)": !isActive,
                           }
                         )}>
                         {/* Active indicator - left border */}
                         {isActive && (
-                          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[var(--primary)] rounded-r" />
+                          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-(--primary) rounded-r" />
                         )}
 
                         {item.icon && (
@@ -286,7 +284,7 @@ export const Sidebar: React.FC = () => {
         <div className="flex-shrink-0 px-5 py-4 border-t border-gray-200">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-2.5 py-2 text-[13px] font-normal text-[#42526D] hover:text-[var(--primary)] transition-colors">
+            className="w-full flex items-center gap-2.5 py-2 text-[13px] font-normal text-[#42526D] hover:text-(--primary) transition-colors">
             <LogOut className="w-4 h-4 flex-shrink-0" />
             <span>Log out</span>
           </button>

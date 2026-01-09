@@ -26,11 +26,11 @@ export default function FormOne({
     redirect("/signup");
   };
   return (
-    <section className="flex justify-center items-center h-screen bg-[var(--primary)]">
-      <Card className="w-[500px]">
+    <section className="flex justify-center items-center h-80vh bg-(--primary)">
+      <Card className="w-125">
         {/* logo and steps */}
         <div className="flex flex-col items-center justify-center gap-5 my-4">
-          <img src="/kiki-logo.svg" alt="Logo" />
+          <img src="/xxing-logo-colored.svg" alt="Logo" />
           {/* steps */}
           <div className="flex items-center gap-2">
             {tabs.map((tab, index) => {
@@ -42,14 +42,14 @@ export default function FormOne({
                     key={index}
                     className={`size-10 rounded-full flex justify-center items-center ${
                       isActive
-                        ? "bg-[#233E97] text-white"
-                        : "bg-transparent text-[#233E97] border border-[#D9D9D9]"
+                        ? "bg-[#F95417] text-white"
+                        : "bg-transparent text-[#F95417] border border-[#D9D9D9]"
                     } `}>
                     {tab}
                   </div>
                   {/* hypen */}
                   {index < tabs.length - 1 && (
-                    <div className="w-16 h-0.5 bg-[#233E97]" />
+                    <div className="w-16 h-0.5 bg-[#F95417]" />
                   )}
                 </>
               );

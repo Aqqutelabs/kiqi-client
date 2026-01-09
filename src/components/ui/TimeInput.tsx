@@ -162,7 +162,7 @@ const TimeInput: React.FC<TimeInputProps> = ({
   const minutes = Array.from({ length: 60 }, (_, i) => i);
 
   return (
-    <div className={`relative max-w-[450px] ${className}`}>
+    <div className={`relative max-w-112.5 ${className}`}>
       {label && (
         <label className="text-sm capitalize font-medium text-gray-900 block mb-2">
           {label}
@@ -185,7 +185,7 @@ const TimeInput: React.FC<TimeInputProps> = ({
       {isPickerOpen && (
         <div
           ref={pickerRef}
-          className="absolute bottom-full left-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-50 p-4 w-4/5 min-w-[280px]">
+          className="absolute bottom-full left-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-50 p-4 w-4/5 min-w-70">
           <div className="flex gap-2 mb-3">
             {/* Hours Column */}
             <div className="flex-1">
@@ -202,10 +202,10 @@ const TimeInput: React.FC<TimeInputProps> = ({
                     type="button"
                     data-selected={selectedHour === hour}
                     className={`
-                      w-full px-3 py-2 text-sm text-center hover:bg-blue-50 transition-colors
+                      w-full px-3 py-2 text-sm text-center hover:bg-orange-50 transition-colors
                       ${
                         selectedHour === hour
-                          ? "bg-blue-100 text-[#155DFC] font-medium"
+                          ? "bg-orange-100 text-[#fc7d15] font-medium"
                           : "text-gray-700"
                       }
                     `}>
@@ -230,10 +230,10 @@ const TimeInput: React.FC<TimeInputProps> = ({
                     type="button"
                     data-selected={selectedMinute === minute}
                     className={`
-                      w-full px-3 py-2 text-sm text-center hover:bg-blue-50 transition-colors
+                      w-full px-3 py-2 text-sm text-center hover:bg-orange-50 transition-colors
                       ${
                         selectedMinute === minute
-                          ? "bg-blue-100 text-[#155DFC] font-medium"
+                          ? "bg-orange-100 text-[#fc7d15] font-medium"
                           : "text-gray-700"
                       }
                     `}>
@@ -257,8 +257,8 @@ const TimeInput: React.FC<TimeInputProps> = ({
                       px-3 py-2 text-sm text-center rounded border transition-colors
                       ${
                         period === "AM"
-                          ? "bg-blue-100 text-[#155DFC] border-blue-300 font-medium"
-                          : "text-gray-700 border-gray-200 hover:bg-blue-50"
+                          ? "bg-orange-100 text-[#fc7d15] border-orange-300 font-medium"
+                          : "text-gray-700 border-gray-200 hover:bg-orange-50"
                       }
                     `}>
                     AM
@@ -270,8 +270,8 @@ const TimeInput: React.FC<TimeInputProps> = ({
                       px-3 py-2 text-sm text-center rounded border transition-colors
                       ${
                         period === "PM"
-                          ? "bg-blue-100 text-[#155DFC] border-blue-300 font-medium"
-                          : "text-gray-700 border-gray-200 hover:bg-blue-50"
+                          ? "bg-orange-100 text-[#fc7d15] border-orange-300 font-medium"
+                          : "text-gray-700 border-gray-200 hover:bg-orange-50"
                       }
                     `}>
                     PM
@@ -292,7 +292,7 @@ const TimeInput: React.FC<TimeInputProps> = ({
             <button
               onClick={handleTimeSelect}
               type="button"
-              className="flex-1 px-3 py-2 text-sm text-white bg-[#155DFC] rounded hover:bg-[#1348d4] transition-colors">
+              className="flex-1 px-3 py-2 text-sm text-white bg-[#fa7305] rounded hover:bg-[#d45013] transition-colors">
               Set Time
             </button>
           </div>

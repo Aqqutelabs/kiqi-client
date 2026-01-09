@@ -52,8 +52,7 @@ export default function ChangeStatusModal({
           <button
             onClick={onClose}
             disabled={isLoading}
-            className="text-gray-500 hover:text-gray-700 disabled:opacity-50"
-          >
+            className="text-gray-500 hover:text-gray-700 disabled:opacity-50">
             <X size={20} />
           </button>
         </div>
@@ -89,8 +88,7 @@ export default function ChangeStatusModal({
               value={newStatus}
               onChange={(e) => setNewStatus(e.target.value as StatusType)}
               disabled={isLoading}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-            >
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50">
               {statusOptions.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
@@ -109,7 +107,7 @@ export default function ChangeStatusModal({
               onChange={(e) => setReason(e.target.value)}
               disabled={isLoading}
               placeholder="Enter reason for status change..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 resize-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 resize-none"
               rows={3}
             />
           </div>
@@ -121,15 +119,13 @@ export default function ChangeStatusModal({
               variant="outline"
               onClick={onClose}
               disabled={isLoading}
-              className="flex-1"
-            >
+              className="flex-1">
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={isLoading || newStatus === currentItem.status}
-              className="flex-1"
-            >
+              className="flex-1">
               {isLoading ? "Updating..." : "Update Status"}
             </Button>
           </div>

@@ -98,11 +98,9 @@ function ActionCard({
   return (
     <div
       onClick={onClick}
-      className="bg-white rounded-xl p-5 border border-[#E5E7EB] hover:bg-gray-50 transition"
-    >
+      className="bg-white rounded-xl p-5 border border-[#E5E7EB] hover:bg-gray-50 transition">
       <div
-        className={`w-10 h-10 rounded-lg ${iconBg} flex items-center justify-center mb-4`}
-      >
+        className={`w-10 h-10 rounded-lg ${iconBg} flex items-center justify-center mb-4`}>
         <Icon className={`w-5 h-5 ${iconColor}`} />
       </div>
       <div>
@@ -131,8 +129,7 @@ function Dropdown({
   return (
     <div
       ref={ref}
-      className="absolute top-full left-0 mt-2 w-52 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
-    >
+      className="absolute top-full left-0 mt-2 w-52 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
       {children}
     </div>
   );
@@ -157,8 +154,7 @@ function DropdownItem({
       className={`w-full flex items-center gap-2 px-4 py-2 rounded-md text-sm text-left
         hover:bg-gray-50
         ${danger ? "text-[#E7000B] hover:bg-red-50" : "text-gray-700"}
-      `}
-    >
+      `}>
       {Icon && <Icon className={`w-4 h-4 ${iconColor}`} />}
       {children}
     </button>
@@ -195,8 +191,7 @@ export function ContactDetailsModal({
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
+            className="text-gray-400 hover:text-gray-600 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -205,7 +200,7 @@ export function ContactDetailsModal({
         <div className="px-6 py-2 space-y-6">
           {/* Profile Section */}
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-[#233E97] rounded-full flex items-center justify-center text-white font-semibold text-lg shrink-0">
+            <div className="w-12 h-12 bg-[#F95417] rounded-full flex items-center justify-center text-white font-semibold text-lg shrink-0">
               {contact.initials}
             </div>
             <div>
@@ -227,8 +222,7 @@ export function ContactDetailsModal({
                 {contact.tags.map((tag: string, index: number) => (
                   <span
                     key={index}
-                    className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-xl"
-                  >
+                    className="px-3 py-1 bg-orange-50 text-orange-700 text-xs font-medium rounded-xl">
                     {tag}
                   </span>
                 ))}
@@ -246,10 +240,9 @@ export function ContactDetailsModal({
               {contact.emails.map((email: string, index: number) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between bg-gray-50 rounded-lg px-4 py-2 mb-2"
-                >
+                  className="flex items-center justify-between bg-gray-50 rounded-lg px-4 py-2 mb-2">
                   <span className="text-sm text-[#4A5565]">{email}</span>
-                  <span className="px-2 py-1 bg-[#233E97] text-white text-xs rounded">
+                  <span className="px-2 py-1 bg-[#F95417] text-white text-xs rounded">
                     Primary
                   </span>
                 </div>
@@ -267,10 +260,9 @@ export function ContactDetailsModal({
               {contact.phones.map((phone: string, index: number) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between bg-gray-50 rounded-lg px-4 py-2 mb-2"
-                >
+                  className="flex items-center justify-between bg-gray-50 rounded-lg px-4 py-2 mb-2">
                   <span className="text-sm text-[#4A5565]">{phone}</span>
-                  <span className="px-2 py-1 bg-[#233E97] text-white text-xs rounded">
+                  <span className="px-2 py-1 bg-[#F95417] text-white text-xs rounded">
                     Primary
                   </span>
                 </div>
@@ -303,7 +295,7 @@ export function ContactDetailsModal({
 
         {/* Footer Actions */}
         <div className="p-6 space-y-3 border-t border-gray-200">
-          <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#233E97] text-white rounded-lg hover:bg-[#1a2f73] transition-colors font-medium">
+          <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#F95417] text-white rounded-lg hover:bg-[#1a2f73] transition-colors font-medium">
             <MessageSquare className="w-4 h-4" />
             Send Message
           </button>
@@ -317,7 +309,7 @@ export function ContactDetailsModal({
             <Eye className="w-4 h-4" />
             View Full Profile
           </button>
-          <button className="w-full px-4 py-3 bg-white text-[#233E97] border border-[#233E97] rounded-lg hover:bg-blue-50 transition-colors font-medium">
+          <button className="w-full px-4 py-3 bg-white text-[#F95417] border border-[#F95417] rounded-lg hover:bg-orange-50 transition-colors font-medium">
             + Add to List
           </button>
         </div>
@@ -383,11 +375,20 @@ export default function ContactsMainContent() {
       setError(null);
       try {
         let response;
-        console.log("Loading contacts with currentPage:", currentPage, "itemsPerPage:", itemsPerPage);
-        
+        console.log(
+          "Loading contacts with currentPage:",
+          currentPage,
+          "itemsPerPage:",
+          itemsPerPage
+        );
+
         if (searchTerm) {
           console.log("Searching for:", searchTerm);
-          response = await searchContacts(searchTerm, itemsPerPage, currentPage);
+          response = await searchContacts(
+            searchTerm,
+            itemsPerPage,
+            currentPage
+          );
         } else {
           console.log("Fetching all contacts");
           response = await getContactsPaginated(currentPage, itemsPerPage);
@@ -401,14 +402,15 @@ export default function ContactsMainContent() {
           return transformContact(contact);
         });
         console.log("Transformed contacts:", transformedContacts);
-        
+
         setContacts(transformedContacts);
         setTotalPages(response.totalPages);
         setTotalContacts(response.totalContacts);
-        
+
         console.log("State updated - totalContacts:", response.totalContacts);
       } catch (err) {
-        const errorMsg = err instanceof Error ? err.message : "Failed to fetch contacts";
+        const errorMsg =
+          err instanceof Error ? err.message : "Failed to fetch contacts";
         console.error("Error fetching contacts:", err);
         setError(errorMsg);
       } finally {
@@ -618,426 +620,397 @@ export default function ContactsMainContent() {
   };
 
   return (
-    <>
-      {/* Contact Details Modal */}
-      <ContactDetailsModal
-        isOpen={isDetailsOpen}
-        onClose={() => setIsDetailsOpen(false)}
-        contact={selectedContact}
-        onViewProfile={(contactId) => router.push(`/contact/${contactId}`)}
-      />
-      {/* New Contact Modal */}
-      <ContactModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
-      {/* Edit Contact Modal */}
-      {editContact && (
-        <EditContactModal
-          isOpen={isEditModalOpen}
-          contact={editContact}
-          onClose={() => {
-            setIsEditModalOpen(false);
-            setEditContact(null);
-          }}
-          onContactUpdated={handleContactUpdated}
-        />
-      )}
-      {/* Success Modal */}
-      <SuccessModal
-        isOpen={showSuccess}
-        title="New List Created"
-        description="To add contacts to your lists, select contacts from All contacts tab, and click add to list."
-        buttonText="Go to All Contacts"
-        onClose={() => setShowSuccess(false)}
-      />
+  <>
+  {/* All modals remain the same */}
+  <ContactDetailsModal
+    isOpen={isDetailsOpen}
+    onClose={() => setIsDetailsOpen(false)}
+    contact={selectedContact}
+    onViewProfile={(contactId) => router.push(`/contact/${contactId}`)}
+  />
+  <ContactModal
+    isOpen={isModalOpen}
+    onClose={() => setIsModalOpen(false)}
+  />
+  {editContact && (
+    <EditContactModal
+      isOpen={isEditModalOpen}
+      contact={editContact}
+      onClose={() => {
+        setIsEditModalOpen(false);
+        setEditContact(null);
+      }}
+      onContactUpdated={handleContactUpdated}
+    />
+  )}
+  <SuccessModal
+    isOpen={showSuccess}
+    title="New List Created"
+    description="To add contacts to your lists, select contacts from All contacts tab, and click add to list."
+    buttonText="Go to All Contacts"
+    onClose={() => setShowSuccess(false)}
+  />
+  <SelectListModal
+    isOpen={isSelectListOpen}
+    onClose={closeSelectListModal}
+    lists={lists}
+    onSubmit={handleAddToList}
+    isLoading={isAddingToList}
+  />
+  <ImportContactsModal isOpen={isImportOpen} onClose={closeImportModal} />
 
-      <SelectListModal
-        isOpen={isSelectListOpen}
-        onClose={closeSelectListModal}
-        lists={lists}
-        onSubmit={handleAddToList}
-        isLoading={isAddingToList}
+  <PageHeader title="Contacts" />
+  <div className="flex flex-col gap-6">
+    {/* Loading or Error State */}
+    {error && (
+      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        {error}
+      </div>
+    )}
+
+    {/* Stats */}
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <StatCard
+        title="Total Contacts"
+        value={totalContacts.toString()}
+        change={"+12.5% from last month"}
       />
+      <StatCard
+        title="New Contacts (30d)"
+        value="0"
+        subtitle="Added this month"
+      />
+      <StatCard
+        title="Top Channels"
+        value="3"
+        subtitle="Email, Form, Import"
+      />
+      <StatCard title="Form Leads" value="1,547" change="+8.2% this week" />
+    </div>
 
-      <ImportContactsModal isOpen={isImportOpen} onClose={closeImportModal} />
+    {/* Quick actions */}
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <ActionCard
+        icon={Plus}
+        title="New Contact"
+        subtitle="Add a contact manually"
+        iconBg="bg-[#F95417]/10"
+        iconColor="text-[#F95417]"
+        onClick={() => setIsModalOpen(true)}
+      />
+      <ActionCard
+        icon={Upload}
+        title="Import Contacts"
+        subtitle="Upload CSV or Excel file"
+        iconBg="bg-[#FF8C42]/10"
+        iconColor="text-[#FF8C42]"
+        onClick={() => setIsImportOpen(true)}
+      />
+      <ActionCard
+        icon={ListPlus}
+        title="Create List"
+        subtitle="Organize your contacts"
+        iconBg="bg-[#F95417]/10"
+        iconColor="text-[#F95417]"
+        onClick={() => setShowCreateList(true)}
+      />
+      <ActionCard
+        icon={FileText}
+        title="Create Form"
+        subtitle="Build a lead capture form"
+        iconBg="bg-[#05AA4A]/10"
+        iconColor="text-[#05AA4A]"
+      />
+    </div>
 
-      <PageHeader title="Contacts" />
-      <div className="flex flex-col gap-6">
-        {/* Loading or Error State */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-            {error}
-          </div>
-        )}
-
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <StatCard
-            title="Total Contacts"
-            value={totalContacts.toString()}
-            change={"+12.5% from last month"}
-          />
-          <StatCard
-            title="New Contacts (30d)"
-            value="0"
-            subtitle="Added this month"
-          />
-          <StatCard
-            title="Top Channels"
-            value="3"
-            subtitle="Email, Form, Import"
-          />
-          <StatCard title="Form Leads" value="1,547" change="+8.2% this week" />
+    {/* Bulk action bar */}
+    {selectedIds.length > 0 && (
+      <div className="flex items-center bg-[#1E2E8C] text-white px-4 py-3 rounded-xl relative">
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-white/10 rounded-xl text-sm font-medium">
+          <span className="w-2 h-2 rounded-full bg-[#22C55E]" />
+          <span>
+            {selectedIds.length} contact{selectedIds.length > 1 ? "s" : ""} selected
+          </span>
         </div>
 
-        {/* Quick actions */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <ActionCard
-            icon={Plus}
-            title="New Contact"
-            subtitle="Add a contact manually"
-            iconBg="bg-[#233E97]/10"
-            iconColor="text-[#233E97]"
-            onClick={() => setIsModalOpen(true)}
-          />
-          <ActionCard
-            icon={Upload}
-            title="Import Contacts"
-            subtitle="Upload CSV or Excel file"
-            iconBg="bg-[#FF8C42]/10"
-            iconColor="text-[#FF8C42]"
-            onClick={() => setIsImportOpen(true)}
-          />
-          <ActionCard
-            icon={ListPlus}
-            title="Create List"
-            subtitle="Organize your contacts"
-            iconBg="bg-[#233E97]/10"
-            iconColor="text-[#233E97]"
-            onClick={() => setShowCreateList(true)}
-          />
-          <ActionCard
-            icon={FileText}
-            title="Create Form"
-            subtitle="Build a lead capture form"
-            iconBg="bg-[#05AA4A]/10"
-            iconColor="text-[#05AA4A]"
-          />
-        </div>
-
-        {/* Bulk action bar */}
-        {selectedIds.length > 0 && (
-          <div className="flex items-center bg-[#1E2E8C] text-white px-4 py-3 rounded-xl relative">
-            <div
-              className="flex items-center gap-2 px-3 py-1.5
-             bg-white/10 rounded-xl text-sm font-medium"
-            >
-              <span className="w-2 h-2 rounded-full bg-[#22C55E]" />
-
-              <span>
-                {selectedIds.length} contact{selectedIds.length > 1 ? "s" : ""}{" "}
-                selected
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2 ml-6 relative">
-              {/* LISTS */}
-              <div className="relative">
-                <button
-                  onClick={() => {
-                    setOpenLists(!openLists);
-                    setOpenMore(false);
-                  }}
-                  className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium
-            bg-white/10   rounded-xl transition"
-                >
-                  <ListPlus className="w-4 h-4" />
-                  Lists
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-
-                <Dropdown open={openLists} onClose={() => setOpenLists(false)}>
-                  <DropdownItem
-                    icon={UserPlus}
-                    iconColor="text-[#00A63E]"
-                    onClick={openSelectListModal}
-                  >
-                    Add to List
-                  </DropdownItem>
-                  <DropdownItem icon={UserMinus} iconColor="text-[#F54900]">
-                    Remove from List
-                  </DropdownItem>
-                  <DropdownItem icon={ListPlus} iconColor="text-[#233E97]">
-                    Create New List & Add
-                  </DropdownItem>
-                </Dropdown>
-              </div>
-
-              <button
-                className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium
-          bg-white/10   rounded-xl transition"
-              >
-                <Download className="w-4 h-4" />
-                Export
-              </button>
-
-              <div className="relative">
-                <button
-                  onClick={() => {
-                    setOpenMore(!openMore);
-                    setOpenLists(false);
-                  }}
-                  className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium
-            bg-white/10   rounded-xl transition"
-                >
-                  More
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-
-                <Dropdown open={openMore} onClose={() => setOpenMore(false)}>
-                  <DropdownItem icon={Mail} iconColor="text-[#155DFC]">
-                    Send Email
-                  </DropdownItem>
-                  <DropdownItem icon={MessageSquare} iconColor="text-[#00A63E]">
-                    Send SMS
-                  </DropdownItem>
-                  <DropdownItem icon={Archive}>Archive</DropdownItem>
-                  <DropdownItem icon={Trash2} iconColor="text-[#E7000B]" danger>
-                    Delete
-                  </DropdownItem>
-                </Dropdown>
-              </div>
-            </div>
-
-            <div className="ml-auto">
-              <button
-                onClick={clearSelection}
-                className="ml-auto flex items-center gap-2 px-3 py-1.5 text-sm font-medium
-        bg-white/10   rounded-xl transition"
-              >
-                <X className="w-4 h-4" />
-                Clear
-              </button>
-            </div>
-          </div>
-        )}
-
-        <div className="flex justify-between items-center text-[#1B223C] font-medium ">
-          <h3 className="text-lg md:text-xl text-[#42526D]">Contacts</h3>
-          <div className="flex items-center gap-2">
-            <SearchInput
-              name="search"
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setCurrentPage(1);
+        <div className="flex items-center gap-2 ml-6 relative">
+          {/* LISTS */}
+          <div className="relative">
+            <button
+              onClick={() => {
+                setOpenLists(!openLists);
+                setOpenMore(false);
               }}
-              placeholder="Search contacts..."
-            />
-            <Filter value="" onChange={() => {}} />
+              className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium bg-white/10 rounded-xl transition">
+              <ListPlus className="w-4 h-4" />
+              Lists
+              <ChevronDown className="w-4 h-4" />
+            </button>
+
+            <Dropdown open={openLists} onClose={() => setOpenLists(false)}>
+              <DropdownItem
+                icon={UserPlus}
+                iconColor="text-[#00A63E]"
+                onClick={openSelectListModal}>
+                Add to List
+              </DropdownItem>
+              <DropdownItem icon={UserMinus} iconColor="text-[#F54900]">
+                Remove from List
+              </DropdownItem>
+              <DropdownItem icon={ListPlus} iconColor="text-[#F95417]">
+                Create New List & Add
+              </DropdownItem>
+            </Dropdown>
+          </div>
+
+          <button className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium bg-white/10 rounded-xl transition">
+            <Download className="w-4 h-4" />
+            Export
+          </button>
+
+          <div className="relative">
+            <button
+              onClick={() => {
+                setOpenMore(!openMore);
+                setOpenLists(false);
+              }}
+              className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium bg-white/10 rounded-xl transition">
+              More
+              <ChevronDown className="w-4 h-4" />
+            </button>
+
+            <Dropdown open={openMore} onClose={() => setOpenMore(false)}>
+              <DropdownItem icon={Mail} iconColor="text-[#155DFC]">
+                Send Email
+              </DropdownItem>
+              <DropdownItem icon={MessageSquare} iconColor="text-[#00A63E]">
+                Send SMS
+              </DropdownItem>
+              <DropdownItem icon={Archive}>Archive</DropdownItem>
+              <DropdownItem icon={Trash2} iconColor="text-[#E7000B]" danger>
+                Delete
+              </DropdownItem>
+            </Dropdown>
           </div>
         </div>
-        {/* Table */}
-        <div className="bg-white overflow-hidden">
-          {isLoading ? (
-            <div className="flex items-center justify-center h-64">
-              <p className="text-gray-500">Loading contacts...</p>
-            </div>
-          ) : (
-            <table className="min-w-full">
-            <thead className="bg-[#D1DAF4] h-16.5">
-              <tr>
-                <th className="px-4">
+
+        <div className="ml-auto">
+          <button
+            onClick={clearSelection}
+            className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium bg-white/10 rounded-xl transition">
+            <X className="w-4 h-4" />
+            Clear
+          </button>
+        </div>
+      </div>
+    )}
+
+    <div className="flex justify-between items-center text-[#1B223C] font-medium">
+      <h3 className="text-lg md:text-xl text-[#42526D]">Contacts</h3>
+      <div className="flex items-center gap-2">
+        <SearchInput
+          name="search"
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setCurrentPage(1);
+          }}
+          placeholder="Search contacts..."
+        />
+        <Filter value="" onChange={() => {}} />
+      </div>
+    </div>
+
+    {/* Table */}
+    <div className="bg-white overflow-hidden">
+      {isLoading ? (
+        <div className="flex items-center justify-center h-64">
+          <p className="text-gray-500">Loading contacts...</p>
+        </div>
+      ) : (
+        <table className="min-w-full">
+          <thead className="bg-[#f4e1d1] h-16.5">
+            <tr>
+              <th className="px-4">
+                <input
+                  type="checkbox"
+                  checked={selectedIds.length === data.length && data.length > 0}
+                  onChange={(e) =>
+                    setSelectedIds(
+                      e.target.checked ? data.map((d) => d.id) : []
+                    )
+                  }
+                />
+              </th>
+              {columns.map((col) => (
+                <th
+                  key={String(col.accessor)}
+                  className="px-6 py-3 text-left text-xs font-medium uppercase">
+                  {col.header}
+                </th>
+              ))}
+              <th className="px-6 py-3 text-right text-xs font-medium uppercase">
+                Action
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {data.map((row) => (
+              <tr
+                key={row.id}
+                className="h-20 hover:bg-gray-50 cursor-pointer"
+                onClick={() => router.push(`/contact/${row.id}`)}>
+                <td className="px-4" onClick={(e) => e.stopPropagation()}>
                   <input
                     type="checkbox"
-                    checked={selectedIds.length === data.length && data.length > 0}
-                    onChange={(e) =>
-                      setSelectedIds(
-                        e.target.checked ? data.map((d) => d.id) : []
-                      )
-                    }
+                    checked={selectedIds.includes(row.id)}
+                    onChange={() => toggleSelect(row.id)}
                   />
-                </th>
+                </td>
                 {columns.map((col) => (
-                  <th
+                  <td
                     key={String(col.accessor)}
-                    className="px-6 py-3 text-left text-xs font-medium uppercase"
-                  >
-                    {col.header}
-                  </th>
+                    className="px-6 py-4 text-sm text-gray-700 w-125">
+                    {renderCellValue(row[col.accessor])}
+                  </td>
                 ))}
-                <th className="px-6 py-3 text-right text-xs font-medium uppercase">
-                  Action
-                </th>
+                <td className="px-6 py-4 text-right relative" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex justify-end items-center gap-3">
+                    <button
+                      onClick={() => handleViewContact(row)}
+                      className="text-gray-500 hover:text-gray-700">
+                      <Eye className="w-4 h-4" />
+                    </button>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenMenuId(openMenuId === row.id ? null : row.id);
+                      }}
+                      className="text-gray-500 hover:text-gray-700">
+                      <MoreVertical className="w-4 h-4" />
+                    </button>
+                    {openMenuId === row.id && (
+                      <div className="absolute right-0 mt-2 w-44 bg-white border border-[#E5E7EB] rounded-lg shadow-lg z-50">
+                        <button
+                          className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50"
+                          onClick={() => handleEditContact(row.id)}>
+                          Edit Contact
+                        </button>
+                        <button
+                          className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50"
+                          onClick={openSelectListModal}>
+                          Add to List
+                        </button>
+                        <button className="w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50">
+                          Delete Contact
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </td>
               </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {data.map((row) => (
-                <tr
-                  key={row.id}
-                  className="h-20 hover:bg-gray-50 cursor-pointer"
-                  onClick={() => router.push(`/contact/${row.id}`)}
-                >
-                  <td className="px-4" onClick={(e) => e.stopPropagation()}>
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.includes(row.id)}
-                      onChange={() => toggleSelect(row.id)}
-                    />
-                  </td>
-                  {columns.map((col) => (
-                    <td
-                      key={col.accessor}
-                      className="px-6 py-4 text-sm text-gray-700 w-125"
-                    >
-                      {renderCellValue(row[col.accessor])}
-                    </td>
-                  ))}
-                  <td className="px-6 py-4 text-right relative" onClick={(e) => e.stopPropagation()}>
-                    <div className="flex justify-end items-center gap-3">
-                      <button
-                        onClick={() => handleViewContact(row)}
-                        className="text-gray-500 hover:text-gray-700"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setOpenMenuId(openMenuId === row.id ? null : row.id);
-                        }}
-                        className="text-gray-500 hover:text-gray-700"
-                      >
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
-                      {openMenuId === row.id && (
-                        <div className="absolute right-0 mt-2 w-44 bg-white border border-[#E5E7EB] rounded-lg shadow-lg z-50">
-                          <button
-                            className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50"
-                            onClick={() => handleEditContact(row.id)}
-                          >
-                            Edit Contact
-                          </button>
-                          <button
-                            className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50"
-                            onClick={openSelectListModal}
-                          >
-                            Add to List
-                          </button>
-                          <button className="w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50">
-                            Delete Contact
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          )}
-        </div>
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-600">
-              Page {currentPage} of {totalPages}
-            </p>
-            <div className="flex gap-2">
-              <Button
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                variant="outline"
-              >
-                Previous
-              </Button>
-              <Button
-                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage === totalPages}
-              >
-                Next
-              </Button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {showCreateList && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-          <div className="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden">
-            {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4">
-              <h2 className="text-base font-semibold text-gray-900">
-                Create New List
-              </h2>
-              <button
-                onClick={() => setShowCreateList(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="h-px bg-gray-200 w-full" />
-
-            {/* Form */}
-            <div className="px-6 py-6 space-y-5">
-              <div>
-                <label className="block text-sm font-medium text-[#364153] mb-1">
-                  List Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g., VIP Customers"
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#233E97]/30"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[#364153] mb-1">
-                  Description <span className="text-[#6A7282]">(optional)</span>
-                </label>
-                <textarea
-                  placeholder="Add a description for this list..."
-                  rows={3}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#233E97]/30"
-                />
-              </div>
-            </div>
-
-            {/* Footer */}
-            <div className="flex justify-end gap-3 px-6 pb-6">
-              <Button
-                onClick={() => setShowCreateList(false)}
-                variant="outline"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={() => {
-                  const nameInput = document.querySelector(
-                    'input[placeholder="e.g., VIP Customers"]'
-                  ) as HTMLInputElement;
-                  const descriptionInput = document.querySelector(
-                    'textarea[placeholder="Add a description for this list..."]'
-                  ) as HTMLTextAreaElement;
-
-                  const name = nameInput?.value || "";
-                  const description = descriptionInput?.value || "";
-
-                  handleCreateList(name, description);
-                  setShowCreateList(false);
-                }}
-              >
-                Create List
-              </Button>
-            </div>
-          </div>
-        </div>
+            ))}
+          </tbody>
+        </table>
       )}
-    </>
+    </div>
+
+    {/* Pagination */}
+    {totalPages > 1 && (
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-gray-600">
+          Page {currentPage} of {totalPages}
+        </p>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+            disabled={currentPage === 1}
+            variant="outline">
+            Previous
+          </Button>
+          <Button
+            onClick={() =>
+              setCurrentPage(Math.min(totalPages, currentPage + 1))
+            }
+            disabled={currentPage === totalPages}>
+            Next
+          </Button>
+        </div>
+      </div>
+    )}
+  </div>
+
+  {showCreateList && (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+      <div className="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4">
+          <h2 className="text-base font-semibold text-gray-900">
+            Create New List
+          </h2>
+          <button
+            onClick={() => setShowCreateList(false)}
+            className="text-gray-400 hover:text-gray-600">
+            ✕
+          </button>
+        </div>
+
+        <div className="h-px bg-gray-200 w-full" />
+
+        {/* Form */}
+        <div className="px-6 py-6 space-y-5">
+          <div>
+            <label className="block text-sm font-medium text-[#364153] mb-1">
+              List Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              placeholder="e.g., VIP Customers"
+              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#F95417]/30"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-[#364153] mb-1">
+              Description <span className="text-[#6A7282]">(optional)</span>
+            </label>
+            <textarea
+              placeholder="Add a description for this list..."
+              rows={3}
+              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#F95417]/30"
+            />
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex justify-end gap-3 px-6 pb-6">
+          <Button
+            onClick={() => setShowCreateList(false)}
+            variant="outline">
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              const nameInput = document.querySelector(
+                'input[placeholder="e.g., VIP Customers"]'
+              ) as HTMLInputElement;
+              const descriptionInput = document.querySelector(
+                'textarea[placeholder="Add a description for this list..."]'
+              ) as HTMLTextAreaElement;
+
+              const name = nameInput?.value || "";
+              const description = descriptionInput?.value || "";
+
+              handleCreateList(name, description);
+              setShowCreateList(false);
+            }}>
+            Create List
+          </Button>
+        </div>
+      </div>
+    </div>
+  )}
+</>
   );
 }
