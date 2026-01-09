@@ -151,7 +151,7 @@ export const fetchContacts = async (params?: ContactsApiParams): Promise<Contact
     if (params?.sortBy) queryParams.append("sortBy", params.sortBy);
 
     const queryString = queryParams.toString();
-    const url = `api/v1/contacts${queryString ? `?${queryString}` : ""}`;
+    const url = `/contacts${queryString ? `?${queryString}` : ""}`;
     
     console.log("Fetching contacts from:", url);
     
@@ -228,7 +228,7 @@ export const createContact = async (contactData: {
 }): Promise<{ error: boolean; contact: Contact }> => {
   try {
     const response = await api.post<{ error: boolean; contact: Contact }>(
-      "api/v1/contacts",
+      "/contacts",
       contactData
     );
 
@@ -249,7 +249,7 @@ export const fetchContactDetails = async (
   
 ): Promise<{ error: boolean; contact: any }> => {
   try {
-    const response = await api.get(`api/v1/contacts/${contactId}`);
+    const response = await api.get(`/contacts/${contactId}`);
 
     if (response.data.error) {
       throw new Error("Failed to fetch contact details");
@@ -263,31 +263,31 @@ export const fetchContactDetails = async (
 };
 
 // Update Contact
-export const updateContact = async (
-  id: string,
-  payload: {
-    firstName: string;
-    lastName: string;
-    company?: string;
-    jobTitle?: string;
-    location?: string;
-    notes?: string;
-    tags?: string[];
-    isArchived?: boolean;
-    emails: {
-      address: string;
-      isPrimary: boolean;
-    }[];
-    phones?: {
-      number: string;
-      isPrimary: boolean;
-    }[];
-  }
-) => {
-  const response = await api.put(`api/v1/contacts/${id}`, payload);
+// export const updateContact = async (
+//   id: string,
+//   payload: {
+//     firstName: string;
+//     lastName: string;
+//     company?: string;
+//     jobTitle?: string;
+//     location?: string;
+//     notes?: string;
+//     tags?: string[];
+//     isArchived?: boolean;
+//     emails: {
+//       address: string;
+//       isPrimary: boolean;
+//     }[];
+//     phones?: {
+//       number: string;
+//       isPrimary: boolean;
+//     }[];
+//   }
+// ) => {
+//   const response = await api.put(`/contacts/${id}`, payload);
 
-  return response.data;
-};
+//   return response.data;
+// };
 
 // Bulk Delete
 export const bulkDeleteContacts = async (
@@ -297,7 +297,7 @@ export const bulkDeleteContacts = async (
     const ids = contactIds.join(",");
 
     const response = await api.get(
-      `api/v1/contacts/bulk-delete?ids=${ids}`
+      `/contacts/bulk-delete?ids=${ids}`
     );
 
     if (response.data.error) {
@@ -348,7 +348,7 @@ export const createList = async (listData: {
 }): Promise<{ error: boolean; list: any }> => {
   try {
     const response = await api.post<{ error: boolean; list: any }>(
-      "api/v1/contacts/lists",
+      "/contacts/lists",
       listData
     );
 

@@ -33,7 +33,7 @@ import ContactModal from "@/components/ui/ContactModal";
 import EditContactModal from "@/components/ui/EditContactModal";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import SuccessModal from "@/components/ui/SuccessModal";
-import { fetchContacts, searchContacts, getContactsPaginated, createList, fetchContactLists, addContactsToList, ContactList, fetchContactById } from "@/lib/contacts-api";
+import { fetchContacts, searchContacts, getContactsPaginated, createList, fetchContactLists, addContactsToList, ContactList, fetchContactById, bulkDeleteContacts } from "@/lib/contacts-api";
 import { Contact as ApiContact } from "@/types/contacts";
 import { useRouter } from "next/navigation";
 import { useClickOutside } from "@/hooks/useClickOutside";
@@ -331,6 +331,8 @@ export default function ContactsMainContent() {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [showCreateList, setShowCreateList] = useState(false);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [idsToDelete, setIdsToDelete] = useState<number[]>([]);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -521,6 +523,24 @@ export default function ContactsMainContent() {
     setIsEditModalOpen(false);
   };
 
+  // const handleConfirmDelete = async () => {
+  //   if (!idsToDelete.length) return;
+
+  //   try {
+  //     await bulkDeleteContacts(idsToDelete);
+
+  //     setSelectedIds((prev) => prev.filter((id) => !idsToDelete.includes(id)));
+
+  //     // Refresh or optimistically update
+  //     fetchContacts();
+  //   } catch (error) {
+  //     console.error(error);
+  //   } finally {
+  //     setIdsToDelete([]);
+  //     setIsDeleteModalOpen(false);
+  //   }
+  // };
+
   useEffect(() => {
     const close = () => setOpenMenuId(null);
     window.addEventListener("click", close);
@@ -626,7 +646,7 @@ export default function ContactsMainContent() {
     isOpen={isDetailsOpen}
     onClose={() => setIsDetailsOpen(false)}
     contact={selectedContact}
-    onViewProfile={(contactId) => router.push(`/contact/${contactId}`)}
+    onViewProfile={(contactId) => router.push(`/contacts/${contactId}`)}
   />
   <ContactModal
     isOpen={isModalOpen}

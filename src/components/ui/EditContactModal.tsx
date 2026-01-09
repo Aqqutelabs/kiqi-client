@@ -198,7 +198,6 @@ const EditContactModal = ({
         </div>
 
         <form onSubmit={handleSubmit} className="p-6">
-          <form onSubmit={handleSubmit} className="p-6">
         <div className="grid grid-cols-2 gap-6">
 
           {/* First Name */}
@@ -350,7 +349,7 @@ const EditContactModal = ({
             />
           </div>
         </div>
-      </form>
+     
           <div className="flex justify-end gap-3 mt-8 pt-6">
             <Button variant="outline" onClick={onClose} disabled={loading}>
               Cancel

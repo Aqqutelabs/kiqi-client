@@ -87,7 +87,14 @@ export default function ContactDetailsPage({ params }: PageProps) {
   }
 
   if (!details) {
-    redirect("/contacts/dashboard");
+    return (
+      <main className="flex-1 overflow-y-auto space-y-6">
+        <PageHeader title="Contact Details" backLink="/contacts/dashboard" />
+        <div className="flex items-center justify-center py-12">
+          <span className="text-gray-500">Contact not found</span>
+        </div>
+      </main>
+    );
   }
 
   return (
@@ -98,7 +105,7 @@ export default function ContactDetailsPage({ params }: PageProps) {
       {/* Header Card */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 flex justify-between items-start">
         <div className="flex gap-4">
-          <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold">
+          <div className="w-12 h-12 rounded-full bg-orange-600 flex items-center justify-center text-white font-semibold">
             {details.initials}
           </div>
           <div>
@@ -106,13 +113,13 @@ export default function ContactDetailsPage({ params }: PageProps) {
               {details.firstName} {details.lastName}
             </h2>
             <p className="text-sm text-gray-500">
-              KiQI Contact ID: {details._id}
+              KiQI Contact ID: {details._id.slice(-6)}
             </p>
             <div className="flex gap-2 mt-2">
               {(details.tags ?? []).map((tag, i) => (
                 <span
                   key={i}
-                  className="px-2 py-1 text-xs rounded-[12px] bg-blue-50 text-blue-600"
+                  className="px-2 py-1 text-xs rounded-[12px] bg-orange-50 text-orange-600"
                 >
                   {tag}
                 </span>
