@@ -7,8 +7,10 @@ import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import SearchInput from "@/components/ui/Search";
 import ActionsMenu from "@/components/ui/ActionsMenu";
-import { fetchContactLists, ContactList } from "@/lib/contacts-api";
+import { fetchContactLists, ContactList, createList } from "@/lib/contacts-api";
 import toast from "react-hot-toast";
+import SuccessModal from "@/components/ui/SuccessModal";
+import CreateListModal from "@/components/ui/CreateListModal";
 
 export default function ContactListsPage() {
   const router = useRouter();
@@ -16,6 +18,8 @@ export default function ContactListsPage() {
   const [lists, setLists] = useState<ContactList[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isCreateListModalOpen, setIsCreateListModalOpen] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
     const loadLists = async () => {
@@ -49,6 +53,22 @@ export default function ContactListsPage() {
       list.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleCreateList = async (name: string, description: string) => {
+    try {
+      const response = await createList({ name, description });
+      console.log("List created successfully:", response.list);
+      setShowSuccess(true);
+      // Refresh the lists after creating a new one
+      const updatedLists = await fetchContactLists();
+      setLists(updatedLists.lists);
+    } catch (error) {
+      console.error("Failed to create list:", error);
+      toast.error("Failed to create list");
+    } finally {
+      setIsCreateListModalOpen(false);
+    }
+  };
+
   return (
     <div className="flex-1 flex flex-col">
       <main className="flex-1 overflow-y-auto space-y-6">
@@ -68,7 +88,10 @@ export default function ContactListsPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <Button className="w-auto shrink-0">
+              <Button
+                className="w-auto shrink-0"
+                onClick={() => setIsCreateListModalOpen(true)}
+              >
                 <Plus size={18} className="mr-1" />
                 Create List
               </Button>
@@ -159,6 +182,20 @@ export default function ContactListsPage() {
           </div>
         </div>
       </main>
+
+      {/* Modals */}
+      <CreateListModal
+        isOpen={isCreateListModalOpen}
+        onClose={() => setIsCreateListModalOpen(false)}
+        onSubmit={handleCreateList}
+      />
+      <SuccessModal
+        isOpen={showSuccess}
+        title="New List Created"
+        description="To add contacts to your lists, select contacts from All contacts tab, and click add to list."
+        buttonText="Go to All Contacts"
+        onClose={() => setShowSuccess(false)}
+      />
     </div>
   );
 }

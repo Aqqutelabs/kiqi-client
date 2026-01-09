@@ -23,6 +23,8 @@ import {
   UserPlus,
   UserMinus,
   ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
   ArrowRight,
 } from "lucide-react";
 import { DataTable, Column } from "@/components/ui/DataTable";
@@ -33,12 +35,13 @@ import ContactModal from "@/components/ui/ContactModal";
 import EditContactModal from "@/components/ui/EditContactModal";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import SuccessModal from "@/components/ui/SuccessModal";
-import { fetchContacts, searchContacts, getContactsPaginated, createList, fetchContactLists, addContactsToList, ContactList, fetchContactById, bulkDeleteContacts } from "@/lib/contacts-api";
+import { fetchContacts, searchContacts, getContactsPaginated, createList, fetchContactLists, addContactsToList, ContactList, fetchContactById, deleteContact } from "@/lib/contacts-api";
 import { Contact as ApiContact } from "@/types/contacts";
 import { useRouter } from "next/navigation";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import SelectListModal from "@/components/ui/SelectListModal";
 import { ImportContactsModal } from "@/components/ui/ImportContactsModal";
+import { DeleteModal } from "@/components/ui/DeleteModal";
 import toast from "react-hot-toast";
 
 interface Contact {
@@ -340,6 +343,9 @@ export default function ContactsMainContent() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalContacts, setTotalContacts] = useState(0);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [contactToDelete, setContactToDelete] = useState<string | null>(null);
+  const [formLeadsCount, setFormLeadsCount] = useState(0);
   const itemsPerPage = 5;
 
   // Transform API contact to UI contact
@@ -353,7 +359,17 @@ export default function ContactsMainContent() {
       : (firstName[0] || lastName[0] || '?').toUpperCase();
     
     const emailAddresses = apiContact.emails.map((e) => e.address);
-    const phoneNumbers = apiContact.phones.map((p) => p.number);
+    
+    // Handle both phones array and phoneCountry/phoneNumber fields
+    let phoneNumbers: string[] = [];
+    if (apiContact.phones && apiContact.phones.length > 0) {
+      phoneNumbers = apiContact.phones.map((p) => p.number);
+    } else if (apiContact.phoneCountry && apiContact.phoneNumber) {
+      phoneNumbers = [`${apiContact.phoneCountry}${apiContact.phoneNumber}`];
+    } else if (apiContact.phoneNumber) {
+      phoneNumbers = [apiContact.phoneNumber];
+    }
+    
     const lastUpdated = new Date(apiContact.updatedAt).toLocaleDateString();
 
     return {
@@ -408,6 +424,7 @@ export default function ContactsMainContent() {
         setContacts(transformedContacts);
         setTotalPages(response.totalPages);
         setTotalContacts(response.totalContacts);
+        setFormLeadsCount(response.formLeads?.length || 0);
 
         console.log("State updated - totalContacts:", response.totalContacts);
       } catch (err) {
@@ -422,6 +439,25 @@ export default function ContactsMainContent() {
 
     loadContacts();
   }, [searchTerm, currentPage]);
+
+  // Function to refresh contacts after creation
+  const handleContactCreated = async () => {
+    console.log("Dashboard: handleContactCreated called"); // Log function call
+    try {
+      setIsLoading(true);
+      console.log("Dashboard: Fetching updated contacts..."); // Log before fetching
+      const response = await getContactsPaginated(currentPage, itemsPerPage);
+      const transformedContacts = response.contacts.map((contact) => transformContact(contact));
+      setContacts(transformedContacts);
+      setTotalPages(response.totalPages);
+      setTotalContacts(response.totalContacts);
+      console.log("Dashboard: Updated contacts fetched", transformedContacts); // Log after fetching
+    } catch (err) {
+      console.error("Failed to refresh contacts:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const data: Contact[] = useMemo(() => contacts, [contacts]);
   const [isSelectListOpen, setIsSelectListOpen] = useState(false);
@@ -523,23 +559,27 @@ export default function ContactsMainContent() {
     setIsEditModalOpen(false);
   };
 
-  // const handleConfirmDelete = async () => {
-  //   if (!idsToDelete.length) return;
-
-  //   try {
-  //     await bulkDeleteContacts(idsToDelete);
-
-  //     setSelectedIds((prev) => prev.filter((id) => !idsToDelete.includes(id)));
-
-  //     // Refresh or optimistically update
-  //     fetchContacts();
-  //   } catch (error) {
-  //     console.error(error);
-  //   } finally {
-  //     setIdsToDelete([]);
-  //     setIsDeleteModalOpen(false);
-  //   }
-  // };
+  const handleDeleteContact = async () => {
+    if (!contactToDelete) return;
+    
+    try {
+      await deleteContact(contactToDelete);
+      toast.success("Contact deleted successfully");
+      // Remove the contact from the local state
+      setContacts((prev) => prev.filter((c) => c.id !== contactToDelete));
+      setTotalContacts((prev) => prev - 1);
+      // If the current page becomes empty, go to previous page
+      if (contacts.length === 1 && currentPage > 1) {
+        setCurrentPage((prev) => prev - 1);
+      }
+    } catch (error) {
+      console.error("Error deleting contact:", error);
+      toast.error("Failed to delete contact");
+    } finally {
+      setIsDeleteModalOpen(false);
+      setContactToDelete(null);
+    }
+  };
 
   useEffect(() => {
     const close = () => setOpenMenuId(null);
@@ -553,6 +593,15 @@ export default function ContactsMainContent() {
     sortable?: boolean;
   };
 
+  const getSortIcon = (accessor: keyof Contact) => {
+    if (sortBy !== accessor) {
+      return <ArrowUpDown className="w-4 h-4 text-gray-500" />;
+    }
+    return sortOrder === "asc" 
+      ? <ArrowUp className="w-4 h-4 text-orange-500" />
+      : <ArrowDown className="w-4 h-4 text-orange-500" />;
+  };
+
   const columns: Column<Contact>[] = [
     {
       header: (
@@ -561,7 +610,7 @@ export default function ContactsMainContent() {
           onClick={() => handleSort("name")}
         >
           Name
-          <ArrowUpDown className="w-4 h-4 text-gray-500" />
+          {getSortIcon("name")}
         </div>
       ),
       accessor: "name",
@@ -574,23 +623,50 @@ export default function ContactsMainContent() {
           onClick={() => handleSort("emails")}
         >
           Email
-          <ArrowUpDown className="w-4 h-4 text-gray-500" />
+          {getSortIcon("emails")}
         </div>
       ),
       accessor: "emails",
       sortable: true,
     },
     {
-      header: "Phone",
+      header: (
+        <div
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => handleSort("phones")}
+        >
+          Phone
+          {getSortIcon("phones")}
+        </div>
+      ),
       accessor: "phones",
+      sortable: true,
     },
     {
-      header: "Company",
+      header: (
+        <div
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => handleSort("company")}
+        >
+          Company
+          {getSortIcon("company")}
+        </div>
+      ),
       accessor: "company",
+      sortable: true,
     },
     {
-      header: "Last updated",
+      header: (
+        <div
+          className="flex items-center gap-2 cursor-pointer"
+          onClick={() => handleSort("lastUpdated")}
+        >
+          Last updated
+          {getSortIcon("lastUpdated")}
+        </div>
+      ),
       accessor: "lastUpdated",
+      sortable: true,
     },
   ];
 
@@ -705,7 +781,7 @@ export default function ContactsMainContent() {
         value="3"
         subtitle="Email, Form, Import"
       />
-      <StatCard title="Form Leads" value="1,547" change="+8.2% this week" />
+      <StatCard title="Form Leads" value={formLeadsCount.toString()} change="+8.2% this week" />
     </div>
 
     {/* Quick actions */}
@@ -740,6 +816,7 @@ export default function ContactsMainContent() {
         subtitle="Build a lead capture form"
         iconBg="bg-[#05AA4A]/10"
         iconColor="text-[#05AA4A]"
+        onClick={() => router.push("/contacts/forms/create")}
       />
     </div>
 
@@ -875,7 +952,7 @@ export default function ContactsMainContent() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {data.map((row) => (
+            {sortedData.map((row) => (
               <tr
                 key={row.id}
                 className="h-20 hover:bg-gray-50 cursor-pointer"
@@ -919,10 +996,21 @@ export default function ContactsMainContent() {
                         </button>
                         <button
                           className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50"
-                          onClick={openSelectListModal}>
+                          onClick={() => {
+                            // Set the current contact as the only selected contact
+                            setSelectedIds([row.id]);
+                            openSelectListModal();
+                            setOpenMenuId(null);
+                          }}>
                           Add to List
                         </button>
-                        <button className="w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50">
+                        <button
+                          className="w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50"
+                          onClick={() => {
+                            setContactToDelete(row.id);
+                            setIsDeleteModalOpen(true);
+                            setOpenMenuId(null);
+                          }}>
                           Delete Contact
                         </button>
                       </div>

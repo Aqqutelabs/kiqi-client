@@ -90,13 +90,13 @@ export default function ContactDetails() {
 //       {/* Page title */}
 //       <PageHeader title="Contact Details" backLink="/contacts/dashboard" />
 
-//       {/* Header card */}
-//       <div className="bg-white rounded-xl border border-gray-200 p-6 flex justify-between items-start">
-//         <div className="flex gap-4">
-//           {/* Avatar */}
-//           <div className="w-12 h-12 rounded-full bg-orange-600 flex items-center justify-center text-white font-semibold">
-//             {getInitials(contact.firstName, contact.lastName)}
-//           </div>
+      {/* Header card */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6 flex justify-between items-start">
+        <div className="flex gap-4">
+          {/* Avatar */}
+          <div className="w-12 h-12 rounded-full bg-orange-600 flex items-center justify-center text-white font-semibold">
+            {getInitials(contact.firstName, contact.lastName)}
+          </div>
 
 //           {/* Name & tags */}
 //           <div>
@@ -105,20 +105,20 @@ export default function ContactDetails() {
 //             </h2>
 //             <p className="text-sm text-gray-500">KiQI Contact ID: {contact._id.slice(-6)}</p>
 
-//              {contact.tags && contact.tags.length > 0 && (
-//               <div className="flex gap-2 mt-2">
-//                 {contact.tags.map((tag, index) => (
-//                   <span
-//                     key={index}
-//                     className="px-2 py-1 text-xs rounded-xl bg-orange-50 text-orange-600"
-//                   >
-//                     {tag}
-//                   </span>
-//                 ))}
-//               </div>
-//             )}
-//           </div>
-//         </div>
+             {contact.tags && contact.tags.length > 0 && (
+              <div className="flex gap-2 mt-2">
+                {contact.tags.map((tag, index) => (
+                  <span
+                    key={index}
+                    className="px-2 py-1 text-xs rounded-xl bg-orange-50 text-orange-600"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
 
 //         {/* Actions */}
 //         <div className="flex gap-2">
@@ -203,32 +203,32 @@ export default function ContactDetails() {
 //             <Stat label="Tags" value={String(contact.tags?.length || 0)} />
 //           </Card>
 
-//           {/* Lists */}
-//           <Card
-//             title="Lists"
-//             action={
-//               <button className="text-sm text-orange-600 hover:underline flex items-center gap-1">
-//                 <Plus size={14} /> Add to List
-//               </button>
-//             }
-//           >
-//             <p className="text-sm text-[#6A7282]">No lists assigned</p>
-//           </Card>
+          {/* Lists */}
+          <Card
+            title="Lists"
+            action={
+              <button className="text-sm text-orange-600 hover:underline flex items-center gap-1">
+                <Plus size={14} /> Add to List
+              </button>
+            }
+          >
+            <p className="text-sm text-[#6A7282]">No lists assigned</p>
+          </Card>
 
-//           {/* Notes */}
-//           <Card
-//             title="Notes"
-//             action={
-//               <button className="text-sm text-orange-600 hover:underline">
-//                 Edit
-//               </button>
-//             }>
-//             <p className="text-sm text-[#364153]">
-//               {contact.notes || "No notes added yet."}
-//             </p>
-//           </Card>
-//         </div>
-//       </div>
+          {/* Notes */}
+          <Card
+            title="Notes"
+            action={
+              <button className="text-sm text-orange-600 hover:underline">
+                Edit
+              </button>
+            }>
+            <p className="text-sm text-[#364153]">
+              {contact.notes || "No notes added yet."}
+            </p>
+          </Card>
+        </div>
+      </div>
 
 //       {/* Edit Contact Modal */}
 //       {contact && (

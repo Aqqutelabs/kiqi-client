@@ -81,7 +81,8 @@ export default function ContactLeadForms() {
   const copyFormLink = (form: Form) => {
     // Use slug if available, fallback to ID for backward compatibility
     const formIdentifier = form.slug || form._id;
-    const formUrl = `${window.location.origin}/forms/${formIdentifier}`;
+    // Always use production domain for the public link
+    const formUrl = `https://autosenderai.com/forms/${formIdentifier}`;
     navigator.clipboard.writeText(formUrl).then(
       () => {
         toast.success("Form link copied to clipboard!");

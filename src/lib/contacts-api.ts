@@ -136,6 +136,25 @@ export const fetchContactById = async (contactId: string): Promise<{ error: bool
 };
 
 /**
+ * Delete a contact by ID
+ * @param contactId - The ID of the contact to delete
+ */
+export const deleteContact = async (contactId: string): Promise<{ error: boolean; message: string }> => {
+  try {
+    const response = await api.delete<{ error: boolean; message: string }>(`/contacts/${contactId}`);
+    
+    if (response.data.error) {
+      throw new Error(response.data.message || "Failed to delete contact");
+    }
+    
+    return response.data;
+  } catch (error) {
+    console.error("Error in deleteContact:", error);
+    throw error;
+  }
+};
+
+/**
  * Fetch all contacts with pagination, search, and sorting
  * Token is automatically injected by the API interceptor from Redux state
  * @param params - Query parameters (page, limit, search, sortBy)
