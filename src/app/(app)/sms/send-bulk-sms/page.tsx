@@ -317,52 +317,196 @@ export default function SendBulkSMS() {
   };
 
   const handleSendSMS = async () => {
-    if (!validateForm()) return;
-    if (!token) {
-      toast.error("Authentication required");
-      return;
-    }
+  if (!validateForm()) return;
+  if (!token) {
+    toast.error("Authentication required");
+    return;
+  }
 
-    setIsLoading(true);
+  setIsLoading(true);
 
-    const phoneNumbers = getPhoneNumbers();
-    const selectedSender = senders.find(
-      (sender) => sender.id === formData.sender_id
-    );
+  let phoneNumbers = getPhoneNumbers();
+  const selectedSender = senders.find(
+    (sender) => sender.id === formData.sender_id
+  );
 
-    if (!selectedSender) {
-      toast.error("Selected sender not found");
+  if (!selectedSender) {
+    toast.error("Selected sender not found");
+    setIsLoading(false);
+    return;
+  }
+
+  try {
+    // Helper function to validate phone number
+    const isValidPhoneNumber = (phone: string): boolean => {
+      // Remove all non-digit characters except +
+      const cleaned = phone.replace(/[^\d+]/g, '');
+      
+      // Check if phone contains invalid characters like X
+      if (phone.toUpperCase().includes('X')) {
+        return false;
+      }
+      
+      // Check if it has at least 10 digits (including country code)
+      const digitsOnly = cleaned.replace(/\D/g, '');
+      return digitsOnly.length >= 10;
+    };
+
+    // Helper function to format phone number
+    const formatPhoneNumber = (phone: string): string => {
+      // Remove all non-digit characters except +
+      let cleaned = phone.replace(/[^\d+]/g, '');
+      
+      // If it contains X, it's invalid
+      if (phone.toUpperCase().includes('X')) {
+        throw new Error("Phone number contains invalid character 'X'");
+      }
+      
+      // Remove leading zeros
+      cleaned = cleaned.replace(/^0+/, '');
+      
+      // If it doesn't start with +, add country code
+      if (!cleaned.startsWith('+')) {
+        // If it starts with 234 (Nigeria country code without +)
+        if (cleaned.startsWith('234')) {
+          return `+${cleaned}`;
+        }
+        // If it's 10-11 digits, assume it's a Nigerian number without country code
+        const digitsOnly = cleaned.replace(/\D/g, '');
+        if (digitsOnly.length === 10 || digitsOnly.length === 11) {
+          if (digitsOnly.startsWith('0')) {
+            return `+234${digitsOnly.slice(1)}`;
+          }
+          return `+234${digitsOnly}`;
+        }
+        // Return with + prefix
+        return `+${cleaned}`;
+      }
+      
+      return cleaned;
+    };
+
+    // Validate and filter phone numbers
+    const validPhoneNumbers: string[] = [];
+    const invalidPhoneNumbers: string[] = [];
+
+    phoneNumbers.forEach(phone => {
+      if (isValidPhoneNumber(phone)) {
+        try {
+          const formatted = formatPhoneNumber(phone);
+          validPhoneNumbers.push(formatted);
+        } catch (error) {
+          invalidPhoneNumbers.push(phone);
+        }
+      } else {
+        invalidPhoneNumbers.push(phone);
+      }
+    });
+
+    console.log("Valid phone numbers:", validPhoneNumbers);
+    console.log("Invalid phone numbers:", invalidPhoneNumbers);
+
+    if (validPhoneNumbers.length === 0) {
+      toast.error("No valid phone numbers found to send SMS");
+      
+      if (invalidPhoneNumbers.length > 0) {
+        toast.error(`${invalidPhoneNumbers.length} phone numbers are invalid (contain X or invalid format)`);
+      }
+      
       setIsLoading(false);
       return;
     }
 
-    try {
-      // Prepare payload based on your API requirements
+    // Show warning about invalid numbers
+    if (invalidPhoneNumbers.length > 0) {
+      toast.error(`${invalidPhoneNumbers.length} phone numbers are invalid and will be skipped`);
+      console.log("Invalid numbers skipped:", invalidPhoneNumbers);
+    }
+
+    // Send to each valid recipient
+    const results = [];
+    
+    for (const phoneNumber of validPhoneNumbers) {
+      // Prepare the exact payload format
       const payload = {
-        to: phoneNumbers.join(", "), // Changed from recipient_group to actual phone numbers joined with a comma
+        to: phoneNumber,
         body: formData.compose_message.trim(),
-        from: selectedSender.name,
+        from: selectedSender.name, // Ensure this is a valid sender ID/number
       };
 
-      console.log("Sending payload:", payload); // For debugging
+      console.log("Sending to", phoneNumber, "with payload:", payload);
 
-      const response = await axios.post(
-        `${BASE_URL}/api/v1/sms/send`,
-        payload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.data.success) {
-        toast.success(
-          `SMS sent successfully to ${phoneNumbers.length} recipient(s)!`
+      try {
+        const response = await axios.post(
+          `${BASE_URL}/api/v1/sms/send`,
+          payload,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            timeout: 30000,
+          }
         );
 
-        // Reset form
+        console.log("Response for", phoneNumber, ":", response.data);
+        
+        results.push({
+          phoneNumber,
+          success: response.data?.success || response.data?.status === "success",
+          message: response.data?.message || "Sent",
+          data: response.data
+        });
+        
+        // Small delay between requests
+        if (validPhoneNumbers.length > 1) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        
+      } catch (error: any) {
+        console.error(`Error sending to ${phoneNumber}:`, error);
+        
+        let errorMessage = "Failed to send";
+        if (error.response?.data?.message) {
+          errorMessage = error.response.data.message;
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+        
+        results.push({
+          phoneNumber,
+          success: false,
+          message: errorMessage,
+          error: error.response?.data
+        });
+      }
+    }
+
+    // Count successful and failed messages
+    const successful = results.filter(r => r.success).length;
+    const failed = results.filter(r => !r.success).length;
+
+    if (successful > 0) {
+      toast.success(
+        `SMS sent successfully to ${successful} recipient(s)!${failed > 0 ? ` ${failed} failed.` : ''}`
+      );
+      
+      // Show details of failed sends if any
+      if (failed > 0) {
+        const failedNumbers = results
+          .filter(r => !r.success)
+          .map(r => `${r.phoneNumber}: ${r.message}`)
+          .slice(0, 3); // Show first 3 errors
+          
+        console.log("Failed sends:", failedNumbers);
+        
+        if (failedNumbers.length > 0) {
+          toast.error(`Some failed: ${failedNumbers.join('; ')}${failedNumbers.length < failed ? '...' : ''}`);
+        }
+      }
+      
+      // Reset form only if successful
+      if (failed === 0) {
         setFormData((prev) => ({
           ...prev,
           recipient_group: "",
@@ -374,25 +518,37 @@ export default function SendBulkSMS() {
         setContactChips([]);
         setCsvFile(null);
         setSelectedRecipientOption("existing");
-      } else {
-        toast.error(response.data.message || "Failed to send SMS");
       }
-    } catch (error: any) {
-      console.error("Error sending SMS:", error);
-      if (error.response?.status === 401) {
-        toast.error("Session expired. Please log in again.");
-      } else if (error.response?.status === 400) {
-        toast.error(
-          error.response.data?.message ||
-            "Invalid request. Please check your inputs."
-        );
-      } else {
-        toast.error("Failed to send SMS. Please try again.");
+    } else {
+      toast.error("Failed to send SMS to all recipients");
+      
+      // Show first error message if available
+      if (results.length > 0 && results[0]?.message) {
+        toast.error(`Error: ${results[0].message}`);
       }
-    } finally {
-      setIsLoading(false);
     }
-  };
+
+    console.log("SMS sending complete. Results:", results);
+
+  } catch (error: any) {
+    console.error("General error in SMS sending:", error);
+    
+    if (error.response?.status === 401) {
+      toast.error("Session expired. Please log in again.");
+    } else if (error.response?.status === 400) {
+      const errorMsg = error.response.data?.message || "Invalid request";
+      toast.error(`Validation Error: ${errorMsg}`);
+    } else if (error.code === 'ECONNABORTED') {
+      toast.error("Request timeout. Please try again.");
+    } else if (!error.response) {
+      toast.error("Network error. Please check your connection.");
+    } else {
+      toast.error(`Failed to send SMS: ${error.message || "Unknown error"}`);
+    }
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const handleSaveAsDraft = async () => {
     if (!formData.compose_message.trim()) {
@@ -448,14 +604,10 @@ export default function SendBulkSMS() {
         }
       );
 
-      if (response.data.success) {
-        toast.success("Draft saved successfully!");
-        setTimeout(() => {
-          router.push("/sms/sms-drafts");
-        }, 1000);
-      } else {
-        toast.error(response.data.message || "Failed to save draft");
-      }
+      toast.success("Draft saved successfully!");
+      setTimeout(() => {
+        router.push("/sms/sms-drafts");
+      }, 1000);
     } catch (error: any) {
       console.error("Error saving draft:", error);
       if (error.response?.status === 401) {

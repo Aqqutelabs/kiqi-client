@@ -311,6 +311,7 @@ export default function CreateSenderID() {
       setData((prev) => [sender, ...prev]);
       setFormData({ name: "", sampleMessage: "" });
       toast.success("Sender ID created successfully!");
+      fetchSenderIDs();
     } catch (error: unknown) {
       handleApiError(error, "creating sender ID");
     } finally {

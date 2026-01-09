@@ -335,19 +335,25 @@ export default function SMSDrafts() {
   };
 
   const deleteDraft = async (id: string): Promise<void> => {
-    if (!token) {
-      throw new Error("Authentication required");
-    }
+  if (!token) {
+    throw new Error("Authentication required");
+  }
 
-    await axios.delete(
-      `${BASE_URL}/api/v1/sms/drafts/${id}`, // Fixed endpoint
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-  };
+  const response = await axios.delete<ApiResponse<{ success: boolean }>>(
+    `${BASE_URL}/api/v1/drafts/${id}`, // Changed to match your fetchDrafts endpoint
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  // Check if deletion was successful
+  if (response.data && !response.data.success) {
+    throw new Error(response.data.message || "Failed to delete draft");
+  }
+};
 
   // Handler Functions
   const handleApiError = (error: any, action: string) => {
@@ -459,28 +465,35 @@ export default function SMSDrafts() {
   };
 
   const handleDeleteConfirm = async () => {
-    if (!deletingDraft) return;
+  if (!deletingDraft) return;
 
-    setIsDeleting(true);
-    try {
-      console.log("Deleting draft:", deletingDraft.id);
+  setIsDeleting(true);
+  try {
+    console.log("Deleting draft:", deletingDraft.id);
 
-      await deleteDraft(deletingDraft.id);
-      
-      console.log("Draft deleted successfully");
+    await deleteDraft(deletingDraft.id);
+    
+    console.log("Draft deleted successfully");
 
-      // Remove from local state
-      setDrafts(prev => prev.filter(item => item.id !== deletingDraft.id));
-      
-      toast.success("Draft deleted successfully!");
-      setShowDeleteModal(false);
-      setDeletingDraft(null);
-    } catch (error: any) {
-      handleApiError(error, "delete draft");
-    } finally {
-      setIsDeleting(false);
-    }
-  };
+    // Remove from local state
+    setDrafts(prev => prev.filter(item => item.id !== deletingDraft.id));
+    
+    // Show success toast
+    toast.success("Draft deleted successfully!");
+    
+    // Refresh the table by fetching fresh data
+    await fetchDraftsData();
+    
+    // Close modal and reset state
+    setShowDeleteModal(false);
+    setDeletingDraft(null);
+    
+  } catch (error: any) {
+    handleApiError(error, "delete draft");
+  } finally {
+    setIsDeleting(false);
+  }
+};
 
   const handleSendDraft = (draft: SMSDraftTable) => {
     console.log("Preparing to send draft:", draft);
