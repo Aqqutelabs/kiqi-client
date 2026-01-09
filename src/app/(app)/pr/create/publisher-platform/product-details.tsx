@@ -45,8 +45,8 @@ function Overview({ product }: { product: Products }) {
         <h2 className="font-bold text-gray-900 mb-4">Key Features</h2>
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-gray-50 rounded-lg p-4">
-            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
-              <Award className="w-4 h-4 text-blue-600" />
+            <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center mb-3">
+              <Award className="w-4 h-4 text-orange-600" />
             </div>
             <div className="text-xs text-gray-600 mb-1">Premium Quality</div>
             <div className="font-semibold text-sm text-gray-900">
@@ -55,16 +55,16 @@ function Overview({ product }: { product: Products }) {
           </div>
 
           <div className="bg-gray-50 rounded-lg p-4">
-            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
-              <Target className="w-4 h-4 text-blue-600" />
+            <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center mb-3">
+              <Target className="w-4 h-4 text-orange-600" />
             </div>
             <div className="text-xs text-gray-600 mb-1">High Engagement</div>
             <div className="font-semibold text-sm text-gray-900">85% CTR</div>
           </div>
 
           <div className="bg-gray-50 rounded-lg p-4">
-            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
-              <Clock className="w-4 h-4 text-blue-600" />
+            <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center mb-3">
+              <Clock className="w-4 h-4 text-orange-600" />
             </div>
             <div className="text-xs text-gray-600 mb-1">Fast Delivery</div>
             <div className="font-semibold text-sm text-gray-900">
@@ -73,8 +73,8 @@ function Overview({ product }: { product: Products }) {
           </div>
 
           <div className="bg-gray-50 rounded-lg p-4">
-            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mb-3">
-              <Globe className="w-4 h-4 text-blue-600" />
+            <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center mb-3">
+              <Globe className="w-4 h-4 text-orange-600" />
             </div>
             <div className="text-xs text-gray-600 mb-1">Global Coverage</div>
             <div className="font-semibold text-sm text-gray-900">
@@ -170,7 +170,7 @@ function Metrics({ product }: { product: Products }) {
           <div key={idx} className="">
             <p className="flex justify-between items-center text-xs space-y-2">
               <span className="text-[#1B223C]">{bar.name}</span>
-              <span className="font-bold text-[#233E97]">{bar.count}/100</span>
+              <span className="font-bold text-[#F95417]">{bar.count}/100</span>
             </p>
             <div className="h-2 w-full rounded-full bg-[#F1F5F9]">
               <span
@@ -401,7 +401,7 @@ export default function ProductSidebar({
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}>
         {/* Header with Blue Background */}
-        <div className="bg-linear-to-r from-[#233E97] to-[#155DFC] p-6 relative h-42.5">
+        <div className="bg-linear-to-r from-[#F95417] to-[#155DFC] p-6 relative h-42.5">
           <button
             onClick={onClose}
             className="absolute top-4 right-4 text-white hover:bg-white/20 rounded-lg p-1 transition-colors">
@@ -458,7 +458,7 @@ export default function ProductSidebar({
                 key={tab.id}
                 className={`flex items-center justify-center gap-2 rounded-[10px] h-8.75 w-27.5 cursor-pointer ${
                   activeTab === tab.id
-                    ? "bg-[#233E97] text-white"
+                    ? "bg-[#F95417] text-white"
                     : "bg-[#F1F5F9] text-[#45556C]"
                 }`}>
                 <tab.icon size={15} />

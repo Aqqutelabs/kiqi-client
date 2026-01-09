@@ -48,7 +48,7 @@ const FAQFooter: React.FC = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* FAQ Section */}
       <div className="flex-1 px-4 sm:px-6 md:px-8 lg:px-6 py-8 sm:py-12 md:py-16 max-w-4xl mx-auto w-full">
-        <h2 className="bg-linear-to-b from-[#2BAAE2] to-[#233E97] text-transparent bg-clip-text font-bold text-2xl sm:text-3xl md:text-4xl lg:text-[47px]">
+        <h2 className="bg-linear-to-b from-[#2BAAE2] to-[#F95417] text-transparent bg-clip-text font-bold text-2xl sm:text-3xl md:text-4xl lg:text-[47px]">
           FAQ
         </h2>
 
@@ -60,7 +60,7 @@ const FAQFooter: React.FC = () => {
                 className="w-full pt-4 sm:pt-5 md:pt-6 pb-2 sm:pb-3 flex items-center justify-between text-left group">
                 <span
                   className={`text-xs sm:text-sm font-medium pr-4 sm:pr-6 md:pr-8 ${
-                    openIndex === index ? "text-blue-700" : "text-gray-900"
+                    openIndex === index ? "text-orange-700" : "text-gray-900"
                   }`}>
                   {faq.question}
                 </span>
@@ -98,7 +98,7 @@ const FAQFooter: React.FC = () => {
             {/* Left Section - Logo and Description */}
             <div className="max-w-lg">
               <img
-                src="/footer-logo.svg"
+                src="/xxing-logo.svg"
                 alt="Kiki Logo"
                 className="w-32 sm:w-36 md:w-40 mb-6 sm:mb-8"
               />
@@ -152,13 +152,15 @@ const FAQFooter: React.FC = () => {
             <h3 className="text-sm sm:text-base font-medium mb-3 sm:mb-4">
               Stay Up To Date
             </h3>
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-0 sm:flex-1 bg-transparent md:border border-gray-600 rounded-full sm:rounded-full text-xs sm:text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-600 transition-colors h-auto sm:h-12.5 md:h-15">
+            <div
+              className="flex flex-col sm:flex-row gap-2 sm:gap-0 sm:flex-1 bg-transparent md:border border-gray-600 rounded-full sm:rounded-full text-xs sm:text-sm text-white placeholder-gray-500 focus:outline-none focus:border-orange-600 transition-colors h-auto sm:h-12.5
+             md:h-15">
               <input
                 type="email"
                 placeholder="Enter Your Email"
                 className="outline-none bg-transparent flex-1 px-4 py-3 sm:ml-4 sm:py-0 placeholder-gray-500 rounded-full sm:rounded-none border border-gray-600 sm:border-0"
               />
-              <button className="px-6 py-3 sm:px-8 md:px-10 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-medium rounded-full transition-colors -mt-px sm:-ml-px">
+              <button className="px-6 py-3 sm:px-8 md:px-10 sm:py-3 bg-orange-600 hover:bg-orange-700 text-white text-xs sm:text-sm font-medium rounded-full transition-colors -mt-px sm:-ml-px">
                 Subscribe
               </button>
             </div>

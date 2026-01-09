@@ -52,20 +52,26 @@ export const EditorPreview: React.FC<EditorPreviewProps> = ({
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = sanitizedHTML;
     const text = tempDiv.textContent || "";
-    const wordCount = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+    const wordCount = text
+      .trim()
+      .split(/\s+/)
+      .filter((w) => w.length > 0).length;
     const charCount = text.length;
     const paragraphs = sanitizedHTML.match(/<p[^>]*>/gi)?.length || 0;
-    
+
     return { wordCount, charCount, paragraphs };
   }, [sanitizedHTML]);
 
   // Show empty state if no content
   if (!content || content === "<p></p>") {
     return (
-      <div className={`flex flex-col items-center justify-center p-8 text-gray-400 ${className}`}>
+      <div
+        className={`flex flex-col items-center justify-center p-8 text-gray-400 ${className}`}>
         <Eye size={48} className="mb-3 opacity-30" />
         <p className="text-sm font-medium">No content yet</p>
-        <p className="text-xs mt-1">Start typing in the editor to see a preview here</p>
+        <p className="text-xs mt-1">
+          Start typing in the editor to see a preview here
+        </p>
       </div>
     );
   }
@@ -73,9 +79,9 @@ export const EditorPreview: React.FC<EditorPreviewProps> = ({
   return (
     <div className={`flex flex-col h-full bg-white rounded-lg ${className}`}>
       {/* Preview Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-orange-50 to-indigo-50">
         <div className="flex items-center gap-2">
-          <Eye size={18} className="text-blue-600" />
+          <Eye size={18} className="text-orange-600" />
           <h3 className="text-sm font-semibold text-gray-900">Live Preview</h3>
         </div>
         <div className="flex items-center gap-4 text-xs text-gray-600">
@@ -98,14 +104,14 @@ export const EditorPreview: React.FC<EditorPreviewProps> = ({
             prose-strong:font-bold prose-strong:text-gray-900
             prose-em:italic prose-em:text-gray-700
             prose-u:underline
-            prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-a:hover:text-blue-800
+            prose-a:text-orange-600 prose-a:no-underline hover:prose-a:underline prose-a:hover:text-orange-800
             prose-code:text-red-600 prose-code:bg-red-50 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-mono
             prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-pre:border prose-pre:border-gray-700
             prose-pre:code:text-gray-100 prose-pre:code:bg-transparent
             prose-ul:text-gray-700 prose-ul:space-y-1 prose-ul:mb-4
             prose-ol:text-gray-700 prose-ol:space-y-1 prose-ol:mb-4
             prose-li:text-gray-700 prose-li:leading-relaxed
-            prose-blockquote:border-l-4 prose-blockquote:border-blue-400 prose-blockquote:bg-blue-50 prose-blockquote:px-4 prose-blockquote:py-3 prose-blockquote:text-gray-700 prose-blockquote:italic prose-blockquote:my-4 prose-blockquote:rounded-r-lg
+            prose-blockquote:border-l-4 prose-blockquote:border-orange-400 prose-blockquote:bg-orange-50 prose-blockquote:px-4 prose-blockquote:py-3 prose-blockquote:text-gray-700 prose-blockquote:italic prose-blockquote:my-4 prose-blockquote:rounded-r-lg
             prose-table:w-full prose-table:my-4 prose-table:border-collapse
             prose-tr:border-b prose-tr:border-gray-200
             prose-th:bg-gray-100 prose-th:p-2 prose-th:text-left prose-th:font-semibold prose-th:text-gray-900 prose-th:border prose-th:border-gray-300

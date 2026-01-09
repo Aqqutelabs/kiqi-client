@@ -656,7 +656,7 @@ export default function SendBulkSMS() {
                   onClick={() => setSelectedRecipientOption("existing")}
                   className={`px-4 flex gap-2 py-2 rounded-lg text-sm font-medium transition-colors ${
                     selectedRecipientOption === "existing"
-                      ? "bg-blue-50 text-blue-600 border border-blue-200"
+                      ? "bg-orange-50 text-orange-600 border border-orange-200"
                       : "text-gray-600 hover:bg-gray-50"
                   }`}>
                   <Users size={18} />
@@ -668,7 +668,7 @@ export default function SendBulkSMS() {
                   onClick={() => setSelectedRecipientOption("manual")}
                   className={`px-4 flex gap-2 py-2 rounded-lg text-sm font-medium transition-colors ${
                     selectedRecipientOption === "manual"
-                      ? "bg-blue-50 text-blue-600 border border-blue-200"
+                      ? "bg-orange-50 text-orange-600 border border-orange-200"
                       : "text-gray-600 hover:bg-gray-50"
                   }`}>
                   <Edit size={18} />
@@ -680,7 +680,7 @@ export default function SendBulkSMS() {
                   onClick={() => setSelectedRecipientOption("upload")}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex gap-2 ${
                     selectedRecipientOption === "upload"
-                      ? "bg-blue-50 text-blue-600 border border-blue-200"
+                      ? "bg-orange-50 text-orange-600 border border-orange-200"
                       : "text-gray-600 hover:bg-gray-50"
                   }`}>
                   <Upload size={18} />
@@ -691,18 +691,18 @@ export default function SendBulkSMS() {
 
             {/* Phone Numbers Summary */}
             {totalNumbers > 0 && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <Users size={18} className="text-blue-600" />
-                    <span className="font-medium text-blue-800">
+                    <Users size={18} className="text-orange-600" />
+                    <span className="font-medium text-orange-800">
                       {totalNumbers} phone number{totalNumbers !== 1 ? "s" : ""}{" "}
                       selected
                     </span>
                   </div>
                   <button
                     onClick={clearRecipients}
-                    className="text-sm text-blue-600 hover:text-blue-800">
+                    className="text-sm text-orange-600 hover:text-orange-800">
                     Clear all
                   </button>
                 </div>
@@ -712,7 +712,7 @@ export default function SendBulkSMS() {
                   {phonePreview.slice(0, 2).map((phone, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between py-2 px-3 bg-white rounded border border-blue-100">
+                      className="flex items-center justify-between py-2 px-3 bg-white rounded border border-orange-100">
                       <span className="text-sm text-gray-700 font-mono">
                         {phone}
                       </span>
@@ -806,7 +806,7 @@ export default function SendBulkSMS() {
             {/* Upload CSV Section */}
             {selectedRecipientOption === "upload" && (
               <div className="space-y-4">
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-orange-400 transition-colors">
                   <input
                     type="file"
                     id="csv-upload"

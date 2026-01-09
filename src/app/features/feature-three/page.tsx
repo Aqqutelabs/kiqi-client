@@ -231,7 +231,7 @@ export default function FeatureThreePage() {
             </div>
           ))}
         </div>
-        <button className="bg-linear-to-b from-[#2BAAE2] to-[#233E97] text-white rounded-lg sm:rounded-xl flex gap-2.5 h-12 sm:h-14 cursor-pointer px-3 sm:px-4 items-center hover:opacity-90 transition-opacity">
+        <button className="bg-linear-to-b from-[#2BAAE2] to-[#F95417] text-white rounded-lg sm:rounded-xl flex gap-2.5 h-12 sm:h-14 cursor-pointer px-3 sm:px-4 items-center hover:opacity-90 transition-opacity">
           See Pricing <MoveRight className="w-4 h-4" />
         </button>
       </div>
@@ -240,14 +240,14 @@ export default function FeatureThreePage() {
       <div className="mx-4 sm:mx-6 md:mx-8 lg:mx-14 my-10 sm:my-14 md:my-16 lg:my-20">
         <h3 className="font-bold text-2xl sm:text-3xl md:text-4xl lg:text-[50px] text-center px-4">
           How it works in
-          <span className="text-[#233E97]"> 3 simple steps</span>
+          <span className="text-[#F95417]"> 3 simple steps</span>
         </h3>
         <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 lg:gap-10 mt-6 md:my-12 lg:my-16 px-4">
           {howItWorksSteps.map((step) => (
             <div
               key={step.id}
               className="flex flex-col items-center gap-6 md:gap-4 relative w-full max-w-sm md:max-w-none">
-              <div className="absolute -top-4 rounded-md bg-radial from-[#233E97] to-[#2BAAE2] text-white text-sm md:text-base h-7 md:h-8 w-16 md:w-20 flex justify-center items-center">
+              <div className="absolute -top-4 rounded-md bg-radial from-[#F95417] to-[#2BAAE2] text-white text-sm md:text-base h-7 md:h-8 w-16 md:w-20 flex justify-center items-center">
                 Step {step.id}
               </div>
               <div className="rounded-xl md:rounded-2xl bg-[#DFEFFC] p-4 md:p-6 flex justify-center items-center w-full h-45 sm:h-50 md:h-62.5 lg:h-75">
@@ -268,8 +268,8 @@ export default function FeatureThreePage() {
 
       {/* use cases */}
       <div className="bg-[#EEF5FD] p-4 sm:p-6 lg:p-10 space-y-6 lg:space-y-10">
-        <div className="h-12 sm:h-14 md:h-16.75 w-40 sm:w-45 md:w-48.5 border border-[#233E97] rounded-full flex justify-center items-center mx-auto">
-          <p className="text-[#233E97] font-bold text-sm sm:text-base md:text-lg">
+        <div className="h-12 sm:h-14 md:h-16.75 w-40 sm:w-45 md:w-48.5 border border-[#F95417] rounded-full flex justify-center items-center mx-auto">
+          <p className="text-[#F95417] font-bold text-sm sm:text-base md:text-lg">
             Use Cases
           </p>
         </div>
@@ -416,14 +416,14 @@ export default function FeatureThreePage() {
       <div className="bg-[#EEF5FD] p-4 sm:p-6 lg:p-10 space-y-3 sm:space-y-4 lg:space-y-6">
         <h3 className="font-bold text-2xl sm:text-3xl md:text-4xl lg:text-[50px] text-center px-4">
           From zero to email marketing in
-          <span className="text-[#233E97] block">3 simple steps</span>
+          <span className="text-[#F95417] block">3 simple steps</span>
         </h3>
         <div className="flex flex-col md:flex-row items-center justify-center gap-6 sm:gap-8 lg:gap-10 mt-6 sm:mt-8 lg:mt-10 px-4">
           {emailMarketingSteps.map((step) => (
             <div
               key={step.id}
               className="flex flex-col items-center gap-3 sm:gap-4 relative w-full max-w-sm md:max-w-none">
-              <div className="absolute -top-4 rounded-md bg-radial from-[#233E97] to-[#2BAAE2] text-white text-sm md:text-base h-7 md:h-8 w-16 md:w-20 flex justify-center items-center">
+              <div className="absolute -top-4 rounded-md bg-radial from-[#F95417] to-[#2BAAE2] text-white text-sm md:text-base h-7 md:h-8 w-16 md:w-20 flex justify-center items-center">
                 Step {step.id}
               </div>
               <div className="rounded-xl sm:rounded-2xl bg-white p-4 sm:p-6 flex justify-center items-center w-full h-45 sm:h-50 md:h-62.5 lg:h-75">
@@ -442,7 +442,7 @@ export default function FeatureThreePage() {
       </div>
 
       {/* last cta section */}
-      <div className="bg-linear-to-b from-blue-900 via-blue-800 to-cyan-400 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12 xl:gap-20 px-4 sm:px-6 lg:px-8 xl:px-16 pt-8 sm:pt-10 lg:pt-16 xl:pt-20 w-[95%] rounded-xl sm:rounded-2xl mx-auto my-10 sm:my-14 lg:my-20">
+      <div className="bg-linear-to-b from-orange-900 via-orange-800 to-cyan-400 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12 xl:gap-20 px-4 sm:px-6 lg:px-8 xl:px-16 pt-8 sm:pt-10 lg:pt-16 xl:pt-20 w-[95%] rounded-xl sm:rounded-2xl mx-auto my-10 sm:my-14 lg:my-20">
         {/* left corner */}
         <div className="max-w-2xl space-y-4 sm:space-y-6 lg:space-y-8 w-full lg:w-1/2">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight text-center lg:text-left">

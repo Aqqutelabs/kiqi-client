@@ -45,7 +45,7 @@ const OtpInput = ({
           maxLength={1}
           value={data}
           onChange={(e) => handleChange(e.target, index)}
-          className="w-10 h-10 sm:w-12 sm:h-12 text-center text-lg font-semibold bg-gray-100 rounded-md border border-gray-100 focus:border-[#3366FF] outline-none"
+          className="w-10 h-10 sm:w-12 sm:h-12 text-center text-lg font-semibold bg-gray-100 rounded-md border border-gray-100 focus:border-[#FF5314] outline-none"
         />
       ))}
     </div>
@@ -62,8 +62,8 @@ const VerifyOtpPage = () => {
   };
 
   return (
-    <section className="flex justify-center items-center h-screen bg-[var(--primary)]">
-      <Card className="w-[500px]">
+    <section className="flex justify-center items-center h-screen bg-(--primary)">
+      <Card className="w-125">
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800">Reset Password</h2>
           <p className="text-gray-500 text-sm mt-2">

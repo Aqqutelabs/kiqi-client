@@ -1,8 +1,9 @@
-import * as React from 'react';
-import { clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import * as React from "react";
+import { clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {
   icon?: React.ReactNode;
 }
 
@@ -19,8 +20,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           type={type}
           className={twMerge(
             clsx(
-              'flex h-11 w-full rounded-md border border-gray-100 bg-gray-200 px-3 py-2 text-sm placeholder:text-gray-400 outline-none focus:border-[#3366FF]',
-              { 'pl-10': !!icon },
+              "flex h-11 w-full rounded-md border border-gray-100 bg-gray-200 px-3 py-2 text-sm placeholder:text-gray-400 outline-none focus:border-[#FF5314]",
+              { "pl-10": !!icon },
               className
             )
           )}
@@ -31,6 +32,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     );
   }
 );
-Input.displayName = 'Input';
+Input.displayName = "Input";
 
 export { Input };

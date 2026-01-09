@@ -40,7 +40,20 @@ const ContactModal = ({ isOpen, onClose, onContactCreated }: ContactModalProps) 
     }));
   };
 
-  const handleCreateContact = async (contactData: { firstName: string; lastName: string; company: string | undefined; jobTitle: string | undefined; phoneCountry: string | undefined; phoneNumber: any; emails: { address: string; isPrimary: boolean; }[] | { address: string; isPrimary: boolean; }[]; tags: string[] | undefined; notes: string | undefined; isArchived: boolean | undefined; }) => {
+  const handleCreateContact = async (contactData: {
+    firstName: string;
+    lastName: string;
+    company: string | undefined;
+    jobTitle: string | undefined;
+    phoneCountry: string | undefined;
+    phoneNumber: any;
+    emails:
+      | { address: string; isPrimary: boolean }[]
+      | { address: string; isPrimary: boolean }[];
+    tags: string[] | undefined;
+    notes: string | undefined;
+    isArchived: boolean | undefined;
+  }) => {
     try {
       const response = await createContact(contactData);
       toast.success("Contact created successfully!");
@@ -138,8 +151,7 @@ const ContactModal = ({ isOpen, onClose, onContactCreated }: ContactModalProps) 
             </p>
             <button
               onClick={handleSuccessClose}
-              className="w-fit px-6 py-3 bg-[#233E97] text-white rounded-lg hover:bg-[#1a2f73] transition-colors font-medium"
-            >
+              className="w-fit px-6 py-3 bg-[#F95417] text-white rounded-lg hover:bg-[#1a2f73] transition-colors font-medium">
               Done
             </button>
           </div>
@@ -156,8 +168,7 @@ const ContactModal = ({ isOpen, onClose, onContactCreated }: ContactModalProps) 
           <h2 className="text-xl font-semibold">Create New Contact</h2>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
+            className="text-gray-400 hover:text-gray-600 transition-colors">
             <X size={24} />
           </button>
         </div>
@@ -176,7 +187,7 @@ const ContactModal = ({ isOpen, onClose, onContactCreated }: ContactModalProps) 
                 value={formData.firstName}
                 onChange={handleInputChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
             </div>
 
@@ -189,8 +200,7 @@ const ContactModal = ({ isOpen, onClose, onContactCreated }: ContactModalProps) 
                 <button
                   type="button"
                   onClick={addEmail}
-                  className="text-sm text-blue-600 hover:text-blue-700"
-                >
+                  className="text-sm text-orange-600 hover:text-orange-700">
                   + Add another
                 </button>
               </div>
@@ -202,7 +212,7 @@ const ContactModal = ({ isOpen, onClose, onContactCreated }: ContactModalProps) 
                   onChange={(e) => updateEmail(index, e.target.value)}
                   placeholder="email@example.com"
                   required={index === 0}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 mb-2"
                 />
               ))}
             </div>
@@ -218,7 +228,7 @@ const ContactModal = ({ isOpen, onClose, onContactCreated }: ContactModalProps) 
                 value={formData.lastName}
                 onChange={handleInputChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
             </div>
 
@@ -231,8 +241,7 @@ const ContactModal = ({ isOpen, onClose, onContactCreated }: ContactModalProps) 
                 <button
                   type="button"
                   onClick={addPhone}
-                  className="text-sm text-blue-600 hover:text-blue-700"
-                >
+                  className="text-sm text-orange-600 hover:text-orange-700">
                   + Add another
                 </button>
               </div>
@@ -243,7 +252,7 @@ const ContactModal = ({ isOpen, onClose, onContactCreated }: ContactModalProps) 
                   value={phone}
                   onChange={(e) => updatePhone(index, e.target.value)}
                   placeholder="+1 (555) 123-4567"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 mb-2"
                 />
               ))}
             </div>
@@ -259,7 +268,7 @@ const ContactModal = ({ isOpen, onClose, onContactCreated }: ContactModalProps) 
                 value={formData.company}
                 onChange={handleInputChange}
                 placeholder="Search or create new system"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
             </div>
 
@@ -274,7 +283,7 @@ const ContactModal = ({ isOpen, onClose, onContactCreated }: ContactModalProps) 
                 value={formData.tags}
                 onChange={handleInputChange}
                 placeholder="Separate tags with commas"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
               <p className="text-xs text-gray-500 mt-1">
                 e.g., VIP, Decision Maker, Enterprise
@@ -291,7 +300,7 @@ const ContactModal = ({ isOpen, onClose, onContactCreated }: ContactModalProps) 
                 name="jobTitle"
                 value={formData.jobTitle}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
             </div>
 
@@ -306,7 +315,7 @@ const ContactModal = ({ isOpen, onClose, onContactCreated }: ContactModalProps) 
                 onChange={handleInputChange}
                 placeholder="Add any additional notes..."
                 rows={6}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
               />
             </div>
 
@@ -321,7 +330,7 @@ const ContactModal = ({ isOpen, onClose, onContactCreated }: ContactModalProps) 
                 value={formData.location}
                 onChange={handleInputChange}
                 placeholder="City, State/Country"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
             </div>
           </div>

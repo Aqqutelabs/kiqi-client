@@ -75,8 +75,7 @@ function CustomStatCard({
       <div className="flex gap-3 items-center">
         <div
           className="size-10 rounded-lg flex justify-center items-center"
-          style={{ backgroundColor: color }}
-        >
+          style={{ backgroundColor: color }}>
           <span className="text-white text-sm">{icon}</span>
         </div>
         <div>
@@ -104,8 +103,7 @@ function CustomStatCard({
               width: `${percent}%`,
               background: color,
               boxShadow: `0 0 6px ${color}`,
-            }}
-          ></div>
+            }}></div>
         </div>
 
         {/* conditional link or percent stat */}
@@ -200,7 +198,7 @@ export default function WalletPage() {
             title: "GoCredits",
             amount: usage.remaining_credits.toLocaleString(),
             currency: "GC",
-            color: "#233E97",
+            color: "#F95417",
             percent: Math.round(
               (usage.remaining_credits / usage.monthly_credits) * 100
             ).toString(),
@@ -325,8 +323,7 @@ export default function WalletPage() {
             <Heading heading="Recent Activity" subtitle="Latest transactions" />
             <Link
               href={"/wallet/transaction-history"}
-              className="text-sm font-medium text-[var(--primary)] hover:underline"
-            >
+              className="text-sm font-medium text-(--primary) hover:underline">
               View all
             </Link>
           </div>
@@ -342,15 +339,13 @@ export default function WalletPage() {
               return (
                 <div
                   key={index}
-                  className="flex justify-between items-center h-[62px] w-full border-b border-[#F1F5F9] py-3"
-                >
+                  className="flex justify-between items-center h-[62px] w-full border-b border-[#F1F5F9] py-3">
                   {/* icon and title */}
                   <div className="flex items-center gap-3">
                     {/* icon */}
                     <div
                       className="size-10 flex justify-center items-center rounded-lg"
-                      style={{ backgroundColor: hexToRgba(dynamicColor, 0.1) }}
-                    >
+                      style={{ backgroundColor: hexToRgba(dynamicColor, 0.1) }}>
                       {a.type === "Added" || a.type === "Referral" ? (
                         <ArrowDownRight size={20} color={dynamicColor} />
                       ) : (
@@ -384,8 +379,7 @@ export default function WalletPage() {
       <Modal
         isOpen={openModal}
         onClose={() => setOpenModal(false)}
-        width="600px"
-      >
+        width="600px">
         <PageHeader
           title="Redeem GoCoins"
           subtitle="Convert your GoCoins to Go Credits"
@@ -400,7 +394,9 @@ export default function WalletPage() {
             <div className="space-y-1">
               <p className="text-sm text-[#62748E]">Available Balance</p>
               <p>
-                <span className="text-[#0F172B] text-2xl">{coins.toLocaleString()}</span>
+                <span className="text-[#0F172B] text-2xl">
+                  {coins.toLocaleString()}
+                </span>
                 <span className="text-[#62748E] text-sm ml-1">GoCoins</span>
               </p>
             </div>
@@ -424,7 +420,7 @@ export default function WalletPage() {
               />
 
               <div className="flex gap-2 items-center ml-3">
-                <div className="rounded-lg text-white py-1 h-[30px] w-[46px] text-xs bg-[var(--primary)] flex justify-center items-center">
+                <div className="rounded-lg text-white py-1 h-[30px] w-[46px] text-xs bg-(--primary) flex justify-center items-center">
                   ALL
                 </div>
                 <p>Coins</p>
@@ -440,19 +436,25 @@ export default function WalletPage() {
             </p>
             <p className="flex items-center justify-between">
               <span className="text-sm text-[#62748E]">Gross Credits</span>
-              <span className="text-sm text-[#0F172B]">{grossCredits.toLocaleString()} GC</span>
+              <span className="text-sm text-[#0F172B]">
+                {grossCredits.toLocaleString()} GC
+              </span>
             </p>
             <p className="flex items-center justify-between">
               <span className="text-sm text-[#62748E]">
                 Processing Fee (10%)
               </span>
-              <span className="text-sm text-[#E7000B]">-{processingFee.toLocaleString()} GC</span>
+              <span className="text-sm text-[#E7000B]">
+                -{processingFee.toLocaleString()} GC
+              </span>
             </p>
             <hr className="text-gray-200" />
             <div className="flex items-center justify-between">
               <p className="text-[#0F172B]">You'll Receive</p>
               <p>
-                <span className="text-xl text-[#27AE60]">{finalCredits.toLocaleString()}</span>
+                <span className="text-xl text-[#27AE60]">
+                  {finalCredits.toLocaleString()}
+                </span>
                 <span className="text-sm text-[#62748E] ml-1">GC</span>
               </p>
             </div>
@@ -460,7 +462,7 @@ export default function WalletPage() {
 
           {/* info text */}
           <div className="border border-[#BEDBFF] h-16 rounded-lg bg-[#EFF6FF] p-2 flex items-start gap-2">
-            <Info size={18} className="mt-0.5 text-[var(--primary)]" />
+            <Info size={18} className="mt-0.5 text-(--primary)" />
             <p className="text-sm text-[#1C398E]">
               GoCoins are converted to Go Credits instantly. A 10% processing
               fee applies to all conversions.
@@ -473,8 +475,7 @@ export default function WalletPage() {
           <Button
             onClick={() => setOpenModal(false)}
             variant={"outline"}
-            className="w-full"
-          >
+            className="w-full">
             Cancel <X size={16} className="ml-3" />
           </Button>
           <Button
@@ -482,8 +483,7 @@ export default function WalletPage() {
             onClick={() => {
               setOpenModal(false);
               setConnectWallet(true);
-            }}
-          >
+            }}>
             Continue <ArrowRight size={16} className="ml-3" />
           </Button>
         </div>

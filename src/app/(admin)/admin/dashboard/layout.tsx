@@ -72,13 +72,12 @@ export default function AdminDashboardLayout({ children }: Props) {
           className={`fixed top-0 left-0 h-full w-64 bg-white text-gray-700 border-r border-gray-200 flex flex-col z-40 transform transition-transform duration-300 ease-in-out
           ${
             mobileOpen ? "translate-x-0" : "-translate-x-full"
-          } md:translate-x-0`}
-        >
+          } md:translate-x-0`}>
           {/* Logo */}
           <div className="flex items-center gap-2 h-16 px-6 border-b border-gray-200">
             <Image
-              src="/kiki-logo.svg"
-              alt="KiQi 2025"
+              src="/xxing-logo-colored.svg"
+              alt="XXING 2025"
               height={24}
               width={60}
               className="h-10 md:h-14 w-auto"
@@ -91,8 +90,7 @@ export default function AdminDashboardLayout({ children }: Props) {
               <Link
                 key={link.href}
                 href={link.href}
-                className="flex items-center gap-3 px-4 py-2 rounded text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors"
-              >
+                className="flex items-center gap-3 px-4 py-2 rounded text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors">
                 {link.icon}
                 {link.label}
               </Link>
@@ -102,8 +100,7 @@ export default function AdminDashboardLayout({ children }: Props) {
           {/* Logout */}
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-2 mb-6 mx-4 mt-auto bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
-          >
+            className="flex items-center gap-3 px-4 py-2 mb-6 mx-4 mt-auto bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors">
             <FiLogOut size={18} />
             Logout
           </button>
@@ -113,8 +110,7 @@ export default function AdminDashboardLayout({ children }: Props) {
         <div className="fixed top-4 left-4 md:hidden z-50">
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="p-2 rounded bg-white shadow text-gray-700"
-          >
+            className="p-2 rounded bg-white shadow text-gray-700">
             {mobileOpen ? <FiX size={24} /> : <FiMenu size={24} />}
           </button>
         </div>

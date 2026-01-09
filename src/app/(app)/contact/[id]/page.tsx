@@ -94,7 +94,7 @@ export default function ContactDetails() {
       <div className="bg-white rounded-xl border border-gray-200 p-6 flex justify-between items-start">
         <div className="flex gap-4">
           {/* Avatar */}
-          <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold">
+          <div className="w-12 h-12 rounded-full bg-orange-600 flex items-center justify-center text-white font-semibold">
             {getInitials(contact.firstName, contact.lastName)}
           </div>
 
@@ -105,12 +105,12 @@ export default function ContactDetails() {
             </h2>
             <p className="text-sm text-gray-500">KiQI Contact ID: {contact._id.slice(-6)}</p>
 
-            {contact.tags && contact.tags.length > 0 && (
+             {contact.tags && contact.tags.length > 0 && (
               <div className="flex gap-2 mt-2">
                 {contact.tags.map((tag, index) => (
                   <span
                     key={index}
-                    className="px-2 py-1 text-xs rounded-[12px] bg-blue-50 text-blue-600"
+                    className="px-2 py-1 text-xs rounded-xl bg-orange-50 text-orange-600"
                   >
                     {tag}
                   </span>
@@ -207,7 +207,7 @@ export default function ContactDetails() {
           <Card
             title="Lists"
             action={
-              <button className="text-sm text-blue-600 hover:underline flex items-center gap-1">
+              <button className="text-sm text-orange-600 hover:underline flex items-center gap-1">
                 <Plus size={14} /> Add to List
               </button>
             }
@@ -219,11 +219,10 @@ export default function ContactDetails() {
           <Card
             title="Notes"
             action={
-              <button className="text-sm text-blue-600 hover:underline">
+              <button className="text-sm text-orange-600 hover:underline">
                 Edit
               </button>
-            }
-          >
+            }>
             <p className="text-sm text-[#364153]">
               {contact.notes || "No notes added yet."}
             </p>
@@ -243,8 +242,6 @@ export default function ContactDetails() {
     </main>
   );
 }
-
-
 
 function Card({
   title,
@@ -275,13 +272,7 @@ function Info({ label, value }: { label: string; value: any }) {
   );
 }
 
-function ContactRow({
-  value,
-  primary,
-}: {
-  value: string;
-  primary?: boolean;
-}) {
+function ContactRow({ value, primary }: { value: string; primary?: boolean }) {
   return (
     <div className="flex justify-between items-center bg-gray-50 rounded-lg px-4 py-2 mb-2">
       <span className="text-sm text-[#101828]">{value}</span>

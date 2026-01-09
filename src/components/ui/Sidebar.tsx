@@ -3,7 +3,20 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown, ChevronRight, LogOut } from "lucide-react";
+import { 
+  ChevronDown, 
+  ChevronRight, 
+  LogOut,
+  LayoutDashboard,
+  Megaphone,
+  BarChart3,
+  Mail,
+  MessageSquare,
+  Users,
+  List,
+  FileText,
+  Home
+} from "lucide-react";
 import { clsx } from "clsx";
 import { useAppDispatch } from "@/redux/hooks";
 import { logout } from "@/redux/slices/authSlice";
@@ -17,13 +30,13 @@ type NavItem = {
   type: "link";
   href: string;
   label: string;
-  icon?: string;
+  icon?: React.ComponentType<{ className?: string; size?: number }>;
 };
 
 type NavDropdown = {
   type: "dropdown";
   label: string;
-  icon?: string;
+  icon?: React.ComponentType<{ className?: string; size?: number }>;
   items: NavItem[];
 };
 
@@ -33,7 +46,6 @@ type NavSection = {
   items: (NavItem | NavDropdown)[];
 };
 
-// Navigation structure matching the screenshot
 const navigationConfig: NavSection[] = [
   {
     type: "section",
@@ -43,7 +55,7 @@ const navigationConfig: NavSection[] = [
         type: "link",
         href: "/dashboard",
         label: "Overview",
-        icon: "/sidebar-icons/overview.svg",
+        icon: Home,
       },
     ],
   },
@@ -55,76 +67,49 @@ const navigationConfig: NavSection[] = [
         type: "link",
         href: "/pr/dashboard",
         label: "PR",
-        icon: "/sidebar-icons/pr.svg",
+        icon: Megaphone,
       },
-      // {
-      //   type: "dropdown",
-      //   label: "Social Media",
-      //   icon: "/sidebar-icons/social-media.svg",
-      //   items: [
-      //     {
-      //       type: "link",
-      //       href: "/campaigns/social/whatsapp",
-      //       label: "Whatsapp",
-      //     },
-      //     {
-      //       type: "link",
-      //       href: "/campaigns/social/facebook",
-      //       label: "Facebook",
-      //     },
-      //     {
-      //       type: "link",
-      //       href: "/campaigns/social/instagram",
-      //       label: "Instagram",
-      //     },
-      //     {
-      //       type: "link",
-      //       href: "/campaigns/social/kollective-marketer",
-      //       label: "Kollective Marketer",
-      //     },
-      //   ],
-      // },
       {
         type: "link",
         href: "/analytics",
         label: "Analytics",
-        icon: "/sidebar-icons/analytics.svg",
+        icon: BarChart3,
       },
       {
         type: "dropdown",
         label: "Email",
-        icon: "/sidebar-icons/analytics.svg",
+        icon: Mail,
         items: [
           {
             type: "link",
             href: "/email-campaigns/dashboard",
             label: "Dashboard",
-            icon: "/sidebar-icons/analytics.svg",
+            icon: LayoutDashboard,
           },
           {
             type: "link",
             href: "/email-campaigns/templates",
             label: "Templates",
-            icon: "/sidebar-icons/analytics.svg",
+            icon: FileText,
           },
           {
             type: "link",
             href: "/email-campaigns/mailbox",
             label: "Mailbox",
-            icon: "/sidebar-icons/analytics.svg",
+            icon: Mail,
           },
           {
             type: "link",
             href: "/email-campaigns/email-lists",
             label: "Email Lists",
-            icon: "/sidebar-icons/analytics.svg",
+            icon: List,
           },
         ],
       },
       {
         type: "dropdown",
         label: "SMS",
-        icon: "/sidebar-icons/sms.svg",
+        icon: MessageSquare,
         items: [
           {
             type: "link",
@@ -163,82 +148,22 @@ const navigationConfig: NavSection[] = [
         type: "link",
         href: "/contacts/dashboard",
         label: "All Contacts",
-        icon: "/sidebar-icons/subscription.svg",
+        icon: Users,
       },
       {
         type: "link",
         href: "/contacts/lists",
         label: "Lists",
-        icon: "/sidebar-icons/lists.svg",
+        icon: List,
       },
       {
         type: "link",
         href: "/contacts/forms",
         label: "Lead Forms",
-        icon: "/sidebar-icons/forms.svg",
+        icon: FileText,
       },
-      // {
-      //   type: "link",
-      //   href: "/contacts/segment",
-      //   label: "Segment",
-      //   icon: "/sidebar-icons/subscription.svg",
-      // },
-      // {
-      //   type: "link",
-      //   href: "/contacts/audience",
-      //   label: "Audience",
-      //   icon: "/sidebar-icons/subscription.svg",
-      // },
     ],
   },
-  // {
-  //   type: "section",
-  //   title: "Finance",
-  //   items: [
-  //     {
-  //       type: "link",
-  //       href: "/wallet",
-  //       label: "Wallet",
-  //       icon: "/sidebar-icons/wallet.svg",
-  //     },
-  //     {
-  //       type: "link",
-  //       href: "/subscriptions",
-  //       label: "Subscriptions",
-  //       icon: "/sidebar-icons/subscription.svg",
-  //     },
-  //     {
-  //       type: "link",
-  //       href: "/refer",
-  //       label: "Invite and Earn",
-  //       icon: "/sidebar-icons/invite.svg",
-  //     },
-  //   ],
-  // },
-  // {
-  //   type: "section",
-  //   title: "System",
-  //   items: [
-  //     {
-  //       type: "link",
-  //       href: "/user-and-roles",
-  //       label: "Users and Roles",
-  //       icon: "/sidebar-icons/subscription.svg",
-  //     },
-  //     {
-  //       type: "link",
-  //       href: "/profile",
-  //       label: "Profile",
-  //       icon: "/sidebar-icons/profile.svg",
-  //     },
-  //     {
-  //       type: "link",
-  //       href: "/settings",
-  //       label: "Settings",
-  //       icon: "/sidebar-icons/settings.svg",
-  //     },
-  //   ],
-  // },
 ];
 
 export const Sidebar: React.FC = () => {
@@ -296,12 +221,13 @@ export const Sidebar: React.FC = () => {
         {/* Header */}
         <div className="h-16 shrink-0 flex items-center px-5 border-b border-gray-200">
           <Image
-            src="/kiki-logo.svg"
-            alt="KiQi 2025"
+            src="/xxing-logo-colored.svg"
+            alt="XXING 2025"
             height={24}
             width={60}
             className="h-10 md:h-14 w-auto"
           />
+          <p className="text-[#FF5314] text-xl font-bold">XINNG</p>
         </div>
 
         {/* Scrollable Navigation */}
@@ -332,17 +258,18 @@ export const Sidebar: React.FC = () => {
                           className={clsx(
                             "w-full h-12.5 flex items-center justify-between px-5 py-2 text-xs sm:text-sm font-normal transition-colors",
                             {
-                              "text-[(--primary)]": hasActiveChild,
-                              "text-[#42526D] hover:text-[(--primary)]":
-                                !hasActiveChild,
+                              "text-[#FF5314]": hasActiveChild,
+                              "text-[#42526D]": !hasActiveChild,
                             }
                           )}>
                           <div className="flex items-center gap-2.5">
                             {item.icon && (
-                              <img
-                                src={item.icon}
-                                alt=""
-                                className="size-4 md:size-5 shrink-0"
+                              <item.icon 
+                                size={20}
+                                className={clsx("shrink-0", {
+                                  "text-[#FF5314]": hasActiveChild,
+                                  "text-[#42526D]": !hasActiveChild,
+                                })}
                               />
                             )}
                             <span>{item.label}</span>
@@ -367,20 +294,21 @@ export const Sidebar: React.FC = () => {
                                     className={clsx(
                                       "flex items-center gap-1.5 pl-8 py-2 text-[10px] md:text-[13px] font-normal transition-colors relative",
                                       {
-                                        "text-[(--primary)] bg-linear-to-r from-[#233E9726] via-white to-[##C4C4C400]":
+                                        "text-[#FF5314] bg-linear-to-r from-[#FF53140D] via-white to-[#C4C4C400]":
                                           isActive,
-                                        "text-[#42526D] hover:text-[(--primary)]":
-                                          !isActive,
+                                        "text-[#42526D]": !isActive,
                                       }
                                     )}>
                                     {/* Active indicator - left border */}
                                     {isActive && (
-                                      <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[(--primary)] rounded-r" />
+                                      <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#FF5314] rounded-r" />
                                     )}
-                                    <img
-                                      src="/sidebar-icons/arrow-right.svg"
-                                      alt="Right arrow"
-                                      className="size-3.5 shrink-0"
+                                    <ChevronRight 
+                                      size={14}
+                                      className={clsx("shrink-0", {
+                                        "text-[#FF5314]": isActive,
+                                        "text-[#42526D]": !isActive,
+                                      })}
                                     />
                                     <span>{subItem.label}</span>
                                   </Link>
@@ -403,22 +331,23 @@ export const Sidebar: React.FC = () => {
                         className={clsx(
                           "flex items-center gap-2.5 px-5 py-2 text-xs sm:text-sm font-normal h-12.5 transition-colors relative",
                           {
-                            "text-[(--primary)] bg-linear-to-r from-[#233E9726] via-white to-[##C4C4C400]":
+                            "text-[#FF5314] bg-linear-to-r from-[#FF53140D] via-white to-[#C4C4C400]":
                               isActive,
-                            "text-[#42526D] hover:text-[(--primary)]":
-                              !isActive,
+                            "text-[#42526D]": !isActive,
                           }
                         )}>
                         {/* Active indicator - left border */}
                         {isActive && (
-                          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[(--primary)] rounded-r" />
+                          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#FF5314] rounded-r" />
                         )}
 
                         {item.icon && (
-                          <img
-                            src={item.icon}
-                            alt=""
-                            className="size-4 md:size-5 shrink-0"
+                          <item.icon
+                            size={20}
+                            className={clsx("shrink-0", {
+                              "text-[#FF5314]": isActive,
+                              "text-[#42526D]": !isActive,
+                            })}
                           />
                         )}
                         <span>{item.label}</span>
@@ -435,7 +364,7 @@ export const Sidebar: React.FC = () => {
         <div className="shrink-0 px-5 py-4 border-t border-gray-200">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-2.5 py-2 text-[13px] font-normal text-[#42526D] hover:text-[(--primary)] transition-colors">
+            className="w-full flex items-center gap-2.5 py-2 text-[13px] font-normal text-[#42526D] hover:text-[#FF5314] transition-colors">
             <LogOut className="w-4 h-4 shrink-0" />
             <span>Log out</span>
           </button>

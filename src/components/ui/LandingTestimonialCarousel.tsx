@@ -2,10 +2,11 @@
 import { useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-
-export default function TestimonialsCarousel ({
-    bgColor = "#FFF"
-}: { bgColor?: string }) {
+export default function TestimonialsCarousel({
+  bgColor = "#FFF",
+}: {
+  bgColor?: string;
+}) {
   const scrollerRef = useRef<HTMLDivElement>(null);
 
   const testimonials = [
@@ -63,7 +64,7 @@ export default function TestimonialsCarousel ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 md:mb-12 px-4">
           See what others are saying about{" "}
-          <span className="text-blue-600">Kiki.</span>
+          <span className="text-orange-600">Kiki.</span>
         </h2>
 
         <div className="relative">
@@ -84,8 +85,7 @@ export default function TestimonialsCarousel ({
               <article
                 key={testimonial.id}
                 className={`flex-none w-70 sm:w-[320px] md:w-100 border border-gray-200 rounded-2xl p-4 md:p-6 snap-start`}
-                style={{ backgroundColor: bgColor }}
-                >
+                style={{ backgroundColor: bgColor }}>
                 <p className="text-gray-700 text-base sm:text-lg md:text-[22px] leading-relaxed mb-4 md:mb-6">
                   "{testimonial.quote}"
                 </p>
@@ -126,4 +126,4 @@ export default function TestimonialsCarousel ({
       `}</style>
     </section>
   );
-};
+}

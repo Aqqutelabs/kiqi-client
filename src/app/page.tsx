@@ -11,13 +11,8 @@ import NavBar from "@/components/ui/landing-nav";
 import LandingNav from "@/components/ui/landing-nav";
 import HorizontalCarousel from "@/components/ui/LandingCarousel";
 import TestimonialsCarousel from "@/components/ui/LandingTestimonialCarousel";
-import {
-  CheckCircleIcon,
-  CirclePlay,
-  ArrowUp,
-} from "lucide-react";
+import { CheckCircleIcon, CirclePlay, ArrowUp } from "lucide-react";
 import Image from "next/image";
-
 
 export default function Home() {
   const carouselText = [
@@ -145,7 +140,7 @@ export default function Home() {
       <LandingNav />
 
       {/* hero section */}
-      <div className="min-h-screen w-[95%] lg:w-full max-w-[95%] bg-linear-to-b from-blue-900 via-blue-800 to-cyan-400 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-10 mx-auto rounded-2xl">
+      <div className="min-h-screen w-[95%] lg:w-full max-w-[95%] bg-linear-to-b from-orange-900 via-orange-800 to-cyan-400 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-10 mx-auto rounded-2xl">
         <div className="max-w-7xl w-full flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12">
           {/* Left Content */}
           <div className="flex-1 space-y-6 lg:space-y-8 px-4 sm:px-6 lg:px-0">
@@ -290,7 +285,7 @@ export default function Home() {
                   onClick={() => setActiveFeatureTab(f.id)}
                   className={`rounded-md py-2 px-3 md:py-3 md:px-4 lg:px-8 flex justify-center items-center cursor-pointer transition-all duration-200 ease-in whitespace-nowrap text-xs md:text-sm lg:text-base ${
                     isActive
-                      ? "text-[#233E97] bg-[#2BAAE233] font-semibold"
+                      ? "text-[#F95417] bg-[#2BAAE233] font-semibold"
                       : "text-gray-400 bg-transparent hover:bg-gray-50"
                   }`}>
                   {f.title}
@@ -321,7 +316,7 @@ export default function Home() {
           <span className="text-[#2BAAE2]">Demo Video</span> Below
         </h2>
         <img
-          src="/blue-arrow.svg"
+          src="/orange-arrow.svg"
           className="absolute left-[65%] sm:left-[70%] top-6 md:top-9 w-16 md:w-auto hidden sm:block"
         />
         <img
@@ -512,14 +507,14 @@ export default function Home() {
       <div className="bg-[#EEF5FD] p-4 md:p-6 lg:p-10 space-y-3 md:space-y-4">
         <h3 className="font-bold text-2xl sm:text-3xl md:text-4xl lg:text-12.5 text-center">
           From zero to email marketing in
-          <span className="text-[#233E97] block">3 simple steps</span>
+          <span className="text-[#F95417] block">3 simple steps</span>
         </h3>
         <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 lg:gap-10 mt-6 md:mt-10 px-4">
           {emailMarketingSteps.map((step) => (
             <div
               key={step.id}
               className="flex flex-col items-center gap-3 md:gap-4 relative w-full max-w-sm md:max-w-none">
-              <div className="absolute -top-4 rounded-md bg-radial from-[#233E97] to-[#2BAAE2] text-white text-sm md:text-base h-7 md:h-8 w-16 md:w-20 flex justify-center items-center">
+              <div className="absolute -top-4 rounded-md bg-radial from-[#F95417] to-[#2BAAE2] text-white text-sm md:text-base h-7 md:h-8 w-16 md:w-20 flex justify-center items-center">
                 Step {step.id}
               </div>
               <div className="rounded-xl md:rounded-2xl bg-white p-4 md:p-6 flex justify-center items-center w-full h-50 md:h-62.5 lg:h-75">

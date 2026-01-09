@@ -116,9 +116,11 @@ export default function ContactLeadForms() {
               name="search"
               placeholder="Search Contact name"
             />
-            <Button onClick={() => router.push("/contacts/forms/create")} className="w-2/4">
-            <Plus className="mr-1" size={20}/>
-            Create Form
+            <Button
+              onClick={() => router.push("/contacts/forms/create")}
+              className="w-2/4">
+              <Plus className="mr-1" size={20} />
+              Create Form
             </Button>
           </div>
         </div>
@@ -126,7 +128,7 @@ export default function ContactLeadForms() {
         <div className="w-full">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-[#E2E8F0] bg-[#D1DAF4] h-14 font-medium">
+              <tr className="border-b border-[#E2E8F0] bg-[#f4e1d1] h-14 font-medium">
                 <th className="text-left py-3 px-4 text-sm font-medium text-[#4A5565]">
                   Form Name
                 </th>
@@ -144,29 +146,37 @@ export default function ContactLeadForms() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={4} className="py-4 px-4 text-center text-sm text-gray-500">
+                  <td
+                    colSpan={4}
+                    className="py-4 px-4 text-center text-sm text-gray-500">
                     Loading forms...
                   </td>
                 </tr>
               ) : error ? (
                 <tr>
-                  <td colSpan={4} className="py-4 px-4 text-center text-sm text-red-500">
+                  <td
+                    colSpan={4}
+                    className="py-4 px-4 text-center text-sm text-red-500">
                     {error}
                   </td>
                 </tr>
               ) : forms.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="py-4 px-4 text-center text-sm text-gray-500">
+                  <td
+                    colSpan={4}
+                    className="py-4 px-4 text-center text-sm text-gray-500">
                     No forms available.
                   </td>
                 </tr>
               ) : (
                 forms.map((form) => (
-                  <tr key={form._id} className="border-b border-[#E2E8F0] hover:bg-gray-50">
+                  <tr
+                    key={form._id}
+                    className="border-b border-[#E2E8F0] hover:bg-gray-50">
                     <td className="py-4 px-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-[#EDF2F7] rounded flex items-center justify-center shrink-0">
-                          <FileText className="w-5 h-5 text-[#233E97]" />
+                          <FileText className="w-5 h-5 text-[#F95417]" />
                         </div>
                         <div>
                           <div className="text-sm font-medium text-[#2D3748]">
@@ -179,7 +189,8 @@ export default function ContactLeadForms() {
                       </div>
                     </td>
                     <td className="py-4 px-4">
-                      <Link href={`/contacts/forms/submissions/${form._id}`} className="text-sm text-[#233E97] font-medium block hover:underline cursor-pointer">
+                     
+                      <Link href={`/contacts/forms/submissions/${form._id}`} className="text-sm text-[#F95417] font-medium block hover:underline cursor-pointer">
                         {form.submissionCount} submissions
                       </Link>
                     </td>
@@ -222,9 +233,12 @@ export default function ContactLeadForms() {
       </div>
       <Modal isOpen={deleteModalOpen} onClose={closeDeleteModal} width="400px">
         <div className="p-4">
-          <h2 className="text-lg font-medium text-[#2D3748] mb-4">Confirm Delete</h2>
+          <h2 className="text-lg font-medium text-[#2D3748] mb-4">
+            Confirm Delete
+          </h2>
           <p className="text-sm text-[#718096] mb-4">
-            Are you sure you want to delete this form? This action cannot be undone.
+            Are you sure you want to delete this form? This action cannot be
+            undone.
           </p>
           <div className="flex justify-end gap-3">
             <Button variant="outline" onClick={closeDeleteModal}>

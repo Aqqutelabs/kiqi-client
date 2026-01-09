@@ -85,8 +85,7 @@ const UserModal = ({
           <button
             onClick={onClose}
             disabled={isLoading}
-            className="text-gray-500 hover:text-gray-700 disabled:opacity-50"
-          >
+            className="text-gray-500 hover:text-gray-700 disabled:opacity-50">
             <X size={20} />
           </button>
         </div>
@@ -95,7 +94,7 @@ const UserModal = ({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Create Notice */}
           {mode === "create" && (
-            <div className="flex gap-2 p-3 text-sm text-blue-700 bg-blue-50 rounded-lg">
+            <div className="flex gap-2 p-3 text-sm text-orange-700 bg-orange-50 rounded-lg">
               <Info size={16} className="mt-0.5" />
               <span>
                 Default password will be the user’s <strong>last name</strong>.
@@ -158,8 +157,7 @@ const UserModal = ({
               type="button"
               variant="outline"
               onClick={onClose}
-              className="flex-1"
-            >
+              className="flex-1">
               Cancel
             </Button>
             <Button type="submit" disabled={isLoading} className="flex-1">

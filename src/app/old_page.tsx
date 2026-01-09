@@ -45,17 +45,17 @@ export default function Home() {
 
   const gridBoxes = [
     {
-      title: "Tailor KiKi to your business",
+      title: "Tailor XINNG to your business",
       subtitle:
-        "KiKi is not just your regular AI chatbot, it understands your business and it can help your business grow faster.",
+        "XINNG is not just your regular AI chatbot, it understands your business and it can help your business grow faster.",
       lists: [
         "Upload your business data with the help of our interactive bot",
-        "Ask KiKi anything about your business",
+        "Ask XINNG anything about your business",
         "Generate text & media for Ads",
       ],
     },
     {
-      title: "Toggle KiKi on/off",
+      title: "Toggle XINNG on/off",
       subtitle: "Switch off AI mode and respond yourself when you want to.",
       lists: [
         "Respond to your customers instantly",
@@ -138,8 +138,8 @@ export default function Home() {
         <nav className="flex justify-between items-center">
           {/* logo */}
           <Image
-            src={"/kiki-logo.svg"}
-            alt="KiKi 2025"
+            src={"/xxing-logo-colored.svg"}
+            alt="XINNG 2025"
             height={66}
             width={140}
           />
@@ -229,7 +229,7 @@ export default function Home() {
             </p>
           </div>
           <h2 className="text-[#111111] text-[32px] md:text-[52px] text-center font-bold md:w-[677px]">
-            One Click Is All It Takes To Connect KiKi With Your Top Sales
+            One Click Is All It Takes To Connect XINNG With Your Top Sales
             Platforms
           </h2>
           <p className="text-[#797878] text-lg md:text-[27px] text-center font-normal">
@@ -436,7 +436,7 @@ export default function Home() {
         {/* getting started */}
         <div className="space-y-4 flex flex-col items-center my-20">
           <h2 className="font-bold text-center text-2xl md:text-[52px]">
-            Get started with <span className="text-[#0C31A1]">KiKi</span>
+            Get started with <span className="text-[#0C31A1]">XINNG</span>
           </h2>
           <p className="text-center text-[#797878] font-normal text-sm md:text-2xl">
             Convert more conversations to sales.{" "}

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
-import '@solana/wallet-adapter-react-ui/styles.css';
+import "@solana/wallet-adapter-react-ui/styles.css";
 import { ReduxProvider } from "@/components/provider/ReduxProvider";
 import ToasterClient from "./ToasterClient";
 import { ProductsProvider } from "@/context/ProductContext";
@@ -22,11 +22,11 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "KiKi",
-  description: "Streamline your business with KiKi.",
+  title: "XINNG",
+  description: "Streamline your business with XINNG.",
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
+    icon: "/xxing-logo-colored.svg",
+    shortcut: "/ .svg",
   },
 };
 
@@ -54,17 +54,17 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         {/* <SolanaProvider> */}
-          <SidebarProvider>
-            <ProductsProvider>
-              <ReduxProvider>
-                {/* <WalletProvider> */}
-                  <ToasterClient />
-                  <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js" />
-                  {children}
-                {/* </WalletProvider> */}
-              </ReduxProvider>
-            </ProductsProvider>
-          </SidebarProvider>
+        <SidebarProvider>
+          <ProductsProvider>
+            <ReduxProvider>
+              {/* <WalletProvider> */}
+              <ToasterClient />
+              <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js" />
+              {children}
+              {/* </WalletProvider> */}
+            </ReduxProvider>
+          </ProductsProvider>
+        </SidebarProvider>
         {/* </SolanaProvider> */}
       </body>
     </html>

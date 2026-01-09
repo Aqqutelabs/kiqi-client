@@ -26,7 +26,8 @@ const ConversionsPage = () => {
   const [statusFilter, setStatusFilter] = useState<string>("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [selectedConversion, setSelectedConversion] = useState<Conversion | null>(null);
+  const [selectedConversion, setSelectedConversion] =
+    useState<Conversion | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -244,8 +245,7 @@ const ConversionsPage = () => {
             </div>
             <button
               onClick={() => setError(null)}
-              className="text-red-600 hover:text-red-700 text-xl"
-            >
+              className="text-red-600 hover:text-red-700 text-xl">
               ×
             </button>
           </div>
@@ -265,8 +265,7 @@ const ConversionsPage = () => {
                   setCurrentPage(1);
                   fetchConversions();
                 }}
-                disabled={loading}
-              >
+                disabled={loading}>
                 <RefreshCw className="w-4 h-4 mr-2" />
                 {loading ? "Refreshing..." : "Refresh"}
               </Button>
@@ -291,8 +290,7 @@ const ConversionsPage = () => {
                 onChange={(e) => {
                   setStatusFilter(e.target.value);
                   setCurrentPage(1);
-                }}
-              >
+                }}>
                 <option value="All">All Status</option>
                 <option value="Pending">Pending</option>
                 <option value="Approved">Approved</option>
@@ -338,7 +336,7 @@ const ConversionsPage = () => {
                   <tr>
                     <td colSpan={6} className="py-12">
                       <div className="flex flex-col items-center justify-center gap-3">
-                        <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+                        <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
                         <p className="text-gray-600 font-medium">
                           Loading conversions...
                         </p>
@@ -362,8 +360,7 @@ const ConversionsPage = () => {
                   filteredConversions.map((conversion) => (
                     <tr
                       key={conversion._id}
-                      className="hover:bg-gray-50 transition-colors"
-                    >
+                      className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex flex-col">
                           <p className="font-medium text-gray-900">
@@ -389,7 +386,8 @@ const ConversionsPage = () => {
                         </p>
                       </td>
                       <td className="px-6 py-4">
-                        <StatusBadge variant={getStatusVariant(conversion.status)}>
+                        <StatusBadge
+                          variant={getStatusVariant(conversion.status)}>
                           {conversion.status}
                         </StatusBadge>
                       </td>
@@ -401,8 +399,7 @@ const ConversionsPage = () => {
                           <Button
                             variant="tertiary"
                             size="sm"
-                            onClick={() => handleViewDetails(conversion)}
-                          >
+                            onClick={() => handleViewDetails(conversion)}>
                             View
                           </Button>
                           {conversion.status === "Pending" && (
@@ -410,8 +407,7 @@ const ConversionsPage = () => {
                               <button
                                 onClick={() => handleApprove(conversion._id)}
                                 disabled={actionLoading === conversion._id}
-                                className="inline-flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium bg-green-100 text-green-700 hover:bg-green-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                              >
+                                className="inline-flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium bg-green-100 text-green-700 hover:bg-green-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                                 {actionLoading === conversion._id ? (
                                   <Loader2 className="w-4 h-4 animate-spin" />
                                 ) : (
@@ -424,8 +420,7 @@ const ConversionsPage = () => {
                               <button
                                 onClick={() => handleReject(conversion._id)}
                                 disabled={actionLoading === conversion._id}
-                                className="inline-flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium bg-red-100 text-red-700 hover:bg-red-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                              >
+                                className="inline-flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium bg-red-100 text-red-700 hover:bg-red-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                                 {actionLoading === conversion._id ? (
                                   <Loader2 className="w-4 h-4 animate-spin" />
                                 ) : (

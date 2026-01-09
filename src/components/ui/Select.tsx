@@ -26,7 +26,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           className={twMerge(
             clsx(
               "w-full border border-gray-300 rounded-md px-3 py-[10px] appearance-none",
-              "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm",
+              "focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none text-sm",
               !hasValue && "text-gray-400",
               className
             )
@@ -34,7 +34,11 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
           {...props}>
           {/* Placeholder (hidden from options but shown when no value) */}
           {placeholder && (
-            <option value="" disabled hidden className="text-sm cursor-not-allowed">
+            <option
+              value=""
+              disabled
+              hidden
+              className="text-sm cursor-not-allowed">
               {placeholder}
             </option>
           )}
