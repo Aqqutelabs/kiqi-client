@@ -12,7 +12,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import apiClient from "@/lib/utils/apiClient";
 import BASE_URL from "@/lib/utils/baseUrl";
 import { RichTextToolbar } from "@/components/ui/RichTextToolbar";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 // import { FormField } from "@/components/ui/FormField";
 import Avatar from "@/components/ui/Avatar";
 import { useAppSelector } from "@/redux/hooks";
@@ -21,6 +21,24 @@ export default function AIGeneratedEmail() {
   const editorRef = React.useRef<HTMLDivElement>(null);
   const kikiPanelRef = React.useRef<HTMLDivElement>(null);
   const [activeFormats, setActiveFormats] = React.useState<string[]>([]);
+   const searchParams = useSearchParams();
+
+    useEffect(() => {
+    const templateMessage = searchParams.get('template');
+    
+    if (templateMessage) {
+      // Decode the template message
+      const decodedMessage = decodeURIComponent(templateMessage);
+      
+      // Prefill the context with the template
+      setContext(`Create an email based on this template: ${decodedMessage}`);
+      
+      // Also prefill the main panel with the template description
+      setMainPanelContent(decodedMessage);
+      
+      toast.success("Template loaded!");
+    }
+  }, [searchParams]);
 
   // for user avatar and name
   const user = useAppSelector((state) => state.auth.user);
