@@ -231,7 +231,11 @@ export default function CreateLeadForm() {
           { name: formName, fields },
           accessToken
         );
-        setPublicLink(response.publicLink);
+        // Construct the frontend public link using the form's slug or ID
+        const formSlug = response.form?.slug || response.form?._id;
+        // Always use production domain for the public link
+        const frontendPublicLink = `https://autosenderai.com/forms/${formSlug}`;
+        setPublicLink(frontendPublicLink);
         setIsModalOpen(true);
       } catch (error) {
         console.error("Failed to create form:", error);
@@ -542,26 +546,60 @@ export default function CreateLeadForm() {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Form Published">
-        <iframe
-          src={publicLink}
-          title="Published Form"
-          className="w-full h-96 border rounded"></iframe>
-        <div className="space-y-2 text-sm text-[#364153] my-6">
-          <p>Hosted Form Link</p>
-          <div className="flex flex-col md:flex-row items-center gap-2">
-            <input
-              type="text"
-              value={publicLink}
-              readOnly
-              className="outline-none border border-[#D1D5DC] bg-[#F9FAFB] px-4 py-2 rounded-lg h-10.5 w-4/5"
-            />
-            <button
-              onClick={() => navigator.clipboard.writeText(publicLink)}
-              className="border border-[#D1D5DC] h-10.5 rounded-lg w-1/5 text-sm cursor-pointer hover:bg-gray-50">
-              Copy
-            </button>
+        title="Form Published Successfully!"
+        width="450px">
+        <div className="flex flex-col items-center text-center">
+          {/* Success Icon */}
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+            <svg
+              className="w-8 h-8 text-green-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
           </div>
+          
+          <p className="text-gray-600 mb-6">
+            Your form is now live and ready to collect responses.
+          </p>
+          
+          {/* Link Section */}
+          <div className="w-full space-y-2">
+            <label className="block text-sm font-medium text-gray-700 text-left">
+              Shareable Link
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={publicLink}
+                readOnly
+                className="flex-1 outline-none border border-gray-300 bg-gray-50 px-4 py-2.5 rounded-lg text-sm text-gray-600"
+              />
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(publicLink);
+                  alert("Link copied to clipboard!");
+                }}
+                className="px-4 py-2.5 bg-[#FF5314] text-white rounded-lg text-sm font-medium hover:bg-[#e64a11] transition-colors">
+                Copy
+              </button>
+            </div>
+          </div>
+          
+          {/* Open Link Button */}
+          <a
+            href={publicLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 text-sm text-[#FF5314] hover:underline font-medium">
+            Open form in new tab →
+          </a>
         </div>
       </Modal>
     </section>

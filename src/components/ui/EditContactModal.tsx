@@ -116,10 +116,10 @@ const EditContactModal: React.FC<EditContactModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-lg p-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl p-8 max-h-[90vh] overflow-y-auto">
         <h2 className="text-xl font-bold mb-6">Edit Contact</h2>
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
             <input
@@ -127,7 +127,7 @@ const EditContactModal: React.FC<EditContactModalProps> = ({
               name="firstName"
               value={formData.firstName}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
             />
           </div>
           <div>
@@ -137,7 +137,7 @@ const EditContactModal: React.FC<EditContactModalProps> = ({
               name="lastName"
               value={formData.lastName}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
             />
           </div>
           <div>
@@ -148,7 +148,7 @@ const EditContactModal: React.FC<EditContactModalProps> = ({
                 type="email"
                 value={email}
                 onChange={(e) => handleEmailChange(idx, e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 mb-2"
               />
             ))}
           </div>
@@ -160,7 +160,7 @@ const EditContactModal: React.FC<EditContactModalProps> = ({
                 type="text"
                 value={phone}
                 onChange={(e) => handlePhoneChange(idx, e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 mb-2"
               />
             ))}
           </div>
@@ -171,7 +171,17 @@ const EditContactModal: React.FC<EditContactModalProps> = ({
               name="company"
               value={formData.company}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Job Title</label>
+            <input
+              type="text"
+              name="jobTitle"
+              value={formData.jobTitle}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
             />
           </div>
           <div>
@@ -181,19 +191,9 @@ const EditContactModal: React.FC<EditContactModalProps> = ({
               name="tags"
               value={formData.tags}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
             />
             <p className="text-xs text-gray-500 mt-1">e.g., VIP, Decision Maker, Enterprise</p>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Job Title</label>
-            <input
-              type="text"
-              name="jobTitle"
-              value={formData.jobTitle}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
@@ -201,8 +201,8 @@ const EditContactModal: React.FC<EditContactModalProps> = ({
               name="notes"
               value={formData.notes}
               onChange={handleInputChange}
-              rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
             />
           </div>
         </div>

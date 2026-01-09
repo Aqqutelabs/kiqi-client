@@ -20,6 +20,8 @@ export interface Contact {
   company?: string;
   emails: EmailEntry[];
   phones: PhoneEntry[];
+  phoneCountry?: string;
+  phoneNumber?: string;
   tags?: string[];
   notes?: string;
   isArchived: boolean;
@@ -34,6 +36,7 @@ export interface ContactsResponse {
   totalPages: number;
   currentPage: number | string;
   totalContacts: number;
+  formLeads?: Contact[];
 }
 
 export interface ContactsApiParams {
