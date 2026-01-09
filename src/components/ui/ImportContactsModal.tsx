@@ -2,7 +2,8 @@ import { useState, useRef } from "react";
 import { X, Upload } from "lucide-react";
 import { Button } from "./Button";
 import Image from "next/image";
-import { fileParser } from "@/lib/utils/fileParser";
+import { importContactsFromCSV } from "@/lib/contacts-api";
+import toast from "react-hot-toast";
 
 interface FileWithProgress {
   id: number;
@@ -24,6 +25,8 @@ export function ImportContactsModal({
   const [step, setStep] = useState(1);
   const [files, setFiles] = useState<FileWithProgress[]>([]);
   const [isDragging, setIsDragging] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
 
   // Importing modal state
   const [showImportingModal, setShowImportingModal] = useState(false);
@@ -62,84 +65,65 @@ export function ImportContactsModal({
       return (isCSV || isExcel) && isUnder10MB;
     });
 
+    if (validFiles.length === 0) {
+      toast.error("Please select a valid CSV or Excel file (max 10MB)");
+      return;
+    }
+
+    // Store the first valid file for upload
+    setSelectedFile(validFiles[0]);
+
     const filesWithProgress = validFiles.map((file, index) => ({
       id: Date.now() + index,
       name: file.name,
       size: file.size,
-      progress: 0,
-      status: "uploading" as const,
+      progress: 100,
+      status: "complete" as const,
     }));
 
     setFiles(filesWithProgress);
-
-    filesWithProgress.forEach((file) => {
-      simulateUpload(file.id);
-    });
   };
-
-  const simulateUpload = (fileId: number) => {
-    let progress = 0;
-
-    const interval = setInterval(() => {
-      progress += 10;
-
-      setFiles((prev) =>
-        prev.map((f) => (f.id === fileId ? { ...f, progress } : f))
-      );
-
-      if (progress >= 100) {
-        clearInterval(interval);
-
-        setFiles((prev) =>
-          prev.map((f) => (f.id === fileId ? { ...f, status: "complete" } : f))
-        );
-
-        // Start importing ONCE, after uploads visually finish
-        if (!hasStartedImportRef.current) {
-          hasStartedImportRef.current = true;
-
-          setTimeout(() => {
-            startImporting();
-          }, 600);
-        }
-      }
-    }, 200);
-  };
-
-  const parseFiles = async () => {
-  const fileList = fileInputRef.current?.files;
-
-  if (!fileList || fileList.length === 0) return;
-
-  for (const file of Array.from(fileList)) {
-    try {
-      const parsedData = await fileParser(file);
-      console.log("Parsed file:", file.name);
-      console.table(parsedData);
-    } catch (error) {
-      console.error("Failed to parse", file.name, error);
-    }
-  }
-};
 
   const startImporting = async () => {
-    if (showImportingModal) return;
+    if (!selectedFile || isImporting) return;
 
+    setIsImporting(true);
     setShowImportingModal(true);
     setImportProgress(0);
 
-    await parseFiles();
+    try {
+      const result = await importContactsFromCSV(selectedFile, (progress) => {
+        setImportProgress(progress);
+      });
 
-    let progress = 0;
+      setImportProgress(100);
 
-    const interval = setInterval(() => {
-      progress += 20;
-      setImportProgress(progress);
-
-      if (progress >= 100) {
-        clearInterval(interval);
+      if (result.error) {
+        toast.error(result.message || "Failed to import contacts");
+      } else {
+        toast.success(
+          result.message || `Successfully imported ${result.importedCount || 0} contacts`
+        );
       }
-    }, 400);
+    } catch (error: unknown) {
+      console.error("Import error:", error);
+      let errorMessage = "Failed to import contacts";
+      
+      // Extract error message from axios error response
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as { response?: { data?: { message?: string } } };
+        if (axiosError.response?.data?.message) {
+          errorMessage = axiosError.response.data.message;
+        }
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      toast.error(errorMessage);
+      setImportProgress(100);
+    } finally {
+      setIsImporting(false);
+    }
   };
 
   const removeFile = (fileId: number) => {
@@ -151,13 +135,14 @@ export function ImportContactsModal({
     setStep(1);
     setShowImportingModal(false);
     setImportProgress(0);
+    setSelectedFile(null);
+    setIsImporting(false);
     hasStartedImportRef.current = false;
     onClose();
   };
 
-  const handleImport = () => {
-    onImportComplete?.(files);
-    handleCancel();
+  const handleImport = async () => {
+    await startImporting();
   };
 
   if (!isOpen && !showImportingModal) return null;
@@ -345,13 +330,13 @@ export function ImportContactsModal({
               </p>
 
               <Button
-                disabled={importProgress < 100}
+                disabled={importProgress < 100 || isImporting}
                 onClick={() => {
-                  setShowImportingModal(false);
-                  setImportProgress(0);
+                  onImportComplete?.(files);
+                  handleCancel();
                 }}
                 className={`px-6 ${
-                  importProgress === 100
+                  importProgress === 100 && !isImporting
                     ? "bg-[#233E97] text-white hover:bg-[#1a2f73]"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
                 }`}

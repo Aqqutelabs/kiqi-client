@@ -3,7 +3,7 @@ import { X, ChevronDown } from "lucide-react";
 import { Button } from "./Button";
 
 interface List {
-  id: number;
+  id: string;
   name: string;
 }
 
@@ -11,7 +11,8 @@ interface SelectListModalProps {
   isOpen: boolean;
   onClose: () => void;
   lists: List[];
-  onSubmit?: (selectedIds: number[]) => void;
+  onSubmit?: (selectedIds: string[]) => void;
+  isLoading?: boolean;
 }
 
 export default function SelectListModal({
@@ -19,19 +20,30 @@ export default function SelectListModal({
   onClose,
   lists,
   onSubmit,
+  isLoading = false,
 }: SelectListModalProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   if (!isOpen) return null;
 
-  function toggleSelect(id: number) {
+  function toggleSelect(id: string) {
     setSelectedIds((prev) =>
       prev.includes(id)
         ? prev.filter((x) => x !== id)
         : [...prev, id]
     );
   }
+
+  const handleClose = () => {
+    setSelectedIds([]);
+    setDropdownOpen(false);
+    onClose();
+  };
+
+  const handleSubmit = () => {
+    onSubmit?.(selectedIds);
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
@@ -40,7 +52,7 @@ export default function SelectListModal({
         <div className="flex items-center justify-between p-6">
           <h2 className="text-base font-semibold text-[#101828]">Select List</h2>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="text-gray-400 hover:text-gray-600"
           >
             <X size={18} />
@@ -65,10 +77,9 @@ export default function SelectListModal({
                 px-4 py-2.5 text-sm text-gray-500
                 hover:border-gray-400"
             >
-                Select list(s) to add contacts
-              {/* {selectedIds.length > 0
+              {selectedIds.length > 0
                 ? `${selectedIds.length} list(s) selected`
-                : "Select list(s) to add contacts"} */}
+                : "Select list(s) to add contacts"}
               <ChevronDown
                 className={`w-4 h-4 text-gray-400 transition-transform ${
                   dropdownOpen ? "rotate-180" : ""
@@ -78,21 +89,25 @@ export default function SelectListModal({
 
             {/* EXPANDING LIST (inside frame) */}
             {dropdownOpen && (
-              <div className="mt-3 border border-gray-200 rounded-lg p-3 space-y-3">
-                {lists.map((list) => (
-                  <label
-                    key={list.id}
-                    className="flex items-center gap-3 text-sm text-gray-700 cursor-pointer"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.includes(list.id)}
-                      onChange={() => toggleSelect(list.id)}
-                      className="rounded border-gray-300 accent-[#059459]"
-                    />
-                    {list.name}
-                  </label>
-                ))}
+              <div className="mt-3 border border-gray-200 rounded-lg p-3 space-y-3 max-h-48 overflow-y-auto">
+                {lists.length === 0 ? (
+                  <p className="text-sm text-gray-500 text-center py-2">No lists available</p>
+                ) : (
+                  lists.map((list) => (
+                    <label
+                      key={list.id}
+                      className="flex items-center gap-3 text-sm text-gray-700 cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(list.id)}
+                        onChange={() => toggleSelect(list.id)}
+                        className="rounded border-gray-300 accent-[#059459]"
+                      />
+                      {list.name}
+                    </label>
+                  ))
+                )}
               </div>
             )}
           </div>
@@ -102,19 +117,19 @@ export default function SelectListModal({
         <div className="flex justify-end gap-3 p-6">
           <Button
           variant="outline"
-            onClick={onClose}
+            onClick={handleClose}
             className="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50"
           >
             Cancel
           </Button>
 
           <Button
-            onClick={() => onSubmit?.(selectedIds)}
-            disabled={selectedIds.length === 0}
+            onClick={handleSubmit}
+            disabled={selectedIds.length === 0 || isLoading}
             className="px-4 py-2 text-white
               disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Add to List(s)
+            {isLoading ? "Adding..." : "Add to List(s)"}
           </Button>
         </div>
       </div>

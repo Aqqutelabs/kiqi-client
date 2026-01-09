@@ -4,10 +4,14 @@ export function DeleteModal({
   isOpen,
   onClose,
   onConfirm,
+  title,
+  message,
 }: {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
+  title?: string;
+  message?: string;
 }) {
   if (!isOpen) return null;
 
@@ -20,11 +24,11 @@ export function DeleteModal({
           </div>
 
           <h3 className="text-lg font-semibold text-[#1B223C] mb-2">
-            You're about to delete this contact
+            {title || "You're about to delete this contact"}
           </h3>
 
           <p className="text-sm text-[#606062] mb-6">
-            This action cannot be reversed
+            {message || "This action cannot be reversed"}
           </p>
 
           <div className="flex gap-3 w-full">

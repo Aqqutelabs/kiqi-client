@@ -33,13 +33,55 @@ type FieldType = {
 };
 
 const FIELD_TYPES: FieldType[] = [
-  { id: "text", label: "Text Input", icon: Type, defaultLabel: "Text Field", defaultPlaceholder: "Enter text",},
-  { id: "email", label: "Email Field", icon: Mail, defaultLabel: "Email", defaultPlaceholder: "email@example.com",},
-  { id: "phone", label: "Phone Field", icon: Phone, defaultLabel: "Phone Number", defaultPlaceholder: "+234 0002 2000 000",},
-  { id: "dropdown", label: "Dropdown", icon: ChevronDown, defaultLabel: "New Dropdown Field", defaultPlaceholder: "Select an option",},
-  { id: "checkbox", label: "Checkbox", icon: CheckSquare, defaultLabel: "New checkbox field", defaultPlaceholder: "",},
-  { id: "multiselect", label: "Multi-select", icon: List, defaultLabel: "New multiselect Field", defaultPlaceholder: "Select multiple options",},
-  { id: "paragraph", label: "Paragraph Text", icon: AlignLeft, defaultLabel: "New textarea field", defaultPlaceholder: "Enter detailed text",},
+  {
+    id: "text",
+    label: "Text Input",
+    icon: Type,
+    defaultLabel: "Text Field",
+    defaultPlaceholder: "Enter text",
+  },
+  {
+    id: "email",
+    label: "Email Field",
+    icon: Mail,
+    defaultLabel: "Email",
+    defaultPlaceholder: "email@example.com",
+  },
+  {
+    id: "phone",
+    label: "Phone Field",
+    icon: Phone,
+    defaultLabel: "Phone Number",
+    defaultPlaceholder: "+234 0002 2000 000",
+  },
+  {
+    id: "dropdown",
+    label: "Dropdown",
+    icon: ChevronDown,
+    defaultLabel: "New Dropdown Field",
+    defaultPlaceholder: "Select an option",
+  },
+  {
+    id: "checkbox",
+    label: "Checkbox",
+    icon: CheckSquare,
+    defaultLabel: "New checkbox field",
+    defaultPlaceholder: "",
+  },
+  {
+    id: "multiselect",
+    label: "Multi-select",
+    icon: List,
+    defaultLabel: "New multiselect Field",
+    defaultPlaceholder: "Select multiple options",
+  },
+  {
+    id: "paragraph",
+    label: "Paragraph Text",
+    icon: AlignLeft,
+    defaultLabel: "New textarea field",
+    defaultPlaceholder: "Enter detailed text",
+  },
 ];
 
 export default function CreateLeadForm() {
@@ -58,9 +100,9 @@ export default function CreateLeadForm() {
   const [draggedType, setDraggedType] = useState<string | null>(null);
   const fieldIdCounter = useRef<number>(0);
   const [formNameError, setFormNameError] = useState("");
+  const [fieldError, setFieldError] = useState("");
 
   // for publish success
-  const [confirmPublish, setConfirmPublish] = useState(false);
   const [publicLink, setPublicLink] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const accessToken = useSelector(selectToken);
@@ -95,6 +137,7 @@ export default function CreateLeadForm() {
       setFields((prev) => [...prev, newField]);
       setSelectedFieldId(newField.id);
       setDraggedType(null);
+      setFieldError("");
     }
   };
 
@@ -103,11 +146,15 @@ export default function CreateLeadForm() {
   };
 
   const handleDeleteField = (fieldId: string) => {
-    setFields((prev) => prev.filter((f) => f.id !== fieldId));
-    if (selectedFieldId === fieldId) {
-      setSelectedFieldId(null);
-    }
-  };
+  setFields((prev) => prev.filter((f) => f.id !== fieldId));
+  if (selectedFieldId === fieldId) {
+    setSelectedFieldId(null);
+  }
+  // If no fields left, set field error if trying to preview
+  if (fields.length === 1) { // About to delete the last field
+    setFieldError("");
+  }
+};
 
   const updateSelectedField = (updates: Partial<Field>) => {
     if (!selectedFieldId) return;
@@ -165,22 +212,31 @@ export default function CreateLeadForm() {
   };
 
   const handlePreview = () => {
+  if (!formName) {
+    setFormNameError("Form name cannot be empty!");
+  } else if (fields.length === 0) { 
+    setFieldError("Form must have at least one field included");
+  } else {
+    setFormNameError("");
+    setFieldError("");
+    
     const previewData = {
       name: formName || "New Form",
       fields: fields,
     };
     localStorage.setItem("form_preview", JSON.stringify(previewData));
     window.open("/contacts/forms/preview", "_blank");
-  };
+  }
+};
 
   const handlePublish = async () => {
     if (!formName) {
-      setFormNameError("Form name cannot be empty!")
+      setFormNameError("Form name cannot be empty!");
     } else if (!accessToken) {
       console.error("No access token available");
       return;
     } else {
-      setFormNameError('');
+      setFormNameError("");
       try {
         const response = await createForm(
           { name: formName, fields },
@@ -188,12 +244,12 @@ export default function CreateLeadForm() {
         );
         setPublicLink(response.publicLink);
         setIsModalOpen(true);
-        setConfirmPublish(true);
+        // setConfirmPublish(true);
       } catch (error) {
         console.error("Failed to create form:", error);
       }
     }
-  }
+  };
 
   return (
     <section className="min-h-screen bg-gray-50">
@@ -255,9 +311,13 @@ export default function CreateLeadForm() {
                 setFormName(e.target.value)
               }
               placeholder="Enter form name"
-              className="w-full px-4 py-2 border border-[#D1D5DC] text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              className="w-full px-4 py-2 border border-[#D1D5DC] text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF5314] bg-white"
             />
-            {formNameError && <span className="text-xs text-red-500 text-left ml-2.5 mt-1">{formNameError}</span>}
+            {formNameError && (
+              <div className="text-xs text-red-500 text-left ml-2.5 mt-1">
+                {formNameError}
+              </div>
+            )}
           </div>
 
           {/* form body */}
@@ -290,7 +350,7 @@ export default function CreateLeadForm() {
                     onClick={() => handleFieldClick(field.id)}
                     className={`relative border-2 rounded-lg p-4 cursor-pointer transition-all ${
                       isSelected
-                        ? "border-blue-500 bg-blue-50"
+                        ? "border-[#FF5314] bg-orange-50"
                         : "border-[#E5E7EB] hover:border-gray-300"
                     }`}>
                     {/* Delete Button */}
@@ -387,6 +447,11 @@ export default function CreateLeadForm() {
               </Button>
             )}
           </div>
+          {fieldError && (
+            <div className="text-xs text-red-500 text-left ml-2.5 mt-1">
+              {fieldError}
+            </div>
+          )}
         </div>
 
         {/* Right Sidebar - Field Settings */}
@@ -489,11 +554,10 @@ export default function CreateLeadForm() {
         )}
       </div>
 
-      <Modal isOpen={confirmPublish} onClose={() => setConfirmPublish(false)} width="500px">
+      {/* <Modal isOpen={confirmPublish} onClose={() => setConfirmPublish(false)} width="500px">
         <Heading heading={`${formName} Published!`} />
         <hr className="text-gray-200 my-4" />
 
-        {/* hosted link */}
         <div className="space-y-2 text-sm text-[#364153] my-6">
           <p>Hosted Form Link</p>
           <div className="flex flex-col md:flex-row items-center gap-2">
@@ -511,7 +575,6 @@ export default function CreateLeadForm() {
           </div>
         </div>
 
-        {/* embed code */}
         <div className="space-y-2">
           <p className="text-sm text-[#364153]">Embed Code</p>
           <div className="min-h-37.5 w-full rounded-lg relative bg-[#101828] p-6">
@@ -535,25 +598,27 @@ frameborder="0"
         </div>
 
         <Button variant={"tertiary"} className="mt-4 w-full cursor-pointer">Close</Button>
-      </Modal>
+      </Modal> */}
 
       {/* Modal to display public link */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Form Published">
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Form Published">
         <iframe
           src={publicLink}
           title="Published Form"
-          className="w-full h-96 border rounded"
-        ></iframe>
+          className="w-full h-96 border rounded"></iframe>
         <div className="space-y-2 text-sm text-[#364153] my-6">
           <p>Hosted Form Link</p>
           <div className="flex flex-col md:flex-row items-center gap-2">
-            <input 
-              type="text" 
+            <input
+              type="text"
               value={publicLink}
               readOnly
-              className="outline-none border border-[#D1D5DC] bg-[#F9FAFB] px-4 py-2 rounded-lg h-10.5 w-4/5" 
+              className="outline-none border border-[#D1D5DC] bg-[#F9FAFB] px-4 py-2 rounded-lg h-10.5 w-4/5"
             />
-            <button 
+            <button
               onClick={() => navigator.clipboard.writeText(publicLink)}
               className="border border-[#D1D5DC] h-10.5 rounded-lg w-1/5 text-sm cursor-pointer hover:bg-gray-50">
               Copy

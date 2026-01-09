@@ -17,9 +17,10 @@ const EditContactModal = ({
   isOpen,
   onClose,
   contact,
-  onUpdated
+  onUpdated,
 }: EditContactModalProps) => {
   const [showSuccess, setShowSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -35,35 +36,39 @@ const EditContactModal = ({
   const [emails, setEmails] = useState<string[]>([""]);
   const [phones, setPhones] = useState<string[]>([""]);
 
+  // Populate form when contact changes
   useEffect(() => {
-    if (contact) {
-      setFormData({
-    firstName: contact.firstName ?? contact.name?.split(" ")[0] ?? "",
-    lastName: contact.lastName ?? contact.name?.split(" ").slice(1).join(" ") ?? "",
-    company: contact.company ?? "",
-    jobTitle: contact.jobTitle ?? contact.title ?? "",
-    location: contact.location ?? "",
-    notes: contact.notes ?? "",
-    tags: Array.isArray(contact.tags) ? contact.tags.join(", ") : "",
-    isArchived: contact.isArchived ?? false,
-  });
+    if (!contact) return;
 
-      setEmails(
-    Array.isArray(contact.emails) && contact.emails.length
-      ? typeof contact.emails[0] === "string"
-        ? contact.emails
-        : contact.emails.map((e: any) => e.address)
-      : [""]
-  );
+    setFormData({
+      firstName: contact.firstName ?? contact.name?.split(" ")[0] ?? "",
+      lastName:
+        contact.lastName ??
+        contact.name?.split(" ").slice(1).join(" ") ??
+        "",
+      company: contact.company ?? "",
+      jobTitle: contact.jobTitle ?? contact.title ?? "",
+      location: contact.location ?? "",
+      notes: contact.notes ?? "",
+      tags: Array.isArray(contact.tags) ? contact.tags.join(", ") : "",
+      isArchived: contact.isArchived ?? false,
+    });
 
-  setPhones(
-    Array.isArray(contact.phones) && contact.phones.length
-      ? typeof contact.phones[0] === "string"
-        ? contact.phones
-        : contact.phones.map((p: any) => p.number)
-      : [""]
-  );
-    }
+    setEmails(
+      Array.isArray(contact.emails) && contact.emails.length
+        ? typeof contact.emails[0] === "string"
+          ? contact.emails
+          : contact.emails.map((e: any) => e.address)
+        : [""]
+    );
+
+    setPhones(
+      Array.isArray(contact.phones) && contact.phones.length
+        ? typeof contact.phones[0] === "string"
+          ? contact.phones
+          : contact.phones.map((p: any) => p.number)
+        : [""]
+    );
   }, [contact]);
 
   const handleInputChange = (e: any) => {
@@ -71,8 +76,8 @@ const EditContactModal = ({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const addEmail = () => setEmails([...emails, ""]);
-  const addPhone = () => setPhones([...phones, ""]);
+  const addEmail = () => setEmails((prev) => [...prev, ""]);
+  const addPhone = () => setPhones((prev) => [...prev, ""]);
 
   const updateEmail = (index: number, value: string) => {
     const copy = [...emails];
@@ -86,8 +91,20 @@ const EditContactModal = ({
     setPhones(copy);
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validation (from colleague’s logic)
+    if (
+      !formData.firstName ||
+      !formData.lastName ||
+      emails.filter((e) => e.trim()).length === 0
+    ) {
+      toast.error(
+        "First name, last name, and at least one email are required"
+      );
+      return;
+    }
 
     const payload = {
       firstName: formData.firstName,
@@ -99,43 +116,53 @@ const EditContactModal = ({
       isArchived: formData.isArchived,
 
       emails: emails
-        .filter(Boolean)
+        .filter((email) => email && email.trim())
         .map((email, index) => ({
           address: email,
           isPrimary: index === 0,
         })),
 
       phones: phones
-        .filter(Boolean)
+        .filter((phone) => phone && phone.trim())
         .map((phone, index) => ({
           number: phone,
           isPrimary: index === 0,
         })),
 
       tags: formData.tags
-        ? formData.tags.split(",").map((t) => t.trim())
+        ? formData.tags
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean)
         : [],
     };
 
     try {
-      console.log("Updating contact:", contact._id, payload);
+      setLoading(true);
       await updateContact(contact._id, payload);
       toast.success("Contact updated successfully");
       setShowSuccess(true);
-    } catch (err) {
-      toast.error("Failed to update contact");
-      console.error(err);
+    } catch (err: any) {
+      console.error("Error updating contact:", err);
+      toast.error(
+        err?.response?.data?.message ||
+          err?.message ||
+          "Failed to update contact"
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSuccessClose = () => {
     setShowSuccess(false);
     onClose();
-    onUpdated();
+    onUpdated(); // refresh list
   };
 
   if (!isOpen || !contact) return null;
 
+  // Success modal
   if (showSuccess) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
@@ -159,19 +186,19 @@ const EditContactModal = ({
     );
   }
 
+  // Main modal (UI untouched)
   return (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-    <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between p-6">
-        <h2 className="text-xl font-semibold">Edit Contact</h2>
-        <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
-          <X size={24} />
-        </button>
-      </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between p-6">
+          <h2 className="text-xl font-semibold">Edit Contact</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <X size={24} />
+          </button>
+        </div>
 
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="p-6">
+        <form onSubmit={handleSubmit} className="p-6">
+          <form onSubmit={handleSubmit} className="p-6">
         <div className="grid grid-cols-2 gap-6">
 
           {/* First Name */}
@@ -323,19 +350,19 @@ const EditContactModal = ({
             />
           </div>
         </div>
-
-        {/* Footer */}
-        <div className="flex justify-end gap-3 mt-8 pt-6 ">
-          <Button variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button type="submit">Update Contact</Button>
-        </div>
       </form>
+          <div className="flex justify-end gap-3 mt-8 pt-6">
+            <Button variant="outline" onClick={onClose} disabled={loading}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? "Saving..." : "Update Contact"}
+            </Button>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
-);
-
+  );
 };
 
 export default EditContactModal;

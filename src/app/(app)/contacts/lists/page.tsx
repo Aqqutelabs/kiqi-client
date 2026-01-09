@@ -1,41 +1,53 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Plus, Users } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import SearchInput from "@/components/ui/Search";
 import ActionsMenu from "@/components/ui/ActionsMenu";
+import { fetchContactLists, ContactList } from "@/lib/contacts-api";
+import toast from "react-hot-toast";
 
 export default function ContactListsPage() {
-  const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const router = useRouter();
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [lists, setLists] = useState<ContactList[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const lists = [
-    {
-      id: 1,
-      name: "Enterprise Clients",
-      description: "All enterprise-level contacts and decision makers",
-      contactsCount: 24,
-      createdAt: "12 Mar 2025",
-      updatedAt: "18 Apr 2025",
-    },
-    {
-      id: 2,
-      name: "Leads",
-      description: "Inbound and outbound leads",
-      contactsCount: 56,
-      createdAt: "02 Feb 2025",
-      updatedAt: "10 Apr 2025",
-    },
-    {
-      id: 3,
-      name: "Partners",
-      description: "Strategic partners and affiliates",
-      contactsCount: 14,
-      createdAt: "18 Jan 2025",
-      updatedAt: "01 Apr 2025",
-    },
-  ];
+  useEffect(() => {
+    const loadLists = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetchContactLists();
+        setLists(response.lists);
+      } catch (error) {
+        console.error("Failed to fetch contact lists:", error);
+        toast.error("Failed to load contact lists");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadLists();
+  }, []);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  const filteredLists = lists.filter(
+    (list) =>
+      list.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      list.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="flex-1 flex flex-col">
@@ -51,7 +63,11 @@ export default function ContactListsPage() {
             </h3>
 
             <div className="flex gap-2">
-              <SearchInput name="search" value="" onChange={() => {}} />
+              <SearchInput
+                name="search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
               <Button className="w-auto shrink-0">
                 <Plus size={18} className="mr-1" />
                 Create List
@@ -83,43 +99,61 @@ export default function ContactListsPage() {
               </thead>
 
               <tbody className="divide-y divide-gray-100">
-                {lists.map((list) => (
-                  <tr key={list.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium text-gray-900">
-                          {list.name}
-                        </span>
-                        <span className="text-sm text-gray-500">
-                          {list.description}
-                        </span>
-                      </div>
-                    </td>
-
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 text-sm text-gray-700">
-                        <Users className="w-4 h-4 text-gray-400" />
-                        {list.contactsCount}
-                      </div>
-                    </td>
-
-                    <td className="px-6 py-4 text-sm text-gray-700">
-                      {list.createdAt}
-                    </td>
-
-                    <td className="px-6 py-4 text-sm text-gray-700">
-                      {list.updatedAt}
-                    </td>
-
-                    <td className="px-6 py-4 text-right">
-                      <ActionsMenu
-                        isOpen={openMenuId === list.id}
-                        onOpen={() => setOpenMenuId(list.id)}
-                        onClose={() => setOpenMenuId(null)}
-                      />
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                      Loading...
                     </td>
                   </tr>
-                ))}
+                ) : filteredLists.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                      No contact lists found
+                    </td>
+                  </tr>
+                ) : (
+                  filteredLists.map((list) => (
+                    <tr
+                      key={list._id}
+                      className="hover:bg-gray-50 cursor-pointer"
+                      onClick={() => router.push(`/contacts/lists/${list._id}`)}
+                    >
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium text-gray-900">
+                            {list.name}
+                          </span>
+                          <span className="text-sm text-gray-500">
+                            {list.description}
+                          </span>
+                        </div>
+                      </td>
+
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2 text-sm text-gray-700">
+                          <Users className="w-4 h-4 text-gray-400" />
+                          {list.contactCount}
+                        </div>
+                      </td>
+
+                      <td className="px-6 py-4 text-sm text-gray-700">
+                        {formatDate(list.createdAt)}
+                      </td>
+
+                      <td className="px-6 py-4 text-sm text-gray-700">
+                        {formatDate(list.updatedAt)}
+                      </td>
+
+                      <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
+                        <ActionsMenu
+                          isOpen={openMenuId === list._id}
+                          onOpen={() => setOpenMenuId(list._id)}
+                          onClose={() => setOpenMenuId(null)}
+                        />
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

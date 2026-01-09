@@ -5,62 +5,75 @@ import {
   Mail,
   MessageSquare,
   Phone,
-  MapPin,
-  Tag,
   Plus,
   Trash2,
   Edit,
 } from "lucide-react";
-import { ContactDetails } from "../dashboard/page";
 import { redirect } from "next/navigation";
 import { fetchContactDetails } from "@/lib/contacts-api";
 import { use, useEffect, useState } from "react";
+import EditContactModal from "@/components/ui/EditContactModal";
 
-interface pageProps {
+export interface ContactDetails {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  initials: string;
+  title?: string;
+  emails: any[];
+  phones: any[];
+  company?: string;
+  tags?: string[];
+  notes?: string;
+  lastUpdated?: string;
+}
+
+interface PageProps {
   params: Promise<{
     id: string;
   }>;
 }
 
-export default function ContactDetailsPage({ params }: pageProps) {
+export default function ContactDetailsPage({ params }: PageProps) {
   const { id: contactId } = use(params);
 
   const [details, setDetails] = useState<ContactDetails | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+
+  const loadContact = async () => {
+    try {
+      const response = await fetchContactDetails(contactId);
+      const c = response.contact;
+
+      const transformed: ContactDetails = {
+        _id: c._id,
+        firstName: c.firstName,
+        lastName: c.lastName,
+        initials: `${c.firstName?.[0] || ""}${c.lastName?.[0] || ""}`.toUpperCase(),
+        title: c.jobTitle,
+        emails: c.emails ?? [],
+        phones: c.phones ?? [],
+        company: c.company,
+        tags: c.tags ?? [],
+        notes: c.notes,
+        lastUpdated: new Date(c.updatedAt).toLocaleDateString(),
+      };
+
+      setDetails(transformed);
+    } catch (err) {
+      console.error("Failed to fetch contact details:", err);
+      redirect("/contacts/dashboard");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!contactId) {
       redirect("/contacts/dashboard");
       return;
     }
-
-    const loadContact = async () => {
-      try {
-        const response = await fetchContactDetails(contactId);
-        const c = response.contact;
-
-        const transformed: ContactDetails = {
-          _id: c._id,
-          firstName: c.firstName,
-          lastName: c.lastName,
-          initials: `${c.firstName[0]}${c.lastName[0]}`.toUpperCase(),
-          title: c.jobTitle,
-          emails: c.emails,
-          phones: c.phones,
-          company: c.company,
-          tags: c.tags ?? [],
-          notes: c.notes,
-          lastUpdated: new Date(c.updatedAt).toLocaleDateString(),
-        };
-
-        setDetails(transformed);
-      } catch (err) {
-        console.error("Failed to fetch contact details:", err);
-        redirect("/contacts/dashboard");
-      } finally {
-        setLoading(false);
-      }
-    };
 
     loadContact();
   }, [contactId]);
@@ -108,19 +121,19 @@ export default function ContactDetailsPage({ params }: pageProps) {
           </div>
         </div>
 
+        {/* Actions */}
         <div className="flex gap-2">
-          {" "}
-          <ActionButton icon={Mail} label="Email" />{" "}
-          <ActionButton icon={MessageSquare} label="SMS" />{" "}
-          <button className="p-2 rounded-lg border border-[#D1D5DC] text-[#364153] hover:bg-gray-50"
-          onClick={() => (window.location.href = `/contacts/${details?._id}`)}>
-            {" "}
-            <Edit size={16} />{" "}
-          </button>{" "}
+          <ActionButton icon={Mail} label="Email" />
+          <ActionButton icon={MessageSquare} label="SMS" />
+          <button
+            onClick={() => setIsEditOpen(true)}
+            className="p-2 rounded-lg border border-[#D1D5DC] text-[#364153] hover:bg-gray-50"
+          >
+            <Edit size={16} />
+          </button>
           <button className="p-2 rounded-lg border border-red-200 text-red-600 hover:bg-red-50">
-            {" "}
-            <Trash2 size={16} />{" "}
-          </button>{" "}
+            <Trash2 size={16} />
+          </button>
         </div>
       </div>
 
@@ -175,6 +188,7 @@ export default function ContactDetailsPage({ params }: pageProps) {
               {details.notes ?? "No notes"}
             </p>
           </Card>
+
           <Card
             title="Lists"
             action={
@@ -183,12 +197,21 @@ export default function ContactDetailsPage({ params }: pageProps) {
               </button>
             }
           >
-            {/* Placeholder lists */}
             <ListItem label="Enterprise Clients" />
             <ListItem label="Q4 2024 Leads" />
           </Card>
         </div>
       </div>
+
+      {/* Edit Modal */}
+      {isEditOpen && details && (
+        <EditContactModal
+          isOpen={isEditOpen}
+          contact={details}
+          onClose={() => setIsEditOpen(false)}
+          onUpdated={loadContact}
+        />
+      )}
     </main>
   );
 }
@@ -231,15 +254,6 @@ function ContactRow({ value, primary }: { value: string; primary?: boolean }) {
           Primary
         </span>
       )}
-    </div>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex justify-between text-sm mb-2">
-      <span className="text-[#4A5565]">{label}</span>
-      <span className="text-[#101828]">{value}</span>
     </div>
   );
 }

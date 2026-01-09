@@ -1,6 +1,139 @@
 // Contacts API Service
-import api from "@/lib/api";
+import api, { publicApi } from "@/lib/api";
 import { Contact, ContactsResponse, ContactsApiParams } from "@/types/contacts";
+
+/**
+ * Contact List interface
+ */
+export interface ContactList {
+  _id: string;
+  name: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+  contactCount: number;
+}
+
+export interface ContactListsResponse {
+  error: boolean;
+  lists: ContactList[];
+}
+
+export interface ContactListDetail {
+  _id: string;
+  userId: string;
+  name: string;
+  description: string;
+  contacts: Contact[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ContactListDetailResponse {
+  error: boolean;
+  list: ContactListDetail;
+}
+
+/**
+ * Fetch all contact lists
+ */
+export const fetchContactLists = async (): Promise<ContactListsResponse> => {
+  try {
+    const response = await api.get<ContactListsResponse>("/contacts/lists");
+    
+    if (response.data.error) {
+      throw new Error("Failed to fetch contact lists");
+    }
+    
+    return response.data;
+  } catch (error) {
+    console.error("Error in fetchContactLists:", error);
+    throw error;
+  }
+};
+
+/**
+ * Fetch a single contact list by ID
+ * @param listId - The ID of the list to fetch
+ */
+export const fetchContactListById = async (listId: string): Promise<ContactListDetailResponse> => {
+  try {
+    const response = await api.get<ContactListDetailResponse>(`/contacts/lists/${listId}`);
+    
+    if (response.data.error) {
+      throw new Error("Failed to fetch contact list");
+    }
+    
+    return response.data;
+  } catch (error) {
+    console.error("Error in fetchContactListById:", error);
+    throw error;
+  }
+};
+
+/**
+ * Delete a contact list by ID
+ * @param listId - The ID of the list to delete
+ */
+export const deleteContactList = async (listId: string): Promise<{ error: boolean; message: string }> => {
+  try {
+    const response = await api.delete<{ error: boolean; message: string }>(`/contacts/lists/${listId}`);
+    
+    if (response.data.error) {
+      throw new Error(response.data.message || "Failed to delete contact list");
+    }
+    
+    return response.data;
+  } catch (error) {
+    console.error("Error in deleteContactList:", error);
+    throw error;
+  }
+};
+
+/**
+ * Add contacts to a list
+ * @param listId - The ID of the list to add contacts to
+ * @param contactIds - Array of contact IDs to add
+ */
+export const addContactsToList = async (
+  listId: string,
+  contactIds: string[]
+): Promise<{ error: boolean; list: ContactListDetail }> => {
+  try {
+    const response = await api.post<{ error: boolean; list: ContactListDetail }>(
+      `/contacts/lists/${listId}/add-contacts`,
+      { contactIds }
+    );
+    
+    if (response.data.error) {
+      throw new Error("Failed to add contacts to list");
+    }
+    
+    return response.data;
+  } catch (error) {
+    console.error("Error in addContactsToList:", error);
+    throw error;
+  }
+};
+
+/**
+ * Fetch a single contact by ID
+ * @param contactId - The ID of the contact to fetch
+ */
+export const fetchContactById = async (contactId: string): Promise<{ error: boolean; contact: Contact }> => {
+  try {
+    const response = await api.get<{ error: boolean; contact: Contact }>(`/contacts/${contactId}`);
+    
+    if (response.data.error) {
+      throw new Error("Failed to fetch contact");
+    }
+    
+    return response.data;
+  } catch (error) {
+    console.error("Error in fetchContactById:", error);
+    throw error;
+  }
+};
 
 /**
  * Fetch all contacts with pagination, search, and sorting
@@ -182,6 +315,30 @@ export const bulkDeleteContacts = async (
 
 
 /**
+ * Update a contact by ID
+ * @param contactId - The ID of the contact to update
+ * @param contactData - The updated contact data
+ */
+export const updateContact = async (
+  contactId: string,
+  contactData: any
+): Promise<{ error: boolean; contact: Contact }> => {
+  try {
+    const response = await api.put<{ error: boolean; contact: Contact }>(
+      `/contacts/${contactId}`,
+      contactData
+    );
+    if (response.data.error) {
+      throw new Error("Failed to update contact");
+    }
+    return response.data;
+  } catch (error) {
+    console.error("Error updating contact:", error);
+    throw error;
+  }
+};
+
+/**
  * Create a new list
  * @param listData - The list data to create
  */
@@ -315,3 +472,147 @@ export const deleteForm = async (formId: string, accessToken: string): Promise<v
     throw error;
   }
 };
+
+/**
+ * Form submission data structure
+ */
+export interface FormSubmission {
+  _id: string;
+  formId: string;
+  userId: string;
+  contactId: string | null;
+  data: Record<string, string>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Fetch form submissions by form ID
+ * @param formId - The ID of the form to fetch submissions for
+ * @param accessToken - The access token for authorization
+ */
+export const fetchFormSubmissions = async (
+  formId: string,
+  accessToken: string
+): Promise<FormSubmission[]> => {
+  try {
+    const response = await api.get<FormSubmission[]>(`/forms/${formId}/submissions`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching form submissions:", error);
+    throw error;
+  }
+};
+
+/**
+ * Import contacts from a CSV file
+ * @param file - The CSV file to import
+ * @param onProgress - Optional callback for upload progress
+ */
+export const importContactsFromCSV = async (
+  file: File,
+  onProgress?: (progress: number) => void
+): Promise<{ error: boolean; message: string; importedCount?: number }> => {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await api.post<{ error: boolean; message: string; importedCount?: number }>(
+      "/contacts/import-csv",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress: (progressEvent) => {
+          if (progressEvent.total && onProgress) {
+            const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            onProgress(progress);
+          }
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error importing contacts from CSV:", error);
+    throw error;
+  }
+};
+
+/**
+ * Fetch a public form by ID or slug (no authentication required)
+ * @param formIdentifier - The ID or slug of the form to fetch
+ */
+export const fetchPublicForm = async (formIdentifier: string) => {
+  try {
+    // Try slug-based endpoint first (new way), fallback to ID-based (legacy)
+    let response;
+    try {
+      response = await publicApi.get(`/forms/s/${formIdentifier}`);
+    } catch (error: any) {
+      // If slug fails (404), try legacy ID-based endpoint
+      if (error.response?.status === 404) {
+        console.log("Slug not found, trying legacy ID endpoint...");
+        response = await publicApi.get(`/forms/public/${formIdentifier}`);
+      } else {
+        throw error;
+      }
+    }
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching public form:", error);
+    throw error;
+  }
+};
+
+/**
+ * Submit a public form (no authentication required)
+ * @param formIdentifier - The ID or slug of the form to submit
+ * @param submissionData - The form data to submit
+ */
+export const submitPublicForm = async (
+  formIdentifier: string,
+  submissionData: Record<string, any>
+): Promise<{ success?: boolean; error?: boolean; message: string; submissionId?: string }> => {
+  try {
+    console.log("=== Submitting Form ===");
+    console.log("Form Identifier:", formIdentifier);
+    console.log("Submission Data:", JSON.stringify(submissionData, null, 2));
+    
+    // Try slug-based endpoint first (new way), fallback to ID-based (legacy)
+    let response;
+    try {
+      response = await publicApi.post(`/forms/s/${formIdentifier}/submit`, {
+        submissionData,
+      });
+    } catch (error: any) {
+      // If slug fails (404), try legacy ID-based endpoint
+      if (error.response?.status === 404) {
+        console.log("Slug endpoint not found, trying legacy ID endpoint...");
+        response = await publicApi.post(`/forms/public/${formIdentifier}/submit`, {
+          submissionData,
+        });
+      } else {
+        throw error;
+      }
+    }
+    
+    console.log("=== Form Submission Response ===");
+    console.log("Status:", response.status);
+    console.log("Response Data:", JSON.stringify(response.data, null, 2));
+    
+    return response.data;
+  } catch (error: any) {
+    console.error("=== Form Submission Error ===");
+    console.error("Error:", error);
+    console.error("Response:", error.response?.data);
+    throw error;
+  }
+};
+

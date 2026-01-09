@@ -42,3 +42,40 @@ export interface ContactsApiParams {
   search?: string;
   sortBy?: "name" | "name-desc" | "company" | "phone" | "lastUpdated";
 }
+
+// Form Types
+export interface FormField {
+  _id?: string;
+  type: "text" | "email" | "phone" | "dropdown" | "paragraph" | "checkbox";
+  label: string;
+  placeholder?: string;
+  required: boolean;
+  options?: string[];
+}
+
+export interface Form {
+  _id: string;
+  userId: string;
+  name: string;
+  slug?: string; // Friendly URL slug
+  fields: FormField[];
+  isActive: boolean;
+  submissionCount: number;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
+export interface FormsResponse {
+  error: boolean;
+  forms: Form[];
+}
+
+export interface PublicFormResponse {
+  error: boolean;
+  form: Form;
+}
+
+export interface FormSubmissionData {
+  [fieldLabel: string]: string | string[];
+}
