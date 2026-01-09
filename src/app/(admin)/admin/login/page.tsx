@@ -21,13 +21,13 @@ const AdminLoginPage = () => {
         email,
         password,
       });
-const { token, user } = res.data;
+      const { token, user } = res.data;
 
-    // Save admin token and user info
-    localStorage.setItem("adminToken", token);
-    localStorage.setItem("adminUser", JSON.stringify(user));
+      // Save admin token and user info
+      localStorage.setItem("adminToken", token);
+      localStorage.setItem("adminUser", JSON.stringify(user));
 
-    // console.log("User saved:", user);
+      // console.log("User saved:", user);
       // Redirect to admin dashboard
       router.push("/admin/dashboard");
     } catch (err: any) {
@@ -38,50 +38,43 @@ const { token, user } = res.data;
   };
 
   return (
-  <div className="min-h-screen flex items-center justify-center bg-gray-100">
-    <form
-      onSubmit={handleLogin}
-      className="w-full max-w-sm bg-white rounded-xl shadow-md p-6"
-    >
-      <h2 className="text-xl font-semibold text-center mb-6">
-        Admin Login
-      </h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <form
+        onSubmit={handleLogin}
+        className="w-full max-w-sm bg-white rounded-xl shadow-md p-6">
+        <h2 className="text-xl font-semibold text-center mb-6">Admin Login</h2>
 
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-        className="mb-4 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="mb-4 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+        />
 
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-        className="mb-4 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          className="mb-4 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+        />
 
-      {error && (
-        <p className="mb-4 text-sm text-red-600 text-center">
-          {error}
-        </p>
-      )}
+        {error && (
+          <p className="mb-4 text-sm text-red-600 text-center">{error}</p>
+        )}
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full rounded-md bg-blue-600 py-2 text-white text-sm font-medium hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {loading ? "Logging in..." : "Login"}
-      </button>
-    </form>
-  </div>
-);
-
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full rounded-md bg-orange-600 py-2 text-white text-sm font-medium hover:bg-orange-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
+          {loading ? "Logging in..." : "Login"}
+        </button>
+      </form>
+    </div>
+  );
 };
 
 export default AdminLoginPage;

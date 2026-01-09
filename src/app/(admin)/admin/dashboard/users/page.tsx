@@ -68,15 +68,11 @@ export default function UsersTable() {
 
     try {
       if (modalMode === "create") {
-        const res = await axios.post(
-          `${BASE_URL}/api/v1/admin/users`,
-          data,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const res = await axios.post(`${BASE_URL}/api/v1/admin/users`, data, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         setUsers((prev) => [res.data.user, ...prev]);
         toast.success("User created successfully");
@@ -176,8 +172,7 @@ export default function UsersTable() {
               setSelectedUser(null);
               setShowModal(true);
             }}
-            className="flex items-center gap-2"
-          >
+            className="flex items-center gap-2">
             <Plus size={18} />
             Create User
           </Button>
@@ -217,8 +212,7 @@ export default function UsersTable() {
                 {users.map((user) => (
                   <tr
                     key={user._id}
-                    className="border-b border-gray-200 hover:bg-gray-50 transition"
-                  >
+                    className="border-b border-gray-200 hover:bg-gray-50 transition">
                     <td className="px-6 py-4">
                       <p className="text-sm font-medium text-gray-900">
                         {user.firstName} {user.lastName}
@@ -241,17 +235,15 @@ export default function UsersTable() {
                             setSelectedUser(user);
                             setShowModal(true);
                           }}
-                          className="text-gray-500 hover:text-blue-600"
-                          title="Edit"
-                        >
+                          className="text-gray-500 hover:text-orange-600"
+                          title="Edit">
                           <Edit3 size={18} />
                         </button>
 
                         <button
                           onClick={() => setDeleteUser(user)}
                           className="text-gray-500 hover:text-red-600 transition"
-                          title="Delete"
-                        >
+                          title="Delete">
                           <Trash2 size={18} />
                         </button>
                       </div>

@@ -2,7 +2,13 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Edit3, Loader2, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Edit3,
+  Loader2,
+  AlertCircle,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import toast from "react-hot-toast";
 import { fetchPressReleases, changePressReleaseStatus } from "@/lib/admin-api";
 import { PressRelease } from "@/types/admin";
@@ -27,8 +33,8 @@ export default function PressReleasesSection() {
     try {
       setLoading(true);
       const response = await fetchPressReleases(page, limit);
-      const releases = Array.isArray(response.data) 
-        ? response.data 
+      const releases = Array.isArray(response.data)
+        ? response.data
         : (response.data as any)?.pressReleases || [];
       setPressReleases(releases);
       setTotal(response.pagination?.total || 0);
@@ -81,16 +87,14 @@ export default function PressReleasesSection() {
             <h3 className="text-lg font-semibold text-gray-900">
               Press Releases
             </h3>
-            <div className="text-sm text-gray-600">
-              Total: {total} releases
-            </div>
+            <div className="text-sm text-gray-600">Total: {total} releases</div>
           </div>
         </div>
 
         {/* Table */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 size={32} className="text-blue-600 animate-spin" />
+            <Loader2 size={32} className="text-orange-600 animate-spin" />
           </div>
         ) : pressReleases.length === 0 ? (
           <div className="flex items-center justify-center py-12">
@@ -126,8 +130,7 @@ export default function PressReleasesSection() {
                 {pressReleases.map((release) => (
                   <tr
                     key={release._id}
-                    className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
-                  >
+                    className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div>
                         <p className="text-sm font-medium text-gray-900 max-w-xs truncate">
@@ -140,18 +143,23 @@ export default function PressReleasesSection() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm text-gray-600">
-                        {release.user?.firstName} {release.user?.lastName ||
+                        {release.user?.firstName}{" "}
+                        {release.user?.lastName ||
                           (typeof release.user_id === "object"
                             ? `${release.user_id?.firstName} ${release.user_id?.lastName}`
                             : "Unknown")}
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <StatusBadge variant={release.status?.toLowerCase() as any} />
+                      <StatusBadge
+                        variant={release.status?.toLowerCase() as any}
+                      />
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm font-medium text-gray-900">
-                        {release.metrics?.views || release.metrics?.total_views || 0}
+                        {release.metrics?.views ||
+                          release.metrics?.total_views ||
+                          0}
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -171,8 +179,7 @@ export default function PressReleasesSection() {
                           setShowStatusModal(true);
                         }}
                         disabled={actionLoading === release._id}
-                        className="gap-2"
-                      >
+                        className="gap-2">
                         {actionLoading === release._id ? (
                           <Loader2 size={16} className="animate-spin" />
                         ) : (
@@ -200,8 +207,7 @@ export default function PressReleasesSection() {
                 variant="outline"
                 onClick={() => setPage(Math.max(1, page - 1))}
                 disabled={page === 1}
-                className="gap-2"
-              >
+                className="gap-2">
                 <ChevronLeft size={16} />
                 Previous
               </Button>
@@ -210,8 +216,7 @@ export default function PressReleasesSection() {
                 variant="outline"
                 onClick={() => setPage(Math.min(totalPages, page + 1))}
                 disabled={page === totalPages}
-                className="gap-2"
-              >
+                className="gap-2">
                 Next
                 <ChevronRight size={16} />
               </Button>

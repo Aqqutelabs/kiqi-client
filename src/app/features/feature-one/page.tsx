@@ -45,32 +45,32 @@ export default function FeatureOnePage() {
   const whyPRWorks = [
     {
       icon: "/landing/pr-work1.svg",
-      header: "⭐ Instant Authority", 
+      header: "⭐ Instant Authority",
       text: "As Seen On Forbes builds credibility overnight.",
     },
-     {
+    {
       icon: "/landing/pr-work2.svg",
-      header: "✅ Guaranteed Placements", 
+      header: "✅ Guaranteed Placements",
       text: " No editor declines. You pay, you publish.",
     },
-     {
+    {
       icon: "/landing/pr-work3.svg",
-      header: "🔗 SEO Power", 
+      header: "🔗 SEO Power",
       text: "High-authority backlinks that rank on Google.",
     },
-     {
+    {
       icon: "/landing/pr-work4.svg",
       header: "🌍 Global Reach",
       text: "Local, African, or worldwide syndication.",
     },
-     {
+    {
       icon: "/landing/pr-work5.svg",
       header: "💼 Investor Trust",
       text: "Media validation that closes funding faster.",
     },
-     {
+    {
       icon: "/landing/pr-work6.svg",
-      header: "🔄 Multi-Channel Flow", 
+      header: "🔄 Multi-Channel Flow",
       text: "Syncs with your email, SMS & influencer campaigns.",
     },
   ];
@@ -80,7 +80,7 @@ export default function FeatureOnePage() {
       <LandingNav />
 
       {/* hero section */}
-      <div className="min-h-screen bg-linear-to-r from-[#0B5ED8] via-blue-500 to-white flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-14">
+      <div className="min-h-screen bg-linear-to-r from-[#0B5ED8] via-orange-500 to-white flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-14">
         {/* Left Content */}
         <div className="flex-1 space-y-6 lg:space-y-8 px-4 sm:px-6 lg:px-0">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight text-center lg:text-left">
@@ -283,9 +283,9 @@ export default function FeatureOnePage() {
       {/* floating btn */}
       <div className="w-115 h-35 rounded-2xl p-4 bg-white border border-gray-300 mx-auto my-20">
         <div className="border border-gray-300 p-4 rounded-2xl h-full">
-          <button className="bg-linear-to-r from-[#2BAAE2] to-[#233E97] border border-black shadow h-full w-full rounded-2xl text-white flex items-center justify-between p-4 text-xl cursor-pointer">
+          <button className="bg-linear-to-r from-[#2BAAE2] to-[#F95417] border border-black shadow h-full w-full rounded-2xl text-white flex items-center justify-between p-4 text-xl cursor-pointer">
             Launch Your PR Now
-            <MousePointer2 color="white" size={30} className="rotate-90"/>
+            <MousePointer2 color="white" size={30} className="rotate-90" />
           </button>
         </div>
       </div>
@@ -296,20 +296,22 @@ export default function FeatureOnePage() {
           Why Kiki PR Works.
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-5xl mx-auto my-8">
-            {whyPRWorks.map((item, idx) => (
-              <div key={idx} className="bg-white/20 backdrop-blur-2xl rounded-xl border border-white h-58 w-full p-6 flex flex-col justify-center items-center gap-6">
-                {/* icon */}
-                <div className="bg-linear-to-b from-[#2BAAE2] to-[#233E97] size-25 rounded-full flex justify-center items-center">
-                  <img src={item.icon} alt={`Icon ${idx}`} />
-                </div>
-
-                {/* content */}
-                <div className="text-center text-white">
-                  <h4 className="font-bold text-xl">{item.header}</h4>
-                  <p className="text-sm">{item.text}</p>
-                </div>
+          {whyPRWorks.map((item, idx) => (
+            <div
+              key={idx}
+              className="bg-white/20 backdrop-blur-2xl rounded-xl border border-white h-58 w-full p-6 flex flex-col justify-center items-center gap-6">
+              {/* icon */}
+              <div className="bg-linear-to-b from-[#2BAAE2] to-[#F95417] size-25 rounded-full flex justify-center items-center">
+                <img src={item.icon} alt={`Icon ${idx}`} />
               </div>
-            ))}
+
+              {/* content */}
+              <div className="text-center text-white">
+                <h4 className="font-bold text-xl">{item.header}</h4>
+                <p className="text-sm">{item.text}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -356,10 +358,13 @@ export default function FeatureOnePage() {
         {/* left corner */}
         <div className="max-w-2xl space-y-4 sm:space-y-6 lg:space-y-8 w-full lg:w-1/2">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight text-center lg:text-left">
-            Your (customers, investors, partners, fans,) are waiting for you. Be visible. be credible.
+            Your (customers, investors, partners, fans,) are waiting for you. Be
+            visible. be credible.
           </h1>
           <p className="text-base sm:text-lg lg:text-xl text-gray-300 text-center lg:text-left">
-            In 24 hours, your brand could be in Punch, TechCabal, or Forbes. Or you could still be waiting for a PR agency to call you back. The choice is yours.
+            In 24 hours, your brand could be in Punch, TechCabal, or Forbes. Or
+            you could still be waiting for a PR agency to call you back. The
+            choice is yours.
           </p>
           <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 text-sm font-medium">
             <button className="h-12 sm:h-14 px-6 w-full sm:w-auto rounded-lg flex justify-center items-center bg-white text-[#111111] hover:cursor-pointer relative group">

@@ -60,7 +60,7 @@ const nigerianStates = [
   { label: "TA - Taraba", value: "TS" },
   { label: "YO - Yobe", value: "YO" },
   { label: "ZA - Zamfara", value: "ZA" },
-  { label: "FC - Federal Capital Territory", value: "FC" }
+  { label: "FC - Federal Capital Territory", value: "FC" },
 ];
 
 const CreateSenderEmailPage = () => {
@@ -109,7 +109,10 @@ const CreateSenderEmailPage = () => {
       // trim whitespace
       t = t.replace(/^\s+|\s+$/g, "");
       // remove surrounding quotes if present
-      if ((t.startsWith('"') && t.endsWith('"')) || (t.startsWith("'") && t.endsWith("'"))) {
+      if (
+        (t.startsWith('"') && t.endsWith('"')) ||
+        (t.startsWith("'") && t.endsWith("'"))
+      ) {
         t = t.slice(1, -1);
       }
       // strip newline / carriage returns
@@ -138,7 +141,7 @@ const CreateSenderEmailPage = () => {
         country: country,
       };
       // avoid leaking token value in logs; only log presence
-      console.log('auth token present:', !!authToken);
+      console.log("auth token present:", !!authToken);
       const cleanToken = sanitizeAuthToken(authToken);
       const headers = cleanToken
         ? { headers: { Authorization: `Bearer ${cleanToken}` } }
@@ -195,80 +198,89 @@ const CreateSenderEmailPage = () => {
     <>
       {/* toasts are handled by the global ToasterClient component */}
       <main className="flex-1 overflow-y-auto">
-        <PageHeader title="Create a sender email" backLink="/email-campaigns/settings" />
+        <PageHeader
+          title="Create a sender email"
+          backLink="/email-campaigns/settings"
+        />
 
         <Card className="mb-6 p-6">
-          <h3 className="text-lg font-semibold mb-2">Create & Verify SendGrid Sender</h3>
-          <p className="text-sm text-gray-500 mb-4">Fill the form to initiate SendGrid verification. A confirmation link will be emailed to the sender address.</p>
+          <h3 className="text-lg font-semibold mb-2">
+            Create & Verify SendGrid Sender
+          </h3>
+          <p className="text-sm text-gray-500 mb-4">
+            Fill the form to initiate SendGrid verification. A confirmation link
+            will be emailed to the sender address.
+          </p>
 
-          <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={handleRequestVerification}>
-            <FormField 
-              label="Nickname" 
-              id="nickname" 
-              value={nickname} 
-              onChange={(e:any) => setNickname(e.target.value)} 
-              placeholder="e.g. My Company" 
-              required 
+          <form
+            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+            onSubmit={handleRequestVerification}>
+            <FormField
+              label="Nickname"
+              id="nickname"
+              value={nickname}
+              onChange={(e: any) => setNickname(e.target.value)}
+              placeholder="e.g. My Company"
+              required
             />
-            <FormField 
-              label="From Email" 
-              id="from_email" 
-              type="email" 
-              value={from_email} 
-              onChange={(e:any) => setFromEmail(e.target.value)} 
-              placeholder="you@company.com" 
-              required 
+            <FormField
+              label="From Email"
+              id="from_email"
+              type="email"
+              value={from_email}
+              onChange={(e: any) => setFromEmail(e.target.value)}
+              placeholder="you@company.com"
+              required
             />
-            <FormField 
-              label="From Name" 
-              id="from_name" 
-              value={from_name} 
-              onChange={(e:any) => setFromName(e.target.value)} 
-              placeholder="Your Name or Company" 
-              required 
+            <FormField
+              label="From Name"
+              id="from_name"
+              value={from_name}
+              onChange={(e: any) => setFromName(e.target.value)}
+              placeholder="Your Name or Company"
+              required
             />
-            <FormField 
-              label="Reply To Email" 
-              id="reply_to" 
-              type="email" 
-              value={reply_to} 
-              onChange={(e:any) => setReplyTo(e.target.value)} 
-              placeholder="reply@company.com" 
-              required 
+            <FormField
+              label="Reply To Email"
+              id="reply_to"
+              type="email"
+              value={reply_to}
+              onChange={(e: any) => setReplyTo(e.target.value)}
+              placeholder="reply@company.com"
+              required
             />
-            <FormField 
-              label="Reply To Name" 
-              id="reply_to_name" 
-              value={reply_to_name} 
-              onChange={(e:any) => setReplyToName(e.target.value)} 
-              placeholder="Reply Name" 
+            <FormField
+              label="Reply To Name"
+              id="reply_to_name"
+              value={reply_to_name}
+              onChange={(e: any) => setReplyToName(e.target.value)}
+              placeholder="Reply Name"
             />
-            <FormField 
-              label="Address" 
-              id="address" 
-              value={address} 
-              onChange={(e:any) => setAddress(e.target.value)} 
-              placeholder="Street address" 
+            <FormField
+              label="Address"
+              id="address"
+              value={address}
+              onChange={(e: any) => setAddress(e.target.value)}
+              placeholder="Street address"
             />
-            <FormField 
-              label="City" 
-              id="city" 
-              value={city} 
-              onChange={(e:any) => setCity(e.target.value)} 
-              placeholder="City" 
+            <FormField
+              label="City"
+              id="city"
+              value={city}
+              onChange={(e: any) => setCity(e.target.value)}
+              placeholder="City"
             />
-            
+
             {/* Nigerian States Dropdown */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
                 State
               </label>
               <select
-                className="w-full bg-[#00000014] rounded-md p-3 border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-sm"
+                className="w-full bg-[#00000014] rounded-md p-3 border border-gray-300 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none text-sm"
                 value={stateVal}
                 onChange={(e) => setStateVal(e.target.value)}
-                required
-              >
+                required>
                 <option value="">Select a state</option>
                 {nigerianStates.map((state) => (
                   <option key={state.value} value={state.value}>
@@ -277,39 +289,47 @@ const CreateSenderEmailPage = () => {
                 ))}
               </select>
             </div>
-            
-            <FormField 
-              label="ZIP" 
-              id="zip" 
-              value={zip} 
-              onChange={(e:any) => setZip(e.target.value)} 
-              placeholder="Postal code" 
+
+            <FormField
+              label="ZIP"
+              id="zip"
+              value={zip}
+              onChange={(e: any) => setZip(e.target.value)}
+              placeholder="Postal code"
             />
-            <FormField 
-              label="Country" 
-              id="country" 
-              value={country} 
-              onChange={(e:any) => setCountry(e.target.value)} 
-              placeholder="Country" 
+            <FormField
+              label="Country"
+              id="country"
+              value={country}
+              onChange={(e: any) => setCountry(e.target.value)}
+              placeholder="Country"
               required
             />
 
             <div className="col-span-1 md:col-span-2 flex gap-3 items-center">
-              <Button type="submit" className="transition-transform transform hover:scale-105" disabled={submitLoading}>
+              <Button
+                type="submit"
+                className="transition-transform transform hover:scale-105"
+                disabled={submitLoading}>
                 {submitLoading ? "Initiating..." : "Initiate Verification"}
               </Button>
-              <Button type="button" className="bg-gray-100 text-gray-800" onClick={() => {
-                setNickname(""); 
-                setFromEmail(""); 
-                setFromName(""); 
-                setReplyTo(""); 
-                setReplyToName(""); 
-                setAddress(""); 
-                setCity(""); 
-                setStateVal(""); 
-                setZip(""); 
-                setCountry("");
-              }}>Reset</Button>
+              <Button
+                type="button"
+                className="bg-gray-100 text-gray-800"
+                onClick={() => {
+                  setNickname("");
+                  setFromEmail("");
+                  setFromName("");
+                  setReplyTo("");
+                  setReplyToName("");
+                  setAddress("");
+                  setCity("");
+                  setStateVal("");
+                  setZip("");
+                  setCountry("");
+                }}>
+                Reset
+              </Button>
             </div>
           </form>
         </Card>
@@ -319,10 +339,17 @@ const CreateSenderEmailPage = () => {
             <div className="flex items-center justify-between">
               <div>
                 <h4 className="text-lg font-medium">Sender Created</h4>
-                <p className="text-sm text-gray-500">ID: <span className="font-mono">{senderData._id}</span></p>
+                <p className="text-sm text-gray-500">
+                  ID: <span className="font-mono">{senderData._id}</span>
+                </p>
               </div>
-              <div className={`px-3 py-1 rounded text-sm ${senderData.verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                {senderData.verified ? 'Verified' : 'Pending Verification'}
+              <div
+                className={`px-3 py-1 rounded text-sm ${
+                  senderData.verified
+                    ? "bg-green-100 text-green-800"
+                    : "bg-yellow-100 text-yellow-800"
+                }`}>
+                {senderData.verified ? "Verified" : "Pending Verification"}
               </div>
             </div>
 
@@ -337,32 +364,61 @@ const CreateSenderEmailPage = () => {
               </div>
               <div>
                 <p className="text-sm text-gray-600">SendGrid ID</p>
-                <div className="font-medium">{senderData.sendgridId ?? '—'}</div>
+                <div className="font-medium">
+                  {senderData.sendgridId ?? "—"}
+                </div>
               </div>
             </div>
 
             <hr className="my-4" />
 
             <div className="space-y-3">
-              <h5 className="font-semibold">Confirm Identity (paste emailed link)</h5>
-              <p className="text-sm text-gray-500">Open the inbox for <span className="font-medium">{senderData.senderEmail}</span>, locate the SendGrid confirmation email, copy the confirmation link and paste it below. The app will extract the token automatically.</p>
+              <h5 className="font-semibold">
+                Confirm Identity (paste emailed link)
+              </h5>
+              <p className="text-sm text-gray-500">
+                Open the inbox for{" "}
+                <span className="font-medium">{senderData.senderEmail}</span>,
+                locate the SendGrid confirmation email, copy the confirmation
+                link and paste it below. The app will extract the token
+                automatically.
+              </p>
 
-              <textarea value={pastedValue} onChange={(e) => setPastedValue(e.target.value)} placeholder="Paste full link or token here" className="w-full border p-2 rounded resize-none" rows={2} />
+              <textarea
+                value={pastedValue}
+                onChange={(e) => setPastedValue(e.target.value)}
+                placeholder="Paste full link or token here"
+                className="w-full border p-2 rounded resize-none"
+                rows={2}
+              />
 
               <div className="flex gap-2">
-                <Button onClick={handleConfirmVerification} disabled={confirmLoading || senderData.verified} className="transition-transform transform hover:scale-105">
-                  {confirmLoading ? 'Confirming...' : (senderData.verified ? 'Already Verified' : 'Extract & Confirm')}
+                <Button
+                  onClick={handleConfirmVerification}
+                  disabled={confirmLoading || senderData.verified}
+                  className="transition-transform transform hover:scale-105">
+                  {confirmLoading
+                    ? "Confirming..."
+                    : senderData.verified
+                    ? "Already Verified"
+                    : "Extract & Confirm"}
                 </Button>
-                <Button type="button" className="bg-gray-100 text-gray-800" onClick={() => setPastedValue('')}>Clear</Button>
+                <Button
+                  type="button"
+                  className="bg-gray-100 text-gray-800"
+                  onClick={() => setPastedValue("")}>
+                  Clear
+                </Button>
               </div>
 
               <div className="text-sm text-gray-600">
-                <strong>Tip:</strong> If your email client shows a button, right-click it and copy link address. If it shows a short link, open it and copy the URL from the browser address bar.
+                <strong>Tip:</strong> If your email client shows a button,
+                right-click it and copy link address. If it shows a short link,
+                open it and copy the URL from the browser address bar.
               </div>
             </div>
           </Card>
         )}
-
       </main>
     </>
   );

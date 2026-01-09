@@ -13,7 +13,7 @@ import apiClient from "@/lib/utils/apiClient";
 import BASE_URL from "@/lib/utils/baseUrl";
 import { RichTextToolbar } from "@/components/ui/RichTextToolbar";
 import { useRouter } from "next/navigation";
-import { FormField } from "@/components/ui/FormField";
+// import { FormField } from "@/components/ui/FormField";
 import Avatar from "@/components/ui/Avatar";
 import { useAppSelector } from "@/redux/hooks";
 
@@ -358,7 +358,7 @@ export default function AIGeneratedEmail() {
           <div className="flex justify-between items-center shrink-0 mb-5">
             <div className="flex gap-3 items-center">
               <Sparkles color="#1B223C" size={20} />
-              <Heading heading="KiKi Ai" />
+              <Heading heading="XINNG Ai" />
             </div>
             <div className="flex gap-2">
               <button
@@ -416,7 +416,7 @@ export default function AIGeneratedEmail() {
                         <button
                           onClick={() => handleApplyMessage(idx)}
                           title="Apply this AI message"
-                          className="absolute right-2 top-2 p-2 rounded-full shadow-md bg-linear-to-tr from-[#1E3A8A] to-[#233E97] text-white hover:scale-105">
+                          className="absolute right-2 top-2 p-2 rounded-full shadow-md bg-linear-to-tr from-[#1E3A8A] to-[#F95417] text-white hover:scale-105">
                           <ArrowRight size={14} />
                         </button>
                       )}

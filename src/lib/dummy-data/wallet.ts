@@ -7,7 +7,7 @@ export const stats = [
     title: "GoCredits",
     amount: "0",
     currency: "GC",
-    color: "#233E97",
+    color: "#F95417",
     percent: "12",
     barText: "Monthly limit",
     barAmount: "15, 000 GC",

@@ -186,7 +186,7 @@ export function ImportContactsModal({
                 onDrop={handleDrop}
                 className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors ${
                   isDragging
-                    ? "border-blue-500 bg-blue-50"
+                    ? "border-orange-500 bg-orange-50"
                     : "border-gray-300 bg-gray-50"
                 }`}
               >
@@ -312,7 +312,7 @@ export function ImportContactsModal({
         </div>
       )}
       {showImportingModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/30">
+        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/30">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-sm px-8 py-10">
             <div className="flex flex-col items-center text-center gap-4">
               <span className="flex items-center justify-center text-xs font-medium text-black">

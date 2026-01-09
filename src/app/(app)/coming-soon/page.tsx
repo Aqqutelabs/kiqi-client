@@ -38,7 +38,7 @@ const ComingSoonPage = () => {
           Go Back
         </Button>
       </motion.div>
-      {/* <div className="mt-8 text-gray-400 text-xs">&copy; {new Date().getFullYear()} KiKi CRM. All rights reserved.</div> */}
+      {/* <div className="mt-8 text-gray-400 text-xs">&copy; {new Date().getFullYear()} XINNG CRM. All rights reserved.</div> */}
     </div>
   );
 };

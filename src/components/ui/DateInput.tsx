@@ -137,7 +137,7 @@ const DateInput: React.FC<DateInputProps> = ({
   const days = getDaysInMonth(currentMonth);
 
   return (
-    <div className={`relative max-w-[450px] ${className}`}>
+    <div className={`relative max-w-112.5 ${className}`}>
       {label && (
         <label className="text-sm capitalize font-medium text-gray-900 block mb-2">
           {label}
@@ -200,10 +200,10 @@ const DateInput: React.FC<DateInputProps> = ({
                 disabled={!day}
                 type="button"
                 className={`
-                  h-8 w-8 text-sm rounded hover:bg-blue-50 transition-colors
+                  h-8 w-8 text-sm rounded hover:bg-orange-50 transition-colors
                   ${day ? "text-gray-700 cursor-pointer" : "cursor-default"}
-                  ${day && isToday(day) ? "bg-blue-100 text-[#155DFC]" : ""}
-                  ${day ? "hover:bg-blue-100 hover:text-[#155DFC]" : ""}
+                  ${day && isToday(day) ? "bg-orange-100 text-[#fc7d15]" : ""}
+                  ${day ? "hover:bg-orange-100 hover:text-[#fc7d15]" : ""}
                 `}>
                 {day}
               </button>

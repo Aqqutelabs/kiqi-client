@@ -95,7 +95,7 @@ const ConversionDetailModal: React.FC<ConversionDetailModalProps> = ({
     <Modal isOpen={isOpen} onClose={onClose} title="Conversion Details">
       <div className="space-y-6">
         {/* Status Section */}
-        <div className="flex items-center justify-between bg-linear-to-r from-blue-50 to-indigo-50 p-4 rounded-lg">
+        <div className="flex items-center justify-between bg-linear-to-r from-orange-50 to-indigo-50 p-4 rounded-lg">
           <div>
             <p className="text-sm font-medium text-gray-600">Current Status</p>
             <StatusBadge variant={getStatusVariant(conversion.status)}>
@@ -112,7 +112,7 @@ const ConversionDetailModal: React.FC<ConversionDetailModalProps> = ({
         {/* User Information */}
         <div className="border border-gray-200 rounded-lg p-4">
           <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <User className="w-5 h-5 text-blue-600" />
+            <User className="w-5 h-5 text-orange-600" />
             User Information
           </h3>
           <div className="space-y-3">
@@ -239,8 +239,8 @@ const ConversionDetailModal: React.FC<ConversionDetailModalProps> = ({
 
         {/* Admin Note */}
         {conversion.admin_id && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-blue-800">
+          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+            <p className="text-sm text-orange-800">
               ✓ Processed by admin: {conversion.admin_id}
             </p>
           </div>

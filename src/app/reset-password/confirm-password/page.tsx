@@ -18,7 +18,7 @@ const ConfirmPasswordPage = () => {
   };
 
   return (
-    <section className="flex justify-center items-center h-screen bg-[var(--primary)]">
+    <section className="flex justify-center items-center h-screen bg-(--primary)">
       <Card className="w-[500px]">
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800">Reset Password</h2>

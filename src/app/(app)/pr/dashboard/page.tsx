@@ -244,14 +244,14 @@ export default function PRDashboard() {
         </div>
 
         {data.length === 0 ? (
-          <section className="flex flex-col justify-center items-center h-[460px] gap-5">
+          <section className="flex flex-col justify-center items-center h-115 gap-5">
             <img src={"/rafiki.svg"} alt="No Press Releases" />
             <Heading
               heading="No Press Releases Yet?"
               subtitle="You haven’t created any press releases. Start by launching your first PR campaign and get featured on top outlets in minutes."
-              className="text-center w-[400px]"
+              className="text-center w-100"
             />
-            <Button onClick={() => redirect("/pr/create")}>
+            <Button onClick={() => redirect("/pr/create")} size={"lg"}>
               Create New Press Release
             </Button>
           </section>

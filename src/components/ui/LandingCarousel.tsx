@@ -67,7 +67,11 @@ export default function HorizontalCarousel({ items }: HorizontalCarouselProps) {
                     )}
                   </div>
                   <img
-                    src={isEven ? "/kiki-logo.svg" : "/kiki-logo-white.svg"}
+                    src={
+                      isEven
+                        ? "/xxing-logo-colored.svg"
+                        : "/kiki-logo-white.svg"
+                    }
                     alt="Logo"
                     className="h-10 w-20 object-cover"
                   />

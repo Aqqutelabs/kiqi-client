@@ -22,7 +22,7 @@ export default function PaymentDetailModal({
   const parseCurrencyString = (value: string | number): number => {
     if (typeof value === "number") return value;
     if (typeof value !== "string") return 0;
-    
+
     // Remove currency symbols and non-numeric characters (except decimals)
     const cleaned = value.replace(/[₦$€£,\s]/g, "").trim();
     const parsed = parseFloat(cleaned);
@@ -57,8 +57,7 @@ export default function PaymentDetailModal({
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
-          >
+            className="text-gray-500 hover:text-gray-700">
             <X size={20} />
           </button>
         </div>
@@ -74,7 +73,8 @@ export default function PaymentDetailModal({
               <div>
                 <p className="text-xs text-gray-600 mb-1">Name</p>
                 <p className="text-sm font-medium text-gray-900">
-                  {payment.user?.firstName} {payment.user?.lastName ||
+                  {payment.user?.firstName}{" "}
+                  {payment.user?.lastName ||
                     (typeof payment.user_id === "object"
                       ? `${payment.user_id?.firstName} ${payment.user_id?.lastName}`
                       : "Unknown")}
@@ -120,8 +120,7 @@ export default function PaymentDetailModal({
                 payment.items.map((item, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                  >
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div className="flex-1">
                       <p className="text-sm font-medium text-gray-900">
                         {item.name || "Unnamed Item"}
@@ -152,40 +151,41 @@ export default function PaymentDetailModal({
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Subtotal</span>
                 <span className="text-sm font-medium text-gray-900">
-                  {formatCurrency(
-                    payment.order_summary?.subtotal || "₦0"
-                  )}
+                  {formatCurrency(payment.order_summary?.subtotal || "₦0")}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">VAT (Tax)</span>
                 <span className="text-sm font-medium text-gray-900">
-                  {formatCurrency(
-                    payment.order_summary?.vat_amount || "₦0"
-                  )}
+                  {formatCurrency(payment.order_summary?.vat_amount || "₦0")}
                 </span>
               </div>
               <div className="border-t border-gray-200 pt-2 mt-2 flex items-center justify-between">
                 <span className="text-sm font-semibold text-gray-900">
                   Total
                 </span>
-                <span className="text-lg font-bold text-blue-600">
-                  {formatCurrency(
-                    payment.order_summary?.total_amount || "₦0"
-                  )}
+                <span className="text-lg font-bold text-orange-600">
+                  {formatCurrency(payment.order_summary?.total_amount || "₦0")}
                 </span>
               </div>
               <div className="flex items-center justify-between pt-2">
                 <span className="text-sm text-gray-600">Payment Status</span>
                 <span
                   className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    (payment.order_summary?.payment_status as string || payment.payment_status || "").toLowerCase() === "successful"
+                    (
+                      (payment.order_summary?.payment_status as string) ||
+                      payment.payment_status ||
+                      ""
+                    ).toLowerCase() === "successful"
                       ? "bg-green-100 text-green-800"
-                      : (payment.order_summary?.payment_status as string || payment.payment_status || "").toLowerCase() === "pending"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : "bg-red-100 text-red-800"
-                  }`}
-                >
+                      : (
+                          (payment.order_summary?.payment_status as string) ||
+                          payment.payment_status ||
+                          ""
+                        ).toLowerCase() === "pending"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : "bg-red-100 text-red-800"
+                  }`}>
                   {(payment.order_summary?.payment_status as string) ||
                     payment.payment_status ||
                     "Pending"}
@@ -211,17 +211,13 @@ export default function PaymentDetailModal({
             <div>
               <p className="text-xs text-gray-600 mb-1">Created Date</p>
               <p className="text-sm font-medium text-gray-900">
-                {payment.createdAt
-                  ? formatDate(payment.createdAt)
-                  : "N/A"}
+                {payment.createdAt ? formatDate(payment.createdAt) : "N/A"}
               </p>
             </div>
             <div>
               <p className="text-xs text-gray-600 mb-1">Last Updated</p>
               <p className="text-sm font-medium text-gray-900">
-                {payment.updatedAt
-                  ? formatDate(payment.updatedAt)
-                  : "N/A"}
+                {payment.updatedAt ? formatDate(payment.updatedAt) : "N/A"}
               </p>
             </div>
           </div>

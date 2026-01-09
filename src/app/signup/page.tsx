@@ -187,7 +187,7 @@ const SignUpPage = () => {
 
   return (
     <AuthLayout>
-      <Card className="w-[650px]">
+      <Card className="w-162.5">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
           Register with:
         </h2>
@@ -214,9 +214,9 @@ const SignUpPage = () => {
         </div>
 
         <div className="my-6 flex items-center">
-          <div className="flex-grow border-t border-gray-200"></div>
-          <span className="flex-shrink mx-4 text-xs text-gray-400">OR</span>
-          <div className="flex-grow border-t border-gray-200"></div>
+          <div className="grow border-t border-gray-200"></div>
+          <span className="shrink mx-4 text-xs text-gray-400">OR</span>
+          <div className="grow border-t border-gray-200"></div>
         </div>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
@@ -316,7 +316,7 @@ const SignUpPage = () => {
           
           <Button
             type="submit"
-            className="w-full !mt-6"
+            className="w-full mt-6!"
             disabled={registration.status === "loading"}>
             {registration.status === "loading" ? "Creating Account..." : "Sign Up"}
           </Button>
@@ -326,7 +326,7 @@ const SignUpPage = () => {
           Already have an account?{" "}
           <Link
             href="/login"
-            className="font-medium text-[#3366FF] hover:underline">
+            className="font-medium text-(--primary) hover:underline">
             Log In
           </Link>
         </p>

@@ -19,23 +19,30 @@ const GoogleCallbackPage = () => {
   useEffect(() => {
     const handleGoogleCallback = async () => {
       try {
-        console.log('🟢 CALLBACK PAGE LOADED');
-        console.log('Full URL:', window.location.href);
-        console.log('Search Params:', Object.fromEntries(searchParams.entries()));
+        console.log("🟢 CALLBACK PAGE LOADED");
+        console.log("Full URL:", window.location.href);
+        console.log(
+          "Search Params:",
+          Object.fromEntries(searchParams.entries())
+        );
 
         // Get the authorization code from URL
         const code = searchParams.get("code");
         const state = searchParams.get("state");
 
-        console.log('📋 Extracted from URL:');
-        console.log('  - code:', code ? code.substring(0, 20) + '...' : 'NOT FOUND');
-        console.log('  - state:', state);
+        console.log("📋 Extracted from URL:");
+        console.log(
+          "  - code:",
+          code ? code.substring(0, 20) + "..." : "NOT FOUND"
+        );
+        console.log("  - state:", state);
 
         // Check for errors
         const errorParam = searchParams.get("error");
         if (errorParam) {
-          const errorDescription = searchParams.get("error_description") || "Authentication failed";
-          console.error('❌ ERROR FROM GOOGLE:', errorParam, errorDescription);
+          const errorDescription =
+            searchParams.get("error_description") || "Authentication failed";
+          console.error("❌ ERROR FROM GOOGLE:", errorParam, errorDescription);
           setLocalError(errorDescription);
           toast.error(errorDescription);
 
@@ -48,7 +55,7 @@ const GoogleCallbackPage = () => {
 
         if (!code) {
           const err = "No authorization code received from Google";
-          console.error('❌ NO CODE:', err);
+          console.error("❌ NO CODE:", err);
           setLocalError(err);
           toast.error(err);
 
@@ -60,14 +67,14 @@ const GoogleCallbackPage = () => {
 
         // Verify state for security
         const savedState = localStorage.getItem("oauthState");
-        console.log('🔐 State verification:');
-        console.log('  - Received state:', state);
-        console.log('  - Saved state:', savedState);
-        console.log('  - Match:', state === savedState);
+        console.log("🔐 State verification:");
+        console.log("  - Received state:", state);
+        console.log("  - Saved state:", savedState);
+        console.log("  - Match:", state === savedState);
 
         if (state !== savedState) {
           const err = "State mismatch - possible CSRF attack";
-          console.error('❌ STATE MISMATCH:', err);
+          console.error("❌ STATE MISMATCH:", err);
           setLocalError(err);
           toast.error(err);
 
@@ -78,25 +85,28 @@ const GoogleCallbackPage = () => {
         }
         localStorage.removeItem("oauthState");
 
-        console.log('✅ All validations passed, sending code to backend...');
+        console.log("✅ All validations passed, sending code to backend...");
         // Dispatch the Google login thunk
         if (code && !dispatchedRef.current) {
-          console.log('Dispatching loginUserWithGoogle thunk with code...', code);
+          console.log(
+            "Dispatching loginUserWithGoogle thunk with code...",
+            code
+          );
           const result = await dispatch(loginUserWithGoogle(code));
           dispatchedRef.current = true; // Mark as dispatched
-          console.log('📦 Backend response:', result);
+          console.log("📦 Backend response:", result);
 
           if (loginUserWithGoogle.fulfilled.match(result)) {
-            console.log('✨ LOGIN SUCCESS! Redirecting to dashboard...');
+            console.log("✨ LOGIN SUCCESS! Redirecting to dashboard...");
             toast.success("Google login successful!");
 
             // Clear query parameters after successful login
-            console.log('🔄 Attempting to redirect to /dashboard');
+            console.log("🔄 Attempting to redirect to /dashboard");
             router.replace("/dashboard"); // Removed shallow: true to ensure full reload
-            console.log('✅ Redirected to /dashboard');
+            console.log("✅ Redirected to /dashboard");
           } else if (loginUserWithGoogle.rejected.match(result)) {
             const errorMsg = result.payload as string;
-            console.error('❌ LOGIN FAILED:', errorMsg);
+            console.error("❌ LOGIN FAILED:", errorMsg);
             toast.error(errorMsg);
 
             setTimeout(() => {
@@ -105,8 +115,9 @@ const GoogleCallbackPage = () => {
           }
         }
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "Authentication failed";
-        console.error('💥 EXCEPTION IN CALLBACK:', errorMessage, err);
+        const errorMessage =
+          err instanceof Error ? err.message : "Authentication failed";
+        console.error("💥 EXCEPTION IN CALLBACK:", errorMessage, err);
         setLocalError(errorMessage);
         toast.error(errorMessage);
         console.error("Google callback error:", err);
@@ -128,14 +139,18 @@ const GoogleCallbackPage = () => {
       <div className="text-center">
         {status === "loading" ? (
           <>
-            <Loader2 className="h-12 w-12 animate-spin mx-auto text-blue-600 mb-4" />
-            <p className="text-lg text-gray-700">Processing Google authentication...</p>
+            <Loader2 className="h-12 w-12 animate-spin mx-auto text-orange-600 mb-4" />
+            <p className="text-lg text-gray-700">
+              Processing Google authentication...
+            </p>
           </>
         ) : displayError ? (
           <>
             <p className="text-lg text-red-600 mb-4">Authentication Error</p>
             <p className="text-sm text-gray-600">{displayError}</p>
-            <p className="text-xs text-gray-500 mt-4">Redirecting to login...</p>
+            <p className="text-xs text-gray-500 mt-4">
+              Redirecting to login...
+            </p>
           </>
         ) : null}
       </div>

@@ -1,7 +1,7 @@
-import React from 'react';
-import { Eye, Trash, Loader2 } from 'lucide-react';
-import { Button } from './Button';
-import Link from 'next/link';
+import React from "react";
+import { Eye, Trash, Loader2 } from "lucide-react";
+import { Button } from "./Button";
+import Link from "next/link";
 
 export interface Column<T> {
   header: string;
@@ -30,13 +30,12 @@ export function DataTable<T extends { id: string | number }>({
   return (
     <div className="w-full overflow-x-auto">
       <table className="min-w-full bg-white">
-        <thead className="bg-[#D1DAF4] h-16.5">
+        <thead className="bg-[#f4dfd1] h-16.5">
           <tr>
             {columns.map((col) => (
               <th
                 key={String(col.accessor)}
-                className="px-6 py-3 text-left text-xs font-medium text-[#0A0A0A] uppercase tracking-wider"
-              >
+                className="px-6 py-3 text-left text-xs font-medium text-[#0A0A0A] uppercase tracking-wider">
                 {col.header}
               </th>
             ))}
@@ -50,9 +49,14 @@ export function DataTable<T extends { id: string | number }>({
         <tbody className="divide-y divide-gray-200 rounded-b-xl">
           {isLoading ? (
             <tr>
-              <td colSpan={columns.length + ((onEdit || onDelete || onView || extraActions) ? 1 : 0)} className="py-12">
+              <td
+                colSpan={
+                  columns.length +
+                  (onEdit || onDelete || onView || extraActions ? 1 : 0)
+                }
+                className="py-12">
                 <div className="flex flex-col items-center gap-3">
-                  <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+                  <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
                   <p className="text-gray-600 text-lg font-medium leading-tight">
                     Loading data...
                   </p>
@@ -61,12 +65,14 @@ export function DataTable<T extends { id: string | number }>({
             </tr>
           ) : data.length === 0 ? (
             <tr>
-              <td colSpan={columns.length + ((onEdit || onDelete || onView || extraActions) ? 1 : 0)} className="py-8">
+              <td
+                colSpan={
+                  columns.length +
+                  (onEdit || onDelete || onView || extraActions ? 1 : 0)
+                }
+                className="py-8">
                 <div className="flex flex-col items-center gap-2">
-                  <Trash
-                    size={60}
-                    color="gray"
-                  />
+                  <Trash size={60} color="gray" />
                   <p className="text-gray-600 text-xl font-bold leading-tight tracking-[-0.015em]">
                     No Items to Display
                   </p>
@@ -80,7 +86,9 @@ export function DataTable<T extends { id: string | number }>({
             data.map((row) => (
               <tr key={row.id} className="bg-white h-20">
                 {columns.map((col) => (
-                  <td key={String(col.accessor)} className="px-6 py-4 whitespace-wrap text-sm text-gray-700 w-125">
+                  <td
+                    key={String(col.accessor)}
+                    className="px-6 py-4 whitespace-wrap text-sm text-gray-700 w-125">
                     {String(row[col.accessor])}
                   </td>
                 ))}
@@ -96,12 +104,18 @@ export function DataTable<T extends { id: string | number }>({
                         </Link>
                       )}
                       {onEdit && (
-                        <Button variant="tertiary" size="sm" onClick={() => onEdit(row)}>
+                        <Button
+                          variant="tertiary"
+                          size="sm"
+                          onClick={() => onEdit(row)}>
                           Edit
                         </Button>
                       )}
                       {onDelete && (
-                        <Button variant="destructive" size="sm" onClick={() => onDelete(row)}>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => onDelete(row)}>
                           Delete
                         </Button>
                       )}

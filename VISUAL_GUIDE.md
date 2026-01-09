@@ -33,9 +33,9 @@
 ┌────────────────────────────────────────────────────────────┐
 │                  STEP 3: Write Content                      │
 │  ┌──────────────────────────────┐ ┌──────────────────┐    │
-│  │  Rich Text Editor (3/5)      │ │ KiKi AI (2/5)    │    │
+│  │  Rich Text Editor (3/5)      │ │ XINNG AI (2/5)    │    │
 │  │                              │ │                  │    │
-│  │  [B][I][U][~][H1][H2]...     │ │ ✨ KiKi AI       │    │
+│  │  [B][I][U][~][H1][H2]...     │ │ ✨ XINNG AI       │    │
 │  │                              │ │ [+] New Chat     │    │
 │  │                              │ │                  │    │
 │  │  Write your press release    │ │ ┌──────────────┐ │    │
@@ -230,6 +230,7 @@ Keyboard Shortcuts:
 ## State Management
 
 ### PR Create Page State
+
 ```typescript
 {
   prContent: "",          // From RichTextEditor
@@ -241,6 +242,7 @@ Keyboard Shortcuts:
 ```
 
 ### KikiAiChatbot Internal State
+
 ```typescript
 {
   chat: ChatMessage[],        // All messages in session
@@ -252,6 +254,7 @@ Keyboard Shortcuts:
 ```
 
 ### RichTextEditor Internal State
+
 ```typescript
 {
   value: string,              // Main content (prop)
@@ -292,6 +295,7 @@ User Action
 ## Responsive Design Breakpoints
 
 ### Desktop (lg: 1024px+)
+
 ```
 ┌─────────────────────────────────┐
 │     Step 1: Full Width          │
@@ -304,6 +308,7 @@ User Action
 ```
 
 ### Tablet/Mobile (< lg)
+
 ```
 ┌─────────────────┐
 │   Step 1: Full  │
@@ -346,18 +351,21 @@ User Action
 ## Performance Profile
 
 ### KikiAiChatbot
+
 - Chat message: ~10ms render
 - API request: 1-5s (network dependent)
 - Auto-scroll: Smooth 60fps
 - localStorage save: <5ms
 
 ### RichTextEditor
+
 - Character input: <5ms
 - Format button click: ~2ms
 - Paste large content: 50-200ms (size dependent)
 - Undo/Redo: <5ms
 
 ### PR Create Page
+
 - Initial render: ~50ms
 - Type character: <2ms
 - Apply AI message: <5ms
@@ -368,15 +376,18 @@ User Action
 ## Memory Usage
 
 ### Chat History
+
 - Per message: ~200 bytes (average)
 - 100 messages: ~20KB
 - localStorage limit: ~5-10MB (browser dependent)
 
 ### Image Upload
+
 - 1MB image → ~1.3MB Base64 (33% inflation)
 - localStorage quota consideration: Avoid images > 2MB
 
 ### Editor Content
+
 - Plain text: 1 byte per character
 - With formatting: Same (no HTML storage)
 - 10,000 characters: ~10KB
@@ -386,6 +397,7 @@ User Action
 ## Security Considerations
 
 ✅ **Implemented**
+
 - Token sanitization removes quotes/newlines
 - Authorization headers on API requests
 - Paste sanitization strips HTML
@@ -393,6 +405,7 @@ User Action
 - Form validation before submission
 
 ⚠️ **Consider**
+
 - CSRF tokens if backend requires
 - XSS prevention in AI response display
 - Rate limiting on API calls
@@ -402,13 +415,13 @@ User Action
 
 ## Browser Compatibility Matrix
 
-| Feature | Chrome | Firefox | Safari | Edge |
-|---------|--------|---------|--------|------|
-| contentEditable | ✅ | ✅ | ✅ | ✅ |
-| Undo/Redo | ✅ | ✅ | ⚠️ | ✅ |
-| FileReader API | ✅ | ✅ | ✅ | ✅ |
-| localStorage | ✅ | ✅ | ✅ | ✅ |
-| Framer Motion | ✅ | ✅ | ✅ | ✅ |
-| Grid Layout | ✅ | ✅ | ✅ | ✅ |
+| Feature         | Chrome | Firefox | Safari | Edge |
+| --------------- | ------ | ------- | ------ | ---- |
+| contentEditable | ✅     | ✅      | ✅     | ✅   |
+| Undo/Redo       | ✅     | ✅      | ⚠️     | ✅   |
+| FileReader API  | ✅     | ✅      | ✅     | ✅   |
+| localStorage    | ✅     | ✅      | ✅     | ✅   |
+| Framer Motion   | ✅     | ✅      | ✅     | ✅   |
+| Grid Layout     | ✅     | ✅      | ✅     | ✅   |
 
 ⚠️ = Limited support or browser-specific behavior

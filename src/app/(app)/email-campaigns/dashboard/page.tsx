@@ -8,10 +8,10 @@ import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { useState, useEffect } from "react";
 import SearchInput from "@/components/ui/Search";
 import { Button } from "@/components/ui/Button";
-import { Plus, Loader, } from "lucide-react";
+import { Plus, Loader } from "lucide-react";
 import { Modal } from "@/components/ui/Modal";
 import { redirect } from "next/navigation";
-import api from '@/lib/api';
+import api from "@/lib/api";
 import { FormField } from "@/components/ui/FormField";
 import axios from "axios";
 import BASE_URL from "@/lib/utils/baseUrl";
@@ -43,7 +43,13 @@ interface EditCampaignModalProps {
   isLoading: boolean;
 }
 
-function EditCampaignModal({ isOpen, onClose, campaign, onSave, isLoading }: EditCampaignModalProps) {
+function EditCampaignModal({
+  isOpen,
+  onClose,
+  campaign,
+  onSave,
+  isLoading,
+}: EditCampaignModalProps) {
   const [formData, setFormData] = useState({
     name: "",
     status: "",
@@ -52,7 +58,7 @@ function EditCampaignModal({ isOpen, onClose, campaign, onSave, isLoading }: Edi
     subjectLine: "",
     opens: "",
     clicks: "",
-    date: ""
+    date: "",
   });
 
   useEffect(() => {
@@ -65,7 +71,7 @@ function EditCampaignModal({ isOpen, onClose, campaign, onSave, isLoading }: Edi
         subjectLine: campaign.subjectLine,
         opens: campaign.opens.toString(),
         clicks: campaign.clicks.toString(),
-        date: campaign.date
+        date: campaign.date,
       });
     }
   }, [campaign]);
@@ -86,12 +92,12 @@ function EditCampaignModal({ isOpen, onClose, campaign, onSave, isLoading }: Edi
       deliveries: parseInt(formData.deliveries) || 0,
       opens: parseInt(formData.opens) || 0,
       clicks: parseInt(formData.clicks) || 0,
-      date: formData.date
+      date: formData.date,
     });
   };
 
   const handleChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -108,7 +114,7 @@ function EditCampaignModal({ isOpen, onClose, campaign, onSave, isLoading }: Edi
           onChange={(e) => handleChange("name", e.target.value)}
           required
         />
-         <FormField
+        <FormField
           label="Subject Line"
           id="edit-subject-line"
           name="subjectLine"
@@ -118,7 +124,7 @@ function EditCampaignModal({ isOpen, onClose, campaign, onSave, isLoading }: Edi
           onChange={(e) => handleChange("subjectLine", e.target.value)}
           required
         />
-        
+
         <FormField
           label="Status"
           id="edit-status"
@@ -129,7 +135,7 @@ function EditCampaignModal({ isOpen, onClose, campaign, onSave, isLoading }: Edi
           onChange={(e) => handleChange("status", e.target.value)}
           required
         />
-        
+
         <FormField
           label="Audience"
           id="edit-audience"
@@ -140,7 +146,7 @@ function EditCampaignModal({ isOpen, onClose, campaign, onSave, isLoading }: Edi
           onChange={(e) => handleChange("audience", e.target.value)}
           required
         />
-        
+
         <div className="grid grid-cols-3 gap-4">
           <FormField
             label="Deliveries"
@@ -152,7 +158,7 @@ function EditCampaignModal({ isOpen, onClose, campaign, onSave, isLoading }: Edi
             onChange={(e) => handleChange("deliveries", e.target.value)}
             required
           />
-          
+
           <FormField
             label="Opens"
             id="edit-opens"
@@ -163,7 +169,7 @@ function EditCampaignModal({ isOpen, onClose, campaign, onSave, isLoading }: Edi
             onChange={(e) => handleChange("opens", e.target.value)}
             required
           />
-          
+
           <FormField
             label="Clicks"
             id="edit-clicks"
@@ -175,7 +181,7 @@ function EditCampaignModal({ isOpen, onClose, campaign, onSave, isLoading }: Edi
             required
           />
         </div>
-        
+
         <FormField
           label="Date"
           id="edit-date"
@@ -185,9 +191,14 @@ function EditCampaignModal({ isOpen, onClose, campaign, onSave, isLoading }: Edi
           onChange={(e) => handleChange("date", e.target.value)}
           required
         />
-        
+
         <div className="flex gap-3 pt-4">
-          <Button type="button" variant="outline" onClick={onClose} className="flex-1" disabled={isLoading}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            className="flex-1"
+            disabled={isLoading}>
             Cancel
           </Button>
           <Button type="submit" disabled={isLoading} className="flex-1">
@@ -228,28 +239,28 @@ function DeleteConfirmModal({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} width="400px">
-      <h4 className="text-lg font-medium text-gray-900 mb-3">Delete Campaign</h4>
+      <h4 className="text-lg font-medium text-gray-900 mb-3">
+        Delete Campaign
+      </h4>
       <p className="text-sm text-gray-600 mb-4">
-        Are you sure you want to delete the campaign <strong>"{campaignName}"</strong>? 
-        This action cannot be undone.
+        Are you sure you want to delete the campaign{" "}
+        <strong>"{campaignName}"</strong>? This action cannot be undone.
       </p>
       <div className="flex gap-3">
-        <Button 
-          type="button" 
-          variant="secondary" 
-          onClick={onClose} 
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={onClose}
           className="flex-1"
-          disabled={isLoading}
-        >
+          disabled={isLoading}>
           Cancel
         </Button>
-        <Button 
+        <Button
           type="button"
           variant="destructive"
-          onClick={handleConfirm} 
+          onClick={handleConfirm}
           className="flex-1"
-          disabled={isLoading}
-        >
+          disabled={isLoading}>
           {isLoading ? (
             <>
               <Loader className="size-4 animate-spin mr-2" />
@@ -272,7 +283,9 @@ export default function EmailCampaignDashboard() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
-  const [deletingCampaign, setDeletingCampaign] = useState<Campaign | null>(null);
+  const [deletingCampaign, setDeletingCampaign] = useState<Campaign | null>(
+    null
+  );
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const [tab, setTab] = useState("All");
@@ -287,47 +300,49 @@ export default function EmailCampaignDashboard() {
   ];
 
   // Fetch campaigns data
-const fetchCampaigns = async (showRefreshLoader = false) => {
-  if (showRefreshLoader) {
-    setRefreshing(true);
-  } else {
-    setLoading(true);
-  }
-  
-  try {
-    const response = await api.get<ApiResponse<Campaign[]>>('/campaigns');
-
-    const campaignsData = response.data.data || [];
-
-    if (!Array.isArray(campaignsData)) {
-      throw new Error("Unexpected data format from server");
+  const fetchCampaigns = async (showRefreshLoader = false) => {
+    if (showRefreshLoader) {
+      setRefreshing(true);
+    } else {
+      setLoading(true);
     }
 
-    const transformedData: Campaign[] = campaignsData.map((campaign: any, index: number) => ({
-      id: campaign.id || index + 1,
-      name: campaign.campaignName || `Campaign ${index + 1}`,
-      status: campaign.status || 'Active',
-      audience: campaign.audience.emailLists || 'All Subscribers',
-      deliveries: campaign.deliveries || 0,
-      opens: campaign.opens || 0,
-      clicks: campaign.clicks || 0,
-      subjectLine: campaign.subjectLine || "---",
-      date: campaign.createdat || new Date().toISOString().split('T')[0],
-    }));
+    try {
+      const response = await api.get<ApiResponse<Campaign[]>>("/campaigns");
 
-    setCampaigns(transformedData);
-    // toast.success(showRefreshLoader ? 'Campaigns refreshed!' : 'Campaigns loaded!');
-    
-  } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : 'Failed to fetch campaigns';
-    toast.error(errorMessage);
-    console.error('Error fetching campaigns:', err);
-    setCampaigns([]);
-  } finally {
-    setLoading(false);
-    setRefreshing(false);
-  }
-};
+      const campaignsData = response.data.data || [];
+
+      if (!Array.isArray(campaignsData)) {
+        throw new Error("Unexpected data format from server");
+      }
+
+      const transformedData: Campaign[] = campaignsData.map(
+        (campaign: any, index: number) => ({
+          id: campaign.id || index + 1,
+          name: campaign.campaignName || `Campaign ${index + 1}`,
+          status: campaign.status || "Active",
+          audience: campaign.audience.emailLists || "All Subscribers",
+          deliveries: campaign.deliveries || 0,
+          opens: campaign.opens || 0,
+          clicks: campaign.clicks || 0,
+          subjectLine: campaign.subjectLine || "---",
+          date: campaign.createdat || new Date().toISOString().split("T")[0],
+        })
+      );
+
+      setCampaigns(transformedData);
+      // toast.success(showRefreshLoader ? 'Campaigns refreshed!' : 'Campaigns loaded!');
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch campaigns";
+      toast.error(errorMessage);
+      console.error("Error fetching campaigns:", err);
+      setCampaigns([]);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
 
   // Initial data fetch
   useEffect(() => {
@@ -350,18 +365,16 @@ const fetchCampaigns = async (showRefreshLoader = false) => {
     setLoading(true);
     try {
       // Update local state
-      setCampaigns(prev => prev.map(item => 
-        item.id === id 
-          ? { ...item, ...data }
-          : item
-      ));
+      setCampaigns((prev) =>
+        prev.map((item) => (item.id === id ? { ...item, ...data } : item))
+      );
 
       setIsEditing(false);
       setEditingCampaign(null);
       toast.success("Campaign updated successfully!");
     } catch (error) {
       toast.error("Failed to update campaign");
-      console.error('Error updating campaign:', error);
+      console.error("Error updating campaign:", error);
     } finally {
       setLoading(false);
     }
@@ -375,47 +388,52 @@ const fetchCampaigns = async (showRefreshLoader = false) => {
 
   // handle delete
   const handleDeleteConfirm = async () => {
-  if (!deletingCampaign) return;
+    if (!deletingCampaign) return;
 
-  setIsDeleting(true);
-  try {
-    // Use the actual campaign ID from the deletingCampaign state
-    const res = await axios.delete(`${BASE_URL}/api/v1/campaigns/${deletingCampaign.id}`);
-    
-    // Remove the campaign from local state
-    setCampaigns(prev => prev.filter(campaign => campaign.id !== deletingCampaign.id));
-    
-    toast.success("Campaign deleted successfully!");
-    setShowDeleteModal(false);
-    setDeletingCampaign(null);
-  } catch (error) {
-    toast.error("Failed to delete campaign");
-    console.error('Error deleting campaign:', error);
-  } finally {
-    setIsDeleting(false);
-  }
-};
-
-  // Filter data based on selected tab
-  const filteredData = tab === "All" 
-    ? campaigns 
-    : campaigns.filter(campaign => 
-        campaign.status.toLowerCase() === tab.toLowerCase()
+    setIsDeleting(true);
+    try {
+      // Use the actual campaign ID from the deletingCampaign state
+      const res = await axios.delete(
+        `${BASE_URL}/api/v1/campaigns/${deletingCampaign.id}`
       );
 
-      // Search query state
-      const [query, setQuery] = useState("");
+      // Remove the campaign from local state
+      setCampaigns((prev) =>
+        prev.filter((campaign) => campaign.id !== deletingCampaign.id)
+      );
+
+      toast.success("Campaign deleted successfully!");
+      setShowDeleteModal(false);
+      setDeletingCampaign(null);
+    } catch (error) {
+      toast.error("Failed to delete campaign");
+      console.error("Error deleting campaign:", error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // Filter data based on selected tab
+  const filteredData =
+    tab === "All"
+      ? campaigns
+      : campaigns.filter(
+          (campaign) => campaign.status.toLowerCase() === tab.toLowerCase()
+        );
+
+  // Search query state
+  const [query, setQuery] = useState("");
 
   return (
     <main className="flex-1 overflow-y-auto space-y-6">
       <PageHeader title="Email Campaigns" backLink="/dashboard" />
-      
+
       {/* campaigns table */}
       <Card>
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <Heading heading="Messages" />
-            
+
             {/* Refresh Button and Total Count */}
             <div className="flex items-center gap-4">
               <Button
@@ -423,14 +441,17 @@ const fetchCampaigns = async (showRefreshLoader = false) => {
                 size="sm"
                 onClick={handleRefresh}
                 disabled={refreshing || loading}
-                title="Refresh campaigns"
-              >
-                <Loader className={`size-5 ${refreshing ? "animate-spin" : ""}`} />
+                title="Refresh campaigns">
+                <Loader
+                  className={`size-5 ${refreshing ? "animate-spin" : ""}`}
+                />
               </Button>
-              <p className="text-xs md:text-sm">Total Campaigns: {campaigns.length}</p>
+              <p className="text-xs md:text-sm">
+                Total Campaigns: {campaigns.length}
+              </p>
             </div>
           </div>
-          
+
           <hr className="text-gray-200" />
 
           {/* tabs and filter */}
@@ -441,21 +462,24 @@ const fetchCampaigns = async (showRefreshLoader = false) => {
                 <button
                   key={t}
                   className={`px-2 py-1 rounded font-medium text-sm w-22.5 cursor-pointer ${
-                    tab === t ? "bg-[#233E97] text-[#ECEDEE]" : "text-gray-700"
+                    tab === t ? "bg-[#F95417] text-[#ECEDEE]" : "text-gray-700"
                   }`}
                   onClick={() => setTab(t)}>
                   {t}
                 </button>
               ))}
             </div>
-            
+
             {/* filters */}
             <div className="flex gap-2">
-              <SearchInput value={query} onChange={(e) => setQuery(e.target.value)} name="query" />
+              <SearchInput
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                name="query"
+              />
               <Button
                 className="w-full"
-                onClick={() => redirect("/email-campaigns/ai/generate-email")}
-              > 
+                onClick={() => redirect("/email-campaigns/ai/generate-email")}>
                 <Plus size={18} className="mr-1" />
                 Create Campaign
               </Button>
@@ -482,7 +506,6 @@ const fetchCampaigns = async (showRefreshLoader = false) => {
           )}
         </div>
       </Card>
-
 
       {/* Edit Modal */}
       <EditCampaignModal

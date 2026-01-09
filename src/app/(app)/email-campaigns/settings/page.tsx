@@ -223,22 +223,6 @@ export default function CampaignSettings() {
     }
   };
 
-  // const prepareAudienceData = () => {
-  //   if (audienceOption === "existing" && data.audience.emailLists[0]) {
-  //     // EXACT format that works: ONLY emailLists, NO emails array
-  //     return {
-  //       emailLists: [data.audience.emailLists[0]], // Single ID in array
-  //       // NO emails: [] field
-  //     };
-  //   } else {
-  //     // For manual/CSV: send emails directly
-  //     const emails = contactChips.map((chip) => chip.email);
-  //     return {
-  //       emails: emails.filter((email) => isValidEmail(email)),
-  //     };
-  //   }
-  // };
-
   // Main API call for creating campaign - UPDATED WITH BETTER ERROR LOGGING
   const createCampaign = async (payload: any) => {
     setLoading(true);
@@ -253,7 +237,7 @@ export default function CampaignSettings() {
       if (response.success) {
         toast.success("Campaign created successfully!");
         setSuccessModal(true);
-        router.push("/email-campaigns/dashboard")
+        router.push("/email-campaigns/dashboard");
         return response;
       } else {
         toast.error(response.message || "Failed to create campaign");
@@ -439,7 +423,7 @@ export default function CampaignSettings() {
                 onClick={() => setAudienceOption("existing")}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   audienceOption === "existing"
-                    ? "bg-blue-50 text-blue-600 border border-blue-200"
+                    ? "bg-orange-50 text-orange-600 border border-orange-200"
                     : "text-gray-600 hover:bg-gray-50"
                 }`}>
                 <Users size={16} className="inline mr-2" />
@@ -449,7 +433,7 @@ export default function CampaignSettings() {
                 onClick={() => setAudienceOption("manual")}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   audienceOption === "manual"
-                    ? "bg-blue-50 text-blue-600 border border-blue-200"
+                    ? "bg-orange-50 text-orange-600 border border-orange-200"
                     : "text-gray-600 hover:bg-gray-50"
                 }`}>
                 <FileText size={16} className="inline mr-2" />
@@ -459,7 +443,7 @@ export default function CampaignSettings() {
                 onClick={() => setAudienceOption("csv")}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   audienceOption === "csv"
-                    ? "bg-blue-50 text-blue-600 border border-blue-200"
+                    ? "bg-orange-50 text-orange-600 border border-orange-200"
                     : "text-gray-600 hover:bg-gray-50"
                 }`}>
                 <Upload size={16} className="inline mr-2" />
@@ -512,7 +496,7 @@ export default function CampaignSettings() {
                     value={manualContacts}
                     onChange={(e) => handleManualContactsChange(e.target.value)}
                     placeholder="Enter email addresses separated by commas. Press comma or enter after each email."
-                    className="w-full bg-[#00000014] rounded-md p-3 min-h-[100px] resize-none border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-sm"
+                    className="w-full bg-[#00000014] rounded-md p-3 min-h-25 resize-none border border-gray-300 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 outline-none text-sm"
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         e.preventDefault();
@@ -529,15 +513,15 @@ export default function CampaignSettings() {
                 </div>
 
                 {/* Contact Chips */}
-                <div className="flex flex-wrap gap-2 min-h-[60px] p-2 border rounded-lg">
+                <div className="flex flex-wrap gap-2 min-h-15 p-2 border rounded-lg">
                   {contactChips.map((chip) => (
                     <div
                       key={chip.id}
-                      className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-sm">
+                      className="inline-flex items-center gap-1 bg-orange-100 text-orange-800 px-3 py-1.5 rounded-full text-sm">
                       <span>{chip.email}</span>
                       <button
                         onClick={() => removeContactChip(chip.id)}
-                        className="ml-1 hover:bg-blue-200 rounded-full p-0.5">
+                        className="ml-1 hover:bg-orange-200 rounded-full p-0.5">
                         <X size={14} />
                       </button>
                     </div>
@@ -558,7 +542,7 @@ export default function CampaignSettings() {
             {/* CSV Upload Option */}
             {audienceOption === "csv" && (
               <div className="space-y-4">
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-orange-400 transition-colors">
                   <input
                     type="file"
                     id="csv-upload"
@@ -599,7 +583,7 @@ export default function CampaignSettings() {
                         <p className="text-sm font-medium text-gray-700">
                           Preview ({csvPreview.length} emails):
                         </p>
-                        <div className="max-h-[120px] overflow-y-auto border rounded p-2">
+                        <div className="max-h-30 overflow-y-auto border rounded p-2">
                           {csvPreview.map((email, index) => (
                             <div
                               key={index}
@@ -614,7 +598,7 @@ export default function CampaignSettings() {
                           <p className="text-sm font-medium text-gray-700">
                             Edit contacts (click × to remove):
                           </p>
-                          <div className="flex flex-wrap gap-2 min-h-[60px] p-2 border rounded-lg">
+                          <div className="flex flex-wrap gap-2 min-h-15 p-2 border rounded-lg">
                             {contactChips.slice(0, 20).map((chip) => (
                               <div
                                 key={chip.id}
@@ -650,7 +634,7 @@ export default function CampaignSettings() {
           <div className="border border-[#E2E8F0] rounded-lg overflow-hidden">
             <button
               onClick={() => setAdvancedSettings(!advancedSettings)}
-              className="w-full flex items-center justify-between px-6 py-4 bg-[#F8FAFC] hover:bg-[#F1F5F9] transition-colors">
+              className="w-full flex items-center justify-between px-6 py-4 bg-[#fcfaf8] hover:bg-[#f9f5f1] transition-colors">
               <h4 className="font-semibold text-base text-[#1B223C]">
                 Advanced Settings
               </h4>
@@ -818,7 +802,7 @@ export default function CampaignSettings() {
 
           {/* schedule date */}
           {scheduleLater && (
-            <div className="flex flex-col md:flex-row items-end gap-3 w-[800px]">
+            <div className="flex flex-col md:flex-row items-end gap-3 w-200">
               <DateInput label="Schedule Date" />
               <TimeInput label="Schedule Time" />
             </div>
@@ -826,7 +810,7 @@ export default function CampaignSettings() {
         </div>
 
         {/* cta buttons */}
-        <div className="flex items-center gap-4 w-[500px] mt-5 ml-8">
+        <div className="flex items-center gap-4 w-125 mt-5 ml-8">
           <Button
             size={"lg"}
             className="w-full"

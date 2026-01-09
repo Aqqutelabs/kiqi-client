@@ -290,7 +290,7 @@ export const KikiAiChatbot: React.FC<KikiAiChatbotProps> = ({
       <div className="flex justify-between items-center shrink-0 mb-5">
         <div className="flex gap-3 items-center">
           <Sparkles color="#1B223C" size={20} />
-          <Heading heading="KiKi AI" />
+          <Heading heading="XINNG AI" />
         </div>
         <button
           onClick={startNewChat}
@@ -345,7 +345,7 @@ export const KikiAiChatbot: React.FC<KikiAiChatbotProps> = ({
                     <button
                       onClick={() => handleApplyMessage(idx)}
                       title="Apply this AI message"
-                      className="absolute right-2 top-2 p-2 rounded-full shadow-md bg-gradient-to-tr from-[#1E3A8A] to-[#233E97] text-white hover:scale-105 transition-transform">
+                      className="absolute right-2 top-2 p-2 rounded-full shadow-md bg-gradient-to-tr from-[#1E3A8A] to-[#F95417] text-white hover:scale-105 transition-transform">
                       <ArrowRight size={14} />
                     </button>
                   )}
@@ -406,7 +406,7 @@ export const KikiAiChatbot: React.FC<KikiAiChatbotProps> = ({
               <button
                 onClick={sendMessage}
                 disabled={loading || !context.trim()}
-                className="absolute right-2 bottom-2 p-2 bg-[var(--primary)] rounded-lg hover:opacity-90 disabled:opacity-50 transition-all"
+                className="absolute right-2 bottom-2 p-2 bg-(--primary) rounded-lg hover:opacity-90 disabled:opacity-50 transition-all"
                 title="Send message">
                 <SendHorizontal size={16} color="white" />
               </button>
