@@ -4,15 +4,18 @@ import { Button } from "@/components/ui/Button";
 import { Column, DataTable } from "@/components/ui/DataTable";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import SearchInput from "@/components/ui/Search";
-import { Download, Eye, Loader2 } from "lucide-react";
-import { useParams } from "next/navigation";
+import { Download, Eye, Loader2, X } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { selectToken } from "@/redux/selectors/authSelectors";
 import { fetchFormSubmissions, FormSubmission } from "@/lib/contacts-api";
+import toast from "react-hot-toast";
+import { Modal } from "@/components/ui/Modal";
 
 interface DisplaySubmission {
   id: string;
+  contactId: string | null;
   name: string;
   email: string;
   phone: string;
@@ -22,6 +25,7 @@ interface DisplaySubmission {
 
 export default function FormSubmissionsPage() {
   const params = useParams();
+  const router = useRouter();
   const formId = params.formId as string;
   const accessToken = useSelector(selectToken);
 
@@ -29,6 +33,8 @@ export default function FormSubmissionsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchValue, setSearchValue] = useState("");
+  const [selectedSubmission, setSelectedSubmission] = useState<DisplaySubmission | null>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   useEffect(() => {
     const getSubmissions = async () => {
@@ -47,6 +53,7 @@ export default function FormSubmissionsPage() {
       try {
         setLoading(true);
         const response = await fetchFormSubmissions(formId, accessToken);
+        console.log('fetched submissions:', response);
         setSubmissions(response);
       } catch (err) {
         console.error("Failed to fetch form submissions:", err);
@@ -80,6 +87,7 @@ export default function FormSubmissionsPage() {
 
       return {
         id: submission._id,
+        contactId: submission.contactId || (submission as any).contact || (submission as any).contact_id || null,
         name: fullName,
         email,
         phone,
@@ -112,12 +120,19 @@ export default function FormSubmissionsPage() {
     // Export submissions as CSV
     if (displaySubmissions.length === 0) return;
 
+    // Helper to escape CSV fields properly
+    const escapeCSVField = (field: string) => {
+      // Replace double quotes with two double quotes and wrap in quotes
+      const escaped = field.replace(/"/g, '""');
+      return `"${escaped}"`;
+    };
+
     const headers = ["Name", "Email", "Phone", "Submitted At"];
     const csvContent = [
       headers.join(","),
       ...displaySubmissions.map((sub) => 
         [sub.name, sub.email, sub.phone, sub.submittedAt]
-          .map((field) => `"${field}"`)
+          .map((field) => escapeCSVField(field))
           .join(",")
       ),
     ].join("\n");
@@ -187,7 +202,13 @@ export default function FormSubmissionsPage() {
             columns={columns}
             data={filteredSubmissions}
             extraActions={(item) => (
-              <Button variant={"outline"}>
+              <Button 
+                variant={"outline"}
+                onClick={() => {
+                  setSelectedSubmission(item);
+                  setIsDetailsModalOpen(true);
+                }}
+              >
                 <Eye className="mr-2" size={16} />
                 View Details
               </Button>
@@ -195,6 +216,55 @@ export default function FormSubmissionsPage() {
           />
         )}
       </div>
+
+      {/* Submission Details Modal */}
+      <Modal
+        isOpen={isDetailsModalOpen}
+        onClose={() => {
+          setIsDetailsModalOpen(false);
+          setSelectedSubmission(null);
+        }}
+        width="500px"
+      >
+        {selectedSubmission && (
+          <div className="space-y-4">
+            <div className="flex justify-between items-center border-b border-gray-200 pb-4">
+              <h3 className="text-lg font-semibold text-[#101828]">Submission Details</h3>
+            </div>
+
+            <div className="space-y-3">
+              {Object.entries(selectedSubmission.rawData).map(([key, value]) => (
+                <div key={key} className="flex flex-col">
+                  <label className="text-xs text-[#4A5565] capitalize">
+                    {key.replace(/([A-Z])/g, ' $1').replace(/_/g, ' ').trim()}
+                  </label>
+                  <p className="text-sm text-[#101828] mt-1 bg-gray-50 rounded-lg px-3 py-2">
+                    {value || "N/A"}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <div className="border-t border-gray-200 pt-4">
+              <p className="text-xs text-[#4A5565]">
+                Submitted on: {selectedSubmission.submittedAt}
+              </p>
+            </div>
+
+            <div className="flex justify-end">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsDetailsModalOpen(false);
+                  setSelectedSubmission(null);
+                }}
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </section>
   );
 }
