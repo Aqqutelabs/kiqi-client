@@ -814,18 +814,17 @@ export default function CampaignSettings() {
           <Button
             size={"lg"}
             className="w-full"
+          variant={"outline"}
             onClick={() => setSuccessModal(true)}>
             Save Draft
           </Button>
           <Button
             size={"lg"}
             className="w-full"
-            variant={"secondary"}
             onClick={handleSendNow}
-            disabled={loading}>
-            {loading
-              ? "Sending..."
-              : scheduleLater
+            // disabled={loading}
+            >
+            {scheduleLater
               ? "Schedule Email"
               : "Send Now"}
           </Button>

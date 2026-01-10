@@ -69,12 +69,12 @@ const navigationConfig: NavSection[] = [
         label: "PR",
         icon: Megaphone,
       },
-      {
-        type: "link",
-        href: "/analytics",
-        label: "Analytics",
-        icon: BarChart3,
-      },
+      // {
+      //   type: "link",
+      //   href: "/analytics",
+      //   label: "Analytics",
+      //   icon: BarChart3,
+      // },
       {
         type: "dropdown",
         label: "Email",
