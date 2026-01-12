@@ -19,6 +19,8 @@ import {
   Upload,
   FileText,
   X,
+  RefreshCw,
+  Check,
 } from "lucide-react";
 import { redirect, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -33,12 +35,27 @@ interface ContactChip {
   email: string;
 }
 
+interface SenderEmail {
+  _id: string;
+  senderName: string;
+  type: string;
+  senderEmail: string;
+  user_id: string;
+  verified: boolean;
+  sendgridId: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
 export default function CampaignSettings() {
   const [successModal, setSuccessModal] = useState(false);
   const [advancedSettings, setAdvancedSettings] = useState(false);
   const [scheduleLater, setScheduleLater] = useState(false);
   const [loading, setLoading] = useState(false);
   const [emailLists, setEmailLists] = useState<any>([]);
+  const [senderEmails, setSenderEmails] = useState<SenderEmail[]>([]);
+  const [loadingSenders, setLoadingSenders] = useState(false);
   const [audienceOption, setAudienceOption] = useState("existing");
   const [loadingLists, setLoadingLists] = useState(false);
   const [manualContacts, setManualContacts] = useState<string>("");
@@ -49,50 +66,122 @@ export default function CampaignSettings() {
   const [newListName, setNewListName] = useState("");
   const [savingList, setSavingList] = useState(false);
 
-  // const user = useAppSelector((state) => state.auth.user);
   const token = useAppSelector((state) => state.auth.token);
-  // const userEmail = user?.email || "";
   const router = useRouter();
 
   const [data, setData] = useState({
     campaignName: "",
     subjectLine: "",
     senderId: "",
+    senderEmail: "",
     autoStart: true,
     audience: {
-      emailLists: [] as string[], // For existing list IDs
+      emailLists: [] as string[],
     },
   });
 
-  // Update data.senderId when userEmail changes
-  // useEffect(() => {
-  //   if (userEmail) {
-  //     setData((prev) => ({ ...prev, senderId: userEmail }));
-  //   }
-  // }, [userEmail]);
+  // Fetch registered sender emails
+  const fetchSenderEmails = async () => {
+    if (!token) {
+      toast.error("Authentication required");
+      return;
+    }
+
+    setLoadingSenders(true);
+    try {
+      const response = await apiClient.get(
+        `${BASE_URL}/api/v1/senders/sendgrid/verified-sender`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      console.log("Senders API Response:", response);
+
+      if (response && !response.error) {
+        // Handle the response structure: { error: false, message: "...", data: {...} }
+        const responseData = response.data;
+        
+        // Check if data is a single object or array
+        if (Array.isArray(responseData)) {
+          // If it's an array, filter for verified senders
+          const verifiedSenders = responseData.filter((sender: SenderEmail) => sender.verified);
+          setSenderEmails(verifiedSenders);
+          
+          if (verifiedSenders.length > 0) {
+            // Auto-select the first verified sender
+            const firstSender = verifiedSenders[0];
+            setData(prev => ({
+              ...prev,
+              senderId: firstSender._id,
+              senderEmail: firstSender.senderEmail
+            }));
+          }
+          
+          toast.success(`Loaded ${verifiedSenders.length} verified sender(s)`);
+        } else if (responseData && typeof responseData === 'object') {
+          // If it's a single object
+          if (responseData.verified) {
+            setSenderEmails([responseData]);
+            
+            // Auto-select this sender
+            setData(prev => ({
+              ...prev,
+              senderId: responseData._id,
+              senderEmail: responseData.senderEmail
+            }));
+            
+            // toast.success("Loaded verified sender");
+          } else {
+            setSenderEmails([]);
+            toast.error("Sender is not verified");
+          }
+        } else {
+          setSenderEmails([]);
+          toast.error("No sender data found");
+        }
+      } else {
+        toast.error(response?.message || "Failed to load sender emails");
+        setSenderEmails([]);
+      }
+    } catch (error: any) {
+      console.error("Error fetching sender emails:", error);
+      toast.error(error?.response?.data?.message || error?.message || "Failed to load sender emails");
+      setSenderEmails([]);
+    } finally {
+      setLoadingSenders(false);
+    }
+  };
 
   // Fetch existing email lists
+  const fetchEmailLists = async () => {
+    if (!token) return;
+
+    setLoadingLists(true);
+    try {
+      const response = await apiClient.get(
+        `${BASE_URL}/api/v1/email-lists/user/me`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setEmailLists(response.data);
+    } catch (error) {
+      console.error("Error fetching email lists:", error);
+      toast.error("Failed to load email lists");
+    } finally {
+      setLoadingLists(false);
+    }
+  };
+
+  // Load data on component mount
   useEffect(() => {
-    const fetchEmailLists = async () => {
-      if (!token) return;
-
-      setLoadingLists(true);
-      try {
-        const response = await apiClient.get(
-          `${BASE_URL}/api/v1/email-lists/user/me`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-
-        setEmailLists(response.data);
-      } catch (error) {
-        console.error("Error fetching email lists:", error);
-        toast.error("Failed to load email lists");
-      } finally {
-        setLoadingLists(false);
-      }
-    };
-
-    fetchEmailLists();
+    if (token) {
+      fetchSenderEmails();
+      fetchEmailLists();
+    }
   }, [token]);
 
   // Handle manual contacts input
@@ -195,18 +284,7 @@ export default function CampaignSettings() {
         setNewListName("");
 
         // Refresh email lists
-        const refreshResponse = await apiClient.get(
-          `${BASE_URL}/api/v1/email-lists/user/me`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-
-        if (refreshResponse.success && refreshResponse.data) {
-          setEmailLists(
-            Array.isArray(refreshResponse.data)
-              ? refreshResponse.data
-              : [refreshResponse.data]
-          );
-        }
+        await fetchEmailLists();
 
         // Switch back to existing lists
         setAudienceOption("existing");
@@ -223,10 +301,12 @@ export default function CampaignSettings() {
     }
   };
 
-  // Main API call for creating campaign - UPDATED WITH BETTER ERROR LOGGING
+  // Main API call for creating campaign
   const createCampaign = async (payload: any) => {
     setLoading(true);
     try {
+      console.log("Creating campaign with payload:", payload);
+      
       // Make API call to create campaign
       const response = await apiClient.post(
         `${BASE_URL}/api/v1/campaigns`,
@@ -234,16 +314,18 @@ export default function CampaignSettings() {
         token ? { headers: { Authorization: `Bearer ${token}` } } : {}
       );
 
-      if (response.success) {
+      console.log("Campaign creation response:", response);
+
+      if (response && (response.success === undefined || response.success === true)) {
         toast.success("Campaign created successfully!");
         setSuccessModal(true);
-        router.push("/email-campaigns/dashboard");
         return response;
       } else {
-        toast.error(response.message || "Failed to create campaign");
+        toast.error(response?.message || "Failed to create campaign");
         return null;
       }
     } catch (error: any) {
+      console.error("Campaign creation error:", error);
       toast.error(
         error?.response?.data?.message ||
           error?.message ||
@@ -273,6 +355,13 @@ export default function CampaignSettings() {
       return;
     }
 
+    // Validate sender email exists in the fetched list
+    const selectedSender = senderEmails.find(sender => sender._id === data.senderId);
+    if (!selectedSender) {
+      toast.error("Please select a verified sender email");
+      return;
+    }
+
     // Validate audience based on selected option
     if (
       audienceOption === "existing" &&
@@ -296,11 +385,11 @@ export default function CampaignSettings() {
       payload = {
         campaignName: data.campaignName.trim(),
         subjectLine: data.subjectLine.trim(),
-        senderId: data.senderId.trim(),
+        senderId: selectedSender._id, // Use the sender ID
+        senderEmail: selectedSender.senderEmail, // Also include the email for reference
         autoStart: scheduleLater ? false : true,
         audience: {
-          emailLists: [data.audience.emailLists[0]], // SINGLE ID in array
-          // NO emails field
+          emailLists: [data.audience.emailLists[0]],
         },
       };
     } else {
@@ -310,29 +399,42 @@ export default function CampaignSettings() {
       payload = {
         campaignName: data.campaignName.trim(),
         subjectLine: data.subjectLine.trim(),
-        senderId: data.senderId.trim(),
+        senderId: selectedSender._id, // Use the sender ID
+        senderEmail: selectedSender.senderEmail, // Also include the email for reference
         autoStart: scheduleLater ? false : true,
         audience: {
           emails: emails.filter((email) => isValidEmail(email)),
         },
       };
     }
-    await createCampaign(payload);
+    
+    console.log("Final campaign payload:", payload);
+    const result = await createCampaign(payload);
+    if (result) {
+      setSuccessModal(true);
+    }
   };
 
   // Continue without saving list
   const handleContinueWithoutSaving = async () => {
     setSaveListModal(false);
 
+    // Get the selected sender
+    const selectedSender = senderEmails.find(sender => sender._id === data.senderId);
+    if (!selectedSender) {
+      toast.error("Please select a sender email first");
+      return;
+    }
+
     // Prepare payload with emails directly
     const emails = contactChips.map((chip) => chip.email);
     const payload = {
       campaignName: data.campaignName,
       subjectLine: data.subjectLine,
-      senderId: data.senderId,
+      senderId: selectedSender._id,
+      senderEmail: selectedSender.senderEmail,
       autoStart: scheduleLater ? false : true,
       audience: {
-        emailLists: [],
         emails: emails,
       },
     };
@@ -340,7 +442,15 @@ export default function CampaignSettings() {
     console.log("Continuing with payload:", payload);
 
     // Proceed with API call
-    await createCampaign(payload);
+    const result = await createCampaign(payload);
+    if (result) {
+      setSuccessModal(true);
+    }
+  };
+
+  // Handle refresh sender emails
+  const handleRefreshSenders = () => {
+    fetchSenderEmails();
   };
 
   return (
@@ -382,28 +492,88 @@ export default function CampaignSettings() {
           />
 
           {/* sender email dropdown */}
-          <div className="flex items-end gap-4">
-            <FormField
-              name="sender-email"
-              label="Sender Email"
-              value={data.senderId}
-              onChange={(e) =>
-                setData((prev) => ({ ...prev, senderId: e.target.value }))
-              }
-              id="sender-email"
-              placeholder="Enter your sender ID that has been verified with SendGrid"
-            />
-            {/* <div className="space-y-1 w-full">
-              <label className="text-[#1B223C] text-sm">Sender Email</label>
+          <div className="flex items-center gap-4">
+            <div className="space-y-1 w-full">
+              <div className="flex items-center justify-between relative">
+              <label className="text-[#1B223C] text-sm">Sender Email *</label>
+                <button
+                  onClick={handleRefreshSenders}
+                  disabled={loadingSenders}
+                  className="text-xs text-orange-600 hover:text-orange-800 flex items-center gap-1 disabled:opacity-50 absolute right-0"
+                  title="Refresh sender emails"
+                >
+                  <RefreshCw size={12} className={loadingSenders ? "animate-spin" : ""} />
+                  Refresh
+                </button>
+              </div>
               <Select
-                placeholder="Select sender email"
-                className="bg-[#00000014]">
-                <option value="">Email 1</option>
+                placeholder={
+                  loadingSenders 
+                    ? "Loading verified senders..." 
+                    : senderEmails.length === 0
+                    ? "No verified senders found"
+                    : "Select a verified sender email"
+                }
+                className="bg-[#00000014]"
+                value={data.senderId}
+                onChange={(e) => {
+                  const selectedId = e.target.value;
+                  const selectedSender = senderEmails.find(sender => sender._id === selectedId);
+                  
+                  if (selectedSender) {
+                    setData(prev => ({ 
+                      ...prev, 
+                      senderId: selectedSender._id,
+                      senderEmail: selectedSender.senderEmail
+                    }));
+                  } else {
+                    setData(prev => ({ 
+                      ...prev, 
+                      senderId: "",
+                      senderEmail: ""
+                    }));
+                  }
+                }}
+                disabled={loadingSenders || senderEmails.length === 0}
+              >
+                <option value="">Select sender email</option>
+                {senderEmails.map((sender) => (
+                  <option key={sender._id} value={sender._id}>
+                    <div className="flex items-center justify-between">
+                      <span>
+                        {sender.senderEmail}
+                        {sender.senderName && ` (${sender.senderName})`}
+                      </span>
+                      {sender.verified && (
+                        <Check size={12} className="text-green-600 ml-2" />
+                      )}
+                    </div>
+                  </option>
+                ))}
               </Select>
-            </div> */}
+              {loadingSenders ? (
+                <p className="text-xs text-gray-500">Loading verified sender emails...</p>
+              ) : senderEmails.length === 0 ? (
+                <p className="text-xs text-red-500">
+                  No verified sender emails found. Please register a sender email first.
+                </p>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <p className="text-xs text-gray-500">
+                    {senderEmails.length} verified sender(s) available
+                  </p>
+                  {data.senderEmail && (
+                    <p className="text-xs text-green-600">
+                      Selected: {data.senderEmail}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
             <Button
-              className="w-[30%]"
-              onClick={() => redirect("/email-campaigns/create-sender")}>
+              className="w-[30%] whitespace-nowrap"
+              onClick={() => router.push("/email-campaigns/create-sender")}
+            >
               Register new sender email
             </Button>
           </div>
@@ -411,7 +581,7 @@ export default function CampaignSettings() {
           {/* divider */}
           <hr className="text-gray-200" />
 
-          {/* AUDIENCE SECTION - MODIFIED */}
+          {/* AUDIENCE SECTION */}
           <div className="space-y-4">
             <label className="text-[#1B223C] text-sm font-medium">
               Audience *
@@ -449,7 +619,7 @@ export default function CampaignSettings() {
                 <Upload size={16} className="inline mr-2" />
                 Upload CSV
               </button>
-              <Button onClick={() => redirect("/email-campaigns/email-lists")}>
+              <Button onClick={() => router.push("/email-campaigns/email-lists")}>
                 Create a new Email list
               </Button>
             </div>
@@ -469,8 +639,8 @@ export default function CampaignSettings() {
                     setData((prev) => ({
                       ...prev,
                       audience: {
-                        emailLists: listId ? [listId] : [], // Store as single-item array
-                        emails: [], // Clear emails when using list
+                        emailLists: listId ? [listId] : [],
+                        emails: [],
                       },
                     }));
                   }}
@@ -731,8 +901,7 @@ export default function CampaignSettings() {
                   </div>
                   <div className="flex gap-4 items-center mt-4 w-fit flex-row-reverse">
                     <p className="text-sm">
-                      If contact is duplicated in multiple segments, only send
-                      once
+                      If contact is duplicated in multiple segments, only send once
                     </p>
                     <ToggleSwitch name="sendOnce" onChange={() => {}} />
                   </div>
@@ -814,17 +983,20 @@ export default function CampaignSettings() {
           <Button
             size={"lg"}
             className="w-full"
-          variant={"outline"}
-            onClick={() => setSuccessModal(true)}>
+            variant={"outline"}
+            onClick={() => setSuccessModal(true)}
+          >
             Save Draft
           </Button>
           <Button
             size={"lg"}
             className="w-full"
             onClick={handleSendNow}
-            // disabled={loading}
-            >
-            {scheduleLater
+            disabled={loading || !data.senderId || senderEmails.length === 0}
+          >
+            {loading
+              ? "Creating..."
+              : scheduleLater
               ? "Schedule Email"
               : "Send Now"}
           </Button>
@@ -842,7 +1014,7 @@ export default function CampaignSettings() {
             subtitle="Your campaign has been created successfully."
             className="text-center"
           />
-          <Button onClick={() => redirect("/email-campaigns/dashboard")}>
+          <Button onClick={() => router.push("/email-campaigns/dashboard")}>
             Back to Dashboard
           </Button>
         </div>
