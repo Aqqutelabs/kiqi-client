@@ -318,6 +318,8 @@ export default function CampaignSettings() {
       };
     }
     await createCampaign(payload);
+    setSuccessModal(true);
+    router.push("/email-campaigns/dashboard");
   };
 
   // Continue without saving list
