@@ -134,7 +134,7 @@ export default function CampaignSettings() {
               senderEmail: responseData.senderEmail
             }));
             
-            toast.success("Loaded verified sender");
+            // toast.success("Loaded verified sender");
           } else {
             setSenderEmails([]);
             toast.error("Sender is not verified");
