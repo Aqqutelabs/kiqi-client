@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import Heading from "@/components/ui/TextHeading";
 import { Sparkles, ArrowRight, X, SendHorizontal, Plus } from "lucide-react";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
@@ -13,34 +13,23 @@ import apiClient from "@/lib/utils/apiClient";
 import BASE_URL from "@/lib/utils/baseUrl";
 import { RichTextToolbar } from "@/components/ui/RichTextToolbar";
 import { useRouter, useSearchParams } from "next/navigation";
-// import { FormField } from "@/components/ui/FormField";
 import Avatar from "@/components/ui/Avatar";
 import { useAppSelector } from "@/redux/hooks";
 
+interface ChatMessage {
+  role: "user" | "ai";
+  message: string;
+  time: string;
+  raw?: any;
+}
+
 export default function AIGeneratedEmail() {
-  const editorRef = React.useRef<HTMLDivElement>(null);
-  const kikiPanelRef = React.useRef<HTMLDivElement>(null);
-  const [activeFormats, setActiveFormats] = React.useState<string[]>([]);
-   const searchParams = useSearchParams();
+  const editorRef = useRef<HTMLDivElement>(null);
+  const kikiPanelRef = useRef<HTMLDivElement>(null);
+  const [activeFormats, setActiveFormats] = useState<string[]>([]);
+  const searchParams = useSearchParams();
 
-    useEffect(() => {
-    const templateMessage = searchParams.get('template');
-    
-    if (templateMessage) {
-      // Decode the template message
-      const decodedMessage = decodeURIComponent(templateMessage);
-      
-      // Prefill the context with the template
-      setContext(`Create an email based on this template: ${decodedMessage}`);
-      
-      // Also prefill the main panel with the template description
-      setMainPanelContent(decodedMessage);
-      
-      toast.success("Template loaded!");
-    }
-  }, [searchParams]);
-
-  // for user avatar and name
+  // For user avatar and name
   const user = useAppSelector((state) => state.auth.user);
   const displayName = user
     ? "firstName" in user &&
@@ -53,8 +42,32 @@ export default function AIGeneratedEmail() {
       : "User"
     : "User";
 
+  // Redux token
+  const authToken = useSelector((state: any) => state.auth?.token ?? null);
+
+  // Chat state with session tracking
+  const [chat, setChat] = useState<ChatMessage[]>([]);
+  const [chatSessionId, setChatSessionId] = useState<string>(() =>
+    Date.now().toString()
+  );
+
+  // Input fields
+  const [context, setContext] = useState("");
+  const [subjectLine, setSubjectLine] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [applied, setApplied] = useState(false);
+
+  // Main panel content - we'll manage this via ref to avoid cursor issues
+  const mainPanelContentRef = useRef<string>("");
+  const isUpdatingFromAIFlagRef = useRef(false);
+
+  const router = useRouter();
+
   // Update active formats for toolbar highlighting
-  const updateActiveFormats = () => {
+  const updateActiveFormats = useCallback(() => {
+    if (!editorRef.current) return;
+
     const formats: string[] = [];
     if (document.queryCommandState("bold")) formats.push("bold");
     if (document.queryCommandState("italic")) formats.push("italic");
@@ -64,33 +77,25 @@ export default function AIGeneratedEmail() {
     if (document.queryCommandState("insertUnorderedList"))
       formats.push("insertUnorderedList");
     setActiveFormats(formats);
-  };
+  }, []);
 
-  // Redux token
-  const authToken = useSelector((state: any) => state.auth?.token ?? null);
+  // Load template from URL if present
+  useEffect(() => {
+    const templateMessage = searchParams.get("template");
 
-  // Chat state with session tracking
-  const [chat, setChat] = React.useState<
-    Array<{ role: "user" | "ai"; message: string; time: string; raw?: any }>
-  >([]);
-  const [chatSessionId, setChatSessionId] = React.useState<string>(() =>
-    Date.now().toString()
-  );
+    if (templateMessage && editorRef.current) {
+      const decodedMessage = decodeURIComponent(templateMessage);
+      setContext(`Create an email based on this template: ${decodedMessage}`);
 
-  // Input fields
-  const [context, setContext] = React.useState("");
-  const [subjectLine, setSubjectLine] = React.useState("");
-  const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
-  const [applied, setApplied] = React.useState(false);
-
-  // Main panel content (for Apply Changes) - single editable string
-  const [mainPanelContent, setMainPanelContent] = React.useState<string>("");
-
-  const router = useRouter();
+      // Set editor content directly
+      editorRef.current.innerHTML = decodedMessage;
+      mainPanelContentRef.current = decodedMessage;
+      toast.success("Template loaded!");
+    }
+  }, [searchParams]);
 
   // Helper: sanitize token
-  const sanitizeAuthToken = (tok: any) => {
+  const sanitizeAuthToken = useCallback((tok: any) => {
     if (!tok && tok !== 0) return null;
     try {
       let t = String(tok);
@@ -106,15 +111,29 @@ export default function AIGeneratedEmail() {
     } catch (e) {
       return null;
     }
-  };
+  }, []);
 
   // Start a new chat session
   const startNewChat = () => {
     setChat([]);
     setChatSessionId(Date.now().toString());
-    setMainPanelContent("");
     setContext("");
+
+    // Clear editor
+    if (editorRef.current) {
+      editorRef.current.innerHTML = "";
+      mainPanelContentRef.current = "";
+    }
+
     toast.success("New chat started");
+  };
+
+  // Get editor content
+  const getEditorContent = () => {
+    if (editorRef.current) {
+      return editorRef.current.innerHTML || editorRef.current.innerText || "";
+    }
+    return "";
   };
 
   // Send message to AI
@@ -123,123 +142,128 @@ export default function AIGeneratedEmail() {
       toast.error("Please enter a context/question.");
       return;
     }
+
     setLoading(true);
     setError(null);
-    setChat((prev) => [
-      ...prev,
-      {
-        role: "user",
-        message: context,
-        time: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-      },
-    ]);
+
+    // Add user message to chat
+    const userMessage: ChatMessage = {
+      role: "user",
+      message: context,
+      time: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
+
+    setChat((prev) => [...prev, userMessage]);
+
     try {
       const cleanToken = sanitizeAuthToken(authToken);
-      const headers = cleanToken
-        ? { headers: { Authorization: `Bearer ${cleanToken}` } }
-        : {};
 
-      // Only continue thread if we have previous messages in this session
-      const shouldContinueThread =
-        chat.filter((msg) => msg.role === "user").length > 0;
+      // Check if we have previous messages in this session
+      const previousUserMessages = chat.filter((msg) => msg.role === "user");
+      const shouldContinueThread = previousUserMessages.length > 0;
 
       const payload: any = {
         context,
         tone: "Professional",
         continueThread: shouldContinueThread,
-        sessionId: chatSessionId, // Send session ID to maintain context properly
+        sessionId: chatSessionId,
       };
 
-      const resp = await apiClient.post(
+      console.log("Sending request with payload:", payload);
+      console.log("Auth token exists:", !!cleanToken);
+
+      // Prepare headers with authorization if token exists
+
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+
+      if (cleanToken) {
+        headers.Authorization = `Bearer ${cleanToken}`;
+      }
+
+      const config = { headers };
+
+      const response = await apiClient.post(
         `${BASE_URL}/api/v1/ai-email/generate-email`,
         payload,
-        headers
+        config
       );
 
-      // Helper: normalize response data into plain text
-      const normalizeToPlainText = (d: any) => {
-        if (d == null) return "";
-        let content = d.content ?? d;
-        if (typeof content === "string") {
-          const trimmed = content.trim();
+      console.log("API Response:", response);
 
-          // Filter out continuation markers and redundant greetings
-          const filteredContent = trimmed
-            .replace(/---\s*Reply\s*continued\s*---/gi, "")
-            .replace(/---\s*Continued\s*---/gi, "")
-            .replace(/_{3,}.*?_{3,}/g, "")
-            .replace(
-              /^(hi there|hello|hey)[\s\S]*?---\s*Reply\s*continued\s*---/gi,
-              ""
-            )
-            .replace(/^(hi there|hello|hey)[,.\s]*/gi, "")
-            .replace(
-              /\b(?:previously|earlier|before|as mentioned)\b.*?\./gi,
-              ""
-            ) // Remove references to previous context
-            .trim();
+      // Process the response
+      if (
+        response &&
+        (response.success === undefined || response.success === true)
+      ) {
+        const data = response.data ?? response;
 
-          if (
-            (filteredContent.startsWith("{") &&
-              filteredContent.endsWith("}")) ||
-            (filteredContent.startsWith("[") && filteredContent.endsWith("]"))
-          ) {
+        // Helper to extract plain text from response
+        const extractPlainText = (data: any): string => {
+          if (!data) return "";
+
+          // Try to get content from various possible structures
+          let content =
+            data.content || data.body || data.message || data.text || data;
+
+          if (typeof content === "string") {
+            // Clean up the content
+            return content
+              .replace(/---\s*Reply\s*continued\s*---/gi, "")
+              .replace(/---\s*Continued\s*---/gi, "")
+              .replace(/_{3,}.*?_{3,}/g, "")
+              .trim();
+          }
+
+          if (typeof content === "object") {
+            // Handle object response (might have subject and body)
+            if (content.subject || content.body) {
+              return `${content.subject ? content.subject + "\n\n" : ""}${
+                content.body || ""
+              }`.trim();
+            }
+            // Try to stringify
             try {
-              const parsed = JSON.parse(filteredContent);
-              if (parsed && typeof parsed === "object") {
-                if (parsed.subject || parsed.body) {
-                  return `${parsed.subject ? parsed.subject + "\n\n" : ""}${
-                    parsed.body ?? ""
-                  }`.trim();
-                }
-                return Object.values(parsed).filter(Boolean).join("\n\n");
-              }
-            } catch (e) {}
+              return JSON.stringify(content, null, 2);
+            } catch {
+              return String(content);
+            }
           }
-          return filteredContent;
-        }
-        if (typeof content === "object") {
-          if (content.subject || content.body) {
-            return `${content.subject ? content.subject + "\n\n" : ""}${
-              content.body ?? ""
-            }`.trim();
-          }
-          return Object.values(content).filter(Boolean).join("\n\n");
-        }
-        return String(content);
-      };
 
-      if (resp && (resp.success === undefined || resp.success === true)) {
-        const data = resp.data ?? resp;
-        const plain = normalizeToPlainText(data);
-        if (plain) {
-          setChat((prev) => [
-            ...prev,
-            {
-              role: "ai",
-              message: plain,
-              time: new Date().toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              }),
-              raw: data,
-            },
-          ]);
-          toast.success(resp.message || "AI email generated");
+          return String(content);
+        };
+
+        const plainText = extractPlainText(data);
+
+        if (plainText) {
+          const aiMessage: ChatMessage = {
+            role: "ai",
+            message: plainText,
+            time: new Date().toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            raw: data,
+          };
+
+          setChat((prev) => [...prev, aiMessage]);
+          toast.success("AI email generated successfully!");
         } else {
-          setError(resp.message || "Failed to generate email");
-          toast.error(resp.message || "Failed to generate email");
+          throw new Error("No content received from AI");
         }
       } else {
-        setError(resp?.message || "Failed to generate email");
-        toast.error(resp?.message || "Failed to generate email");
+        throw new Error(response?.message || "Failed to generate email");
       }
     } catch (err: any) {
-      setError(err?.message || "Request failed");
-      toast.error(err?.message || "Request failed");
+      console.error("AI generation error:", err);
+      const errorMessage =
+        err.response?.data?.message || err.message || "Request failed";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
       setContext("");
@@ -247,66 +271,143 @@ export default function AIGeneratedEmail() {
   };
 
   // Auto-scroll kiki panel when chat updates or while loading
-  React.useEffect(() => {
-    try {
-      const el = kikiPanelRef.current;
-      if (!el) return;
+  useEffect(() => {
+    const el = kikiPanelRef.current;
+    if (!el) return;
+
+    // Use setTimeout to ensure DOM is updated
+    setTimeout(() => {
       el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
-    } catch (e) {
-      // ignore
-    }
+    }, 100);
   }, [chat, loading]);
 
-  // Auto-apply the latest AI response to the main email editor
-  useEffect(() => {
-    if (chat.length === 0) return;
+  // Handle applying AI message to main editor - FIXED with cursor preservation
+  const handleApplyMessage = useCallback(
+    (idx: number) => {
+      const msg = chat[idx];
+      if (!msg || msg.role !== "ai") {
+        toast.error("No AI message to apply");
+        return;
+      }
 
-    const lastMessage = chat[chat.length - 1];
-    if (lastMessage.role === "ai") {
-      setMainPanelContent(lastMessage.message);
-    }
-  }, [chat]);
+      if (!editorRef.current) return;
 
-  // Apply a specific AI message by index
-  const handleApplyMessage = (idx: number) => {
-    const msg = chat[idx];
-    if (!msg || msg.role !== "ai") {
-      toast.error("No AI message to apply");
-      return;
-    }
-    setMainPanelContent(msg.message);
-    setApplied(true);
-    toast.success("AI message applied to main panel");
-    setTimeout(() => setApplied(false), 1500);
-  };
+      // Set flag to indicate we're updating from AI
+      isUpdatingFromAIFlagRef.current = true;
+
+      // Save current selection
+      const selection = window.getSelection();
+      const range = selection?.rangeCount
+        ? selection.getRangeAt(0).cloneRange()
+        : null;
+
+      // Update editor content
+      editorRef.current.innerHTML = msg.message;
+      mainPanelContentRef.current = msg.message;
+
+      // Restore selection at the end
+      setTimeout(() => {
+        if (editorRef.current) {
+          const newRange = document.createRange();
+          newRange.selectNodeContents(editorRef.current);
+          newRange.collapse(false); // Move to end
+
+          if (selection) {
+            selection.removeAllRanges();
+            selection.addRange(newRange);
+          }
+
+          // Focus the editor
+          editorRef.current.focus();
+        }
+
+        // Reset flag
+        setTimeout(() => {
+          isUpdatingFromAIFlagRef.current = false;
+        }, 100);
+      }, 50);
+
+      setApplied(true);
+      toast.success("AI message applied to main panel");
+
+      setTimeout(() => setApplied(false), 1500);
+    },
+    [chat]
+  );
 
   // Send current applied main panel message to Settings page as a draft
   const sendToSettings = () => {
-    const content = mainPanelContent || editorRef.current?.innerText || "";
+    const content = getEditorContent();
 
-    if (!content) {
+    if (!content.trim()) {
       toast.error("No generated message applied to send");
       return;
     }
+
     const draft = {
       subjectLine: subjectLine || "",
       body: content,
     };
+
+    console.log("Saving draft:", draft);
+
     try {
       localStorage.setItem("kiqi_campaign_draft", JSON.stringify(draft));
       toast.success("Draft saved. Opening Settings...");
       router.push("/email-campaigns/settings");
     } catch (e) {
+      console.error("Failed to save draft:", e);
       toast.error("Failed to save draft");
     }
   };
 
-  // Handle manual typing in the contentEditable div
-  const handleEditorInput = (e: React.FormEvent<HTMLDivElement>) => {
-    const content = e.currentTarget.innerText;
-    setMainPanelContent(content);
-    updateActiveFormats();
-  };
+  // Handle editor input without causing cursor jumps
+  const handleEditorInput = useCallback(
+    (e: React.FormEvent<HTMLDivElement>) => {
+      // Only update ref, don't trigger React state update during normal typing
+      if (editorRef.current && !isUpdatingFromAIFlagRef.current) {
+        mainPanelContentRef.current = editorRef.current.innerHTML;
+      }
+      updateActiveFormats();
+    },
+    [updateActiveFormats]
+  );
+
+  // Handle key events in editor
+  const handleEditorKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      updateActiveFormats();
+
+      // Handle tab key
+      if (e.key === "Tab") {
+        e.preventDefault();
+        document.execCommand("insertText", false, "    ");
+      }
+    },
+    [updateActiveFormats]
+  );
+
+  // Handle paste in editor
+  const handleEditorPaste = useCallback(
+    (e: React.ClipboardEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      const text = e.clipboardData.getData("text/plain");
+      document.execCommand("insertText", false, text);
+      updateActiveFormats();
+    },
+    [updateActiveFormats]
+  );
+
+  // Initialize editor with empty content if needed
+  useEffect(() => {
+    if (
+      editorRef.current &&
+      !editorRef.current.innerHTML &&
+      !mainPanelContentRef.current
+    ) {
+      editorRef.current.innerHTML = "";
+    }
+  }, []);
 
   return (
     <section className="space-y-4 h-screen flex flex-col">
@@ -316,16 +417,6 @@ export default function AIGeneratedEmail() {
           title="AI Generated Email"
           backLink="/email-campaigns/dashboard"
         />
-
-        {/* subject line */}
-        {/* <FormField
-          label="Add a subject line for this campaign"
-          id="subjectLine"
-          placeholder="Enter a subject line"
-          className="bg-transparent mt-2 h-14 mb-5"
-          value={subjectLine}
-          onChange={(e: any) => setSubjectLine(e.target.value)}
-        /> */}
       </Card>
 
       {/* cards */}
@@ -343,28 +434,27 @@ export default function AIGeneratedEmail() {
             onUpdateFormats={updateActiveFormats}
           />
 
-          {/* email body */}
+          {/* email body - FIXED editor implementation */}
           <div
             ref={editorRef}
             contentEditable
             onInput={handleEditorInput}
+            onKeyDown={handleEditorKeyDown}
+            onPaste={handleEditorPaste}
             onFocus={updateActiveFormats}
             onClick={updateActiveFormats}
-            className="space-y-5 text-[#1B223C] text-base my-5 focus:outline-none flex-1 overflow-y-auto min-h-0 max-h-100 scrollbar-hide"
+            className="space-y-5 text-[#1B223C] text-base my-5 focus:outline-none flex-1 overflow-y-auto min-h-0 max-h-100 scrollbar-hide p-3 border border-transparent hover:border-gray-200 rounded-lg transition-colors"
             tabIndex={0}
-            suppressContentEditableWarning={true}>
-            {mainPanelContent ? (
-              <div className="whitespace-pre-wrap">{mainPanelContent}</div>
-            ) : (
-              <p className="text-gray-400">
-                Your AI generated email will appear here...
-              </p>
-            )}
-          </div>
+            suppressContentEditableWarning={true}
+          />
 
           {/* Fixed Send Email button at bottom */}
           <div className="shrink-0 pt-4">
-            <Button size={"lg"} onClick={sendToSettings} className="w-full">
+            <Button
+              size={"lg"}
+              onClick={sendToSettings}
+              className="w-full"
+              disabled={!getEditorContent().trim()}>
               Send Email
             </Button>
           </div>
@@ -396,9 +486,10 @@ export default function AIGeneratedEmail() {
               {chat.length > 0 ? (
                 chat.map((msg, idx) => (
                   <motion.div
-                    key={idx}
+                    key={`${chatSessionId}-${idx}`}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
                     className="flex gap-3 items-start">
                     {msg.role === "user" ? (
                       <Avatar name={displayName} />
@@ -434,7 +525,11 @@ export default function AIGeneratedEmail() {
                         <button
                           onClick={() => handleApplyMessage(idx)}
                           title="Apply this AI message"
-                          className="absolute right-2 top-2 p-2 rounded-full shadow-md bg-linear-to-tr from-[#1E3A8A] to-[#F95417] text-white hover:scale-105">
+                          className={`absolute right-2 top-2 p-2 rounded-full shadow-md text-white hover:scale-105 transition-transform ${
+                            applied
+                              ? "bg-green-500"
+                              : "bg-linear-to-tr from-[#1E3A8A] to-[#F95417]"
+                          }`}>
                           <ArrowRight size={14} />
                         </button>
                       )}
@@ -454,7 +549,11 @@ export default function AIGeneratedEmail() {
                 animate={{ opacity: 1 }}
                 className="flex gap-2 items-start">
                 <div className="flex justify-center items-center bg-white p-2 rounded-full min-w-8 h-8">
-                  <img src="/xxing-logo-colored.svg" alt="Icon" className="size-11" />
+                  <img
+                    src="/xxing-logo-colored.svg"
+                    alt="Icon"
+                    className="size-11"
+                  />
                 </div>
                 <div className="mt-2 px-2.5 bg-[#F3F6F8] rounded-full p-2">
                   <div className="flex gap-1">
@@ -467,7 +566,9 @@ export default function AIGeneratedEmail() {
             )}
 
             {error && (
-              <div className="text-red-500 text-sm text-center">{error}</div>
+              <div className="text-red-500 text-sm text-center bg-red-50 p-2 rounded-lg">
+                {error}
+              </div>
             )}
           </div>
 
@@ -482,17 +583,18 @@ export default function AIGeneratedEmail() {
                     onKeyDown={(e) => {
                       if (e.key === "Enter" && !e.shiftKey) {
                         e.preventDefault();
-                        if (!loading) sendMessage();
+                        if (!loading && context.trim()) sendMessage();
                       }
                     }}
-                    placeholder="Describe the changes you want..."
+                    placeholder="Describe the email you want to generate..."
                     className="w-full bg-transparent rounded-md resize-none min-h-18 pr-20 pl-3 py-2 outline-none text-sm text-[#1B223C] placeholder:text-gray-400 scrollbar-hide"
+                    disabled={loading}
                   />
 
                   <button
                     onClick={sendMessage}
                     disabled={loading || !context.trim()}
-                    className="absolute right-2 bottom-2 p-2 bg-(--primary) rounded-lg hover:opacity-90 disabled:opacity-50 transition-all">
+                    className="absolute right-2 bottom-2 p-2 bg-orange-600 rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
                     <SendHorizontal size={16} color="white" />
                   </button>
                 </div>
