@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Trash2, Search, Filter, ChevronDown, Plus, X } from "lucide-react";
+import { Trash2, Search, Filter, ChevronDown, Plus, X, Upload, Edit2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
@@ -86,7 +86,7 @@ const ChipInput = ({
   };
 
   return (
-    <div className="min-h-[60px] border border-gray-300 rounded-md p-2 flex flex-wrap gap-2 items-start focus-within:ring-2 focus-within:ring-orange-500 focus-within:border-orange-500">
+    <div className="min-h-15 border border-gray-300 rounded-md p-2 flex flex-wrap gap-2 items-start focus-within:ring-2 focus-within:ring-orange-500 focus-within:border-orange-500">
       {chips.map((chip, index) => (
         <div
           key={index}
@@ -111,7 +111,7 @@ const ChipInput = ({
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
         placeholder={chips.length === 0 ? placeholder : ""}
-        className="flex-1 min-w-[200px] outline-none bg-transparent text-sm"
+        className="flex-1 min-w-50 outline-none bg-transparent text-sm"
       />
     </div>
   );
@@ -300,56 +300,31 @@ const EmailListDetailPage = () => {
         backLink="/email-campaigns/email-lists"
       />
 
-      <div className="bg-white rounded-lg shadow-md flex-1 flex flex-col">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 flex-1 flex flex-col">
         {/* Toolbar */}
-        <div className="p-4 border-b flex flex-wrap gap-4 justify-between items-center">
-          <div className="flex items-center gap-2 flex-wrap">
+        <div className="p-4 border-b border-gray-200 flex flex-wrap gap-4 justify-between items-center">
+          <div className="flex items-center gap-3">
             {/* Email List Dropdown */}
             <div className="relative">
-              <Button
-                variant="tertiary"
-                className="!bg-white border font-semibold !text-gray-800"
-                onClick={() => setShowListDropdown(!showListDropdown)}>
-                {currentList
-                  ? `${currentList.email_listName} (${
-                      currentList.emails?.length || 0
-                    })`
-                  : "Loading..."}
-                <ChevronDown size={16} className="ml-2" />
-              </Button>
-
-              {/* Dropdown Menu */}
-              {showListDropdown && (
-                <div className="absolute top-full left-0 mt-1 w-64 bg-white border rounded-lg shadow-lg z-10 max-h-64 overflow-y-auto scrollbar-hide">
-                  {allLists.map((list) => (
-                    <button
-                      key={list._id}
-                      onClick={() => handleListSwitch(list._id)}
-                      className={`w-full text-left px-4 py-3 hover:bg-gray-50 border-b last:border-b-0 transition-colors ${
-                        list._id === listId ? "bg-orange-50" : ""
-                      }`}>
-                      <div className="font-medium text-gray-800">
-                        {list.email_listName}
-                      </div>
-                      <div className="text-xs text-gray-500 mt-1">
-                        {list.emails?.length || 0} emails • Created{" "}
-                        {new Date(list.createdAt).toLocaleDateString()}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
+              <div className="flex items-center gap-2">
+                <span className="text-gray-600 font-medium">new list</span>
+                <span className="bg-gray-100 text-gray-600 text-xs font-medium px-2 py-1 rounded">
+                  {currentList ? (currentList.emails?.length || 0) : 0}
+                </span>
+              </div>
             </div>
+          </div>
 
-            {/* Add Email Button */}
+          {/* Add Email and CSV Buttons */}
+          <div className="flex items-center gap-2">
             <Button
-              variant="tertiary"
-              className="!bg-white border"
+              variant="outline"
+              className="border-gray-300 hover:bg-gray-50"
               onClick={() => setShowAddEmailModal(true)}>
-              <Plus size={16} /> Add Email
+              <Plus size={16} className="mr-2" />
+              Add Email
             </Button>
-
-            {/* Upload CSV Button */}
+            
             <label className="inline-block cursor-pointer">
               <input
                 type="file"
@@ -358,85 +333,97 @@ const EmailListDetailPage = () => {
                 onChange={handleCsvUpload}
                 className="hidden"
               />
-              <span className="inline-flex items-center px-3 py-2 border rounded bg-white text-sm font-medium hover:bg-gray-50">
+              <Button
+                variant="outline"
+                className="border-gray-300 hover:bg-gray-50">
+                <Upload size={16} className="mr-2" />
                 Upload CSV
-              </span>
+              </Button>
             </label>
 
             {/* Upload Status Messages */}
-            {uploading && (
-              <div className="text-orange-600 text-xs">Uploading CSV...</div>
-            )}
-            {uploadError && (
-              <div className="text-red-500 text-xs">{uploadError}</div>
-            )}
-            {uploadSuccess && (
-              <div className="text-green-600 text-xs">{uploadSuccess}</div>
-            )}
-          </div>
-
-          {/* Search and Filter */}
-          <div className="flex items-center gap-2">
-            <Input
-              icon={<Search size={16} />}
-              placeholder="Search email or name"
-              className="h-9"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+            <div className="flex items-center gap-2 ml-2">
+              {uploading && (
+                <div className="text-orange-600 text-xs">Uploading...</div>
+              )}
+              {uploadError && (
+                <div className="text-red-500 text-xs">{uploadError}</div>
+              )}
+              {uploadSuccess && (
+                <div className="text-green-600 text-xs">{uploadSuccess}</div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Email Table */}
         <div className="flex-1 overflow-x-auto">
+          <div className="p-4 border-b border-gray-200">
+            <div className="relative max-w-xs">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <input
+                type="text"
+                placeholder="Search email or name"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+          </div>
+
           {loading ? (
             <div className="p-8 text-center text-orange-600">Loading...</div>
           ) : error ? (
             <div className="p-8 text-center text-red-500">{error}</div>
           ) : filteredEmails.length > 0 ? (
-            <table className="min-w-full text-sm">
-              <thead className="bg-gray-100/70">
-                <tr className="text-left text-gray-600">
-                  <th className="p-3 font-medium">Email Address</th>
-                  <th className="p-3 font-medium">Full Name</th>
-                  <th className="p-3 font-medium">Date Added</th>
-                  <th className="p-3 font-medium">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {filteredEmails.map((email, index) => (
-                  <tr key={email._id || index}>
-                    <td className="p-3">
-                      <div className="border border-gray-400 rounded-full w-fit py-1 px-3 text-sm bg-gray-50 flex gap-1.5 items-center">
-                        <div className="size-8 rounded-full bg-gray-300 flex justify-center items-center uppercase">
-                          {email.email.substring(0, 1)}
-                        </div>
-                        <span>{email.email}</span>
-                      </div>
-                    </td>
-                    <td className="p-3">{email.fullName || "-"}</td>
-                    <td className="p-3">
-                      {currentList?.createdAt
-                        ? new Date(currentList.createdAt).toLocaleDateString()
-                        : "-"}
-                    </td>
-                    <td className="p-3">
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          className="!p-2"
-                          onClick={() =>
-                            email._id && handleDeleteEmail(email._id)
-                          }>
-                          <Trash2 size={16} />
-                        </Button>
-                      </div>
-                    </td>
+            <div className="overflow-x-auto">
+              <table className="min-w-full">
+                <thead className="bg-gray-50">
+                  <tr className="text-left text-gray-600 text-sm">
+                    <th className="py-3 px-4 font-semibold border-b border-gray-200">EMAIL ADDRESS</th>
+                    <th className="py-3 px-4 font-semibold border-b border-gray-200">FULL NAME</th>
+                    <th className="py-3 px-4 font-semibold border-b border-gray-200">DATE ADDED</th>
+                    <th className="py-3 px-4 font-semibold border-b border-gray-200">ACTION</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-gray-100 text-sm">
+                  {filteredEmails.map((email, index) => (
+                    <tr key={email._id || index} className="hover:bg-gray-50">
+                      <td className="py-3 px-4">
+                        <div className="font-medium text-gray-900">{email.email}</div>
+                      </td>
+                      <td className="py-3 px-4 text-gray-600">
+                        {email.fullName || "-"}
+                      </td>
+                      <td className="py-3 px-4 text-gray-600">
+                        {currentList?.createdAt
+                          ? new Date(currentList.createdAt).toLocaleDateString('en-US', {
+                              month: 'numeric',
+                              day: 'numeric',
+                              year: 'numeric'
+                            })
+                          : "1/13/2026"}
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-2">
+                          <button
+                            className="p-1.5 text-gray-500 hover:text-orange-600 hover:bg-orange-50 rounded-md transition-colors"
+                            title="Edit">
+                            <Edit2 size={18} />
+                          </button>
+                          <button
+                            className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                            onClick={() => email._id && handleDeleteEmail(email._id)}
+                            title="Delete">
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           ) : (
             <div className="p-8 text-center text-gray-500">
               {searchQuery
@@ -445,56 +432,56 @@ const EmailListDetailPage = () => {
             </div>
           )}
         </div>
-      </div>
 
-      {/* Add Email Modal */}
-      {showAddEmailModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">Add Emails</h3>
-              <button
-                onClick={() => {
-                  setShowAddEmailModal(false);
-                  setNewEmails([]);
-                }}
-                className="text-gray-500 hover:text-gray-700">
-                <X size={20} />
-              </button>
-            </div>
+        {/* Add Email Modal */}
+        {showAddEmailModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold">Add Emails</h3>
+                <button
+                  onClick={() => {
+                    setShowAddEmailModal(false);
+                    setNewEmails([]);
+                  }}
+                  className="text-gray-500 hover:text-gray-700">
+                  <X size={20} />
+                </button>
+              </div>
 
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">
-                Enter email addresses
-              </label>
-              <ChipInput
-                chips={newEmails}
-                onChipsChange={setNewEmails}
-                placeholder="Type email and press comma or Enter"
-              />
-              <p className="text-xs text-gray-500 mt-2">
-                Format: email@example.com or email@example.com John Doe
-              </p>
-            </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-2">
+                  Enter email addresses
+                </label>
+                <ChipInput
+                  chips={newEmails}
+                  onChipsChange={setNewEmails}
+                  placeholder="Type email and press comma or Enter"
+                />
+                <p className="text-xs text-gray-500 mt-2">
+                  Format: email@example.com or email@example.com John Doe
+                </p>
+              </div>
 
-            <div className="flex justify-end gap-2">
-              <Button
-                variant="tertiary"
-                onClick={() => {
-                  setShowAddEmailModal(false);
-                  setNewEmails([]);
-                }}>
-                Cancel
-              </Button>
-              <Button
-                onClick={handleAddEmails}
-                disabled={newEmails.length === 0}>
-                Add {newEmails.length} Email{newEmails.length !== 1 ? "s" : ""}
-              </Button>
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowAddEmailModal(false);
+                    setNewEmails([]);
+                  }}>
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleAddEmails}
+                  disabled={newEmails.length === 0}>
+                  Add {newEmails.length} Email{newEmails.length !== 1 ? "s" : ""}
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </main>
   );
 };

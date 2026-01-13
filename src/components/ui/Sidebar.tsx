@@ -92,12 +92,12 @@ const navigationConfig: NavSection[] = [
             label: "Templates",
             icon: FileText,
           },
-          {
-            type: "link",
-            href: "/email-campaigns/mailbox",
-            label: "Mailbox",
-            icon: Mail,
-          },
+          // {
+          //   type: "link",
+          //   href: "/email-campaigns/mailbox",
+          //   label: "Mailbox",
+          //   icon: Mail,
+          // },
           {
             type: "link",
             href: "/email-campaigns/email-lists",
