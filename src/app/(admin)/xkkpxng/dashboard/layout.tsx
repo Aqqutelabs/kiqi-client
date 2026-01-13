@@ -34,26 +34,26 @@ export default function AdminDashboardLayout({ children }: Props) {
       },
     }).catch(() => {});
 
-    router.push("/admin/login");
+    router.push("/xkkpxng/login");
   };
 
   React.useEffect(() => {
     const token = localStorage.getItem("adminToken");
-    if (!token) router.push("/admin/login");
+    if (!token) router.push("/xkkpxng/login");
   }, [router]);
 
   const navLinks = [
-    { href: "/admin/dashboard", label: "Home", icon: <FiHome size={18} /> },
+    { href: "/xkkpxng/dashboard", label: "Home", icon: <FiHome size={18} /> },
     {
-      href: "/admin/dashboard/users",
+      href: "/xkkpxng/dashboard/users",
       label: "Users",
       icon: <FiUsers size={18} />,
     },
-    {
-      href: "/admin/dashboard/wallet",
-      label: "Wallet",
-      icon: <FiCreditCard size={18} />,
-    },
+    // {
+    //   href: "/xkkpxng/dashboard/wallet",
+    //   label: "Wallet",
+    //   icon: <FiCreditCard size={18} />,
+    // },
   ];
 
   return (

@@ -236,7 +236,7 @@ export default function ContactDetails() {
           isOpen={isEditModalOpen}
           contact={contact}
           onClose={() => setIsEditModalOpen(false)}
-          onUpdated={fetchContacts}
+          onUpdated={handleContactUpdated}
         />
       )}
     </main>
