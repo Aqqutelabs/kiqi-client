@@ -33,7 +33,7 @@ export default function SuccessModal({
 
           <button
             onClick={onClose}
-            className="w-fit px-6 py-3 bg-[#F95417] text-white rounded-lg hover:bg-[#1a2f73] transition-colors font-medium">
+            className="w-fit px-6 py-3 bg-[#F95417] text-white rounded-lg hover:bg-[#c74313] transition-colors font-medium">
             {buttonText}
           </button>
         </div>

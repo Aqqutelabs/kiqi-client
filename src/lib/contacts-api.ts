@@ -288,6 +288,77 @@ export const createContact = async (contactData: {
   }
 };
 
+// Get a contact
+export const fetchContactDetails = async (
+  contactId: string,
+  
+): Promise<{ error: boolean; contact: any }> => {
+  try {
+    const response = await api.get(`/contacts/${contactId}`);
+
+    if (response.data.error) {
+      throw new Error("Failed to fetch contact details");
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching contact details:", error);
+    throw error;
+  }
+};
+
+// Update Contact
+// export const updateContact = async (
+//   id: string,
+//   payload: {
+//     firstName: string;
+//     lastName: string;
+//     company?: string;
+//     jobTitle?: string;
+//     location?: string;
+//     notes?: string;
+//     tags?: string[];
+//     isArchived?: boolean;
+//     emails: {
+//       address: string;
+//       isPrimary: boolean;
+//     }[];
+//     phones?: {
+//       number: string;
+//       isPrimary: boolean;
+//     }[];
+//   }
+// ) => {
+//   const response = await api.put(`/contacts/${id}`, payload);
+
+//   return response.data;
+// };
+
+// Bulk Delete
+export const bulkDeleteContacts = async (
+  contactIds: number[]
+): Promise<{ error: boolean; message: string }> => {
+  try {
+    const ids = contactIds.join(",");
+
+    const response = await api.get(
+      `/contacts/bulk-delete?ids=${ids}`
+    );
+
+    if (response.data.error) {
+      throw new Error("Failed to delete contacts");
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting contacts:", error);
+    throw error;
+  }
+};
+
+
+
+
 /**
  * Update a contact by ID
  * @param contactId - The ID of the contact to update

@@ -13,7 +13,7 @@ import {
   Trash2,
   Edit,
 } from "lucide-react";
-import { fetchContactById } from "@/lib/contacts-api";
+import { fetchContactById, fetchContacts } from "@/lib/contacts-api";
 import { Contact } from "@/types/contacts";
 import EditContactModal from "@/components/ui/EditContactModal";
 import toast from "react-hot-toast";
@@ -236,7 +236,7 @@ export default function ContactDetails() {
           isOpen={isEditModalOpen}
           contact={contact}
           onClose={() => setIsEditModalOpen(false)}
-          onContactUpdated={handleContactUpdated}
+          onUpdated={handleContactUpdated}
         />
       )}
     </main>

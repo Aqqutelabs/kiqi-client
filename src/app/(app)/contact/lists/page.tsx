@@ -6,11 +6,21 @@ import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import SearchInput from "@/components/ui/Search";
 import ActionsMenu from "@/components/ui/ActionsMenu";
-import { fetchLists } from "@/lib/contacts-api";
+import { deleteContactList, fetchLists } from "@/lib/contacts-api";
+import { DeleteModal } from "@/components/ui/DeleteModal";
+import toast from "react-hot-toast";
+import { useParams, useRouter } from "next/navigation";
 
 export default function ContactListsPage() {
+  const params = useParams();
+  const router = useRouter();
+  const listId = params.id as string;
+
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [lists, setLists] = useState<any[]>([]);
+  const [listToDelete, setListToDelete] = useState<string | null>(null);
+  const [isDeleteListModalOpen, setIsDeleteListModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const loadLists = async () => {
@@ -24,6 +34,39 @@ export default function ContactListsPage() {
 
     loadLists();
   }, []);
+
+  const handleDeleteList = async () => {
+    if (!listToDelete) return;
+
+    try {
+      setIsDeleting(true);
+
+      await deleteContactList(listToDelete);
+
+      toast.success("List deleted successfully");
+
+      // Update UI immediately
+      setLists((prev) => prev.filter((l) => l._id !== listToDelete));
+    } catch (error) {
+      console.error("Failed to delete list:", error);
+
+      let errorMessage = "Failed to delete list";
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as {
+          response?: { data?: { message?: string } };
+        };
+        if (axiosError.response?.data?.message) {
+          errorMessage = axiosError.response.data.message;
+        }
+      }
+
+      toast.error(errorMessage);
+    } finally {
+      setIsDeleting(false);
+      setIsDeleteListModalOpen(false);
+      setListToDelete(null);
+    }
+  };
 
   return (
     <div className="flex-1 flex flex-col">
@@ -104,6 +147,11 @@ export default function ContactListsPage() {
                         isOpen={openMenuId === list._id}
                         onOpen={() => setOpenMenuId(list._id)}
                         onClose={() => setOpenMenuId(null)}
+                        onDelete={() => {
+                          setListToDelete(list._id);
+                          setIsDeleteListModalOpen(true);
+                          setOpenMenuId(null);
+                        }}
                       />
                     </td>
                   </tr>
@@ -112,6 +160,19 @@ export default function ContactListsPage() {
             </table>
           </div>
         </div>
+        <DeleteModal
+          isOpen={isDeleteListModalOpen}
+          onClose={() => setIsDeleteListModalOpen(false)}
+          onConfirm={handleDeleteList}
+          title="Delete List"
+          message={
+            listToDelete
+              ? `Are you sure you want to delete "${
+                  lists.find((l) => l._id === listToDelete)?.name
+                }"? This action cannot be undone.`
+              : "Are you sure you want to delete this list?"
+          }
+        />
       </main>
     </div>
   );
