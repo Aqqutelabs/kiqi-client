@@ -250,6 +250,16 @@ export default function ContactListsPage() {
         buttonText="Go to All Contacts"
         onClose={() => setShowSuccess(false)}
       />
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setListToDelete(null);
+        }}
+        onConfirm={handleDeleteList}
+        title="You're about to delete this list"
+        message="This action cannot be reversed. All contacts will remain in your account but will be removed from this list."
+      />
     </div>
   );
 }

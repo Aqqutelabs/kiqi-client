@@ -15,6 +15,7 @@ import api from "@/lib/api";
 import { FormField } from "@/components/ui/FormField";
 import axios from "axios";
 import BASE_URL from "@/lib/utils/baseUrl";
+import { useAppSelector } from "@/redux/hooks";
 
 // Define type for campaign data
 interface Campaign {
@@ -287,9 +288,11 @@ export default function EmailCampaignDashboard() {
     null
   );
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+   const token = useAppSelector((state) => state.auth.token);
+
 
   const [tab, setTab] = useState("All");
-  const tabs = ["All", "Active", "Scheduled", "Completed"];
+  const tabs = ["All", "Draft", "Scheduled", "Sent"];
 
   // Table columns with actions
   const columns: Column<Campaign>[] = [
@@ -394,8 +397,14 @@ export default function EmailCampaignDashboard() {
     try {
       // Use the actual campaign ID from the deletingCampaign state
       const res = await axios.delete(
-        `${BASE_URL}/api/v1/campaigns/${deletingCampaign.id}`
-      );
+      `${BASE_URL}/api/v1/campaigns/${deletingCampaign.id}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
+      }
+    );
 
       // Remove the campaign from local state
       setCampaigns((prev) =>
@@ -426,7 +435,7 @@ export default function EmailCampaignDashboard() {
 
   return (
     <main className="flex-1 overflow-y-auto space-y-6">
-      <PageHeader title="Email Campaigns" backLink="/dashboard" />
+      <PageHeader title="Email" backLink="/dashboard" />
 
       {/* campaigns table */}
       <Card>
