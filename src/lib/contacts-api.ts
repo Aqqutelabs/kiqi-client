@@ -117,6 +117,32 @@ export const addContactsToList = async (
 };
 
 /**
+ * Remove contacts from a list
+ * @param listId - The ID of the list to remove contacts from
+ * @param contactIds - Array of contact IDs to remove
+ */
+export const removeContactsFromList = async (
+  listId: string,
+  contactIds: string[]
+): Promise<{ error: boolean; list: ContactListDetail }> => {
+  try {
+    const response = await api.post<{ error: boolean; list: ContactListDetail }>(
+      `/contacts/lists/${listId}/remove-contacts`,
+      { contactIds }
+    );
+    
+    if (response.data.error) {
+      throw new Error("Failed to remove contacts from list");
+    }
+    
+    return response.data;
+  } catch (error) {
+    console.error("Error in removeContactsFromList:", error);
+    throw error;
+  }
+};
+
+/**
  * Fetch a single contact by ID
  * @param contactId - The ID of the contact to fetch
  */
