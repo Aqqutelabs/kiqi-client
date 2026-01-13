@@ -251,9 +251,9 @@ export default function ContactListsPage() {
         onClose={() => setShowSuccess(false)}
       />
       <DeleteModal
-        isOpen={isDeleteModalOpen}
+        isOpen={isDeleteListModalOpen}
         onClose={() => {
-          setIsDeleteModalOpen(false);
+          setIsDeleteListModalOpen(false);
           setListToDelete(null);
         }}
         onConfirm={handleDeleteList}
