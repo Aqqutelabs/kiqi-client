@@ -296,7 +296,7 @@ const EmailListDetailPage = () => {
   return (
     <main className="flex-1 flex flex-col">
       <PageHeader
-        title={currentList?.email_listName || "Email List"}
+        title="Email List"
         backLink="/email-campaigns/email-lists"
       />
 
@@ -307,7 +307,7 @@ const EmailListDetailPage = () => {
             {/* Email List Dropdown */}
             <div className="relative">
               <div className="flex items-center gap-2">
-                <span className="text-gray-600 font-medium">new list</span>
+                <span className="text-gray-600 font-medium capitalize">{currentList?.email_listName || "Email List"}</span>
                 <span className="bg-gray-100 text-gray-600 text-xs font-medium px-2 py-1 rounded">
                   {currentList ? (currentList.emails?.length || 0) : 0}
                 </span>
