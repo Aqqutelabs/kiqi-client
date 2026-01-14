@@ -6,9 +6,9 @@ import { PageHeader } from "@/components/ui/layout/PageHeader";
 import SearchInput from "@/components/ui/Search";
 import SelectListModal from "@/components/ui/SelectListModal";
 import SelectContactsModal from "@/components/ui/SelectContactsModal";
-import { Plus, Trash2, Users, ListPlus, X } from "lucide-react";
+import { Plus, Trash2, Users, ListPlus, X, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { fetchContactListById, deleteContactList, ContactListDetail, fetchContactLists, addContactsToList, removeContactsFromList } from "@/lib/contacts-api";
 import { Contact } from "@/types/contacts";
 import toast from "react-hot-toast";
@@ -31,6 +31,9 @@ export default function ContactListPage() {
   // Add contacts to this list functionality
   const [isSelectContactsOpen, setIsSelectContactsOpen] = useState(false);
   const [isAddingContacts, setIsAddingContacts] = useState(false);
+  
+  // Sort functionality
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | null>(null);
   
   // Add selected contacts to other lists functionality
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -86,12 +89,25 @@ export default function ContactListPage() {
     });
   };
 
-  const filteredContacts = list?.contacts.filter(
-    (contact) =>
-      `${contact.firstName} ${contact.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      contact.emails?.some((e) => e.address.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      contact.company?.toLowerCase().includes(searchQuery.toLowerCase())
-  ) || [];
+  const filteredContacts = useMemo(() => {
+    let contacts = list?.contacts.filter(
+      (contact) =>
+        `${contact.firstName} ${contact.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        contact.emails?.some((e) => e.address.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        contact.company?.toLowerCase().includes(searchQuery.toLowerCase())
+    ) || [];
+    
+    // Sort by date created if sort order is selected
+    if (sortOrder) {
+      contacts = [...contacts].sort((a, b) => {
+        const dateA = new Date(a.createdAt || 0).getTime();
+        const dateB = new Date(b.createdAt || 0).getTime();
+        return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+      });
+    }
+    
+    return contacts;
+  }, [list?.contacts, searchQuery, sortOrder]);
 
   // Handler for removing a contact from this list
   const handleRemoveContact = async () => {
@@ -286,12 +302,36 @@ export default function ContactListPage() {
             {list.name}
           </h3>
 
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             <SearchInput
               name="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
+            <button
+              onClick={() => {
+                if (sortOrder === null) setSortOrder('desc');
+                else if (sortOrder === 'desc') setSortOrder('asc');
+                else setSortOrder(null);
+              }}
+              className={`flex items-center gap-1.5 px-3 h-10 text-sm font-medium border rounded-lg transition-colors shrink-0 ${
+                sortOrder 
+                  ? 'bg-blue-50 border-blue-200 text-blue-700' 
+                  : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+              }`}
+              title={sortOrder === 'asc' ? 'Oldest first' : sortOrder === 'desc' ? 'Newest first' : 'Sort by date'}
+            >
+              {sortOrder === 'asc' ? (
+                <ArrowUp size={16} />
+              ) : sortOrder === 'desc' ? (
+                <ArrowDown size={16} />
+              ) : (
+                <ArrowUpDown size={16} />
+              )}
+              <span>
+                {sortOrder === 'asc' ? 'Oldest' : sortOrder === 'desc' ? 'Newest' : 'Sort'}
+              </span>
+            </button>
             <Button className="w-auto shrink-0" onClick={() => setIsSelectContactsOpen(true)}>
               <Plus size={18} className="mr-1" />
               Add Contacts

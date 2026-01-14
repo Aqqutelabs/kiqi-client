@@ -82,8 +82,19 @@ export default function FormSubmissionsPage() {
         data.email_address || "N/A";
       
       // Try to extract phone from common field patterns
-      const phone = data.phone || data.mobilenumber || data.mobileNumber || 
-        data.mobile_number || data.phoneNumber || data.phone_number || "N/A";
+      // Enhanced phone detection: looks for "phonenumber", "cellphone", "cell", "tel", "phone", "mobile"
+      const phone = data.phone || data.phonenumber || data.phoneNumber || data.phone_number ||
+        data["Phone Number"] || data.mobile || data.mobilenumber || data.mobileNumber || 
+        data.mobile_number || data.cellphone || data.cellPhone || data.cell_phone ||
+        data.cell || data.tel || data.telephone || "N/A";
+      
+      // Debug logging to help track phone field detection
+      const phoneKey = Object.keys(data).find(key => 
+        key.toLowerCase().replace(/[^a-z]/g, '').match(/^(phone|phonenumber|mobile|mobilenumber|cellphone|cell|tel|telephone)$/)
+      );
+      if (phoneKey) {
+        console.log('Phone field detected:', { phoneKey, value: data[phoneKey] });
+      }
 
       return {
         id: submission._id,
