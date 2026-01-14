@@ -298,7 +298,7 @@ export function ContactDetailsModal({
 
         {/* Footer Actions */}
         <div className="p-6 space-y-3 border-t border-gray-200">
-          <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#F95417] text-white rounded-lg hover:bg-[#1a2f73] transition-colors font-medium">
+          <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#F95417] text-white rounded-lg hover:bg-[#c74313] transition-colors font-medium">
             <MessageSquare className="w-4 h-4" />
             Send Message
           </button>
@@ -735,7 +735,7 @@ export default function ContactsMainContent() {
         setIsEditModalOpen(false);
         setEditContact(null);
       }}
-      onContactUpdated={handleContactUpdated}
+      onUpdated={handleContactUpdated}
     />
   )}
   <SuccessModal

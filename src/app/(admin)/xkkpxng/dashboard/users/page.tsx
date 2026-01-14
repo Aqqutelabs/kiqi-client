@@ -46,7 +46,7 @@ export default function UsersTable() {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get("${BASE_URL}/api/v1/admin/users", {
+      const res = await axios.get(`${BASE_URL}/api/v1/admin/users`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
