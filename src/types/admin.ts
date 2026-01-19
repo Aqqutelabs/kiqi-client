@@ -143,3 +143,161 @@ export interface ChangePressReleaseStatusResponse {
   message: string;
   success: boolean;
 }
+
+export interface Campaign {
+  _id: string;
+  campaignName: string;
+  subjectLine: string;
+  status: "Draft" | "Scheduled" | "Sent";
+  user: User;
+  audienceSize: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CampaignsResponse {
+  campaigns: Campaign[];
+  pagination: PaginationData;
+}
+
+export interface CampaignsApiResponse {
+  statusCode: number;
+  data: CampaignsResponse;
+  message: string;
+  success: boolean;
+}
+
+export interface DeleteCampaignResponse {
+  statusCode: number;
+  data: {
+    message: string;
+  };
+  message: string;
+  success: boolean;
+}
+
+export interface PublisherMetrics {
+  domain_authority: number;
+  trust_score: number;
+  avg_traffic: number;
+  social_signals: number;
+}
+
+export interface PublisherAddOn {
+  enabled: boolean;
+  price?: number;
+  description?: string;
+}
+
+export interface PublisherAddOns {
+  backdating: PublisherAddOn;
+  socialPosting: PublisherAddOn;
+  featuredPlacement: PublisherAddOn;
+  newsletterInclusion: PublisherAddOn;
+  authorByline: PublisherAddOn;
+  paidAmplification: PublisherAddOn;
+  whitePaperGating: PublisherAddOn & { leadGenEnabled?: boolean };
+}
+
+export interface PublisherFAQ {
+  _id?: string;
+  question: string;
+  answer: string;
+  isActive?: boolean;
+  order?: number;
+}
+
+export interface Publisher {
+  _id: string;
+  publisherId: string;
+  name: string;
+  price: string | number;
+  avg_publish_time: string;
+  industry_focus: string[];
+  region_reach: string[];
+  audience_reach: string;
+  key_features: string[];
+  metrics: PublisherMetrics;
+  formatDepth?: string[];
+  addOns?: PublisherAddOns;
+  enhancedMetrics?: {
+    lastUpdated: string;
+  };
+  averageRating?: number;
+  totalReviews?: number;
+  faqs?: PublisherFAQ[];
+  isPublished?: boolean;
+  isMarketplaceListing?: boolean;
+  viewCount?: number;
+  cartAddCount?: number;
+  bookmarkCount?: number;
+  shareCount?: number;
+  conversionRate?: number;
+  createdBy?: string | User;
+  updatedBy?: User;
+  reviews?: any[];
+  createdAt: string;
+  updatedAt: string;
+  __v?: number;
+}
+
+export interface PublisherFormData {
+  name: string;
+  price: number | string;
+  avg_publish_time: string;
+  audience_reach: string;
+  industry_focus: string[];
+  region_reach: string[];
+  isMarketplaceListing?: boolean;
+  key_features?: string[];
+}
+
+export interface PublishersResponse {
+  publishers: Publisher[];
+  pagination: PaginationData;
+}
+
+export interface PublishersApiResponse {
+  statusCode: number;
+  data: PublishersResponse;
+  message: string;
+  success: boolean;
+}
+
+export interface CreatePublisherResponse {
+  statusCode: number;
+  data: Publisher;
+  message: string;
+  success: boolean;
+}
+
+export interface UpdatePublisherResponse {
+  statusCode: number;
+  data: Publisher;
+  message: string;
+  success: boolean;
+}
+
+export interface DeletePublisherResponse {
+  statusCode: number;
+  data: {
+    message: string;
+  };
+  message: string;
+  success: boolean;
+}
+
+export interface UpdatePublisherAddOnsResponse {
+  statusCode: number;
+  data: Publisher;
+  message: string;
+  success: boolean;
+}
+
+export interface UpdatePublisherFAQsResponse {
+  statusCode: number;
+  data: Publisher;
+  message: string;
+  success: boolean;
+}
+
