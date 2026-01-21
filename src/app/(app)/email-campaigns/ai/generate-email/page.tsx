@@ -211,6 +211,20 @@ export default function AIGeneratedEmail() {
             data.content || data.body || data.message || data.text || data;
 
           if (typeof content === "string") {
+            // Check if it's a JSON string that needs parsing
+            if (content.trim().startsWith('{')) {
+              try {
+                const parsed = JSON.parse(content);
+                if (parsed && typeof parsed === "object") {
+                  content = parsed;
+                }
+              } catch (e) {
+                // Not valid JSON, continue with string
+              }
+            }
+          }
+
+          if (typeof content === "string") {
             // Clean up the content
             return content
               .replace(/---\s*Reply\s*continued\s*---/gi, "")
