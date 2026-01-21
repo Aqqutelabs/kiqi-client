@@ -30,6 +30,11 @@ export const getAuthToken = (): string | null => {
   }
 };
 
+export const getAdminToken = (): string | null => {
+  return localStorage.getItem("adminToken");
+};
+
+
 /**
  * Gets the full user object from persisted state
  */
