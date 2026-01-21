@@ -345,6 +345,7 @@ export default function ManageRecipientGroups() {
       });
 
       toast.success("Recipient group created successfully!");
+      fetchRecipientGroups();
     } catch (error: unknown) {
       handleApiError(error, "creating recipient group");
     } finally {
@@ -486,7 +487,7 @@ export default function ManageRecipientGroups() {
                 onChange={(e) => handleFormChange("contacts", e.target.value)}
                 required
               />
-              <div className="w-full md:w-[300px]">
+              <div className="w-full md:w-75">
                 <Button size={"lg"} type="button">
                   Select from contacts
                 </Button>

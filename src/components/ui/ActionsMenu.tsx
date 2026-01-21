@@ -8,10 +8,11 @@ interface Props {
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
-  onDelete: () => void;
+  onDelete?: () => void;
+  onViewContacts?: () => void;
 }
 
-export default function ActionsMenu({ isOpen, onOpen, onClose, onDelete }: Props) {
+export default function ActionsMenu({ isOpen, onOpen, onClose, onDelete, onViewContacts }: Props) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const [coords, setCoords] = useState<{ top: number; left: number } | null>(
@@ -84,11 +85,17 @@ export default function ActionsMenu({ isOpen, onOpen, onClose, onDelete }: Props
             }}
             className="z-[9999] w-48 rounded-md border border-gray-200 bg-white shadow-lg"
           >
-            <button className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-50"
-            onClick={() => (window.location.href = `/contacts/lists/[id]}`)}>
+            <button 
+              className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-50"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+                onViewContacts?.();
+              }}
+            >
               View Contacts
             </button>
-            <button className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-50">
+            {/* <button className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-50">
               Rename
             </button>
             <button className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-50">
@@ -96,13 +103,14 @@ export default function ActionsMenu({ isOpen, onOpen, onClose, onDelete }: Props
             </button>
             <button className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-50">
               Merge
-            </button>
-            <button
-              onClick={() => {
-                onClose();
-                onDelete();
-              }}
+            </button> */}
+            <button 
               className="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+                onDelete?.();
+              }}
             >
               Delete List
             </button>

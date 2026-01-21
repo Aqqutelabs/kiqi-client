@@ -16,6 +16,8 @@ import { fetchAdminOverview } from "@/lib/admin-api";
 import { AdminOverviewData } from "@/types/admin";
 import PressReleasesSection from "@/components/admin/PressReleasesSection";
 import PaymentsSection from "@/components/admin/PaymentsSection";
+import CampaignsSection from "@/components/admin/CampaignsSection";
+import PublishersSection from "@/components/admin/PublishersSection";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 
@@ -25,7 +27,7 @@ export default function AdminDashboard() {
   );
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<
-    "overview" | "press-releases" | "payments"
+    "overview" | "press-releases" | "payments" | "campaigns" | "publishers"
   >("overview");
 
   const loadOverviewData = useCallback(async () => {
@@ -105,6 +107,8 @@ export default function AdminDashboard() {
                 { id: "overview", label: "Overview" },
                 { id: "press-releases", label: "Press Releases" },
                 { id: "payments", label: "Payments" },
+                { id: "campaigns", label: "Campaigns" },
+                { id: "publishers", label: "Publishers" },
               ] as const
             ).map((tab) => (
               <button
@@ -276,6 +280,8 @@ export default function AdminDashboard() {
 
         {activeTab === "press-releases" && <PressReleasesSection />}
         {activeTab === "payments" && <PaymentsSection />}
+        {activeTab === "campaigns" && <CampaignsSection />}
+        {activeTab === "publishers" && <PublishersSection />}
       </div>
     </div>
   );
