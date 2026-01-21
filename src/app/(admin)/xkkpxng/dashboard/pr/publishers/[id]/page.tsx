@@ -158,39 +158,37 @@ export default function PublisherDetailsPage() {
 
           {/* Add-ons */}
           <div className="bg-white rounded-2xl shadow-sm p-6 space-y-4">
-  <h2 className="text-lg font-semibold">Add-ons</h2>
+            <h2 className="text-lg font-semibold">Add-ons</h2>
 
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-    {publisher?.addOns &&
-      Object.entries(publisher.addOns).map(([key, value]) => {
-        const isEnabled = Boolean(value?.enabled);
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {publisher?.addOns &&
+                Object.entries(publisher.addOns).map(([key, value]) => {
+                  const isEnabled = Boolean(value?.enabled);
 
-        return (
-          <div
-            key={key}
-            className="flex items-center justify-between border rounded-lg p-4"
-          >
-            <span className="capitalize">
-              {key.replace(/([A-Z])/g, " $1")}
-            </span>
+                  return (
+                    <div
+                      key={key}
+                      className="flex items-center justify-between border rounded-lg p-4"
+                    >
+                      <span className="capitalize">
+                        {key.replace(/([A-Z])/g, " $1")}
+                      </span>
 
-            <span
-              className={`text-xs px-3 py-1 rounded-full border font-medium
+                      <span
+                        className={`text-xs px-3 py-1 rounded-full border font-medium
                 ${
                   isEnabled
                     ? "bg-green-50 text-green-700 border-green-200"
                     : "bg-gray-50 text-gray-500 border-gray-200"
                 }`}
-            >
-              {isEnabled ? "Enabled" : "Disabled"}
-            </span>
+                      >
+                        {isEnabled ? "Enabled" : "Disabled"}
+                      </span>
+                    </div>
+                  );
+                })}
+            </div>
           </div>
-        );
-      })}
-  </div>
-</div>
-
-
 
           {/* Reviews */}
           <div className="bg-white rounded-2xl shadow-sm p-6 space-y-6">
