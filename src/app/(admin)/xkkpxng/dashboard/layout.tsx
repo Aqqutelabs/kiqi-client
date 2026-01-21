@@ -15,6 +15,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import BASE_URL from "@/lib/utils/baseUrl";
+import { Megaphone } from "lucide-react";
 
 interface Props {
   children: ReactNode;
@@ -48,6 +49,11 @@ export default function AdminDashboardLayout({ children }: Props) {
       href: "/xkkpxng/dashboard/users",
       label: "Users",
       icon: <FiUsers size={18} />,
+    },
+    {
+      href: "/xkkpxng/dashboard/pr",
+      label: "Press-Releases",
+      icon: <Megaphone size={18} />,
     },
     // {
     //   href: "/xkkpxng/dashboard/wallet",
