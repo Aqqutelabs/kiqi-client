@@ -59,9 +59,11 @@ export default function CreatePressRelease() {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
+        console.log(res);
 
-        const mapped: Publications[] = res.data.data.map((pub: any) => ({
-          id: pub.publisherId,
+        const mapped: Publications[] = res.data.data.publishers.map(
+        (pub: any) => ({
+          id: pub.publisherId, // stable & unique
           productName: pub.name,
           duration: pub.avg_publish_time,
           industry: pub.industry_focus?.join(", "),
@@ -69,10 +71,16 @@ export default function CreatePressRelease() {
           reach: pub.audience_reach,
           amount: pub.price,
           paymentType: "One time payment",
-        }));
 
-        setPublications(mapped);
-      } catch (error) {
+          // optional extras
+          isPopular: pub.metrics?.domain_authority >= 70,
+          rating: pub.averageRating,
+          totalReviews: pub.totalReviews,
+        })
+      );
+
+      setPublications(mapped);
+    } catch (error) {
         console.error("Failed to load publications", error);
       } finally {
         setLoading(false);
