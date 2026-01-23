@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 export interface Publications {
+  _id: string;
   id: string;
   productName: string;
   duration: string;
