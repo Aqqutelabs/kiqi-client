@@ -29,7 +29,7 @@ const AdminLoginPage = () => {
 
       // console.log("User saved:", user);
       // Redirect to admin dashboard
-      router.push("/xkkpxng/dashboard");
+      router.push("/A/admin/dashboard");
     } catch (err: any) {
       setError(err.response?.data?.message || "Login failed");
     } finally {
