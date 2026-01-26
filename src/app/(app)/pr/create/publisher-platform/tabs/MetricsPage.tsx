@@ -1,4 +1,8 @@
-import { BarChart3, MousePointerClick, ShieldCheck, TrendingUp } from "lucide-react";
+import { BarChart3, Globe, MousePointerClick, ShieldCheck, TrendingUp } from "lucide-react";
+
+interface MetricPageProps {
+  publisher: any;
+}
 
 interface Metric {
   id: string;
@@ -8,38 +12,51 @@ interface Metric {
   icon: React.ElementType;
 }
 
+
+
+export default function MetricPage({ publisher }: MetricPageProps){
+  const publisherMetrics = publisher.metrics;
 const metrics: Metric[] = [
   {
-    id: "traffic",
+    id: "avgTrafficMonthly",
     label: "Monthly Traffic",
-    value: "500,000+",
-    description: "Average monthly unique visitors to the publisher's platform.",
+    value: publisherMetrics?.avgTrafficMonthly
+      ? publisherMetrics.avgTrafficMonthly.toLocaleString()
+      : "—",
+    description:
+      "Average number of unique visitors per month across the publisher’s domain.",
     icon: TrendingUp,
   },
   {
-    id: "ctr",
-    label: "Average CTR",
-    value: "3.4%",
-    description: "Click-through rate based on historical article performance.",
-    icon: MousePointerClick,
+    id: "domainAuthority",
+    label: "Domain Authority",
+    value: publisherMetrics?.domainAuthority
+      ? `${publisherMetrics.domainAuthority}/100`
+      : "—",
+    description:
+      "SEO authority score based on backlink quality, domain age, and search visibility.",
+    icon: Globe,
   },
   {
-    id: "trust",
+    id: "trustScore",
     label: "Trust Score",
-    value: "92/100",
-    description: "Internal quality and credibility score derived from publisher signals.",
+    value: publisherMetrics?.trustScore
+      ? `${publisherMetrics.trustScore}/100`
+      : "—",
+    description:
+      "Internal credibility score derived from editorial quality and audience trust.",
     icon: ShieldCheck,
   },
+
   {
-    id: "social",
+    id: "socialSignals",
     label: "Social Signals",
     value: "6.8%",
-    description: "Measures how actively readers interact with published content.",
+    description:
+      "Measures how actively readers interact with published content across social platforms.",
     icon: BarChart3,
   },
 ];
-
-export default function MetricsPage() {
   return (
     <div>
       <main className="py-8">

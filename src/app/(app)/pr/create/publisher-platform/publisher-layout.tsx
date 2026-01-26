@@ -9,9 +9,12 @@ interface PublisherLayoutProps {
   publisher: {
     name: string;
     description: string;
-    rating: number;
-    reviews: number;
-    price: number | string;
+    price: string;
+    industry_focus: string[];
+    region_reach: string[];
+    audience_reach: string;
+    averageRating: number;
+    totalReviews: number;
   };
   overview: ReactNode;
   metrics: ReactNode;

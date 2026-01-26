@@ -4,9 +4,12 @@ interface PublisherHeaderProps {
   publisher: {
     name: string;
     description: string;
-    rating: number;
-    reviews: number;
-    price: number | string;
+    price: string;
+    industry_focus: string[];
+    region_reach: string[];
+    audience_reach: string;
+    averageRating: number;
+    totalReviews: number;
   };
 }
 
@@ -24,15 +27,15 @@ export function PublisherHeader({ publisher }: PublisherHeaderProps) {
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-1">
             <Star className="w-4 h-4 fill-[#FF5314] stroke-[#FF5314]" />
-            <span className="font-medium">{publisher.rating}</span>
+            <span className="font-medium">{publisher.averageRating || "No ratings yet"}</span>
             <span className="text-sm text-muted-foreground">/ 5</span>
             <span className="text-sm text-muted-foreground">
-              ({publisher.reviews} reviews)
+              ({publisher.totalReviews || "0"} reviews)
             </span>
           </div>
 
           <div className="text-lg font-semibold text-[#FF5314]">
-            ${publisher.price}
+            {publisher.price}
           </div>
         </div>
       </div>

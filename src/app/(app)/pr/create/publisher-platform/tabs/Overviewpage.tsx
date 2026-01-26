@@ -6,6 +6,11 @@ import ToggleSwitch from "@/components/ui/SwitchComponent";
 import { Input } from "@/components/ui/Input";
 import type { LucideIcon } from "lucide-react";
 
+interface OverviewPageProps {
+  publisher: any; //  tighten this later
+}
+
+
 interface InfoItemProps {
   icon: LucideIcon;
   label: string;
@@ -21,34 +26,95 @@ interface AddOn {
   enabled: boolean;
 }
 
-export default function OverviewPage() {
+export default function OverviewPage({ publisher }: OverviewPageProps) {
   const [selectedAddOns, setSelectedAddOns] = useState<Record<string, boolean>>({});
   const [addOnValues, setAddOnValues] = useState<Record<string, number>>({});
 
+  const infoItems = [
+  {
+    icon: Briefcase,
+    label: "Industry Focus",
+    value: publisher.industryFocus?.join(", "),
+  },
+  {
+    icon: Users,
+    label: "Audience Reach",
+    value: publisher.audienceReach,
+  },
+  {
+    icon: Globe,
+    label: "Coverage",
+    value: publisher.region_reach?.join(", "),
+  },
+  {
+    icon: Zap,
+    label: "Delivery Speed",
+    value: publisher.avg_publish_time ?? "—",
+  },
+  {
+    icon: FileText,
+    label: "Article Formats",
+    value: "PDF, DOCX",
+  },
+];
+
+
   const addOns: AddOn[] = [
-    {
-      id: "featured",
-      name: "Featured Placement",
-      description: "Boost visibility by featuring your article prominently.",
-      type: "quantity",
-      enabled: true,
-    },
-    {
-      id: "amplification",
-      name: "Paid Amplification",
-      description: "Promote your article via paid distribution channels.",
-      type: "budget",
-      enabled: true,
-    },
-    {
-      id: "express",
-      name: "Express Delivery",
-      description: "Get your article published faster.",
-      type: "fixed",
-      price: 150,
-      enabled: true,
-    },
-  ];
+  {
+    id: "backdating",
+    name: "Backdating",
+    description: "Publish the article with an earlier date.",
+    type: "fixed",
+    price: publisher.addOns?.backdating?.price,
+    enabled: publisher.addOns?.backdating?.enabled,
+  },
+  {
+    id: "socialPosting",
+    name: "Social Media Posting",
+    description: "Share the article across publisher social media channels.",
+    type: "fixed",
+    price: publisher.addOns?.socialPosting?.price,
+    enabled: publisher.addOns?.socialPosting?.enabled,
+  },
+  {
+    id: "featuredPlacement",
+    name: "Featured Placement",
+    description: "Place the article in a featured or highlighted section.",
+    type: "quantity",
+    enabled: publisher.addOns?.featuredPlacement?.enabled,
+  },
+  {
+    id: "newsletterInclusion",
+    name: "Newsletter Inclusion",
+    description: "Include the article in the publisher’s newsletter.",
+    type: "fixed",
+    price: publisher.addOns?.newsletterInclusion?.price,
+    enabled: publisher.addOns?.newsletterInclusion?.enabled,
+  },
+  {
+    id: "authorByline",
+    name: "Author Byline",
+    description: "Publish the article with a named author byline.",
+    type: "fixed",
+    price: publisher.addOns?.authorByline?.price,
+    enabled: publisher.addOns?.authorByline?.enabled,
+  },
+  {
+    id: "paidAmplification",
+    name: "Paid Amplification",
+    description: "Boost reach using paid promotion and distribution.",
+    type: "budget",
+    enabled: publisher.addOns?.paidAmplification?.enabled,
+  },
+  {
+    id: "whitePaperGating",
+    name: "Whitepaper Gating",
+    description: "Gate content behind a lead capture form.",
+    type: "fixed",
+    price: publisher.addOns?.whitePaperGating?.price,
+    enabled: publisher.addOns?.whitePaperGating?.enabled,
+  },
+];
 
   return (
     <div>
@@ -56,12 +122,16 @@ export default function OverviewPage() {
         {/* Info Items */}
         <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <InfoItem icon={Briefcase} label="Industry Focus" value="Technology, Software, SaaS" />
-            <InfoItem icon={Users} label="Audience Reach" value="500,000 monthly unique visitors" />
-            <InfoItem icon={Globe} label="Coverage" value="North America, Europe" />
-            <InfoItem icon={Zap} label="Delivery Speed" value="24–48 hours" />
-            <InfoItem icon={FileText} label="Article Formats" value="PDF, DOCX" />
-          </div>
+  {infoItems.map((item) => (
+    <InfoItem
+      key={item.label}
+      icon={item.icon}
+      label={item.label}
+      value={item.value}
+    />
+  ))}
+</div>
+
         </div>
 
         {/* Add-Ons Section */}

@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 
 
 export default function PublisherPage() {
-  const { publisherId } = useParams<{ publisherId: string }>();
+  const { id } = useParams<{ id: string }>();
   const [publisher, setPublisher] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -26,12 +26,12 @@ export default function PublisherPage() {
       : null;
 
   useEffect(() => {
-    if (!publisherId) return;
+    if (!id) return;
 
     const fetchPublisher = async () => {
       try {
         const res = await fetch(
-          `${BASE_URL}/api/v1/admin/publishers/${publisherId}`,
+          `${BASE_URL}/api/v1/press-releases/publishers/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -40,6 +40,7 @@ export default function PublisherPage() {
         );
 
         const data = await res.json();
+        console.log(data);
         setPublisher(data.data);
       } catch (err) {
         console.error(err);
@@ -49,7 +50,7 @@ export default function PublisherPage() {
     };
 
     fetchPublisher();
-  }, [publisherId]);
+  }, [id]);
 
   if (loading) return <div>Loading...</div>;
   if (!publisher) return <div>Publisher not found</div>;
@@ -57,10 +58,10 @@ export default function PublisherPage() {
   return (
     <PublisherLayout
       publisher={publisher}
-      overview={<OverviewPage />}
-      metrics={<MetricsPage />}      
+      overview={<OverviewPage publisher={publisher} />}
+      metrics={<MetricsPage publisher={publisher}  />}      
       reviews={<ReviewsPage />}
-      faq={<FAQPage />}
+      faq={<FAQPage publisher={publisher}/>}
     />
   );
 }
