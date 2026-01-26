@@ -10,8 +10,11 @@ import {
 import ProductSidebar from "@/app/(app)/pr/create/publisher-platform/product-details";
 import { useProducts } from "@/context/ProductContext";
 import { Button } from "./Button";
+import { routerServerGlobal } from "next/dist/server/lib/router-utils/router-server-context";
+import { useRouter } from "next/navigation";
 
 export interface Products {
+  _id: string;
   id: string;
   productName: string;
   duration: string;
@@ -35,6 +38,7 @@ export default function ProductCard({
   isAdded,
 }: ProductProps) {
   const { setIsSidebarOpen, isSidebarOpen } = useProducts();
+  const router = useRouter();
 
   return (
     <>
@@ -112,7 +116,7 @@ export default function ProductCard({
           <div className="flex gap-3 w-full">
             {!isAdded && (
               <Button
-                onClick={() => setIsSidebarOpen(true)}
+                onClick={() => router.push(`/pr/create/publisher-platform/${product.id}`)}
                 size={"lg"}
                 variant={"outline"}
                 className="w-2/5">
