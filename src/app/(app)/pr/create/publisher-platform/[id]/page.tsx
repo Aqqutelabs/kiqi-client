@@ -7,11 +7,12 @@ import MetricsPage from "../tabs/MetricsPage";
 import OverviewPage from "../tabs/Overviewpage";
 import ReviewsPage from "../tabs/ReviewPage";
 import { useAppSelector } from "@/redux/hooks";
-import { notFound, useParams } from "next/navigation";
+import { notFound, useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-
+import { useCart, useProceedToCheckout } from "@/hooks/useCart";
 
 export default function PublisherPage() {
+  const router = useRouter();
   const { id } = useParams<{ id: string }>();
   const [publisher, setPublisher] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -20,7 +21,7 @@ export default function PublisherPage() {
     typeof window !== "undefined"
       ? JSON.parse(localStorage.getItem("persist:root") || "{}").auth
         ? JSON.parse(
-            JSON.parse(localStorage.getItem("persist:root") || "{}").auth
+            JSON.parse(localStorage.getItem("persist:root") || "{}").auth,
           ).token
         : null
       : null;
@@ -36,7 +37,7 @@ export default function PublisherPage() {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         const data = await res.json();
@@ -52,16 +53,32 @@ export default function PublisherPage() {
     fetchPublisher();
   }, [id]);
 
+  const { cart, handleAddToCart } = useCart();
+  const { proceedToCheckout } = useProceedToCheckout();
+
+  const isInCart = cart.some((item) => item.id === publisher.id);
+
+  const handleFooterAction = () => {
+    if (isInCart) {
+      proceedToCheckout();
+    } else {
+      handleAddToCart(publisher);
+    }
+  };
+
   if (loading) return <div>Loading...</div>;
   if (!publisher) return <div>Publisher not found</div>;
 
   return (
     <PublisherLayout
       publisher={publisher}
+      isInCart={isInCart}
+      loading={loading}
+      onFooterAction={handleFooterAction}
       overview={<OverviewPage publisher={publisher} />}
-      metrics={<MetricsPage publisher={publisher}  />}      
-      reviews={<ReviewsPage />}
-      faq={<FAQPage publisher={publisher}/>}
+      metrics={<MetricsPage publisher={publisher} />}
+      reviews={<ReviewsPage publisherId={id}/>}
+      faq={<FAQPage publisher={publisher} />}
     />
   );
 }

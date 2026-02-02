@@ -1,5 +1,7 @@
 import { Star } from "lucide-react";
 
+type TabKey = "overview" | "metrics" | "reviews" | "faq";
+
 interface PublisherHeaderProps {
   publisher: {
     name: string;
@@ -11,9 +13,10 @@ interface PublisherHeaderProps {
     averageRating: number;
     totalReviews: number;
   };
+  onSelectTab?: (tab: TabKey) => void;
 }
 
-export function PublisherHeader({ publisher }: PublisherHeaderProps) {
+export function PublisherHeader({ publisher, onSelectTab }: PublisherHeaderProps) {
   return (
     <div className="sticky top-0 z-30 bg-white ">
       <div className="flex items-center justify-between px-6 py-4">
@@ -25,7 +28,8 @@ export function PublisherHeader({ publisher }: PublisherHeaderProps) {
         </div>
 
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 cursor-pointer"
+          onClick={() => onSelectTab?.("reviews")}>
             <Star className="w-4 h-4 fill-[#FF5314] stroke-[#FF5314]" />
             <span className="font-medium">{publisher.averageRating || "No ratings yet"}</span>
             <span className="text-sm text-muted-foreground">/ 5</span>
