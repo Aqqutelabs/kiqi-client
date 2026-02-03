@@ -23,23 +23,72 @@ export default function PRCheckoutPage() {
   const [publications, setPublications] = useState<Publications[]>([]);
   const router = useRouter();
 
+  interface AddOn {
+    id: string;
+    name: string;
+    price: number;
+  }
+
   interface CartItem {
-    _id: string; // for React key
+    _id: string; // unique cart item id
     publisherId: string;
     name: string;
-    price: string;
-    region_reach: string[];
+    basePrice: number;
     audience_reach: string;
+    region_reach: string[];
+    addons: AddOn[]; // 👈 new
     selected: boolean;
   }
 
+  // const [cartData, setCartData] = useState<{
+  //   items: CartItem[];
+  //   _id: string;
+  //   user_id: string;
+  //   created_at: string;
+  //   updated_at: string;
+  // } | null>(null);
+
   const [cartData, setCartData] = useState<{
     items: CartItem[];
-    _id: string;
-    user_id: string;
-    created_at: string;
-    updated_at: string;
   } | null>(null);
+
+  useEffect(() => {
+    setCartData({
+      items: [
+        {
+          _id: "cart-1",
+          publisherId: "pub-1",
+          name: "TechCrunch Africa",
+          basePrice: 150000,
+          audience_reach: "500k+ Readers",
+          region_reach: ["Nigeria", "Ghana"],
+          selected: true,
+          addons: [
+            {
+              id: "addon-1",
+              name: "Homepage Feature",
+              price: 50000,
+            },
+            {
+              id: "addon-2",
+              name: "Social Media Boost",
+              price: 30000,
+            },
+          ],
+        },
+        {
+          _id: "cart-2",
+          publisherId: "pub-2",
+          name: "BusinessDay",
+          basePrice: 100000,
+          audience_reach: "300k+ Readers",
+          region_reach: ["Nigeria"],
+          selected: true,
+          addons: [],
+        },
+      ],
+    });
+  }, []);
 
   // useEffect(() => {
   //   const savedCart = localStorage.getItem("cart");
@@ -52,31 +101,44 @@ export default function PRCheckoutPage() {
     typeof window !== "undefined"
       ? JSON.parse(localStorage.getItem("persist:root") || "{}").auth
         ? JSON.parse(
-            JSON.parse(localStorage.getItem("persist:root") || "{}").auth
+            JSON.parse(localStorage.getItem("persist:root") || "{}").auth,
           ).token
         : null
       : null;
 
-  const fetchCart = async () => {
-    try {
-      const res = await axios.get(`${BASE_URL}/api/v1/press-releases/cart`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      console.log("Cart item:", res);
+  // const fetchCart = async () => {
+  //   try {
+  //     const res = await axios.get(`${BASE_URL}/api/v1/press-releases/cart`, {
+  //       headers: { Authorization: `Bearer ${token}` },
+  //     });
+  //     console.log("Cart item:", res);
 
-      setCartData(res.data.data);
-    } catch (error) {
-      console.error("Error fetching cart:", error);
-    }
-  };
+  //     setCartData(res.data.data);
+  //   } catch (error) {
+  //     console.error("Error fetching cart:", error);
+  //   }
+  // };
 
-  useEffect(() => {
-    fetchCart();
-  }, []);
+  // useEffect(() => {
+  //   fetchCart();
+  // }, []);
+
+  // const subtotal =
+  //   cartData?.items?.reduce((sum, item) => {
+  //     return sum + parseAmount(item.price);
+  //   }, 0) || 0;
+
+  // const vat = subtotal * 0.075;
+  // const total = subtotal + vat;
 
   const subtotal =
-    cartData?.items?.reduce((sum, item) => {
-      return sum + parseAmount(item.price);
+    cartData?.items.reduce((sum, item) => {
+      const addonsTotal = item.addons.reduce(
+        (aSum, addon) => aSum + addon.price,
+        0,
+      );
+
+      return sum + item.basePrice + addonsTotal;
     }, 0) || 0;
 
   const vat = subtotal * 0.075;
@@ -96,7 +158,7 @@ export default function PRCheckoutPage() {
         },
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
 
       console.log(res);
@@ -189,33 +251,85 @@ export default function PRCheckoutPage() {
                     {cartData?.items?.length ? (
                       cartData.items.map((pub, pubIndex) => {
                         return (
-                          <div
-                            key={`${pub._id}-${pubIndex}`}
-                            className="flex items-start justify-between p-4 rounded-xl border border-gray-100 bg-linear-to-r from-[#F8FAFC] to-[#FFFFFF]">
-                            <div className="flex-1">
-                              <h4 className="font-semibold text-gray-900 mb-2">
-                                {pub.name}
-                              </h4>
+                          // <div
+                          //   key={`${pub._id}-${pubIndex}`}
+                          //   className="flex items-start justify-between p-4 rounded-xl border border-gray-100 bg-linear-to-r from-[#F8FAFC] to-[#FFFFFF]">
+                          //   <div className="flex-1">
+                          //     <h4 className="font-semibold text-gray-900 mb-2">
+                          //       {pub.name}
+                          //     </h4>
 
-                              <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
-                                <span className="bg-white border border-[#E2E8F0] h-6 px-3 flex justify-center items-center rounded-md">
-                                  {pub.audience_reach}
-                                </span>
+                          //     <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+                          //       <span className="bg-white border border-[#E2E8F0] h-6 px-3 flex justify-center items-center rounded-md">
+                          //         {pub.audience_reach}
+                          //       </span>
 
-                                {pub.region_reach?.map(
-                                  (region, regionIndex) => (
+                          //       {pub.region_reach?.map(
+                          //         (region, regionIndex) => (
+                          //           <span
+                          //             key={`${pub._id}-${regionIndex}`}
+                          //             className="bg-white border border-[#E2E8F0] h-6 px-3 flex justify-center items-center rounded-md">
+                          //             {region}
+                          //           </span>
+                          //         )
+                          //       )}
+                          //     </div>
+                          //   </div>
+
+                          //   <div className="text-right ml-4 mt-auto font-bold text-gray-900">
+                          //     {pub.price}
+                          //   </div>
+                          // </div>
+                          <div className="flex items-start justify-between p-4 rounded-xl border border-gray-100 bg-linear-to-r from-[#F8FAFC] to-[#FFFFFF]">
+                            <div className="flex-1 space-y-3">
+                              {/* PR */}
+                              <div>
+                                <h4 className="font-semibold text-gray-900">
+                                  {pub.name}
+                                </h4>
+
+                                <div className="flex flex-wrap gap-2 mt-2 text-xs text-gray-500">
+                                  <span className="bg-white border px-3 h-6 flex items-center rounded-md">
+                                    {pub.audience_reach}
+                                  </span>
+
+                                  {pub.region_reach.map((region) => (
                                     <span
-                                      key={`${pub._id}-${regionIndex}`}
-                                      className="bg-white border border-[#E2E8F0] h-6 px-3 flex justify-center items-center rounded-md">
+                                      key={region}
+                                      className="bg-white border px-3 h-6 flex items-center rounded-md"
+                                    >
                                       {region}
                                     </span>
-                                  )
-                                )}
+                                  ))}
+                                </div>
                               </div>
+
+                              {/* ADD-ONS */}
+                              {pub.addons.length > 0 && (
+                                <div className="mt-3 space-y-2">
+                                  {pub.addons.map((addon) => (
+                                    <div
+                                      key={addon.id}
+                                      className="flex justify-between text-xs text-gray-600 pl-4 border-l"
+                                    >
+                                      <span>+ {addon.name}</span>
+                                      <span>
+                                        ₦{addon.price.toLocaleString()}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
                             </div>
 
-                            <div className="text-right ml-4 mt-auto font-bold text-gray-900">
-                              {pub.price}
+                            {/* Total for this PR */}
+                            <div className="text-right font-bold text-gray-900">
+                              ₦
+                              {(
+                                pub.basePrice +
+                                (pub.addons?.reduce((a, b) => a + b.price, 0) ||
+                                  0)
+                              ).toLocaleString()}
                             </div>
                           </div>
                         );
@@ -241,7 +355,8 @@ export default function PRCheckoutPage() {
                       selectedPayment === "paystack"
                         ? "border-orange-600 bg-orange-50"
                         : "border-gray-200 hover:border-gray-300"
-                    }`}>
+                    }`}
+                  >
                     <div className="flex items-start gap-3 flex-1 text-left">
                       <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center shrink-0">
                         <CreditCard size={20} color="white" />
@@ -269,7 +384,8 @@ export default function PRCheckoutPage() {
                       selectedPayment === "crypto"
                         ? "border-orange-600 bg-orange-50"
                         : "border-gray-200 hover:border-gray-300"
-                    }`}>
+                    }`}
+                  >
                     <div className="flex items-start gap-3 flex-1 text-left">
                       <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center shrink-0">
                         <Smartphone size={20} color="gray" />
@@ -297,7 +413,8 @@ export default function PRCheckoutPage() {
                       selectedPayment === "go-credit"
                         ? "border-orange-600 bg-orange-50"
                         : "border-gray-200 hover:border-gray-300"
-                    }`}>
+                    }`}
+                  >
                     <div className="flex items-start gap-3 flex-1 text-left">
                       <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center shrink-0">
                         <div className="w-8 h-8 bg-orange-600 rounded-md flex items-center justify-center">
@@ -375,13 +492,15 @@ export default function PRCheckoutPage() {
                       selectedPayment !== "paystack"
                         ? "opacity-50 cursor-not-allowed"
                         : ""
-                    }`}>
+                    }`}
+                  >
                     Complete Payment
                   </Button>
 
                   <Button
                     variant={"tertiary"}
-                    onClick={() => redirect("/pr/create/publisher-platform")}>
+                    onClick={() => redirect("/pr/create/publisher-platform")}
+                  >
                     Back to Selection
                   </Button>
                 </div>
