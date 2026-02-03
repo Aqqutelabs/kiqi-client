@@ -89,11 +89,25 @@ export default function PRCheckoutPage() {
       // Get press_release_id from localStorage
       const pressReleaseId = localStorage.getItem("pr_id");
 
+      // Include cart items in the request
+      const items = cartData?.items?.map((item) => ({
+        publisherId: item.publisherId,
+        name: item.name,
+        price: item.price,
+        region_reach: item.region_reach,
+        audience_reach: item.audience_reach,
+      })) || [];
+
+      const payloadData = {
+        press_release_id: pressReleaseId,
+        items,
+      };
+
+      console.log("Sending checkout data:", payloadData);
+
       const res = await axios.post(
         `${BASE_URL}/api/v1/press-releases/orders/checkout`,
-        {
-          press_release_id: pressReleaseId,
-        },
+        payloadData,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
