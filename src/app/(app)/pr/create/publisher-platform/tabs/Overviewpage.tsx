@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Briefcase, Users, Globe, Zap, FileText } from "lucide-react";
+import { Briefcase, Users, Globe, Zap, FileText, Check } from "lucide-react";
 import ToggleSwitch from "@/components/ui/SwitchComponent";
 import { Input } from "@/components/ui/Input";
 import type { LucideIcon } from "lucide-react";
 
 interface OverviewPageProps {
   publisher: any; //  tighten this later
+  onAddonsChange?: (addons: any[], totalAddonsPrice: number) => void;
 }
 
 
@@ -26,7 +27,7 @@ interface AddOn {
   enabled: boolean;
 }
 
-export default function OverviewPage({ publisher }: OverviewPageProps) {
+export default function OverviewPage({ publisher, onAddonsChange }: OverviewPageProps) {
   const [selectedAddOns, setSelectedAddOns] = useState<Record<string, boolean>>({});
   const [addOnValues, setAddOnValues] = useState<Record<string, number>>({});
 
@@ -58,63 +59,81 @@ export default function OverviewPage({ publisher }: OverviewPageProps) {
   },
 ];
 
+  // Map API response addOns to component format
+  const addOns: AddOn[] = (publisher.addOns || []).map((addon: any) => {
+    let type: "fixed" | "quantity" | "budget" = "fixed";
+    if (addon.id === "paidAmplification") {
+      type = "budget";
+    } else if (addon.id === "featuredPlacement") {
+      type = addon.quantity ? "quantity" : "fixed";
+    }
 
-  const addOns: AddOn[] = [
-  {
-    id: "backdating",
-    name: "Backdating",
-    description: "Publish the article with an earlier date.",
-    type: "fixed",
-    price: publisher.addOns?.backdating?.price,
-    enabled: publisher.addOns?.backdating?.enabled,
-  },
-  {
-    id: "socialPosting",
-    name: "Social Media Posting",
-    description: "Share the article across publisher social media channels.",
-    type: "fixed",
-    price: publisher.addOns?.socialPosting?.price,
-    enabled: publisher.addOns?.socialPosting?.enabled,
-  },
-  {
-    id: "featuredPlacement",
-    name: "Featured Placement",
-    description: "Place the article in a featured or highlighted section.",
-    type: "quantity",
-    enabled: publisher.addOns?.featuredPlacement?.enabled,
-  },
-  {
-    id: "newsletterInclusion",
-    name: "Newsletter Inclusion",
-    description: "Include the article in the publisher’s newsletter.",
-    type: "fixed",
-    price: publisher.addOns?.newsletterInclusion?.price,
-    enabled: publisher.addOns?.newsletterInclusion?.enabled,
-  },
-  {
-    id: "authorByline",
-    name: "Author Byline",
-    description: "Publish the article with a named author byline.",
-    type: "fixed",
-    price: publisher.addOns?.authorByline?.price,
-    enabled: publisher.addOns?.authorByline?.enabled,
-  },
-  {
-    id: "paidAmplification",
-    name: "Paid Amplification",
-    description: "Boost reach using paid promotion and distribution.",
-    type: "budget",
-    enabled: publisher.addOns?.paidAmplification?.enabled,
-  },
-  {
-    id: "whitePaperGating",
-    name: "Whitepaper Gating",
-    description: "Gate content behind a lead capture form.",
-    type: "fixed",
-    price: publisher.addOns?.whitePaperGating?.price,
-    enabled: publisher.addOns?.whitePaperGating?.enabled,
-  },
-];
+    return {
+      id: addon.id,
+      name: addon.name,
+      description: addon.description,
+      type,
+      price: addon.price,
+      enabled: addon.enabled,
+    };
+  });
+
+  // Calculate total addons price
+  const calculateTotalAddonsPrice = () => {
+    return addOns.reduce((total, addon) => {
+      if (!selectedAddOns[addon.id]) return total;
+      
+      if (addon.type === "fixed") {
+        return total + (addon.price || 0);
+      } else if (addon.type === "budget" && addOnValues[addon.id]) {
+        return total + addOnValues[addon.id];
+      }
+      return total;
+    }, 0);
+  };
+
+  const totalAddonsPrice = calculateTotalAddonsPrice();
+
+  // Notify parent component of addon changes
+  const handleAddonToggle = (addonId: string, value: boolean) => {
+    const updatedAddons = { ...selectedAddOns, [addonId]: value };
+    setSelectedAddOns(updatedAddons);
+    
+    if (onAddonsChange) {
+      const selectedData = addOns
+        .filter(addon => updatedAddons[addon.id])
+        .map(addon => ({
+          id: addon.id,
+          name: addon.name,
+          price: addon.type === "budget" ? addOnValues[addon.id] || 0 : addon.price,
+          type: addon.type,
+        }));
+      onAddonsChange(selectedData, calculateTotalAddonsPrice());
+    }
+  };
+
+  const handleAddonValueChange = (addonId: string, value: number) => {
+    const updatedValues = { ...addOnValues, [addonId]: value };
+    setAddOnValues(updatedValues);
+    
+    if (onAddonsChange && selectedAddOns[addonId]) {
+      const selectedData = addOns
+        .filter(addon => selectedAddOns[addon.id])
+        .map(addon => ({
+          id: addon.id,
+          name: addon.name,
+          price: addon.id === addonId ? value : (addon.type === "budget" ? addOnValues[addon.id] || 0 : addon.price),
+          type: addon.type,
+        }));
+      const newTotal = addOns.reduce((total, addon) => {
+        if (!selectedAddOns[addon.id]) return total;
+        if (addon.id === addonId && addon.type === "budget") return total + value;
+        if (addon.type === "fixed") return total + (addon.price || 0);
+        return total;
+      }, 0);
+      onAddonsChange(selectedData, newTotal);
+    }
+  };
 
   return (
     <div>
@@ -135,49 +154,84 @@ export default function OverviewPage({ publisher }: OverviewPageProps) {
         </div>
 
         {/* Add-Ons Section */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Add-ons</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {addOns.map((addon) => {
-              if (!addon.enabled) return null; // don't render disabled add-ons
-              const isActive = selectedAddOns[addon.id];
-              return (
-                <div
-                  key={addon.id}
-                  className={`border border-gray-200 rounded-2xl p-4 transition-all bg-white ${isActive ? "border-[#FF5314] bg-[#FF5314]/5" : "hover:border-gray-300"}`}
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="font-medium">{addon.name}</p>
-                      <p className="text-sm text-muted-foreground">{addon.description}</p>
-                    </div>
-                    <ToggleSwitch
-                      name={addon.id}
-                      isChecked={!!isActive}
-                      onChange={(v) => setSelectedAddOns((prev) => ({ ...prev, [addon.id]: v }))}
-                    />
-                  </div>
-
-                  {/* Input for Quantity / Budget */}
-                  {isActive && (addon.type === "quantity" || addon.type === "budget") && (
-                    <div className="mt-4">
-                      <Input
-                        type="number"
-                        min={addon.type === "quantity" ? 1 : 0}
-                        placeholder={addon.type === "quantity" ? "Quantity" : "Enter budget"}
-                        value={addOnValues[addon.id] ?? ""}
-                        onChange={(e) => setAddOnValues((prev) => ({ ...prev, [addon.id]: Number(e.target.value) }))}
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">Add-ons</h3>
+              <p className="text-sm text-gray-500 mt-1">Enhance your publication with optional add-ons</p>
+            </div>
+            {totalAddonsPrice > 0 && (
+              <div className="bg-orange-50 rounded-lg px-4 py-2 border border-orange-200">
+                <p className="text-xs text-gray-600">Add-ons Total</p>
+                <p className="text-lg font-bold text-[#FF5314]">₦{totalAddonsPrice.toLocaleString()}</p>
+              </div>
+            )}
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {addOns.length > 0 ? (
+              addOns.map((addon) => {
+                const isActive = selectedAddOns[addon.id];
+                const addonPrice = addon.type === "budget" ? addOnValues[addon.id] || 0 : addon.price || 0;
+                return (
+                  <div
+                    key={addon.id}
+                    className={`border-2 rounded-xl p-5 transition-all duration-200 ${
+                      isActive
+                        ? "border-[#FF5314] bg-gradient-to-br from-[#FF5314]/5 to-[#FF5314]/10 shadow-md"
+                        : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm"
+                    }`}
+                  >
+                    {/* Header */}
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-gray-900">{addon.name}</p>
+                          {isActive && (
+                            <Check className="w-4 h-4 text-[#FF5314]" />
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-600 mt-1">{addon.description}</p>
+                      </div>
+                      <ToggleSwitch
+                        name={addon.id}
+                        isChecked={!!isActive}
+                        onChange={(v) => handleAddonToggle(addon.id, v)}
                       />
                     </div>
-                  )}
 
-                  {/* Fixed price display */}
-                  {addon.type === "fixed" && addon.price && (
-                    <p className="mt-4 font-semibold text-[#FF5314]">+${addon.price}</p>
-                  )}
-                </div>
-              );
-            })}
+                    {/* Input for Quantity / Budget */}
+                    {isActive && (addon.type === "quantity" || addon.type === "budget") && (
+                      <div className="mt-4 mb-4">
+                        <label className="text-xs font-medium text-gray-700 block mb-2">
+                          {addon.type === "quantity" ? "Quantity" : "Budget Amount (₦)"}
+                        </label>
+                        <Input
+                          type="number"
+                          min={addon.type === "quantity" ? 1 : 0}
+                          placeholder={addon.type === "quantity" ? "Enter quantity" : "Enter amount"}
+                          value={addOnValues[addon.id] ?? ""}
+                          onChange={(e) => handleAddonValueChange(addon.id, Number(e.target.value))}
+                          className="w-full"
+                        />
+                      </div>
+                    )}
+
+                    {/* Price display */}
+                    <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                      <span className="text-sm text-gray-600">Price:</span>
+                      <span className={`font-bold text-sm ${
+                        isActive ? "text-[#FF5314]" : "text-gray-900"
+                      }`}>
+                        ₦{addonPrice.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <p className="text-gray-500 col-span-full text-center py-8">No add-ons available</p>
+            )}
           </div>
         </div>
       </main>

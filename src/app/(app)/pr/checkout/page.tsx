@@ -7,7 +7,6 @@ import {
   CreditCard,
   Smartphone,
   Wallet,
-  XCircleIcon,
 } from "lucide-react";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { Button } from "@/components/ui/Button";
@@ -15,58 +14,106 @@ import { redirect, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import BASE_URL from "@/lib/utils/baseUrl";
 import axios from "axios";
-import { Publications } from "../create/publisher-platform/page";
 import { parseAmount } from "@/lib/utils/parseAmount";
 
 export default function PRCheckoutPage() {
   const [selectedPayment, setSelectedPayment] = useState("paystack");
-  const [publications, setPublications] = useState<Publications[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedAddons, setSelectedAddons] = useState<{
+    [cartItemId: string]: Set<string>;
+  }>({});
   const router = useRouter();
 
+  interface AddOn {
+    id: string;
+    name: string;
+    price: number | string;
+  }
+
   interface CartItem {
-    _id: string; // for React key
+    _id: string;
     publisherId: string;
     name: string;
-    price: string;
-    region_reach: string[];
+    price?: number | string;
+    subtotal?: number;
+    basePrice?: number | string;
     audience_reach: string;
+    region_reach: string[];
+    addons?: AddOn[];
+    addOns?: AddOn[];
     selected: boolean;
   }
 
+  // Helper function to safely parse price (handles both strings and numbers)
+  const getPriceAsNumber = (price: number | string | undefined): number => {
+    if (price === undefined || price === null) return 0;
+    if (typeof price === "number") return price;
+    if (typeof price === "string") {
+      try {
+        return parseAmount(price);
+      } catch {
+        return 0;
+      }
+    }
+    return 0;
+  };
+
+  // Helper function to get item price (tries multiple field names)
+  const getItemPrice = (item: CartItem): number => {
+    // First try subtotal (most reliable)
+    if (item.subtotal && typeof item.subtotal === "number") {
+      return item.subtotal;
+    }
+    // Then try basePrice
+    if (item.basePrice) {
+      return getPriceAsNumber(item.basePrice);
+    }
+    // Finally try price
+    if (item.price) {
+      return getPriceAsNumber(item.price);
+    }
+    return 0;
+  };
+
   const [cartData, setCartData] = useState<{
     items: CartItem[];
-    _id: string;
-    user_id: string;
-    created_at: string;
-    updated_at: string;
   } | null>(null);
-
-  // useEffect(() => {
-  //   const savedCart = localStorage.getItem("cart");
-  //   if (savedCart) {
-  //     setCartData(JSON.parse(savedCart));
-  //   }
-  // }, []);
 
   const token =
     typeof window !== "undefined"
       ? JSON.parse(localStorage.getItem("persist:root") || "{}").auth
         ? JSON.parse(
-            JSON.parse(localStorage.getItem("persist:root") || "{}").auth
+            JSON.parse(localStorage.getItem("persist:root") || "{}").auth,
           ).token
         : null
       : null;
 
   const fetchCart = async () => {
     try {
+      setLoading(true);
       const res = await axios.get(`${BASE_URL}/api/v1/press-releases/cart`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("Cart item:", res);
+      console.log("Cart data:", res.data);
 
-      setCartData(res.data.data);
+      if (res.data.data && res.data.data.items) {
+        setCartData(res.data.data);
+        
+        // Initialize selected addons state with all addons checked by default
+        const initialSelectedAddons: { [key: string]: Set<string> } = {};
+        res.data.data.items.forEach((item: CartItem) => {
+          const addons = item.addons || item.addOns || [];
+          if (addons.length > 0) {
+            initialSelectedAddons[item._id] = new Set(addons.map((a: AddOn) => a.id));
+          }
+        });
+        setSelectedAddons(initialSelectedAddons);
+      }
     } catch (error) {
       console.error("Error fetching cart:", error);
+      toast.error("Failed to load cart");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -74,9 +121,24 @@ export default function PRCheckoutPage() {
     fetchCart();
   }, []);
 
+  // const subtotal =
+  //   cartData?.items?.reduce((sum, item) => {
+  //     return sum + parseAmount(item.price);
+  //   }, 0) || 0;
+
+  // const vat = subtotal * 0.075;
+  // const total = subtotal + vat;
   const subtotal =
-    cartData?.items?.reduce((sum, item) => {
-      return sum + parseAmount(item.price);
+    cartData?.items.reduce((sum, item) => {
+      const selectedAddonsForItem = selectedAddons[item._id] || new Set();
+      const addons = item.addons || item.addOns || [];
+      const addonsTotal = addons
+        .filter((addon) => selectedAddonsForItem.has(addon.id))
+        .reduce((aSum, addon) => aSum + getPriceAsNumber(addon.price), 0);
+
+      const itemPrice = getItemPrice(item);
+      console.log(`Item ${item.name}: price=${itemPrice}, addonsTotal=${addonsTotal}`);
+      return sum + itemPrice + addonsTotal;
     }, 0) || 0;
 
   const vat = subtotal * 0.075;
@@ -84,33 +146,37 @@ export default function PRCheckoutPage() {
 
   const formatPrice = (amount: number) => `₦${amount.toLocaleString()}`;
 
+  const handleAddonToggle = (cartItemId: string, addonId: string) => {
+    setSelectedAddons((prev) => {
+      const current = prev[cartItemId] || new Set();
+      const updated = new Set(current);
+
+      if (updated.has(addonId)) {
+        updated.delete(addonId);
+      } else {
+        updated.add(addonId);
+      }
+
+      return {
+        ...prev,
+        [cartItemId]: updated,
+      };
+    });
+  };
+
   const completePayment = async () => {
     try {
       // Get press_release_id from localStorage
       const pressReleaseId = localStorage.getItem("pr_id");
 
-      // Include cart items in the request
-      const items = cartData?.items?.map((item) => ({
-        publisherId: item.publisherId,
-        name: item.name,
-        price: item.price,
-        region_reach: item.region_reach,
-        audience_reach: item.audience_reach,
-      })) || [];
-
-      const payloadData = {
-        press_release_id: pressReleaseId,
-        items,
-      };
-
-      console.log("Sending checkout data:", payloadData);
-
       const res = await axios.post(
         `${BASE_URL}/api/v1/press-releases/orders/checkout`,
-        payloadData,
+        {
+          press_release_id: pressReleaseId,
+        },
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
 
       console.log(res);
@@ -154,6 +220,39 @@ export default function PRCheckoutPage() {
   };
 
   const [showBalance, setShowBalance] = useState(false);
+
+  if (loading) {
+    return (
+      <>
+        <PageHeader title="Checkout" backLink="/pr/create/publisher-platform" />
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-linear-to-b from-[#F95417] to-[#1C3178] rounded-full mb-4 animate-pulse">
+              <ShoppingBag className="w-8 h-8 text-white" />
+            </div>
+            <p className="text-gray-600">Loading your cart...</p>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (!cartData?.items?.length) {
+    return (
+      <>
+        <PageHeader title="Checkout" backLink="/pr/create/publisher-platform" />
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <ShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <p className="text-gray-600 mb-4">Your cart is empty</p>
+            <Button onClick={() => router.push("/pr/create/publisher-platform")}>
+              Browse Publishers
+            </Button>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -203,33 +302,148 @@ export default function PRCheckoutPage() {
                     {cartData?.items?.length ? (
                       cartData.items.map((pub, pubIndex) => {
                         return (
-                          <div
-                            key={`${pub._id}-${pubIndex}`}
-                            className="flex items-start justify-between p-4 rounded-xl border border-gray-100 bg-linear-to-r from-[#F8FAFC] to-[#FFFFFF]">
-                            <div className="flex-1">
-                              <h4 className="font-semibold text-gray-900 mb-2">
-                                {pub.name}
-                              </h4>
+                          // <div
+                          //   key={`${pub._id}-${pubIndex}`}
+                          //   className="flex items-start justify-between p-4 rounded-xl border border-gray-100 bg-linear-to-r from-[#F8FAFC] to-[#FFFFFF]">
+                          //   <div className="flex-1">
+                          //     <h4 className="font-semibold text-gray-900 mb-2">
+                          //       {pub.name}
+                          //     </h4>
 
-                              <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
-                                <span className="bg-white border border-[#E2E8F0] h-6 px-3 flex justify-center items-center rounded-md">
-                                  {pub.audience_reach}
-                                </span>
+                          //     <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+                          //       <span className="bg-white border border-[#E2E8F0] h-6 px-3 flex justify-center items-center rounded-md">
+                          //         {pub.audience_reach}
+                          //       </span>
 
-                                {pub.region_reach?.map(
-                                  (region, regionIndex) => (
+                          //       {pub.region_reach?.map(
+                          //         (region, regionIndex) => (
+                          //           <span
+                          //             key={`${pub._id}-${regionIndex}`}
+                          //             className="bg-white border border-[#E2E8F0] h-6 px-3 flex justify-center items-center rounded-md">
+                          //             {region}
+                          //           </span>
+                          //         )
+                          //       )}
+                          //     </div>
+                          //   </div>
+
+                          //   <div className="text-right ml-4 mt-auto font-bold text-gray-900">
+                          //     {pub.price}
+                          //   </div>
+                          // </div>
+                          <div className="flex items-start justify-between p-4 rounded-xl border border-gray-100 bg-linear-to-r from-[#F8FAFC] to-[#FFFFFF]">
+                            <div className="flex-1 space-y-3">
+                              {/* PR */}
+                              <div>
+                                <h4 className="font-semibold text-gray-900">
+                                  {pub.name}
+                                </h4>
+
+                                <div className="flex flex-wrap gap-2 mt-2 text-xs text-gray-500">
+                                  <span className="bg-white border px-3 h-6 flex items-center rounded-md">
+                                    {pub.audience_reach}
+                                  </span>
+
+                                  {pub.region_reach.map((region) => (
                                     <span
-                                      key={`${pub._id}-${regionIndex}`}
-                                      className="bg-white border border-[#E2E8F0] h-6 px-3 flex justify-center items-center rounded-md">
+                                      key={region}
+                                      className="bg-white border px-3 h-6 flex items-center rounded-md"
+                                    >
                                       {region}
                                     </span>
-                                  )
-                                )}
+                                  ))}
+                                </div>
                               </div>
+
+                              {/* ADD-ONS */}
+                              {(() => {
+                                const addons = pub.addons || pub.addOns || [];
+                                const selectedAddonsForItem = selectedAddons[pub._id] || new Set();
+                                const selectedAddonsData = addons.filter((addon) =>
+                                  selectedAddonsForItem.has(addon.id)
+                                );
+
+                                return (
+                                  <div className="mt-3 space-y-3">
+                                    {/* Selected Addons Summary */}
+                                    {selectedAddonsData.length > 0 && (
+                                      <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                                        <p className="text-xs font-semibold text-green-800 mb-2">
+                                          ✓ Selected Add-ons
+                                        </p>
+                                        <div className="space-y-1">
+                                          {selectedAddonsData.map((addon) => (
+                                            <div
+                                              key={addon.id}
+                                              className="flex justify-between items-start"
+                                            >
+                                              <span className="text-xs text-green-700 font-medium">
+                                                • {addon.name}
+                                              </span>
+                                              <span className="text-xs text-green-700 font-semibold">
+                                                +₦{getPriceAsNumber(addon.price).toLocaleString()}
+                                              </span>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* Available Addons to Select */}
+                                    {addons.length > 0 && (
+                                      <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
+                                        <p className="text-xs font-semibold text-gray-700 mb-2">
+                                          Add-ons (Optional)
+                                        </p>
+                                        {addons.map((addon) => {
+                                          const isSelected =
+                                            selectedAddonsForItem.has(addon.id);
+                                          return (
+                                            <label
+                                              key={addon.id}
+                                              className="flex items-center gap-3 cursor-pointer hover:bg-blue-100 p-2 rounded transition-colors"
+                                            >
+                                              <input
+                                                type="checkbox"
+                                                checked={isSelected}
+                                                onChange={() =>
+                                                  handleAddonToggle(pub._id, addon.id)
+                                                }
+                                                className="w-4 h-4 text-orange-600 border-gray-300 rounded cursor-pointer"
+                                              />
+                                              <div className="flex justify-between flex-1 min-w-0">
+                                                <span className="text-xs text-gray-700 font-medium">
+                                                  {addon.name}
+                                                </span>
+                                                <span className="text-xs font-semibold text-gray-900 ml-2">
+                                                  +₦{getPriceAsNumber(addon.price).toLocaleString()}
+                                                </span>
+                                              </div>
+                                            </label>
+                                          );
+                                        })}
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })()}
                             </div>
 
-                            <div className="text-right ml-4 mt-auto font-bold text-gray-900">
-                              {pub.price}
+                            {/* Total for this PR */}
+                            <div className="text-right font-bold text-gray-900">
+                              ₦
+                              {(() => {
+                                const addons = pub.addons || pub.addOns || [];
+                                const addonsTotal = addons
+                                  .filter((addon) =>
+                                    (selectedAddons[pub._id] || new Set()).has(
+                                      addon.id,
+                                    ),
+                                  )
+                                  .reduce((a, b) => a + getPriceAsNumber(b.price), 0);
+                                const itemPrice = getItemPrice(pub);
+                                return (itemPrice + addonsTotal).toLocaleString();
+                              })()}
                             </div>
                           </div>
                         );
@@ -255,7 +469,8 @@ export default function PRCheckoutPage() {
                       selectedPayment === "paystack"
                         ? "border-orange-600 bg-orange-50"
                         : "border-gray-200 hover:border-gray-300"
-                    }`}>
+                    }`}
+                  >
                     <div className="flex items-start gap-3 flex-1 text-left">
                       <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center shrink-0">
                         <CreditCard size={20} color="white" />
@@ -283,7 +498,8 @@ export default function PRCheckoutPage() {
                       selectedPayment === "crypto"
                         ? "border-orange-600 bg-orange-50"
                         : "border-gray-200 hover:border-gray-300"
-                    }`}>
+                    }`}
+                  >
                     <div className="flex items-start gap-3 flex-1 text-left">
                       <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center shrink-0">
                         <Smartphone size={20} color="gray" />
@@ -311,7 +527,8 @@ export default function PRCheckoutPage() {
                       selectedPayment === "go-credit"
                         ? "border-orange-600 bg-orange-50"
                         : "border-gray-200 hover:border-gray-300"
-                    }`}>
+                    }`}
+                  >
                     <div className="flex items-start gap-3 flex-1 text-left">
                       <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center shrink-0">
                         <div className="w-8 h-8 bg-orange-600 rounded-md flex items-center justify-center">
@@ -389,13 +606,15 @@ export default function PRCheckoutPage() {
                       selectedPayment !== "paystack"
                         ? "opacity-50 cursor-not-allowed"
                         : ""
-                    }`}>
+                    }`}
+                  >
                     Complete Payment
                   </Button>
 
                   <Button
                     variant={"tertiary"}
-                    onClick={() => redirect("/pr/create/publisher-platform")}>
+                    onClick={() => redirect("/pr/create/publisher-platform")}
+                  >
                     Back to Selection
                   </Button>
                 </div>

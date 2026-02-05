@@ -15,6 +15,8 @@ export default function PublisherPage() {
   const { id } = useParams<{ id: string }>();
   const [publisher, setPublisher] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedAddons, setSelectedAddons] = useState<any[]>([]);
+  const [totalAddonsPrice, setTotalAddonsPrice] = useState(0);
 
   const token =
     typeof window !== "undefined"
@@ -52,16 +54,24 @@ export default function PublisherPage() {
     fetchPublisher();
   }, [id]);
 
+  const handleAddonsChange = (addons: any[], totalPrice: number) => {
+    setSelectedAddons(addons);
+    setTotalAddonsPrice(totalPrice);
+  };
+
   if (loading) return <div>Loading...</div>;
   if (!publisher) return <div>Publisher not found</div>;
 
   return (
     <PublisherLayout
       publisher={publisher}
-      overview={<OverviewPage publisher={publisher} />}
+      overview={<OverviewPage publisher={publisher} onAddonsChange={handleAddonsChange} />}
       metrics={<MetricsPage publisher={publisher}  />}      
       reviews={<ReviewsPage />}
       faq={<FAQPage publisher={publisher}/>}
+      onAddonsChange={handleAddonsChange}
+      selectedAddons={selectedAddons}
+      totalAddonsPrice={totalAddonsPrice}
     />
   );
 }

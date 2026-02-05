@@ -156,11 +156,25 @@ const handleAddToCart = async (pub: Publications) => {
           })()
         : null;
 
-    await axios.post(
+    const requestData = { publisherId: pub.id };
+    console.log("📦 Add to Cart - API Request:", {
+      endpoint: `${BASE_URL}/api/v1/press-releases/cart/add`,
+      data: requestData,
+      timestamp: new Date().toISOString(),
+      product: pub
+    });
+
+    const response = await axios.post(
       `${BASE_URL}/api/v1/press-releases/cart/add`,
-      { publisherId: pub.id },
+      requestData,
       { headers: { Authorization: `Bearer ${token}` } }
     );
+
+    console.log("✅ Add to Cart - API Response:", {
+      data: response.data,
+      status: response.status,
+      timestamp: new Date().toISOString()
+    });
 
     toast.success("Added to cart!");
   } catch (error) {

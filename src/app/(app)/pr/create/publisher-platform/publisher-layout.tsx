@@ -10,6 +10,7 @@ interface PublisherLayoutProps {
     name: string;
     description: string;
     price: string;
+    publisherId: string;
     industry_focus: string[];
     region_reach: string[];
     audience_reach: string;
@@ -20,6 +21,9 @@ interface PublisherLayoutProps {
   metrics: ReactNode;
   faq: ReactNode;
   reviews: ReactNode;
+  onAddonsChange?: (addons: any[], totalPrice: number) => void;
+  totalAddonsPrice?: number;
+  selectedAddons?: any[];
 }
 
 const TABS = [
@@ -37,8 +41,17 @@ export default function PublisherLayout({
   metrics,
   faq,
   reviews,
+  onAddonsChange,
+  totalAddonsPrice = 0,
+  selectedAddons = [],
 }: PublisherLayoutProps) {
   const [activeTab, setActiveTab] = useState<TabKey>("overview");
+
+  const handleAddonsChange = (addons: any[], totalPrice: number) => {
+    if (onAddonsChange) {
+      onAddonsChange(addons, totalPrice);
+    }
+  };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -57,7 +70,7 @@ export default function PublisherLayout({
   return (
     <div className="flex flex-col min-h-screen bg-background">
       {/* Sticky Publisher Header */}
-      <PublisherHeader publisher={publisher} />
+      <PublisherHeader publisher={publisher} totalAddonsPrice={totalAddonsPrice} />
 
       {/* Tabs */}
       <div className="sticky top-[72px] z-20 bg-white">
@@ -86,6 +99,9 @@ export default function PublisherLayout({
       <PublisherFooter
         isInCart={false}
         onAction={() => console.log("cart action")}
+        publisherId={publisher.publisherId}
+        totalPrice={totalAddonsPrice}
+        selectedAddons={selectedAddons}
       />
     </div>
   );
