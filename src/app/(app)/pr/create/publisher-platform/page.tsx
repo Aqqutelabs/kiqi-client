@@ -64,7 +64,7 @@ export default function CreatePressRelease() {
 
         const mapped: Publications[] = res.data.data.publishers.map(
         (pub: any) => ({
-          id: pub.id, // stable & unique
+          id: pub.publisherId, // Use publisherId (e.g., "PUB1769073007599"), not _id
           productName: pub.name,
           duration: pub.avg_publish_time,
           industry: pub.industry_focus?.join(", "),

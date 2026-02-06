@@ -52,8 +52,10 @@ interface TrackerData {
     step: string;
     timestamp: string;
     notes: string;
+    metadata?: any;
     _id?: string;
   }>;
+  step_descriptions?: Record<string, string>;
   status_message?: string;
   next_action?: string;
 }
@@ -150,6 +152,61 @@ const ProgressTracker = ({
   };
 
   const statusConfigResolved = getStatusConfig();
+
+  // Get all steps with their completion status
+  const getAllSteps = () => {
+    if (!trackerData || !trackerData.timeline) return [];
+
+    // Extract unique steps from timeline, preserving order
+    const completedSteps = new Map<string, any>();
+    trackerData.timeline.forEach((event) => {
+      if (!completedSteps.has(event.step)) {
+        completedSteps.set(event.step, event);
+      }
+    });
+
+    // Get all possible steps from step_descriptions if available
+    let allPossibleSteps = trackerData.step_descriptions
+      ? Object.keys(trackerData.step_descriptions)
+      : Array.from(completedSteps.keys());
+
+    const prStatus = trackerData.press_release?.status;
+    const isPublished = prStatus === "Published";
+
+    const steps = allPossibleSteps.map((stepName) => ({
+      name: stepName,
+      description: trackerData.step_descriptions?.[stepName] || "",
+      // If published, mark all steps up to and including "approved" as completed
+      isCompleted:
+        completedSteps.has(stepName) ||
+        (isPublished && (stepName === "approved" || stepName === "under_review")),
+      timestamp: completedSteps.get(stepName)?.timestamp,
+      notes: completedSteps.get(stepName)?.notes,
+    }));
+
+    // Add status step based on press release status
+    // Only add published/rejected step if status is not "Draft"
+    if (prStatus && prStatus !== "Draft") {
+      const statusStep = {
+        name: isPublished ? "published" : "rejected",
+        description: isPublished
+          ? "Press release published and live"
+          : "Press release rejected",
+        isCompleted: true,
+        timestamp: isPublished
+          ? trackerData.progress?.payment_completed_at
+          : trackerData.progress?.rejected_at,
+        notes: isPublished
+          ? "Press release has been published"
+          : trackerData.progress?.rejection_reason || "Press release was rejected",
+      };
+      steps.push(statusStep);
+    }
+
+    return steps;
+  };
+
+  const allSteps = getAllSteps();
 
   // Convert hex to tailwind class (simplified - uses closest color)
   const convertHexToBgClass = (hex: string): string => {
@@ -346,11 +403,70 @@ const ProgressTracker = ({
                 )}
               </div>
             )}
+
+            {/* All Steps Visual Indicator */}
+            {allSteps.length > 0 && (
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                <p className="text-sm font-medium text-gray-700 mb-4">
+                  All Steps
+                </p>
+                <div className="space-y-3">
+                  {allSteps.map((step, idx) => {
+                    // Determine if this step is a status step (published/rejected)
+                    const isStatusStep = step.name === "published" || step.name === "rejected";
+                    const isRejected = step.name === "rejected";
+                    
+                    return (
+                      <div key={step.name} className="flex items-start gap-3">
+                        <div className="flex-shrink-0 mt-0.5">
+                          {step.isCompleted ? (
+                            <div
+                              className={`w-6 h-6 rounded-full flex items-center justify-center ${
+                                isRejected ? "bg-red-100" : "bg-green-100"
+                              }`}>
+                              {isRejected ? (
+                                <XCircle size={16} className="text-red-600" />
+                              ) : (
+                                <CheckCircle size={16} className="text-green-600" />
+                              )}
+                            </div>
+                          ) : (
+                            <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
+                              <div className="w-2 h-2 rounded-full bg-gray-400" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p
+                            className={`text-xs font-medium capitalize ${
+                              step.isCompleted
+                                ? isRejected
+                                  ? "text-red-700"
+                                  : "text-green-700"
+                                : "text-gray-600"
+                            }`}>
+                            {step.name.replace(/_/g, " ")}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">
+                            {step.description}
+                          </p>
+                          {step.timestamp && (
+                            <p className="text-xs text-gray-400 mt-1">
+                              {new Date(step.timestamp).toLocaleString()}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
         {/* Tabs */}
-        <div className="flex border-b border-gray-200">
+        {/* <div className="flex border-b border-gray-200">
           <button
             onClick={() => setActiveTab("all")}
             className={`flex-1 px-6 py-3 text-sm font-medium transition-colors ${
@@ -369,7 +485,7 @@ const ProgressTracker = ({
             }`}>
             Unread
           </button>
-        </div>
+        </div> */}
 
         {/* Timeline Content */}
         <div className="flex-1 overflow-y-auto p-6">

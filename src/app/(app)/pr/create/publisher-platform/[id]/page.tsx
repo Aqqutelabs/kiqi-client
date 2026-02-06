@@ -32,8 +32,10 @@ export default function PublisherPage() {
 
     const fetchPublisher = async () => {
       try {
+        // The id from URL is publisherId (e.g., "PUB1769073007599")
+        // We need to fetch all publishers and find the one matching this publisherId
         const res = await fetch(
-          `${BASE_URL}/api/v1/press-releases/publishers/${id}`,
+          `${BASE_URL}/api/v1/press-releases/publishers`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -42,8 +44,18 @@ export default function PublisherPage() {
         );
 
         const data = await res.json();
-        console.log(data);
-        setPublisher(data.data);
+        console.log("All publishers:", data);
+        
+        // Find the publisher matching the publisherId from URL
+        const publisher = data.data.publishers.find(
+          (pub: any) => pub.publisherId === id
+        );
+        
+        if (publisher) {
+          setPublisher(publisher);
+        } else {
+          console.error("Publisher not found with id:", id);
+        }
       } catch (err) {
         console.error(err);
       } finally {
