@@ -6,6 +6,7 @@ import Checkbox from "@/components/ui/CheckBox";
 import DateInput from "@/components/ui/DateInput";
 import { FormField } from "@/components/ui/FormField";
 import { Select } from "@/components/ui/Select";
+import { EmailListDropdown } from "@/components/ui/EmailListDropdown";
 import TimeInput from "@/components/ui/TimeInput";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { Modal } from "@/components/ui/Modal";
@@ -627,14 +628,10 @@ export default function CampaignSettings() {
             {/* Existing Lists Option */}
             {audienceOption === "existing" && (
               <div className="space-y-3">
-                <Select
-                  placeholder={
-                    loadingLists ? "Loading lists..." : "Select from email list"
-                  }
-                  className="bg-[#00000014]"
+                <EmailListDropdown
+                  lists={Array.isArray(emailLists) ? emailLists : []}
                   value={data.audience.emailLists[0] || ""}
-                  onChange={(e) => {
-                    const listId = e.target.value;
+                  onChange={(listId) => {
                     console.log("Selected list ID:", listId);
                     setData((prev) => ({
                       ...prev,
@@ -644,17 +641,12 @@ export default function CampaignSettings() {
                       },
                     }));
                   }}
+                  placeholder={
+                    loadingLists ? "Loading lists..." : "Select from email list"
+                  }
+                  loading={loadingLists}
                   disabled={loadingLists}
-                  required>
-                  <option value="">Select an email list</option>
-                  {Array.isArray(emailLists) &&
-                    emailLists.map((list: any) => (
-                      <option key={list._id} value={list._id}>
-                        {list.name || list.email_listName || list._id} - (
-                        {list.emails?.length || 0} contacts)
-                      </option>
-                    ))}
-                </Select>
+                />
               </div>
             )}
 
