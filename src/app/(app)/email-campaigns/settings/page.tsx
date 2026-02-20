@@ -6,6 +6,8 @@ import Checkbox from "@/components/ui/CheckBox";
 import DateInput from "@/components/ui/DateInput";
 import { FormField } from "@/components/ui/FormField";
 import { Select } from "@/components/ui/Select";
+import { EmailListDropdown } from "@/components/ui/EmailListDropdown";
+import { SenderEmailDropdown } from "@/components/ui/SenderEmailDropdown";
 import TimeInput from "@/components/ui/TimeInput";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { Modal } from "@/components/ui/Modal";
@@ -506,19 +508,11 @@ export default function CampaignSettings() {
                   Refresh
                 </button>
               </div>
-              <Select
-                placeholder={
-                  loadingSenders 
-                    ? "Loading verified senders..." 
-                    : senderEmails.length === 0
-                    ? "No verified senders found"
-                    : "Select a verified sender email"
-                }
-                className="bg-[#00000014]"
+              <SenderEmailDropdown
+                senders={senderEmails}
                 value={data.senderId}
-                onChange={(e) => {
-                  const selectedId = e.target.value;
-                  const selectedSender = senderEmails.find(sender => sender._id === selectedId);
+                onChange={(senderId) => {
+                  const selectedSender = senderEmails.find(sender => sender._id === senderId);
                   
                   if (selectedSender) {
                     setData(prev => ({ 
@@ -534,23 +528,10 @@ export default function CampaignSettings() {
                     }));
                   }
                 }}
+                placeholder={loadingSenders ? "Loading verified senders..." : "Select a verified sender email"}
+                loading={loadingSenders}
                 disabled={loadingSenders || senderEmails.length === 0}
-              >
-                <option value="">Select sender email</option>
-                {senderEmails.map((sender) => (
-                  <option key={sender._id} value={sender._id}>
-                    <div className="flex items-center justify-between">
-                      <span>
-                        {sender.senderEmail}
-                        {sender.senderName && ` (${sender.senderName})`}
-                      </span>
-                      {sender.verified && (
-                        <Check size={12} className="text-green-600 ml-2" />
-                      )}
-                    </div>
-                  </option>
-                ))}
-              </Select>
+              />
               {loadingSenders ? (
                 <p className="text-xs text-gray-500">Loading verified sender emails...</p>
               ) : senderEmails.length === 0 ? (
@@ -558,16 +539,9 @@ export default function CampaignSettings() {
                   No verified sender emails found. Please register a sender email first.
                 </p>
               ) : (
-                <div className="flex items-center justify-between">
-                  <p className="text-xs text-gray-500">
-                    {senderEmails.length} verified sender(s) available
-                  </p>
-                  {data.senderEmail && (
-                    <p className="text-xs text-green-600">
-                      Selected: {data.senderEmail}
-                    </p>
-                  )}
-                </div>
+                <p className="text-xs text-gray-500">
+                  {senderEmails.length} verified sender(s) available
+                </p>
               )}
             </div>
             <Button
@@ -627,14 +601,10 @@ export default function CampaignSettings() {
             {/* Existing Lists Option */}
             {audienceOption === "existing" && (
               <div className="space-y-3">
-                <Select
-                  placeholder={
-                    loadingLists ? "Loading lists..." : "Select from email list"
-                  }
-                  className="bg-[#00000014]"
+                <EmailListDropdown
+                  lists={Array.isArray(emailLists) ? emailLists : []}
                   value={data.audience.emailLists[0] || ""}
-                  onChange={(e) => {
-                    const listId = e.target.value;
+                  onChange={(listId) => {
                     console.log("Selected list ID:", listId);
                     setData((prev) => ({
                       ...prev,
@@ -644,17 +614,12 @@ export default function CampaignSettings() {
                       },
                     }));
                   }}
+                  placeholder={
+                    loadingLists ? "Loading lists..." : "Select from email list"
+                  }
+                  loading={loadingLists}
                   disabled={loadingLists}
-                  required>
-                  <option value="">Select an email list</option>
-                  {Array.isArray(emailLists) &&
-                    emailLists.map((list: any) => (
-                      <option key={list._id} value={list._id}>
-                        {list.name || list.email_listName || list._id} - (
-                        {list.emails?.length || 0} contacts)
-                      </option>
-                    ))}
-                </Select>
+                />
               </div>
             )}
 
